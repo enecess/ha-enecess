@@ -1,0 +1,95 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Gerät hinzufügen",
+        "data": {
+          "device_type": "Gerätetyp"
+        }
+      },
+      "ecomain_mode": {
+        "title": "EcoMain einrichten",
+        "data": {
+          "mode": "Hinzufügungsmethode"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Automatische Erkennung",
+        "description": "EcoMain auswählen"
+      },
+      "ecomain_local_confirm": {
+        "title": "Gerät bestätigen",
+        "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Gerät konfigurieren",
+        "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Manuelle Einrichtung",
+        "data": {
+          "ecomain_serial": "Master-Seriennummer",
+          "ecomain_host": "Adresse (IP oder Hostname)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Kontoanmeldung",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "EcoMain auswählen",
+        "data": {
+          "ecomain_cloud_master_id": "EcoMain-Master"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Gerät bestätigen",
+        "description": "Seriennummer: {ecomain_serial}",
+        "data": {
+          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "Keine kompatiblen Geräte gefunden.",
+      "invalid_input": "Ungültige Eingabe.",
+      "auto_discovery_not_supported": "Automatische Erkennung wird für diesen Gerätetyp nicht unterstützt.",
+      "no_matching_discovery": "Der entdeckte Dienst ist kein unterstütztes Gerät.",
+      "auth_failed": "Ungültiger Benutzername oder Passwort.",
+      "cannot_connect": "Verbindung zum Cloud-Dienst fehlgeschlagen.",
+      "cannot_connect_local": "Verbindung zum Gerät fehlgeschlagen.",
+      "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt.",
+      "already_configured": "Dieses Gerät wurde bereits konfiguriert.",
+      "unsupported_device_type": "Dieser Gerätetyp wird nicht unterstützt.",
+      "unsupported_add_mode": "Diese Hinzufügungsmethode wird nicht unterstützt."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Automatische Erkennung (Lokal)",
+        "manual": "Manuelle Einrichtung (Lokal)",
+        "cloud": "Kontoanmeldung (Cloud)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    }
+  }
+}

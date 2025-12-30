@@ -1,0 +1,95 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "添加设备",
+        "data": {
+          "device_type": "设备类型"
+        }
+      },
+      "ecomain_mode": {
+        "title": "配置 EcoMain",
+        "data": {
+          "mode": "添加方式"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "自动发现",
+        "description": "选择 EcoMain"
+      },
+      "ecomain_local_confirm": {
+        "title": "确认设备",
+        "description": "序列号：{ecomain_serial}\n地址：{ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "设备设置",
+        "description": "序列号：{ecomain_serial}\n地址：{ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "选择要添加的从机"
+        }
+      },
+      "ecomain_manual": {
+        "title": "手动设置",
+        "data": {
+          "ecomain_serial": "主机序列号",
+          "ecomain_host": "地址（IP 或主机名）"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "账号登录",
+        "data": {
+          "username": "用户名",
+          "password": "密码"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "选择 EcoMain",
+        "data": {
+          "ecomain_cloud_master_id": "EcoMain 主机"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "确认设备",
+        "description": "序列号：{ecomain_serial}",
+        "data": {
+          "ecomain_selected_slaves": "选择要添加的从机"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "未找到兼容的设备。",
+      "invalid_input": "输入无效。",
+      "auto_discovery_not_supported": "此设备类型不支持自动发现。",
+      "no_matching_discovery": "发现的服务不是受支持的设备。",
+      "auth_failed": "用户名或密码无效。",
+      "cannot_connect": "无法连接到云服务。",
+      "cannot_connect_local": "无法连接到设备。",
+      "firmware_too_old": "设备固件版本过低。",
+      "already_configured": "该设备已配置。",
+      "unsupported_device_type": "不支持此设备类型。",
+      "unsupported_add_mode": "不支持此添加方式。"
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "自动发现（本地）",
+        "manual": "手动设置（本地）",
+        "cloud": "账号登录（云端）"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    }
+  }
+}
