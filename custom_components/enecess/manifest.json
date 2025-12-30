@@ -1,0 +1,24 @@
+{
+  "domain": "enecess",
+  "name": "enecess",
+  "codeowners": [
+    "@facefunny"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/enecess/ha-enecess",
+  "issue_tracker": "https://github.com/enecess/ha-enecess/issues",
+  "iot_class": "local_polling",
+  "dependencies": [
+    "zeroconf"
+  ],
+  "zeroconf": [
+    {
+      "type": "_http._tcp.local.",
+      "name": "enecess-main-*"
+    }
+  ],
+  "requirements": [
+    "pymodbus"
+  ],
+  "version": "0.1.0"
+}

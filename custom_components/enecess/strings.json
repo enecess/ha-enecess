@@ -1,0 +1,95 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Add Device",
+        "data": {
+          "device_type": "Device Type"
+        }
+      },
+      "ecomain_mode": {
+        "title": "Set Up EcoMain",
+        "data": {
+          "mode": "Add Method"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Automatic Discovery",
+        "description": "Select EcoMain"
+      },
+      "ecomain_local_confirm": {
+        "title": "Confirm Device",
+        "description": "Serial Number: {ecomain_serial}\nAddress: {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Setup Device",
+        "description": "Serial Number: {ecomain_serial}\nAddress: {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Select Slaves to Add"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Manual Setup",
+        "data": {
+          "ecomain_serial": "Master Serial Number",
+          "ecomain_host": "Address (IP or Hostname)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Account Login",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "Select EcoMain",
+        "data": {
+          "ecomain_cloud_master_id": "EcoMain Master"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Confirm Device",
+        "description": "Serial Number: {ecomain_serial}",
+        "data": {
+          "ecomain_selected_slaves": "Select Slaves to Add"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "No compatible devices found.",
+      "invalid_input": "Invalid input.",
+      "auto_discovery_not_supported": "Automatic discovery is not supported for this device type.",
+      "no_matching_discovery": "The discovered service is not a supported device.",
+      "auth_failed": "Invalid username or password.",
+      "cannot_connect": "Unable to connect to the cloud service.",
+      "cannot_connect_local": "Unable to connect to device.",
+      "firmware_too_old": "Device firmware version is too old.",
+      "already_configured": "This device has already been configured.",
+      "unsupported_device_type": "This device type is not supported.",
+      "unsupported_add_mode": "This add method is not supported."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Automatic Discovery (Local)",
+        "manual": "Manual Setup (Local)",
+        "cloud": "Account Login (Cloud)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    }
+  }
+}

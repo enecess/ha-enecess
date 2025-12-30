@@ -1,0 +1,95 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Ajouter un appareil",
+        "data": {
+          "device_type": "Type d'appareil"
+        }
+      },
+      "ecomain_mode": {
+        "title": "Configurer EcoMain",
+        "data": {
+          "mode": "Méthode d'ajout"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Découverte automatique",
+        "description": "Sélectionner EcoMain"
+      },
+      "ecomain_local_confirm": {
+        "title": "Confirmer l'appareil",
+        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Configurer l'appareil",
+        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Configuration manuelle",
+        "data": {
+          "ecomain_serial": "Numéro de série du maître",
+          "ecomain_host": "Adresse (IP ou nom d'hôte)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Connexion au compte",
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "Sélectionner EcoMain",
+        "data": {
+          "ecomain_cloud_master_id": "Maître EcoMain"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Confirmer l'appareil",
+        "description": "Numéro de série : {ecomain_serial}",
+        "data": {
+          "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "Aucun appareil compatible trouvé.",
+      "invalid_input": "Saisie invalide.",
+      "auto_discovery_not_supported": "La découverte automatique n'est pas prise en charge pour ce type d'appareil.",
+      "no_matching_discovery": "Le service découvert ne correspond à aucun appareil pris en charge.",
+      "auth_failed": "Nom d'utilisateur ou mot de passe invalide.",
+      "cannot_connect": "Impossible de se connecter au service cloud.",
+      "cannot_connect_local": "Impossible de se connecter à l'appareil.",
+      "firmware_too_old": "La version du firmware de l'appareil est trop ancienne.",
+      "already_configured": "Cet appareil a déjà été configuré.",
+      "unsupported_device_type": "Ce type d'appareil n'est pas pris en charge.",
+      "unsupported_add_mode": "Cette méthode d'ajout n'est pas prise en charge."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Découverte automatique (local)",
+        "manual": "Configuration manuelle (local)",
+        "cloud": "Connexion au compte (cloud)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    }
+  }
+}
