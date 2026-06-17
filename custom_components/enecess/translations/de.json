@@ -16,7 +16,10 @@
       },
       "ecomain_auto_scan": {
         "title": "Automatische Erkennung",
-        "description": "EcoMain auswählen"
+        "description": "EcoMain auswählen",
+        "data": {
+          "ecomain_serial": "Master-Seriennummer"
+        }
       },
       "ecomain_local_confirm": {
         "title": "Gerät bestätigen",
@@ -51,9 +54,51 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Gerät bestätigen",
-        "description": "Seriennummer: {ecomain_serial}",
+        "description": "Seriennummer: {ecomain_serial}\n\nHinweis zur Cloud-Energie: *_energy_total_1m ist der vom Cloud-API gelieferte rohe 1-Minuten-Energiezuwachs. Verwende *_energy_accumulated für das Home Assistant Energy Dashboard. Die in Home Assistant kumulierte Cloud-Energie ist bestmöglich berechnet, da das Cloud-API derzeit keinen Zeitstempel und keine Sample-ID pro Wert bereitstellt.",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
+        }
+      },
+      "extra_entities": {
+        "title": "Zusätzliche Entitäten",
+        "description": "Konfigurierte zusätzliche Entitäten: {extra_entities}",
+        "data": {
+          "extra_action": "Nächste Aktion",
+          "extra_entity_name": "Entitätsname",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Quell-Leistungsentität",
+          "extra_entity_source_kind": "Quelltyp",
+          "extra_entity_sources": "Quellentitäten",
+          "extra_entity_remove": "Zusätzliche Entität"
+        }
+      },
+      "extra_transform": {
+        "title": "Leistungstransformations-Entität hinzufügen",
+        "data": {
+          "extra_entity_name": "Entitätsname",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Quell-Leistungsentität"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Quelltyp auswählen",
+        "data": {
+          "extra_entity_source_kind": "Quelltyp"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Aggregationsentität hinzufügen",
+        "data": {
+          "extra_entity_source_kind": "Quelltyp",
+          "extra_entity_name": "Entitätsname",
+          "extra_entity_operation": "Operation",
+          "extra_entity_sources": "Quellentitäten"
+        }
+      },
+      "extra_remove": {
+        "title": "Zusätzliche Entität entfernen",
+        "data": {
+          "extra_entity_remove": "Zusätzliche Entität"
         }
       }
     },
@@ -68,7 +113,59 @@
       "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt.",
       "already_configured": "Dieses Gerät wurde bereits konfiguriert.",
       "unsupported_device_type": "Dieser Gerätetyp wird nicht unterstützt.",
-      "unsupported_add_mode": "Diese Hinzufügungsmethode wird nicht unterstützt."
+      "unsupported_add_mode": "Diese Hinzufügungsmethode wird nicht unterstützt.",
+      "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
+      "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "EcoMain anpassen",
+        "description": "Gerätetyp: {device_type}\nHinzufügungsmethode: {mode}\nEcoMain-Seriennummer: {ecomain_serial}\nKonfigurierte zusätzliche Entitäten: {extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "extra_action": "Nächste Aktion"
+        }
+      },
+      "extra_transform": {
+        "title": "Leistungstransformations-Entität hinzufügen",
+        "data": {
+          "extra_entity_name": "Entitätsname",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Quell-Leistungsentität"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Quelltyp auswählen",
+        "data": {
+          "extra_entity_source_kind": "Quelltyp"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Aggregationsentität hinzufügen",
+        "data": {
+          "extra_entity_source_kind": "Quelltyp",
+          "extra_entity_name": "Entitätsname",
+          "extra_entity_operation": "Operation",
+          "extra_entity_sources": "Quellentitäten"
+        }
+      },
+      "extra_remove": {
+        "title": "Zusätzliche Entität entfernen",
+        "data": {
+          "extra_entity_remove": "Zusätzliche Entität"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
+      "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert.",
+      "no_devices_found": "Keine kompatiblen Geräte gefunden.",
+      "auth_failed": "Ungültiger Benutzername oder Passwort.",
+      "cannot_connect": "Verbindung zum Cloud-Dienst fehlgeschlagen.",
+      "cannot_connect_local": "Verbindung zum Gerät fehlgeschlagen.",
+      "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt."
     }
   },
   "selector": {
@@ -89,6 +186,28 @@
         "1": "EcoSub 1",
         "2": "EcoSub 2",
         "3": "EcoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "Fertigstellen",
+        "add_transform": "Invertierte/absolute Leistungsentität hinzufügen",
+        "add_aggregate": "Summen-/Durchschnittsentität hinzufügen",
+        "remove": "Zusätzliche Entität entfernen"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "Invertieren",
+        "absolute": "Absolutwert",
+        "sum": "Summe",
+        "average": "Durchschnitt"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "Leistung",
+        "energy": "Energie"
       }
     }
   }

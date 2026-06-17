@@ -1,6 +1,6 @@
 # enecess Home Assistant 集成（测试版）
 
-[English](README.md) • [Deutsch](README.de.md) • [Français](README.fr.md)
+[English](README.md) • [Deutsch](README.de.md) • [Français](README.fr.md) • [Polski](README.pl.md)
 
 本仓库提供 **enecess** 品牌产品的 Home Assistant（简称 HA）自定义集成。
 
@@ -151,7 +151,11 @@ EcoMain 目前支持三种添加方式：
 4. 确认设备信息（序列号和地址）。
 5. 集成会先读取设备的 **固件版本**，若版本过低会中止并提示；版本符合要求后，会通过 **Modbus TCP** 连接并探测 **在线从机（EcoSub）**。
 6. 如果探测到从机，可以勾选需要添加的从机（可选）。
-7. 完成后，会生成一个集成条目。
+7. 可选配置 **额外实体**：
+    - 基于功率源实体创建取反或绝对值实体。
+    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+8. 完成后，会生成一个集成条目。
 
 排错提示：
 
@@ -167,6 +171,8 @@ EcoMain 目前支持三种添加方式：
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -195,7 +201,11 @@ EcoMain 目前支持三种添加方式：
 3. 确认设备信息（序列号和 IP）。
 4. 集成会先读取 **固件版本**，若版本过低会停止并提示更新固件；版本符合要求后，会通过 **Modbus TCP** 连接并获取 **在线从机（EcoSub）**。
 5. 如果探测到从机，可勾选需要添加的从机（可选）。
-6. 完成后，会生成一个集成条目。
+6. 可选配置 **额外实体**：
+    - 基于功率源实体创建取反或绝对值实体。
+    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+7. 完成后，会生成一个集成条目。
 
 排错提示：
 
@@ -211,6 +221,8 @@ EcoMain 目前支持三种添加方式：
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -238,7 +250,11 @@ EcoMain 目前支持三种添加方式：
 3. 集成会调用云端接口登录，并列出账号下所有可用的 EcoMain 主机。
 4. 在列表中选择你要添加的 EcoMain 主机。
 5. 如果账号下还存在 EcoSub 从机，集成会继续读取并列出，从中勾选需要添加的从机（可选）。
-6. 完成后，会生成一个云端模式的集成条目。
+6. 可选配置 **额外实体**：
+    - 基于功率源实体创建取反或绝对值实体。
+    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+7. 完成后，会生成一个云端模式的集成条目。
 
 说明：
 
@@ -254,24 +270,40 @@ EcoMain 目前支持三种添加方式：
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 ---
+> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
 ## 目前的限制与注意事项
 
-### 暂不支持修改已添加的集成条目
+### 修改已添加的集成条目
 
-当前版本中，**已经添加的集成条目无法在前端修改**（例如：不能直接修改主机地址、切换模式、重新选择从机等）。
+进入 **设置 → 设备与服务 → enecess → 配置**，可以调整可变选项。
 
-如需修改配置：
+可以修改：
+
+- 已选择的 EcoSub 从机。
+- 额外实体配置。
+
+不可修改：
+
+- 设备类型。
+- 添加方式。
+- 已选择的 EcoMain 主设备 / 序列号。
+
+> **流程截图：**  
+> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+如需修改不可变配置：
 
 1. 进入 **设置 → 设备与服务**。
 2. 找到 **enecess** 对应的 EcoMain 条目。
 3. 删除该集成条目。
 4. 根据新的需求，重新添加一次集成。
-
-> 未来版本会考虑加入“选项 / 编辑”功能。
 
 ### 测试版本声明
 
@@ -394,7 +426,12 @@ EcoMain 目前支持三种添加方式：
 #### 云端实体后缀含义
 
 - `avg_1m`：1 分钟平均值（average in 1 minute）
-- `total_1m`：1 分钟累计值（total in 1 minute）
+- `total_1m`：云端接口返回的原始 1 分钟电能增量
+- `energy_accumulated`：Home Assistant 侧累加生成的累计电能表
+
+在 Home Assistant Energy Dashboard 中请使用 `*_energy_accumulated` 实体；`*_power_avg_1m` 适合用于实时功率监控。原有的云端 `*_energy_total_1m` 实体会继续保留，但它们表示每分钟增量，不是累计电表。
+
+由于当前云端接口没有提供每个 1 分钟电能值的时间戳或样本 ID，云端累计电能是尽力而为的结果。在重复云端样本或 Home Assistant 重启附近，它可能不如本地 Modbus 生命周期电能表精确。
 
 #### 云端模式示例
 
@@ -402,16 +439,19 @@ EcoMain 目前支持三种添加方式：
 
 - `main_all_power_avg_1m`
 - `main_all_energy_total_1m`
+- `main_all_energy_accumulated`
 
 主机支路：
 
 - `main_ch1_power_avg_1m`
 - `main_ch1_energy_total_1m`
+- `main_ch1_energy_accumulated`
 
 从机支路：
 
 - `sub1_ch1_power_avg_1m`
 - `sub1_ch1_energy_total_1m`
+- `sub1_ch1_energy_accumulated`
 
 ---
 
@@ -543,16 +583,11 @@ EcoMain 目前支持三种添加方式：
 
 ---
 
-### Q8：已添加的条目无法修改主机 / 从机 / 添加方式
+### Q8：添加后还能修改哪些配置？
 
-这是当前测试版本的已知限制：**没有“选项 / Options”配置界面**，现有条目无法在前端修改。
+可以从 Home Assistant 的 **配置 / Options** 流程中修改已选择的 EcoSub 从机和额外实体配置。
 
-**如需修改配置：**
-
-1. 进入 **设置 → 设备与服务**。
-2. 找到对应的 enecess 集成条目。
-3. 删除该条目。
-4. 按新的参数（主机地址、模式、从机选择等）重新添加集成。
+设备类型、添加方式、已选择的 EcoMain 主设备不可原地修改。如需修改这些不可变配置，请删除现有条目后按新参数重新添加。
 
 ---
 

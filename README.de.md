@@ -1,6 +1,6 @@
 # enecess Home Assistant Integration (Testversion)
 
-[Deutsch](README.de.md) • [Français](README.fr.md) • [中文](README.zh-CN.md)
+[English](README.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
 Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration für **enecess**-Produkte bereit.
 
@@ -150,7 +150,11 @@ Schritte (für beide Starts):
 4. Geräteinformationen (Seriennummer, Adresse) bestätigen.
 5. Die Integration prüft zuerst die **Firmwareversion** des Geräts und versucht danach, per **Modbus TCP** zu verbinden und **online Slaves** (EcoSub) zu erkennen.
 6. Falls Slaves entdeckt werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-7. Vorgang abschließen – der Integrationseintrag wird erstellt.
+7. Optional **zusätzliche Entitäten** konfigurieren:
+    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
+    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
+    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
+8. Vorgang abschließen – der Integrationseintrag wird erstellt.
 
 Tipps bei Problemen:
 
@@ -166,6 +170,8 @@ Tipps bei Problemen:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -194,7 +200,11 @@ Schritte:
 3. Geräteinformationen bestätigen.
 4. Die Integration prüft zuerst die **Firmwareversion**, verbindet sich anschließend per **Modbus TCP** und sucht nach **online Slaves** (EcoSub).
 5. Falls Slaves gefunden werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. Vorgang abschließen – der Integrationseintrag wird erstellt.
+6. Optional **zusätzliche Entitäten** konfigurieren:
+    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
+    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
+    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
+7. Vorgang abschließen – der Integrationseintrag wird erstellt.
 
 Tipps bei Problemen:
 
@@ -210,6 +220,8 @@ Tipps bei Problemen:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -235,7 +247,11 @@ Schritte:
 3. Die Integration meldet sich an und listet verfügbare EcoMain-Master auf.
 4. Den gewünschten EcoMain-Master auswählen.
 5. Wenn im Cloud-Konto EcoSub-Geräte vorhanden sind, werden sie geladen und du kannst auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. Vorgang abschließen – der Integrationseintrag wird erstellt.
+6. Optional **zusätzliche Entitäten** konfigurieren:
+    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
+    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
+    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
+7. Vorgang abschließen – der Integrationseintrag wird erstellt.
 
 Hinweise:
 
@@ -251,17 +267,35 @@ Hinweise:
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 ---
+> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
 ## Aktuelle Einschränkungen / Wichtige Hinweise
 
-### Keine „Bearbeiten“ / „Optionen“ für bestehende Einträge (noch nicht)
+### Bestehenden Eintrag bearbeiten
 
-Nachdem ein Integrationseintrag erstellt wurde, gibt es derzeit **keine UI-Möglichkeit**, diesen zu ändern (z. B. Host, Modus, ausgewählte Slaves).
+Öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, um veränderbare Optionen anzupassen.
 
-Wenn du Einstellungen ändern möchtest:
+Änderbar:
+
+- Ausgewählte EcoSub-Slaves.
+- Konfiguration zusätzlicher Entitäten.
+
+Nicht änderbar:
+
+- Gerätetyp.
+- Hinzufügungsmethode.
+- Ausgewählter EcoMain-Master / Seriennummer.
+
+> **Ablauf-Screenshot:**  
+> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+Wenn du nicht änderbare Einstellungen anpassen möchtest:
 
 1. Zu **Einstellungen → Geräte & Dienste** gehen.
 2. Den **enecess**-Eintrag suchen.
@@ -373,20 +407,28 @@ Im Cloud-Modus werden u. a. folgende Entitäten erstellt:
 
 - **Gesamt (L1+L2+L3)**
     - 1-Minuten-Durchschnittsleistung
-    - 1-Minuten-Energie-Total
+    - roher 1-Minuten-Energiezuwachs
+    - in Home Assistant kumulierte Energie
 - **10 Haupt-Abzweigkanäle (ch1–ch10)**
     - 1-Minuten-Durchschnittsleistung
-    - 1-Minuten-Energie-Total
+    - roher 1-Minuten-Energiezuwachs
+    - in Home Assistant kumulierte Energie
 - **Slaves (EcoSub) mit Abzweigkanälen (ch1–ch10)**
     - 1-Minuten-Durchschnittsleistung
-    - 1-Minuten-Energie-Total
+    - roher 1-Minuten-Energiezuwachs
+    - in Home Assistant kumulierte Energie
 
 > Die Cloud-Werte werden vom entfernten Dienst gemäß deiner Cloud-Konfiguration verarbeitet und bereitgestellt.
 
 #### Suffixe im Cloud-Modus
 
 - `avg_1m` = **1-Minuten-Durchschnitt**
-- `total_1m` = **1-Minuten-Energie-Total**
+- `total_1m` = **roher 1-Minuten-Energiezuwachs aus dem Cloud-API**
+- `energy_accumulated` = **in Home Assistant kumulierter Energiezähler**
+
+Verwende `*_energy_accumulated` im Home Assistant Energy Dashboard. `*_power_avg_1m` eignet sich für die Echtzeit-Leistungsüberwachung. Die rohen Cloud-Entitäten `*_energy_total_1m` bleiben verfügbar, sind aber Minuten-Zuwächse und keine kumulativen Zähler.
+
+Da das Cloud-API derzeit keinen Zeitstempel und keine Sample-ID pro 1-Minuten-Energiewert bereitstellt, ist die kumulierte Cloud-Energie bestmöglich berechnet. Sie kann insbesondere bei wiederholten Cloud-Samples oder Neustarts weniger genau sein als lokale Modbus-Lebenszeitzähler.
 
 #### Beispiele – Cloud-Modus
 
@@ -394,16 +436,19 @@ Main Gesamt:
 
 - `main_all_power_avg_1m`
 - `main_all_energy_total_1m`
+- `main_all_energy_accumulated`
 
 Main Abzweig:
 
 - `main_ch1_power_avg_1m`
 - `main_ch1_energy_total_1m`
+- `main_ch1_energy_accumulated`
 
 Slave Abzweig:
 
 - `sub1_ch1_power_avg_1m`
 - `sub1_ch1_energy_total_1m`
+- `sub1_ch1_energy_accumulated`
 
 ---
 
@@ -538,16 +583,13 @@ Wenn bereits ein Eintrag mit derselben ID existiert, kann das Gerät nicht nochm
 
 ---
 
-### F8: Ich kann Host, Slaves oder Hinzufügungsmethode nachträglich nicht ändern
+### F8: Was kann ich nachträglich ändern?
 
-Aktuell gibt es **keinen „Optionen“- oder Bearbeitungs-Dialog** für bestehende Einträge. Das ist eine bekannte Einschränkung der Testversion.
+Öffne den **Konfigurieren**- / **Optionen**-Dialog des bestehenden Eintrags in Home Assistant.
 
-**Um die Konfiguration zu ändern:**
+Du kannst ausgewählte EcoSub-Slaves und zusätzliche Entitäten ändern. Gerätetyp, Hinzufügungsmethode und ausgewählter EcoMain-Master können nicht direkt geändert werden.
 
-1. Zu **Einstellungen → Geräte & Dienste** gehen.
-2. Den entsprechenden enecess-Eintrag finden.
-3. Integrationseintrag löschen/entfernen.
-4. Die Integration mit neuen Parametern (Host, Modus, Slaves usw.) erneut hinzufügen.
+Für diese nicht änderbaren Werte entferne den bestehenden Eintrag und füge ihn mit den neuen Parametern erneut hinzu.
 
 ---
 
