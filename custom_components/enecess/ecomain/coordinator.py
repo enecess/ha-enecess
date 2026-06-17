@@ -7,7 +7,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .model import build_specs_cloud, RegisterSpec
+from .model import RegisterSpec
 from .. import CONF_ECOMAIN_PORT
 from ..client_api import EnecessApi, EnecessApiError, EnecessAuthError
 from ..client_modbus import (
@@ -16,7 +16,7 @@ from ..client_modbus import (
     decode_int64_word_swap,
 )
 from ..const import (
-    CONF_CLOUD_UPDATE_INTERVAL, CONF_LOCAL_UPDATE_INTERVAL, CONST_ECOMAIN_PORT, CONST_ECOMAIN_SERIAL, CONST_ECOMAIN_SELECTED_SLAVES,
+    CONF_CLOUD_UPDATE_INTERVAL, CONF_LOCAL_UPDATE_INTERVAL, CONST_ECOMAIN_PORT, CONST_ECOMAIN_SERIAL,
     CONST_ECOMAIN_CLOUD_SLAVE_MAP, CONST_CLOUD_TOKEN, CONST_CLOUD_USERNAME, CONST_CLOUD_PASSWORD, CONST_ECOMAIN_HOST
 )
 
@@ -106,7 +106,9 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         self._serial: str = entry.data[CONST_ECOMAIN_SERIAL]
         self._slave_map: dict[int, Any] = entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
 
-        self.specs = build_specs_cloud(entry.data.get(CONST_ECOMAIN_SELECTED_SLAVES))
+        from ..extra import build_entry_specs
+
+        self.specs = build_entry_specs(entry.data, entry.options)
 
     async def _refresh_token_and_store(self) -> None:
         token = await self._api.generate_token(self._username, self._password)
@@ -148,8 +150,12 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
             channels = hw_data.get("ch_info", []) or []
             for ch in channels:
-                ch_no = ch.get("ch_number") + 1
-                if ch_no is None:
+                raw_ch_no = ch.get("ch_number")
+                if raw_ch_no is None:
+                    continue
+                try:
+                    ch_no = int(raw_ch_no) + 1
+                except (TypeError, ValueError):
                     continue
                 power = ch.get("power")
                 energy = ch.get("energy")

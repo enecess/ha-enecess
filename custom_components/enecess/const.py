@@ -56,10 +56,31 @@ CONST_ECOMAIN_CLOUD_MASTER = "ecomain_cloud_master"
 CONST_ECOMAIN_CLOUD_SLAVES = "ecomain_cloud_slaves"
 CONST_ECOMAIN_CLOUD_SLAVE_MAP = "ecomain_cloud_slave_map"
 
+# Extra derived entity config
+CONST_EXTRA_ENTITIES = "extra_entities"
+CONST_EXTRA_ACTION = "extra_action"
+CONST_EXTRA_ACTION_FINISH = "finish"
+CONST_EXTRA_ACTION_ADD_TRANSFORM = "add_transform"
+CONST_EXTRA_ACTION_ADD_AGGREGATE = "add_aggregate"
+CONST_EXTRA_ACTION_REMOVE = "remove"
+CONST_EXTRA_ENTITY_NAME = "extra_entity_name"
+CONST_EXTRA_ENTITY_OPERATION = "extra_entity_operation"
+CONST_EXTRA_ENTITY_SOURCE = "extra_entity_source"
+CONST_EXTRA_ENTITY_SOURCES = "extra_entity_sources"
+CONST_EXTRA_ENTITY_SOURCE_KIND = "extra_entity_source_kind"
+CONST_EXTRA_ENTITY_REMOVE = "extra_entity_remove"
+CONST_EXTRA_OPERATION_INVERT = "invert"
+CONST_EXTRA_OPERATION_ABSOLUTE = "absolute"
+CONST_EXTRA_OPERATION_SUM = "sum"
+CONST_EXTRA_OPERATION_AVERAGE = "average"
+
 # time intervals
 CONF_LOCAL_MDNS_SCAN_INTERVAL = 3
 CONF_LOCAL_UPDATE_INTERVAL = 5
 CONF_CLOUD_UPDATE_INTERVAL = 60
+
+# Default frontend display precision for numeric sensor entities.
+CONF_SENSOR_DISPLAY_PRECISION = 3
 
 
 @dataclass(frozen=True)

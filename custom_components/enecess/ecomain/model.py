@@ -1,20 +1,25 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.const import UnitOfEnergy, UnitOfPower
 
-from ..const import CONF_ECOMAIN_AVAILABLE_SLAVES
+from ..const import CONF_ECOMAIN_AVAILABLE_SLAVES, CONF_SENSOR_DISPLAY_PRECISION
 
 
 @dataclass(frozen=True)
 class RegisterSpec:
     key: str
-    kind: str  # "power" or "energy"
+    kind: str  # "power", "energy", "energy_delta", "energy_accumulated"
     device_index: int  # 0=main, 1..3=slaves
     address: Optional[int] = None
     regs: Optional[int] = None  # 2 for int32, 4 for int64
     scale: float = 1.0
+    source_key: Optional[str] = None
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -81,41 +86,102 @@ def build_specs_local(slaves: Optional[list] = None) -> list[RegisterSpec]:
 
 
 def build_specs_cloud(slaves: Optional[list[int]] = None) -> list[RegisterSpec]:
-    """Build RegisterSpec list for cloud mode (no Modbus addresses, only key/kind/device)."""
+    """Build RegisterSpec list for cloud mode.
+
+    Cloud energy values are per-minute deltas, so expose:
+    - *_energy_total_1m: raw 1-minute delta
+    - *_energy_accumulated: restored cumulative meter for Energy Dashboard
+    """
     specs: list[RegisterSpec] = []
     slave_indices = CONF_ECOMAIN_AVAILABLE_SLAVES if slaves is None else slaves
 
     def add_power(key: str, device_index: int) -> None:
         specs.append(RegisterSpec(key=key, kind="power", device_index=device_index))
 
-    def add_energy(key: str, device_index: int) -> None:
-        specs.append(RegisterSpec(key=key, kind="energy", device_index=device_index))
+    def add_energy_delta(key: str, device_index: int) -> None:
+        specs.append(RegisterSpec(key=key, kind="energy_delta", device_index=device_index))
+
+    def add_energy_accumulated(key: str, source_key: str, device_index: int) -> None:
+        specs.append(
+            RegisterSpec(
+                key=key,
+                kind="energy_accumulated",
+                device_index=device_index,
+                source_key=source_key,
+            )
+        )
 
     add_power("main_all_power_avg_1m", 0)
-    add_energy("main_all_energy_total_1m", 0)
+
+    main_delta_key = "main_all_energy_total_1m"
+    add_energy_delta(main_delta_key, 0)
+    add_energy_accumulated("main_all_energy_accumulated", main_delta_key, 0)
+
     for ch in range(1, 11):
         add_power(f"main_ch{ch}_power_avg_1m", 0)
-        add_energy(f"main_ch{ch}_energy_total_1m", 0)
+
+        delta_key = f"main_ch{ch}_energy_total_1m"
+        add_energy_delta(delta_key, 0)
+        add_energy_accumulated(f"main_ch{ch}_energy_accumulated", delta_key, 0)
+
     for s, ch in ((s, ch) for s in slave_indices for ch in range(1, 11)):
         add_power(f"sub{s}_ch{ch}_power_avg_1m", s)
-        add_energy(f"sub{s}_ch{ch}_energy_total_1m", s)
+
+        delta_key = f"sub{s}_ch{ch}_energy_total_1m"
+        add_energy_delta(delta_key, s)
+        add_energy_accumulated(f"sub{s}_ch{ch}_energy_accumulated", delta_key, s)
+
     return specs
 
 
 def build_sensor_descriptions(specs: list[RegisterSpec]) -> list[EnecessSensorDescription]:
     """Convert RegisterSpecs to HA SensorEntityDescriptions."""
-    unit_map = {
-        "power": UnitOfPower.WATT,
-        "energy": UnitOfEnergy.WATT_HOUR,
-    }
     descs: list[EnecessSensorDescription] = []
     for spec in specs:
-        descs.append(
-            EnecessSensorDescription(
-                key=spec.key,
-                name=spec.key,
-                native_unit_of_measurement=unit_map.get(spec.kind),
-                spec=spec,
+        if spec.kind == "power":
+            descs.append(
+                EnecessSensorDescription(
+                    key=spec.key,
+                    name=spec.key,
+                    native_unit_of_measurement=UnitOfPower.WATT,
+                    device_class=SensorDeviceClass.POWER,
+                    state_class=SensorStateClass.MEASUREMENT,
+                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
+                    spec=spec,
+                )
             )
-        )
+        elif spec.kind == "energy":
+            descs.append(
+                EnecessSensorDescription(
+                    key=spec.key,
+                    name=spec.key,
+                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+                    device_class=SensorDeviceClass.ENERGY,
+                    state_class=SensorStateClass.TOTAL_INCREASING,
+                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
+                    spec=spec,
+                )
+            )
+        elif spec.kind == "energy_accumulated":
+            descs.append(
+                EnecessSensorDescription(
+                    key=spec.key,
+                    name=spec.key,
+                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+                    device_class=SensorDeviceClass.ENERGY,
+                    state_class=SensorStateClass.TOTAL_INCREASING,
+                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
+                    spec=spec,
+                )
+            )
+        elif spec.kind == "energy_delta":
+            descs.append(
+                EnecessSensorDescription(
+                    key=spec.key,
+                    name=spec.key,
+                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
+                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
+                    spec=spec,
+                )
+            )
     return descs

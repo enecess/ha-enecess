@@ -16,7 +16,10 @@
       },
       "ecomain_auto_scan": {
         "title": "Automatic Discovery",
-        "description": "Select EcoMain"
+        "description": "Select EcoMain",
+        "data": {
+          "ecomain_serial": "Master Serial Number"
+        }
       },
       "ecomain_local_confirm": {
         "title": "Confirm Device",
@@ -51,9 +54,51 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Confirm Device",
-        "description": "Serial Number: {ecomain_serial}",
+        "description": "Serial Number: {ecomain_serial}\n\nCloud energy note: *_energy_total_1m is the raw 1-minute energy increment returned by the cloud API. Use *_energy_accumulated for the Home Assistant Energy Dashboard. Cloud accumulated energy is best-effort because the cloud API does not currently expose a per-sample timestamp or ID.",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add"
+        }
+      },
+      "extra_entities": {
+        "title": "Extra Entities",
+        "description": "Configured extra entities: {extra_entities}",
+        "data": {
+          "extra_action": "Next Action",
+          "extra_entity_name": "Entity Name",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Source Power Entity",
+          "extra_entity_source_kind": "Source Type",
+          "extra_entity_sources": "Source Entities",
+          "extra_entity_remove": "Extra Entity"
+        }
+      },
+      "extra_transform": {
+        "title": "Add Power Transform Entity",
+        "data": {
+          "extra_entity_name": "Entity Name",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Source Power Entity"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Select Source Type",
+        "data": {
+          "extra_entity_source_kind": "Source Type"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Add Aggregate Entity",
+        "data": {
+          "extra_entity_source_kind": "Source Type",
+          "extra_entity_name": "Entity Name",
+          "extra_entity_operation": "Operation",
+          "extra_entity_sources": "Source Entities"
+        }
+      },
+      "extra_remove": {
+        "title": "Remove Extra Entity",
+        "data": {
+          "extra_entity_remove": "Extra Entity"
         }
       }
     },
@@ -68,7 +113,59 @@
       "firmware_too_old": "Device firmware version is too old.",
       "already_configured": "This device has already been configured.",
       "unsupported_device_type": "This device type is not supported.",
-      "unsupported_add_mode": "This add method is not supported."
+      "unsupported_add_mode": "This add method is not supported.",
+      "no_source_entities": "No compatible source entities are available.",
+      "no_extra_entities": "No extra entities have been configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Adjust EcoMain",
+        "description": "Device type: {device_type}\nAdd method: {mode}\nEcoMain serial number: {ecomain_serial}\nConfigured extra entities: {extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "Select Slaves to Add",
+          "extra_action": "Next Action"
+        }
+      },
+      "extra_transform": {
+        "title": "Add Power Transform Entity",
+        "data": {
+          "extra_entity_name": "Entity Name",
+          "extra_entity_operation": "Operation",
+          "extra_entity_source": "Source Power Entity"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Select Source Type",
+        "data": {
+          "extra_entity_source_kind": "Source Type"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Add Aggregate Entity",
+        "data": {
+          "extra_entity_source_kind": "Source Type",
+          "extra_entity_name": "Entity Name",
+          "extra_entity_operation": "Operation",
+          "extra_entity_sources": "Source Entities"
+        }
+      },
+      "extra_remove": {
+        "title": "Remove Extra Entity",
+        "data": {
+          "extra_entity_remove": "Extra Entity"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "No compatible source entities are available.",
+      "no_extra_entities": "No extra entities have been configured.",
+      "no_devices_found": "No compatible devices found.",
+      "auth_failed": "Invalid username or password.",
+      "cannot_connect": "Unable to connect to the cloud service.",
+      "cannot_connect_local": "Unable to connect to device.",
+      "firmware_too_old": "Device firmware version is too old."
     }
   },
   "selector": {
@@ -89,6 +186,28 @@
         "1": "EcoSub 1",
         "2": "EcoSub 2",
         "3": "EcoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "Finish",
+        "add_transform": "Add Invert/Absolute Power Entity",
+        "add_aggregate": "Add Sum/Average Entity",
+        "remove": "Remove Extra Entity"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "Invert",
+        "absolute": "Absolute Value",
+        "sum": "Sum",
+        "average": "Average"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "Power",
+        "energy": "Energy"
       }
     }
   }

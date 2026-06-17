@@ -16,7 +16,10 @@
       },
       "ecomain_auto_scan": {
         "title": "自动发现",
-        "description": "选择 EcoMain"
+        "description": "选择 EcoMain",
+        "data": {
+          "ecomain_serial": "主机序列号"
+        }
       },
       "ecomain_local_confirm": {
         "title": "确认设备",
@@ -51,9 +54,51 @@
       },
       "ecomain_cloud_confirm": {
         "title": "确认设备",
-        "description": "序列号：{ecomain_serial}",
+        "description": "序列号：{ecomain_serial}\n\n云端电能说明：*_energy_total_1m 是云端接口返回的原始 1 分钟电能增量。Home Assistant Energy Dashboard 请使用 *_energy_accumulated。由于当前云端接口没有为每个值提供时间戳或样本 ID，云端累计电能是尽力而为的结果。",
         "data": {
           "ecomain_selected_slaves": "选择要添加的从机"
+        }
+      },
+      "extra_entities": {
+        "title": "额外实体",
+        "description": "已配置额外实体：{extra_entities}",
+        "data": {
+          "extra_action": "下一步操作",
+          "extra_entity_name": "实体名称",
+          "extra_entity_operation": "运算",
+          "extra_entity_source": "源功率实体",
+          "extra_entity_source_kind": "源类型",
+          "extra_entity_sources": "源实体",
+          "extra_entity_remove": "额外实体"
+        }
+      },
+      "extra_transform": {
+        "title": "添加功率转换实体",
+        "data": {
+          "extra_entity_name": "实体名称",
+          "extra_entity_operation": "运算",
+          "extra_entity_source": "源功率实体"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "选择源类型",
+        "data": {
+          "extra_entity_source_kind": "源类型"
+        }
+      },
+      "extra_aggregate": {
+        "title": "添加聚合实体",
+        "data": {
+          "extra_entity_source_kind": "源类型",
+          "extra_entity_name": "实体名称",
+          "extra_entity_operation": "运算",
+          "extra_entity_sources": "源实体"
+        }
+      },
+      "extra_remove": {
+        "title": "移除额外实体",
+        "data": {
+          "extra_entity_remove": "额外实体"
         }
       }
     },
@@ -68,7 +113,59 @@
       "firmware_too_old": "设备固件版本过低。",
       "already_configured": "该设备已配置。",
       "unsupported_device_type": "不支持此设备类型。",
-      "unsupported_add_mode": "不支持此添加方式。"
+      "unsupported_add_mode": "不支持此添加方式。",
+      "no_source_entities": "没有可用的兼容源实体。",
+      "no_extra_entities": "尚未配置额外实体。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "调整 EcoMain",
+        "description": "设备类型：{device_type}\n添加方式：{mode}\nEcoMain 序列号：{ecomain_serial}\n已配置额外实体：{extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "选择要添加的从机",
+          "extra_action": "下一步操作"
+        }
+      },
+      "extra_transform": {
+        "title": "添加功率转换实体",
+        "data": {
+          "extra_entity_name": "实体名称",
+          "extra_entity_operation": "运算",
+          "extra_entity_source": "源功率实体"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "选择源类型",
+        "data": {
+          "extra_entity_source_kind": "源类型"
+        }
+      },
+      "extra_aggregate": {
+        "title": "添加聚合实体",
+        "data": {
+          "extra_entity_source_kind": "源类型",
+          "extra_entity_name": "实体名称",
+          "extra_entity_operation": "运算",
+          "extra_entity_sources": "源实体"
+        }
+      },
+      "extra_remove": {
+        "title": "移除额外实体",
+        "data": {
+          "extra_entity_remove": "额外实体"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "没有可用的兼容源实体。",
+      "no_extra_entities": "尚未配置额外实体。",
+      "no_devices_found": "未找到兼容的设备。",
+      "auth_failed": "用户名或密码无效。",
+      "cannot_connect": "无法连接到云服务。",
+      "cannot_connect_local": "无法连接到设备。",
+      "firmware_too_old": "设备固件版本过低。"
     }
   },
   "selector": {
@@ -89,6 +186,28 @@
         "1": "EcoSub 1",
         "2": "EcoSub 2",
         "3": "EcoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "完成",
+        "add_transform": "添加取反/绝对值功率实体",
+        "add_aggregate": "添加总和/平均实体",
+        "remove": "移除额外实体"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "取反",
+        "absolute": "绝对值",
+        "sum": "总和",
+        "average": "平均值"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "功率",
+        "energy": "能耗"
       }
     }
   }

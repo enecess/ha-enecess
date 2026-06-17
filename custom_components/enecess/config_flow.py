@@ -5,7 +5,10 @@ from typing import Any, cast, Optional
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components import zeroconf
+from homeassistant.const import Platform
 from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import SelectSelectorMode
@@ -20,7 +23,21 @@ from .const import (
     CONST_DEVICE_ECOMAIN, CONF_CLOUD_BASE_URL, CONST_ADD_MODE_LOCAL_AUTO, CONST_ADD_MODE_LOCAL_MANUAL, CONST_ADD_MODE_CLOUD, EcoMainDeviceTyp,
     CONST_ECOMAIN_PORT, CONST_ECOMAIN_MASTERS, CONST_ECOMAIN_CLOUD_MASTER, CONST_ECOMAIN_CLOUD_SLAVES, CONST_ADD_MODE_LOCAL, CONST_MDNS_IP,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START, CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
-    CONST_ECOMAIN_ONLINE_SLAVES, CONST_ECOMAIN_HOST, CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, CONF_ECOMAIN_MIN_FIRMWARE_VERSION
+    CONST_ECOMAIN_ONLINE_SLAVES, CONST_ECOMAIN_HOST, CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
+    CONST_EXTRA_ACTION, CONST_EXTRA_ACTION_ADD_AGGREGATE, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_REMOVE,
+    CONST_EXTRA_ENTITIES, CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_REMOVE, CONST_EXTRA_ENTITY_SOURCE,
+    CONST_EXTRA_ENTITY_SOURCE_KIND, CONST_EXTRA_ENTITY_SOURCES,
+)
+from .extra import (
+    EXTRA_AGGREGATE_OPERATIONS,
+    EXTRA_SOURCE_KINDS,
+    EXTRA_TRANSFORM_OPERATIONS,
+    build_entry_device_identifiers,
+    build_entry_sensor_unique_ids,
+    build_source_options,
+    get_entry_extra_entities,
+    get_entry_slaves,
+    normalize_extra_entity,
 )
 
 try:
@@ -50,10 +67,16 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._cloud_password: Optional[str] = None
         self._ecomain_local_config: dict[str, Any] = {}
         self._ecomain_cloud_config: dict[str, Any] = {}
+        self._entry_data: dict[str, Any] = {}
+        self._extra_entities: list[dict[str, Any]] = []
 
     @property
     def _ecomain_available_slaves(self) -> list[str]:
         return cast(EcoMainDeviceTyp, DEVICE_CONFIGS[CONST_DEVICE_ECOMAIN]).available_slaves or []
+
+    @staticmethod
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
+        return EnecessOptionsFlow(config_entry)
 
     async def async_step_user(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
@@ -293,9 +316,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self.context["title_placeholders"] = {CONST_ECOMAIN_SERIAL: selected.serial, CONST_ECOMAIN_HOST: selected.ip}
 
-        existing_entry = await self.async_set_unique_id(f"ecomain:{selected.serial}:mode_local", raise_on_progress=False)
+        unique_id = f"ecomain:{selected.serial}:mode_local"
+        existing_entry = self._entry_by_unique_id(unique_id)
         if existing_entry is not None:
-            self._abort_if_unique_id_configured(updates={CONST_MDNS_IP: selected.ip})
+            updates = {CONST_MDNS_IP: selected.ip}
+            if existing_entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_LOCAL_AUTO:
+                updates[CONST_ECOMAIN_HOST] = selected.ip
+            self.hass.config_entries.async_update_entry(existing_entry, data={**existing_entry.data, **updates})
+            return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
         return await self.async_step_ecomain_local_confirm()  # type: ignore[return-value]
 
@@ -350,24 +378,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if user_input is not None:
                 selected = user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
 
-                existing_entry = await self.async_set_unique_id(
-                    f"ecomain:{ecomain_serial}:mode_local",
-                    raise_on_progress=False,
-                )
-                if existing_entry is not None:
+                if self._entry_by_unique_id(f"ecomain:{ecomain_serial}:mode_local") is not None:
                     return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
-                return self.async_create_entry(  # type: ignore[return-value]
-                    title=self._build_title(),
-                    data={
+                self._entry_data = {
                         CONST_DEVICE_TYPE: CONST_DEVICE_ECOMAIN,
                         CONST_ADD_MODE: self._mode,
                         CONST_ECOMAIN_HOST: host,
                         CONST_ECOMAIN_PORT: CONF_ECOMAIN_PORT,
                         CONST_ECOMAIN_SERIAL: ecomain_serial,
                         CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(selected),
-                    },
-                )
+                }
+                return await self.async_step_extra_entities()
 
             online_slaves = self._ecomain_local_config.get(CONST_ECOMAIN_ONLINE_SLAVES)
             return self.async_show_form(  # type: ignore[return-value]
@@ -404,24 +426,18 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         online_slaves = self._ecomain_local_config.get(CONST_ECOMAIN_ONLINE_SLAVES)
         if not online_slaves:
-            existing_entry = await self.async_set_unique_id(
-                f"ecomain:{ecomain_serial}:mode_local",
-                raise_on_progress=False,
-            )
-            if existing_entry is not None:
+            if self._entry_by_unique_id(f"ecomain:{ecomain_serial}:mode_local") is not None:
                 return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
-            return self.async_create_entry(  # type: ignore[return-value]
-                title=self._build_title(),
-                data={
+            self._entry_data = {
                     CONST_DEVICE_TYPE: CONST_DEVICE_ECOMAIN,
                     CONST_ADD_MODE: self._mode,
                     CONST_ECOMAIN_HOST: host,
                     CONST_ECOMAIN_PORT: CONF_ECOMAIN_PORT,
                     CONST_ECOMAIN_SERIAL: ecomain_serial,
                     CONST_ECOMAIN_SELECTED_SLAVES: [],
-                },
-            )
+            }
+            return await self.async_step_extra_entities()
 
         return self.async_show_form(  # type: ignore[return-value]
             step_id="ecomain_local_setup",
@@ -493,7 +509,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is None:
             options = {
-                int(m["id"]): str(m.get("name") or m.get("hardware_number") or m["id"])
+                str(int(m["id"])): str(m.get("name") or m.get("hardware_number") or m["id"])
                 for m in masters
                 if "id" in m
             }
@@ -572,15 +588,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if slave:
                 slave_map[int(sid_str)] = slave.get("hardware_number")
 
-        existing_entry = await self.async_set_unique_id(
-            f"ecomain:{serial}:mode_cloud", raise_on_progress=False
-        )
-        if existing_entry is not None:
+        if self._entry_by_unique_id(f"ecomain:{serial}:mode_cloud") is not None:
             return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
-        return self.async_create_entry(  # type: ignore[return-value]
-            title=self._build_title(),
-            data={
+        self._entry_data = {
                 CONST_DEVICE_TYPE: CONST_DEVICE_ECOMAIN,
                 CONST_ADD_MODE: CONST_ADD_MODE_CLOUD,
                 CONST_CLOUD_USERNAME: self._cloud_username,
@@ -589,7 +600,211 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONST_ECOMAIN_SERIAL: serial,
                 CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(selected_slaves),
                 CONST_ECOMAIN_CLOUD_SLAVE_MAP: slave_map,
-            },
+        }
+        return await self.async_step_extra_entities()
+
+    async def async_step_extra_entities(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self._show_extra_entities_menu("extra_entities")
+
+        action = user_input.get(CONST_EXTRA_ACTION)
+        if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
+            if CONST_EXTRA_ENTITY_OPERATION not in user_input:
+                return self._show_extra_transform_form()
+            return self._handle_extra_transform(user_input)
+        if CONST_EXTRA_ENTITY_SOURCE in user_input:
+            return self._handle_extra_transform(user_input)
+        if action == CONST_EXTRA_ACTION_ADD_AGGREGATE:
+            if CONST_EXTRA_ENTITY_OPERATION not in user_input:
+                if CONST_EXTRA_ENTITY_SOURCE_KIND in user_input:
+                    return self._show_extra_aggregate_form(user_input[CONST_EXTRA_ENTITY_SOURCE_KIND])
+                return self._show_extra_aggregate_kind_form()
+            return self._handle_extra_aggregate(user_input)
+        if CONST_EXTRA_ENTITY_SOURCES in user_input:
+            return self._handle_extra_aggregate(user_input)
+        if CONST_EXTRA_ENTITY_SOURCE_KIND in user_input:
+            return self._show_extra_aggregate_form(user_input[CONST_EXTRA_ENTITY_SOURCE_KIND])
+        if action == CONST_EXTRA_ACTION_REMOVE:
+            if CONST_EXTRA_ENTITY_REMOVE not in user_input:
+                return self._show_extra_remove_form()
+            return self._handle_extra_remove(user_input)
+        if CONST_EXTRA_ENTITY_REMOVE in user_input:
+            return self._handle_extra_remove(user_input)
+        return await self._create_config_entry()
+
+    async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self._show_extra_entities_menu("extra_entities")
+        return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_TRANSFORM})
+
+    def _show_extra_transform_form(self) -> FlowResult:
+        source_options = build_source_options(self._entry_data, self._options_data(), source_kind="power", power_only=True)
+        return self.async_show_form(
+            step_id="extra_entities",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_EXTRA_ENTITY_NAME): str,
+                    vol.Required(CONST_EXTRA_ENTITY_OPERATION): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=EXTRA_TRANSFORM_OPERATIONS,
+                            translation_key=CONST_EXTRA_ENTITY_OPERATION,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                    vol.Required(CONST_EXTRA_ENTITY_SOURCE): vol.In(source_options),
+                }
+            ),
+            errors={} if source_options else {"base": "no_source_entities"},
+            description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
+        )
+
+    def _handle_extra_transform(self, user_input: dict[str, Any]) -> FlowResult:
+        if not all(
+            user_input.get(key)
+            for key in (CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_SOURCE)
+        ):
+            return self._show_extra_transform_form()
+
+        self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
+        return self._show_extra_entities_menu("extra_entities")
+
+    async def async_step_extra_aggregate_kind(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self._show_extra_entities_menu("extra_entities")
+        return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_AGGREGATE})
+
+    def _show_extra_aggregate_kind_form(self) -> FlowResult:
+        return self.async_show_form(
+            step_id="extra_entities",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=EXTRA_SOURCE_KINDS,
+                            translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                }
+            ),
+            errors={},
+            description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
+        )
+
+    async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self._show_extra_entities_menu("extra_entities")
+        return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_AGGREGATE})
+
+    def _show_extra_aggregate_form(self, source_kind: str) -> FlowResult:
+        source_options = build_source_options(self._entry_data, self._options_data(), source_kind=source_kind)
+        return self.async_show_form(
+            step_id="extra_entities",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND, default=source_kind): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=EXTRA_SOURCE_KINDS,
+                            translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                    vol.Required(CONST_EXTRA_ENTITY_NAME): str,
+                    vol.Required(CONST_EXTRA_ENTITY_OPERATION): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=EXTRA_AGGREGATE_OPERATIONS,
+                            translation_key=CONST_EXTRA_ENTITY_OPERATION,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                    vol.Required(CONST_EXTRA_ENTITY_SOURCES): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[{"value": key, "label": label} for key, label in source_options.items()],
+                            multiple=True,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                }
+            ),
+            errors={} if source_options else {"base": "no_source_entities"},
+            description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
+        )
+
+    def _handle_extra_aggregate(self, user_input: dict[str, Any]) -> FlowResult:
+        source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
+        selected = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []
+        if not user_input.get(CONST_EXTRA_ENTITY_NAME) or not user_input.get(CONST_EXTRA_ENTITY_OPERATION) or len(selected) < 2:
+            return self._show_extra_aggregate_form(source_kind)
+        self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
+        return self._show_extra_entities_menu("extra_entities")
+
+    async def async_step_extra_remove(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self._show_extra_entities_menu("extra_entities")
+        return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_REMOVE})
+
+    def _show_extra_remove_form(self) -> FlowResult:
+        options = {extra["key"]: extra.get("name") or extra["key"] for extra in self._extra_entities}
+        return self.async_show_form(
+            step_id="extra_entities",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_EXTRA_ENTITY_REMOVE): vol.In(options),
+                }
+            ),
+            errors={} if options else {"base": "no_extra_entities"},
+            description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
+        )
+
+    def _handle_extra_remove(self, user_input: dict[str, Any]) -> FlowResult:
+        if not user_input.get(CONST_EXTRA_ENTITY_REMOVE):
+            return self._show_extra_remove_form()
+        remove_key = user_input[CONST_EXTRA_ENTITY_REMOVE]
+        self._extra_entities = [extra for extra in self._extra_entities if extra.get("key") != remove_key]
+        return self._show_extra_entities_menu("extra_entities")
+
+    def _options_data(self) -> dict[str, Any]:
+        return {
+            CONST_ECOMAIN_SELECTED_SLAVES: self._entry_data.get(CONST_ECOMAIN_SELECTED_SLAVES, []),
+            CONST_EXTRA_ENTITIES: self._extra_entities,
+        }
+
+    def _show_extra_entities_menu(self, step_id: str) -> FlowResult:
+        actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
+        if self._extra_entities:
+            actions.append(CONST_EXTRA_ACTION_REMOVE)
+        return self.async_show_form(
+            step_id=step_id,
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_EXTRA_ACTION, default=CONST_EXTRA_ACTION_FINISH): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=actions,
+                            translation_key=CONST_EXTRA_ACTION,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    )
+                }
+            ),
+            description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
+        )
+
+    async def _create_config_entry(self) -> FlowResult:
+        serial = self._entry_data.get(CONST_ECOMAIN_SERIAL)
+        mode = self._entry_data.get(CONST_ADD_MODE)
+        mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+        existing_entry = await self.async_set_unique_id(
+            f"ecomain:{serial}:mode_{mode_key}",
+            raise_on_progress=False,
+        )
+        if existing_entry is not None:
+            return self.async_abort(reason="already_configured")  # type: ignore[return-value]
+
+        options = self._options_data()
+        return self.async_create_entry(
+            title=self._build_title(),
+            data=self._entry_data,
+            options=options,
         )
 
     def _build_title(self) -> str:
@@ -609,3 +824,341 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if suffix.isdigit():
             return int(suffix)
         return None
+
+    def _entry_by_unique_id(self, unique_id: str):
+        return next(
+            (entry for entry in self._async_current_entries() if entry.unique_id == unique_id),
+            None,
+        )
+
+
+class EnecessOptionsFlow(config_entries.OptionsFlow):
+    """Handle mutable EcoMain options."""
+
+    def __init__(self, entry: config_entries.ConfigEntry) -> None:
+        self._entry = entry
+        self._options: dict[str, Any] = {
+            CONST_ECOMAIN_SELECTED_SLAVES: get_entry_slaves(entry.data, entry.options),
+            CONST_EXTRA_ENTITIES: get_entry_extra_entities(entry.options),
+        }
+        self._available_slaves: list[str] = []
+        self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
+            entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
+        )
+        self._cloud_token: Optional[str] = entry.data.get(CONST_CLOUD_TOKEN)
+
+    @property
+    def _extra_entities(self) -> list[dict[str, Any]]:
+        return self._options[CONST_EXTRA_ENTITIES]
+
+    @_extra_entities.setter
+    def _extra_entities(self, value: list[dict[str, Any]]) -> None:
+        self._options[CONST_EXTRA_ENTITIES] = value
+
+    async def async_step_init(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            errors = await self._async_refresh_available_slaves()
+            return await self._show_options_menu(errors)
+
+        if CONST_ECOMAIN_SELECTED_SLAVES in user_input:
+            self._options[CONST_ECOMAIN_SELECTED_SLAVES] = self._normalize_slaves(
+                user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
+            )
+        action = user_input[CONST_EXTRA_ACTION]
+        if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
+            return await self.async_step_extra_transform()
+        if action == CONST_EXTRA_ACTION_ADD_AGGREGATE:
+            return await self.async_step_extra_aggregate_kind()
+        if action == CONST_EXTRA_ACTION_REMOVE:
+            return await self.async_step_extra_remove()
+
+        self._async_remove_stale_sensor_entries()
+        self._update_entry_data()
+        return self.async_create_entry(title="", data=self._options)
+
+    async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        source_options = build_source_options(self._entry.data, self._options, source_kind="power", power_only=True)
+        if user_input is None:
+            return self.async_show_form(
+                step_id="extra_transform",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONST_EXTRA_ENTITY_NAME): str,
+                        vol.Required(CONST_EXTRA_ENTITY_OPERATION): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=EXTRA_TRANSFORM_OPERATIONS,
+                                translation_key=CONST_EXTRA_ENTITY_OPERATION,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                        vol.Required(CONST_EXTRA_ENTITY_SOURCE): vol.In(source_options),
+                    }
+                ),
+                errors={} if source_options else {"base": "no_source_entities"},
+        )
+
+        if not all(
+            user_input.get(key)
+            for key in (CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_SOURCE)
+        ):
+            return await self.async_step_extra_transform()
+
+        self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
+        return await self._show_options_menu()
+
+    async def async_step_extra_aggregate_kind(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if user_input is None:
+            return self.async_show_form(
+                step_id="extra_aggregate_kind",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=EXTRA_SOURCE_KINDS,
+                                translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                    }
+                ),
+                errors={},
+            )
+        if not user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND):
+            return await self.async_step_extra_aggregate_kind()
+        return await self.async_step_extra_aggregate(user_input)
+
+    async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
+        source_options = build_source_options(self._entry.data, self._options, source_kind=source_kind)
+        if user_input is None or CONST_EXTRA_ENTITY_OPERATION not in user_input:
+            return self.async_show_form(
+                step_id="extra_aggregate",
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND, default=source_kind): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=EXTRA_SOURCE_KINDS,
+                                translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                        vol.Required(CONST_EXTRA_ENTITY_NAME): str,
+                        vol.Required(CONST_EXTRA_ENTITY_OPERATION): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=EXTRA_AGGREGATE_OPERATIONS,
+                                translation_key=CONST_EXTRA_ENTITY_OPERATION,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                        vol.Required(CONST_EXTRA_ENTITY_SOURCES): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=[{"value": key, "label": label} for key, label in source_options.items()],
+                                multiple=True,
+                                mode=SelectSelectorMode.LIST,
+                            )
+                        ),
+                    }
+                ),
+                errors={} if source_options else {"base": "no_source_entities"},
+            )
+
+        selected = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []
+        if not user_input.get(CONST_EXTRA_ENTITY_NAME) or not user_input.get(CONST_EXTRA_ENTITY_OPERATION) or len(selected) < 2:
+            return await self.async_step_extra_aggregate_kind()
+        self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
+        return await self._show_options_menu()
+
+    async def async_step_extra_remove(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        options = {extra["key"]: extra.get("name") or extra["key"] for extra in self._extra_entities}
+        if user_input is None:
+            return self.async_show_form(
+                step_id="extra_remove",
+                data_schema=vol.Schema({vol.Required(CONST_EXTRA_ENTITY_REMOVE): vol.In(options)}),
+                errors={} if options else {"base": "no_extra_entities"},
+            )
+
+        remove_key = user_input[CONST_EXTRA_ENTITY_REMOVE]
+        self._extra_entities = [extra for extra in self._extra_entities if extra.get("key") != remove_key]
+        return await self._show_options_menu()
+
+    async def _show_options_menu(self, errors: Optional[dict[str, str]] = None) -> FlowResult:
+        actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
+        if self._extra_entities:
+            actions.append(CONST_EXTRA_ACTION_REMOVE)
+        selected_slaves = [
+            str(s)
+            for s in self._options.get(CONST_ECOMAIN_SELECTED_SLAVES, [])
+            if str(s) in self._available_slaves
+        ]
+        schema_fields: dict[Any, Any] = {}
+        if self._available_slaves:
+            schema_fields[
+                vol.Optional(
+                    CONST_ECOMAIN_SELECTED_SLAVES,
+                    default=selected_slaves,
+                )
+            ] = selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=self._available_slaves,
+                    multiple=True,
+                    translation_key=CONST_ECOMAIN_SELECTED_SLAVES,
+                    mode=SelectSelectorMode.LIST,
+                )
+            )
+        schema_fields[
+            vol.Required(CONST_EXTRA_ACTION, default=CONST_EXTRA_ACTION_FINISH)
+        ] = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=actions,
+                translation_key=CONST_EXTRA_ACTION,
+                mode=SelectSelectorMode.LIST,
+            )
+        )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(schema_fields),
+            description_placeholders={
+                CONST_DEVICE_TYPE: str(self._entry.data.get(CONST_DEVICE_TYPE)),
+                CONST_ADD_MODE: str(self._entry.data.get(CONST_ADD_MODE)),
+                CONST_ECOMAIN_SERIAL: str(self._entry.data.get(CONST_ECOMAIN_SERIAL)),
+                CONST_EXTRA_ENTITIES: str(len(self._extra_entities)),
+            },
+            errors=errors or {},
+        )
+
+    async def _async_refresh_available_slaves(self) -> Optional[dict[str, str]]:
+        if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
+            return await self._async_refresh_cloud_slaves()
+        return await self._async_refresh_local_slaves()
+
+    async def _async_refresh_local_slaves(self) -> Optional[dict[str, str]]:
+        host = self._entry.data.get(CONST_ECOMAIN_HOST)
+        port = self._entry.data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT)
+        if not host:
+            self._available_slaves = []
+            return {"base": "cannot_connect_local"}
+
+        client = EnecessModbusClient(host, port)
+        try:
+            rr = await client.read_holding_registers(CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1)
+            firmware_version = decode_int16(rr.registers, signed=False)
+            if firmware_version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
+                self._available_slaves = []
+                return {"base": "firmware_too_old"}
+
+            rr = await client.read_holding_registers(
+                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+            )
+            allowed = set(self._ecomain_available_slaves)
+            self._available_slaves = [
+                str(idx)
+                for idx, reg in enumerate(rr.registers, start=1)
+                if decode_int16([reg], signed=False) == 1 and str(idx) in allowed
+            ]
+            return None
+        except Exception:
+            self._available_slaves = []
+            return {"base": "cannot_connect_local"}
+        finally:
+            await client.async_close()
+
+    async def _async_refresh_cloud_slaves(self) -> Optional[dict[str, str]]:
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+        api = EnecessApi(session=async_get_clientsession(self.hass), base_url=CONF_CLOUD_BASE_URL)
+        try:
+            token = await api.generate_token(
+                self._entry.data[CONST_CLOUD_USERNAME],
+                self._entry.data[CONST_CLOUD_PASSWORD],
+            )
+            masters = await api.get_hardware_list(token, hardware_type=0)
+            serial = str(self._entry.data[CONST_ECOMAIN_SERIAL])
+            master = next((m for m in masters if str(m.get("hardware_number")) == serial), None)
+            if master is None:
+                self._available_slaves = []
+                return {"base": "no_devices_found"}
+            cloud_slaves = await api.get_hardware_list(token, hardware_type=1, parent_id=int(master["id"]))
+        except EnecessAuthError:
+            self._available_slaves = []
+            return {"base": "auth_failed"}
+        except Exception:
+            self._available_slaves = []
+            return {"base": "cannot_connect"}
+
+        allowed = set(self._ecomain_available_slaves)
+        self._cloud_token = token
+        self._available_slaves = []
+        self._cloud_slave_map = {}
+        for slave in cloud_slaves:
+            slave_index = self._get_slave_index(slave)
+            if slave_index is not None and str(slave_index) in allowed:
+                self._available_slaves.append(str(slave_index))
+                self._cloud_slave_map[slave_index] = slave.get("hardware_number")
+        self._available_slaves = sorted(set(self._available_slaves), key=int)
+        return None
+
+    def _update_entry_data(self) -> None:
+        if self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
+            return
+
+        selected = {int(s) for s in self._options.get(CONST_ECOMAIN_SELECTED_SLAVES, [])}
+        slave_map = {
+            idx: hardware_number
+            for idx, hardware_number in self._cloud_slave_map.items()
+            if idx in selected
+        }
+        data = {
+            **self._entry.data,
+            CONST_CLOUD_TOKEN: self._cloud_token or self._entry.data.get(CONST_CLOUD_TOKEN),
+            CONST_ECOMAIN_CLOUD_SLAVE_MAP: slave_map,
+        }
+        self.hass.config_entries.async_update_entry(self._entry, data=data)
+
+    def _async_remove_stale_sensor_entries(self) -> None:
+        old_unique_ids = build_entry_sensor_unique_ids(self._entry.data, self._entry.options)
+        new_unique_ids = build_entry_sensor_unique_ids(self._entry.data, self._options)
+        stale_unique_ids = old_unique_ids - new_unique_ids
+        registry = er.async_get(self.hass)
+        for unique_id in stale_unique_ids:
+            entity_id = registry.async_get_entity_id(Platform.SENSOR, DOMAIN, unique_id)
+            if entity_id is not None:
+                registry.async_remove(entity_id)
+
+        old_identifiers = build_entry_device_identifiers(self._entry.data, self._entry.options)
+        new_identifiers = build_entry_device_identifiers(self._entry.data, self._options)
+        stale_identifiers = old_identifiers - new_identifiers
+        if not stale_identifiers:
+            return
+
+        device_registry = dr.async_get(self.hass)
+        for device_entry in dr.async_entries_for_config_entry(device_registry, self._entry.entry_id):
+            if device_entry.identifiers.isdisjoint(stale_identifiers):
+                continue
+            device_registry.async_remove_device(device_entry.id)
+
+    @property
+    def _ecomain_available_slaves(self) -> list[str]:
+        return cast(EcoMainDeviceTyp, DEVICE_CONFIGS[CONST_DEVICE_ECOMAIN]).available_slaves or []
+
+    def _normalize_slaves(self, slaves: Optional[list[str]]) -> list[int]:
+        if not slaves:
+            return []
+        allowed = set(self._available_slaves or self._ecomain_available_slaves)
+        return sorted({int(s) for s in slaves if str(s) in allowed})
+
+    def _get_slave_index(self, slave: dict[str, Any]) -> Optional[int]:
+        hardware_number = str(slave.get("hardware_number") or "")
+        suffix = hardware_number.rsplit("_", maxsplit=1)[-1] if hardware_number else ""
+        if suffix.isdigit():
+            return int(suffix)
+        return None
+
+    def _normalize_slave_map(self, slave_map: dict[Any, Any]) -> dict[int, Any]:
+        normalized = {}
+        for idx, hardware_number in (slave_map or {}).items():
+            try:
+                normalized[int(idx)] = hardware_number
+            except (TypeError, ValueError):
+                continue
+        return normalized

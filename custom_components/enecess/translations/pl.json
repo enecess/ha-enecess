@@ -1,0 +1,214 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Dodaj urządzenie",
+        "data": {
+          "device_type": "Typ urządzenia"
+        }
+      },
+      "ecomain_mode": {
+        "title": "Konfiguracja EcoMain",
+        "data": {
+          "mode": "Metoda dodawania"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Automatyczne wykrywanie",
+        "description": "Wybierz EcoMain",
+        "data": {
+          "ecomain_serial": "Numer seryjny urządzenia głównego"
+        }
+      },
+      "ecomain_local_confirm": {
+        "title": "Potwierdź urządzenie",
+        "description": "Numer seryjny: {ecomain_serial}\nAdres: {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Konfiguracja urządzenia",
+        "description": "Numer seryjny: {ecomain_serial}\nAdres: {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Konfiguracja ręczna",
+        "data": {
+          "ecomain_serial": "Numer seryjny urządzenia głównego",
+          "ecomain_host": "Adres (IP lub nazwa hosta)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Logowanie do konta",
+        "data": {
+          "username": "Nazwa użytkownika",
+          "password": "Hasło"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "Wybierz EcoMain",
+        "data": {
+          "ecomain_cloud_master_id": "EcoMain główny"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Potwierdź urządzenie",
+        "description": "Numer seryjny: {ecomain_serial}\n\nUwaga dotycząca energii w chmurze: *_energy_total_1m to surowy 1-minutowy przyrost energii zwracany przez API chmury. W panelu Home Assistant Energy Dashboard używaj *_energy_accumulated. Energia skumulowana w chmurze jest wyliczana metodą best-effort, ponieważ API chmury obecnie nie udostępnia znacznika czasu ani identyfikatora próbki.",
+        "data": {
+          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
+        }
+      },
+      "extra_entities": {
+        "title": "Dodatkowe encje",
+        "description": "Skonfigurowane dodatkowe encje: {extra_entities}",
+        "data": {
+          "extra_action": "Następna akcja",
+          "extra_entity_name": "Nazwa encji",
+          "extra_entity_operation": "Operacja",
+          "extra_entity_source": "Źródłowa encja mocy",
+          "extra_entity_source_kind": "Typ źródła",
+          "extra_entity_sources": "Encje źródłowe",
+          "extra_entity_remove": "Dodatkowa encja"
+        }
+      },
+      "extra_transform": {
+        "title": "Dodaj encję przekształcenia mocy",
+        "data": {
+          "extra_entity_name": "Nazwa encji",
+          "extra_entity_operation": "Operacja",
+          "extra_entity_source": "Źródłowa encja mocy"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Wybierz typ źródła",
+        "data": {
+          "extra_entity_source_kind": "Typ źródła"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Dodaj encję agregującą",
+        "data": {
+          "extra_entity_source_kind": "Typ źródła",
+          "extra_entity_name": "Nazwa encji",
+          "extra_entity_operation": "Operacja",
+          "extra_entity_sources": "Encje źródłowe"
+        }
+      },
+      "extra_remove": {
+        "title": "Usuń dodatkową encję",
+        "data": {
+          "extra_entity_remove": "Dodatkowa encja"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "Nie znaleziono zgodnych urządzeń.",
+      "invalid_input": "Nieprawidłowe dane wejściowe.",
+      "auto_discovery_not_supported": "Automatyczne wykrywanie nie jest obsługiwane dla tego typu urządzenia.",
+      "no_matching_discovery": "Wykryta usługa nie jest obsługiwanym urządzeniem.",
+      "auth_failed": "Nieprawidłowa nazwa użytkownika lub hasło.",
+      "cannot_connect": "Nie można połączyć się z usługą chmury.",
+      "cannot_connect_local": "Nie można połączyć się z urządzeniem.",
+      "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara.",
+      "already_configured": "To urządzenie zostało już skonfigurowane.",
+      "unsupported_device_type": "Ten typ urządzenia nie jest obsługiwany.",
+      "unsupported_add_mode": "Ta metoda dodawania nie jest obsługiwana.",
+      "no_source_entities": "Brak zgodnych encji źródłowych.",
+      "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Dostosuj EcoMain",
+        "description": "Typ urządzenia: {device_type}\nMetoda dodawania: {mode}\nNumer seryjny EcoMain: {ecomain_serial}\nSkonfigurowane dodatkowe encje: {extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
+          "extra_action": "Następna akcja"
+        }
+      },
+      "extra_transform": {
+        "title": "Dodaj encję przekształcenia mocy",
+        "data": {
+          "extra_entity_name": "Nazwa encji",
+          "extra_entity_operation": "Operacja",
+          "extra_entity_source": "Źródłowa encja mocy"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Wybierz typ źródła",
+        "data": {
+          "extra_entity_source_kind": "Typ źródła"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Dodaj encję agregującą",
+        "data": {
+          "extra_entity_source_kind": "Typ źródła",
+          "extra_entity_name": "Nazwa encji",
+          "extra_entity_operation": "Operacja",
+          "extra_entity_sources": "Encje źródłowe"
+        }
+      },
+      "extra_remove": {
+        "title": "Usuń dodatkową encję",
+        "data": {
+          "extra_entity_remove": "Dodatkowa encja"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "Brak zgodnych encji źródłowych.",
+      "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
+      "no_devices_found": "Nie znaleziono zgodnych urządzeń.",
+      "auth_failed": "Nieprawidłowa nazwa użytkownika lub hasło.",
+      "cannot_connect": "Nie można połączyć się z usługą chmury.",
+      "cannot_connect_local": "Nie można połączyć się z urządzeniem.",
+      "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Automatyczne wykrywanie (lokalnie)",
+        "manual": "Konfiguracja ręczna (lokalnie)",
+        "cloud": "Logowanie do konta (chmura)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "Zakończ",
+        "add_transform": "Dodaj encję odwrócenia/wartości bezwzględnej mocy",
+        "add_aggregate": "Dodaj encję sumy/średniej",
+        "remove": "Usuń dodatkową encję"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "Odwróć znak",
+        "absolute": "Wartość bezwzględna",
+        "sum": "Suma",
+        "average": "Średnia"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "Moc",
+        "energy": "Energia"
+      }
+    }
+  }
+}

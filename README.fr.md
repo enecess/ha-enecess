@@ -1,6 +1,6 @@
 # Intégration enecess pour Home Assistant (Version de test)
 
-[Deutsch](README.de.md) • [Français](README.fr.md) • [中文](README.zh-CN.md)
+[English](README.md) • [Deutsch](README.de.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
 Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** destinée aux produits de la marque **enecess**.
 
@@ -151,7 +151,11 @@ Cette méthode couvre deux cas :
 5. L’intégration vérifie d’abord la **version du firmware** de l’appareil, puis tente de se connecter via **Modbus TCP** et de détecter les **modules esclaves (EcoSub)**
    en ligne.
 6. Si des esclaves sont détectés, choisissez ceux que vous souhaitez ajouter (facultatif).
-7. Terminez pour créer l’entrée d’intégration.
+7. Configurez éventuellement des **entités supplémentaires** :
+    - Créer des valeurs inversées ou absolues depuis des sources de puissance.
+    - Créer une somme ou une moyenne depuis plusieurs sources de puissance ou d’énergie du même type.
+    - Les entités agrégées conservent le `device_class`, le `state_class` et l’unité du type source.
+8. Terminez pour créer l’entrée d’intégration.
 
 Conseils en cas de problème :
 
@@ -167,6 +171,8 @@ Conseils en cas de problème :
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -195,7 +201,11 @@ Avant de commencer :
 3. Confirmez les informations de l’appareil.
 4. L’intégration va d’abord vérifier la **version du firmware**, puis se connecter via **Modbus TCP** et détecter les **modules esclaves (EcoSub)** en ligne.
 5. Si des esclaves sont détectés, sélectionnez ceux que vous souhaitez ajouter (facultatif).
-6. Terminez pour créer l’entrée d’intégration.
+6. Configurez éventuellement des **entités supplémentaires** :
+    - Créer des valeurs inversées ou absolues depuis des sources de puissance.
+    - Créer une somme ou une moyenne depuis plusieurs sources de puissance ou d’énergie du même type.
+    - Les entités agrégées conservent le `device_class`, le `state_class` et l’unité du type source.
+7. Terminez pour créer l’entrée d’intégration.
 
 Conseils en cas de problème :
 
@@ -211,6 +221,8 @@ Conseils en cas de problème :
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -237,7 +249,11 @@ Conseils en cas de problème :
 3. L’intégration se connecte et récupère la liste des maîtres EcoMain disponibles.
 4. Sélectionnez le maître EcoMain à ajouter.
 5. Si le compte cloud contient des appareils EcoSub, l’intégration les lira et vous proposera de sélectionner les esclaves à ajouter (facultatif).
-6. Terminez pour créer l’entrée d’intégration.
+6. Configurez éventuellement des **entités supplémentaires** :
+    - Créer des valeurs inversées ou absolues depuis des sources de puissance.
+    - Créer une somme ou une moyenne depuis plusieurs sources de puissance ou d’énergie du même type.
+    - Les entités agrégées conservent le `device_class`, le `state_class` et l’unité du type source.
+7. Terminez pour créer l’entrée d’intégration.
 
 Remarques :
 
@@ -253,18 +269,35 @@ Remarques :
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 ---
+> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
 ## Limitations actuelles / Points importants
 
-### Pas de « modifier » / « options » pour les entrées existantes (pour l’instant)
+### Modifier une entrée existante
 
-Une fois l’entrée d’intégration créée, **il n’existe actuellement aucun écran d’options pour la modifier** (changer l’hôte, la méthode d’ajout, la liste d’esclaves,
-etc.).
+Ouvrez **Paramètres → Appareils et services → enecess → Configurer** pour ajuster les options modifiables.
 
-Si vous devez changer la configuration :
+Modifiable :
+
+- Les esclaves EcoSub sélectionnés.
+- La configuration des entités supplémentaires.
+
+Non modifiable :
+
+- Le type d’appareil.
+- La méthode d’ajout.
+- Le maître EcoMain / numéro de série sélectionné.
+
+> **Capture d’écran du processus :**  
+> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+Si vous devez modifier un réglage non modifiable :
 
 1. Allez dans **Paramètres → Appareils et services**.
 2. Recherchez **enecess**.
@@ -377,20 +410,28 @@ En mode cloud, les entités incluent :
 
 - **Somme maîtres (L1+L2+L3) uniquement :**
     - puissance moyenne sur 1 minute
-    - énergie cumulée sur 1 minute
+    - incrément d'énergie brut sur 1 minute
+    - énergie cumulée côté Home Assistant
 - **10 canaux de dérivation du maître (ch1–ch10) :**
     - puissance moyenne sur 1 minute
-    - énergie cumulée sur 1 minute
+    - incrément d'énergie brut sur 1 minute
+    - énergie cumulée côté Home Assistant
 - **Esclaves (EcoSub) : uniquement canaux (ch1–ch10) :**
     - puissance moyenne sur 1 minute
-    - énergie cumulée sur 1 minute
+    - incrément d'énergie brut sur 1 minute
+    - énergie cumulée côté Home Assistant
 
 > Les valeurs cloud sont **traitées et renvoyées par le service distant**, en fonction de la configuration enregistrée dans votre compte.
 
 #### Signification des suffixes (mode cloud)
 
 - `avg_1m` = **moyenne sur 1 minute**
-- `total_1m` = **cumul sur 1 minute**
+- `total_1m` = **incrément d'énergie brut sur 1 minute provenant de l'API cloud**
+- `energy_accumulated` = **compteur d'énergie cumulée côté Home Assistant**
+
+Utilisez les entités `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant. Les entités `*_power_avg_1m` conviennent au suivi de puissance en temps réel. Les entités cloud brutes `*_energy_total_1m` restent disponibles, mais ce sont des incréments par minute et non des compteurs cumulatifs.
+
+Comme l'API cloud ne fournit actuellement ni horodatage ni ID d'échantillon pour chaque valeur d'énergie par minute, l'énergie cloud cumulée est une estimation au mieux. Elle peut être moins précise que les compteurs de durée de vie Modbus locaux, en particulier autour des échantillons cloud répétés ou des redémarrages.
 
 #### Exemples (cloud)
 
@@ -398,16 +439,19 @@ Maître total :
 
 - `main_all_power_avg_1m`
 - `main_all_energy_total_1m`
+- `main_all_energy_accumulated`
 
 Canaux maître :
 
 - `main_ch1_power_avg_1m`
 - `main_ch1_energy_total_1m`
+- `main_ch1_energy_accumulated`
 
 Canaux esclave :
 
 - `sub1_ch1_power_avg_1m`
 - `sub1_ch1_energy_total_1m`
+- `sub1_ch1_energy_accumulated`
 
 ---
 
@@ -542,16 +586,13 @@ Si une entrée avec le même ID existe déjà, vous ne pouvez pas l’ajouter un
 
 ---
 
-### Q8 : Je ne peux pas changer l’hôte, les esclaves sélectionnés ou la méthode d’ajout après la configuration
+### Q8 : Que puis-je modifier après la configuration ?
 
-Pour l’instant, il n’y a **pas de flux d’options** pour les entrées existantes. C’est une limitation connue de cette version de test.
+Ouvrez le flux **Configurer** / **Options** de l’entrée existante dans Home Assistant.
 
-**Pour modifier la configuration :**
+Vous pouvez modifier les esclaves EcoSub sélectionnés et les entités supplémentaires. Le type d’appareil, la méthode d’ajout et le maître EcoMain sélectionné ne peuvent pas être modifiés directement.
 
-1. Allez dans **Paramètres → Appareils et services**.
-2. Repérez l’entrée enecess concernée.
-3. Supprimez-la.
-4. Ajoutez une nouvelle entrée avec les paramètres mis à jour (hôte, mode, esclaves, etc.).
+Pour ces réglages non modifiables, supprimez l’entrée existante puis ajoutez-la de nouveau avec les nouveaux paramètres.
 
 ---
 

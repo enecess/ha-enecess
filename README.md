@@ -1,6 +1,6 @@
 # enecess Home Assistant Integration (Test Version)
 
-[Deutsch](README.de.md) • [Français](README.fr.md) • [中文](README.zh-CN.md)
+[Deutsch](README.de.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
 This repository provides a Home Assistant (HA) custom integration for **enecess** brand products.
 
@@ -149,7 +149,11 @@ Steps (applies to both starts):
 4. Confirm the device information (serial and address).
 5. The integration will first check the **firmware version** of the device, then try to connect via **Modbus TCP** and detect **online slaves** (EcoSub).
 6. If slaves are detected, select which slaves to add (optional).
-7. Finish to create the integration entry.
+7. Optionally configure **Extra Entities**:
+    - Create inverted or absolute-value entities from power sources.
+    - Create sum or average entities from multiple power or energy sources of the same type.
+    - Aggregate entities keep the same `device_class`, `state_class`, and native unit as their source type.
+8. Finish to create the integration entry.
 
 Troubleshooting tips:
 
@@ -165,6 +169,8 @@ Troubleshooting tips:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -193,7 +199,11 @@ Steps:
 3. Confirm the device information.
 4. The integration will first check the **firmware version**, then connect via **Modbus TCP** and detect **online slaves** (EcoSub).
 5. If slaves are detected, select which slaves to add (optional).
-6. Finish to create the integration entry.
+6. Optionally configure **Extra Entities**:
+    - Create inverted or absolute-value entities from power sources.
+    - Create sum or average entities from multiple power or energy sources of the same type.
+    - Aggregate entities keep the same `device_class`, `state_class`, and native unit as their source type.
+7. Finish to create the integration entry.
 
 Troubleshooting tips:
 
@@ -209,6 +219,8 @@ Troubleshooting tips:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+---
+> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
@@ -234,7 +246,11 @@ Steps:
 3. The integration will log in and list available EcoMain masters.
 4. Select the EcoMain master you want to add.
 5. If the cloud account has EcoSub devices, the integration will read them and let you choose slaves (optional).
-6. Finish to create the integration entry.
+6. Optionally configure **Extra Entities**:
+    - Create inverted or absolute-value entities from power sources.
+    - Create sum or average entities from multiple power or energy sources of the same type.
+    - Aggregate entities keep the same `device_class`, `state_class`, and native unit as their source type.
+7. Finish to create the integration entry.
 
 Notes:
 
@@ -250,24 +266,40 @@ Notes:
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 ---
+> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
 ## Current Limitations / Important Notes
 
-### No “Edit” / “Options” for existing entries (for now)
+### Editing an existing entry
 
-After an integration entry is created, **there is currently no UI option to modify it** (e.g., change host, switch modes, change selected slaves).
+Open **Settings → Devices & services → enecess → Configure** to adjust mutable options.
 
-If you need to change settings:
+You can change:
+
+- Selected EcoSub slave devices.
+- Extra entity configuration.
+
+You cannot change:
+
+- Device type.
+- Add method.
+- The selected EcoMain master device / serial number.
+
+> **Process Screenshot:**  
+> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
+> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+If you need to change immutable settings:
 
 1. Go to **Settings → Devices & services**.
 2. Find **enecess**.
 3. Delete/remove the integration entry.
 4. Add it again with the new settings.
-
-> Planned for future versions.
 
 ### Test version warning
 
@@ -372,20 +404,28 @@ In cloud mode, entities include:
 
 - **Main total (L1+L2+L3) only**
     - 1-minute average power
-    - 1-minute accumulated energy
+    - raw 1-minute energy increment
+    - Home Assistant-side accumulated energy
 - **Main 10 branch channels (ch1–ch10)**
     - 1-minute average power
-    - 1-minute accumulated energy
+    - raw 1-minute energy increment
+    - Home Assistant-side accumulated energy
 - **Slaves (EcoSub) only have branch channels (ch1–ch10)**
     - 1-minute average power
-    - 1-minute accumulated energy
+    - raw 1-minute energy increment
+    - Home Assistant-side accumulated energy
 
 > Cloud values are **processed and returned by the remote service** according to your cloud configuration.
 
 #### Cloud entity suffix meaning
 
 - `avg_1m` = **1-minute average**
-- `total_1m` = **1-minute accumulated total**
+- `total_1m` = **raw 1-minute energy increment from the cloud API**
+- `energy_accumulated` = **Home Assistant-side accumulated energy meter**
+
+Use `*_energy_accumulated` entities in the Home Assistant Energy Dashboard. Use `*_power_avg_1m` entities for real-time power monitoring. The raw cloud `*_energy_total_1m` entities remain available, but they are per-minute increments and are not cumulative meters.
+
+Because the cloud API currently does not expose a timestamp or sample ID for each per-minute energy value, accumulated cloud energy is best-effort. It may be less precise than local Modbus lifetime counters, especially around repeated cloud samples or restarts.
 
 #### Cloud examples
 
@@ -393,16 +433,19 @@ Main total:
 
 - `main_all_power_avg_1m`
 - `main_all_energy_total_1m`
+- `main_all_energy_accumulated`
 
 Main branch:
 
 - `main_ch1_power_avg_1m`
 - `main_ch1_energy_total_1m`
+- `main_ch1_energy_accumulated`
 
 Slave branch:
 
 - `sub1_ch1_power_avg_1m`
 - `sub1_ch1_energy_total_1m`
+- `sub1_ch1_energy_accumulated`
 
 ---
 
@@ -535,16 +578,13 @@ If an entry with the same ID already exists, you cannot add it again.
 
 ---
 
-### Q8: I cannot change host, selected slaves, or add method after setup
+### Q8: What can I change after setup?
 
-Currently there is **no “Options” / edit flow** for an existing integration entry. This is a known limitation in this test version.
+Open the entry’s **Configure** / **Options** flow from Home Assistant.
 
-**To change configuration:**
+You can change selected EcoSub slaves and extra entity configuration. Device type, add method, and the selected EcoMain master device cannot be changed in place.
 
-1. Go to **Settings → Devices & services**.
-2. Find the relevant enecess integration entry.
-3. Delete/remove it.
-4. Add a new integration entry with updated parameters (host, mode, slaves, etc.).
+To change immutable settings, remove the existing entry and add it again with the new parameters.
 
 ---
 
