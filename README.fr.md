@@ -4,6 +4,8 @@
 
 Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** destinée aux produits de la marque **enecess**.
 
+> **Prérequis du firmware (mode local) :** La configuration locale d’EcoMain via Modbus TCP nécessite la version **136 ou ultérieure** du firmware. Si le firmware est plus ancien ou si l’appareil n’expose pas de registre de version du firmware compatible, l’intégration affiche **La version du firmware de l’appareil est trop ancienne**. Ce contrôle local du firmware ne s’applique pas au mode cloud.
+
 ## Appareils pris en charge
 
 - **EcoMain**

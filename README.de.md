@@ -4,6 +4,8 @@
 
 Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration für **enecess**-Produkte bereit.
 
+> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von EcoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
+
 ## Unterstützte Geräte
 
 - **EcoMain**

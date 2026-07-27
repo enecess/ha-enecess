@@ -4,6 +4,8 @@
 
 To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla produktów marki **enecess**.
 
+> **Wymagania dotyczące oprogramowania układowego (tryb lokalny):** Lokalna konfiguracja EcoMain przez Modbus TCP wymaga wersji oprogramowania układowego **136 lub nowszej**. Jeśli wersja jest starsza albo urządzenie nie udostępnia zgodnego rejestru wersji oprogramowania, integracja wyświetli komunikat **Wersja oprogramowania urządzenia jest zbyt stara**. Ta lokalna kontrola wersji nie dotyczy trybu chmurowego.
+
 ## Obsługiwane urządzenia
 
 - **EcoMain**

@@ -4,6 +4,8 @@
 
 This repository provides a Home Assistant (HA) custom integration for **enecess** brand products.
 
+> **Firmware requirement (local mode):** Local EcoMain setup over Modbus TCP requires firmware version **136 or later**. If the firmware is older or the device does not expose a compatible firmware-version register, the integration displays **Device firmware version is too old**. This local firmware check does not apply to cloud mode.
+
 ## Supported Devices
 
 - **EcoMain**

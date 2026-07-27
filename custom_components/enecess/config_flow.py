@@ -24,10 +24,12 @@ from .const import (
     CONST_ECOMAIN_PORT, CONST_ECOMAIN_MASTERS, CONST_ECOMAIN_CLOUD_MASTER, CONST_ECOMAIN_CLOUD_SLAVES, CONST_ADD_MODE_LOCAL, CONST_MDNS_IP,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START, CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
     CONST_ECOMAIN_ONLINE_SLAVES, CONST_ECOMAIN_HOST, CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
+    CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
     CONST_EXTRA_ACTION, CONST_EXTRA_ACTION_ADD_AGGREGATE, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_REMOVE,
     CONST_EXTRA_ENTITIES, CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_REMOVE, CONST_EXTRA_ENTITY_SOURCE,
     CONST_EXTRA_ENTITY_SOURCE_KIND, CONST_EXTRA_ENTITY_SOURCES,
 )
+from .local_validation import async_validate_local_device
 from .extra import (
     EXTRA_AGGREGATE_OPERATIONS,
     EXTRA_SOURCE_KINDS,
@@ -329,29 +331,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def _async_validate_local_device(self, host: str, port: int) -> Optional[dict[str, str]]:
         client = EnecessModbusClient(host, port)
-        try:
-            rr = await client.read_holding_registers(CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1)
-            firmware_version = decode_int16(rr.registers, signed=False)
-            if firmware_version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
-                return {"base": "firmware_too_old"}
-        except Exception:
-            return {"base": "firmware_too_old"}
-        try:
-            rr = await client.read_holding_registers(
-                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
-                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
-            )
-            allowed = set(self._ecomain_available_slaves)
-            online_slaves = []
-            for idx, reg in enumerate(rr.registers, start=1):
-                if decode_int16([reg], signed=False) == 1 and str(idx) in allowed:
-                    online_slaves.append(str(idx))
-            self._ecomain_local_config[CONST_ECOMAIN_ONLINE_SLAVES] = online_slaves
-            return None
-        except Exception:
-            return {"base": "cannot_connect_local"}
-        finally:
-            await client.async_close()
+        result = await async_validate_local_device(
+            client,
+            firmware_register=CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
+            minimum_firmware=CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
+            slave_register_start=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+            slave_register_count=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+            allowed_slaves=set(self._ecomain_available_slaves),
+            firmware_timeout=CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
+        )
+        if result.error is not None:
+            return {"base": result.error}
+        self._ecomain_local_config[CONST_ECOMAIN_ONLINE_SLAVES] = result.online_slaves or []
+        return None
 
     async def async_step_ecomain_local_confirm(
             self, user_input: Optional[dict[str, Any]] = None

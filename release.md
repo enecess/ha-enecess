@@ -1,5 +1,21 @@
 # enecess Home Assistant Integration Release Notes
 
+## v0.1.2
+
+Release date: 2026-07-27
+
+v0.1.2 improves local EcoMain setup cleanup and limits the wait when a device does not provide a compatible firmware version register.
+
+### Changes
+
+- Local setup now always closes its temporary Modbus client when firmware validation finishes or exits early.
+- Firmware-register validation is now limited to 5 seconds. v0.1.1 already returned **Device firmware version is too old** after pymodbus finished retrying; v0.1.2 bounds that wait.
+- pymodbus may still log the initial unsupported or malformed Modbus response before the integration displays the firmware error.
+- Firmware validation stops before reading EcoSub online-status registers when the firmware is too old or the firmware register cannot be read.
+- The firmware register address remains 3009, the minimum supported firmware remains 136, and normal coordinator polling is unchanged.
+
+---
+
 ## v0.1.1
 
 Release date: 2026-06-17
