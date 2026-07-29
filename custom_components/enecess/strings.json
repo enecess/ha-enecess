@@ -46,6 +46,20 @@
           "password": "Password"
         }
       },
+      "ecoplug_cloud_login": {
+        "title": "EcoPlug Account Login",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Select EcoPlug",
+        "description": "Each selected plug creates an on/off switch, a real-time power sensor in W, and a total energy sensor in kWh.",
+        "data": {
+          "ecoplug_selected": "Select Plugs to Add"
+        }
+      },
       "ecomain_cloud_master": {
         "title": "Select EcoMain",
         "data": {
@@ -116,6 +130,9 @@
       "unsupported_add_mode": "This add method is not supported.",
       "no_source_entities": "No compatible source entities are available.",
       "no_extra_entities": "No extra entities have been configured."
+    },
+    "abort": {
+      "already_configured": "This device has already been configured."
     }
   },
   "options": {
@@ -126,6 +143,13 @@
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add",
           "extra_action": "Next Action"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Adjust EcoPlug",
+        "description": "Each selected plug creates an on/off switch, a real-time power sensor in W, and a total energy sensor in kWh.",
+        "data": {
+          "ecoplug_selected": "Select Plugs to Add"
         }
       },
       "extra_transform": {
@@ -162,6 +186,7 @@
       "no_source_entities": "No compatible source entities are available.",
       "no_extra_entities": "No extra entities have been configured.",
       "no_devices_found": "No compatible devices found.",
+      "no_devices_selected": "Select at least one plug to add.",
       "auth_failed": "Invalid username or password.",
       "cannot_connect": "Unable to connect to the cloud service.",
       "cannot_connect_local": "Unable to connect to device.",
@@ -178,7 +203,8 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain"
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
       }
     },
     "ecomain_selected_slaves": {

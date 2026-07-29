@@ -11,8 +11,10 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
 - **EcoMain**
     - Lokalnie (Modbus TCP, z wykrywaniem zeroconf / mDNS)
     - Chmura (Enecess cloud)
-
-> Obsługa kolejnych urządzeń enecess może zostać dodana w przyszłych wersjach.
+- **EcoPlug**
+    - Tylko chmura (Enecess cloud)
+    - Jeden wpis konta może wybrać wiele gniazdek według nazwy i numeru seryjnego.
+    - W **Konfiguruj / Opcje** można później zmienić wybór.
 
 ---
 
@@ -271,6 +273,29 @@ Uwagi:
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
+
+---
+
+## Konfiguracja EcoPlug w chmurze i zachowanie encji
+
+EcoPlug jest obsługiwany **wyłącznie przez chmurę Enecess**. Integracja nie udostępnia lokalnej konfiguracji EcoPlug ani konfiguracji dodatkowych encji.
+
+Kroki:
+
+1. Przejdź do **Ustawienia → Urządzenia i usługi → Dodaj integrację** i wybierz **enecess**.
+2. Wybierz typ urządzenia **EcoPlug**.
+3. Wpisz nazwę użytkownika i hasło używane przez konto enecess App.
+4. Po zalogowaniu wybierz z listy **jedno lub więcej** gniazdek. Każda pozycja pokazuje nazwę i numer seryjny gniazdka.
+5. Zakończ konfigurację, aby utworzyć jeden wpis integracji EcoPlug dla tego konta i wszystkich wybranych gniazdek.
+6. Aby później zmienić wybór, otwórz **Ustawienia → Urządzenia i usługi → enecess → Konfiguruj**, dodaj lub usuń gniazdka i zapisz opcje.
+
+Każdy wybrany EcoPlug tworzy dokładnie następujące encje:
+
+- **Przełącznik** sterujący gniazdkiem przez chmurę.
+- `power_rt`: czujnik mocy chwilowej w **W**.
+- `energy_total`: czujnik energii całkowitej w **kWh**.
+
+Integracja pobiera dane EcoPlug z chmury mniej więcej co **60 sekund**. Po pomyślnym wykonaniu polecenia stan przełącznika jest natychmiast aktualizowany do wartości docelowej zaakceptowanej przez chmurę. Późniejsze dane pobrane z chmury pozostają miarodajne i mogą skorygować stan, jeśli gniazdko lub chmura zgłosi inną wartość.
 
 ---
 

@@ -46,6 +46,20 @@
           "password": "Passwort"
         }
       },
+      "ecoplug_cloud_login": {
+        "title": "EcoPlug-Kontoanmeldung",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
+      },
+      "ecoplug_select": {
+        "title": "EcoPlug auswählen",
+        "description": "Jede ausgewählte Steckdose erstellt einen Ein-/Aus-Schalter, einen Echtzeit-Leistungssensor in W und einen Gesamtenergiesensor in kWh.",
+        "data": {
+          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
+        }
+      },
       "ecomain_cloud_master": {
         "title": "EcoMain auswählen",
         "data": {
@@ -116,6 +130,9 @@
       "unsupported_add_mode": "Diese Hinzufügungsmethode wird nicht unterstützt.",
       "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
       "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert."
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät wurde bereits konfiguriert."
     }
   },
   "options": {
@@ -126,6 +143,13 @@
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
           "extra_action": "Nächste Aktion"
+        }
+      },
+      "ecoplug_select": {
+        "title": "EcoPlug anpassen",
+        "description": "Jede ausgewählte Steckdose erstellt einen Ein-/Aus-Schalter, einen Echtzeit-Leistungssensor in W und einen Gesamtenergiesensor in kWh.",
+        "data": {
+          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
         }
       },
       "extra_transform": {
@@ -162,6 +186,7 @@
       "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
       "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert.",
       "no_devices_found": "Keine kompatiblen Geräte gefunden.",
+      "no_devices_selected": "Wählen Sie mindestens eine hinzuzufügende Steckdose aus.",
       "auth_failed": "Ungültiger Benutzername oder Passwort.",
       "cannot_connect": "Verbindung zum Cloud-Dienst fehlgeschlagen.",
       "cannot_connect_local": "Verbindung zum Gerät fehlgeschlagen.",
@@ -178,7 +203,8 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain"
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
       }
     },
     "ecomain_selected_slaves": {

@@ -25,6 +25,34 @@ class EnecessApi:
     async def _json(self, resp: aiohttp.ClientResponse) -> dict[str, Any]:
         return await resp.json(content_type=None)
 
+    async def _request_data(
+            self,
+            method: str,
+            path: str,
+            token: str,
+            *,
+            timeout: int,
+            **request_kwargs: Any,
+    ) -> dict[str, Any]:
+        """Send an authenticated request and return successful business data."""
+        url = self._url(path)
+        headers = {CONST_CLOUD_HEADER_TOKEN: token}
+        request = getattr(self.session, method)
+
+        async with request(
+                url,
+                headers=headers,
+                timeout=timeout,
+                **request_kwargs,
+        ) as resp:
+            if resp.status in (401, 403):
+                raise EnecessAuthError("Token invalid or expired")
+            data = await self._json(resp)
+
+        if data.get("status") != 200:
+            raise EnecessApiError(data.get("msg") or "API request failed")
+        return data.get("data") or {}
+
     async def generate_token(self, username: str, password: str) -> str:
         url = self._url("/pb/generate/token/")
         payload = {"username": username, "password": password}
@@ -72,3 +100,43 @@ class EnecessApi:
         if data.get("status") != 200:
             raise EnecessApiError(data.get("msg") or f"Failed to fetch passageway: {hardware_number}")
         return data.get("data") or {}
+
+    async def get_plug_data(self, token: str, hardware_number: str) -> dict[str, Any]:
+        return await self._request_data(
+            "get",
+            "/api/v1/other/plug/data/",
+            token,
+            params={"hardware_number": str(hardware_number)},
+            timeout=20,
+        )
+
+    async def get_plug_state(self, token: str, hardware_number: str) -> dict[str, Any]:
+        return await self._request_data(
+            "post",
+            "/api/v1/other/plug/control/",
+            token,
+            json={
+                "instruction": "plug_conf",
+                "query_conf": "106",
+                "hardware_number": str(hardware_number),
+            },
+            timeout=15,
+        )
+
+    async def control_plug(
+            self,
+            token: str,
+            hardware_number: str,
+            is_on: bool,
+    ) -> dict[str, Any]:
+        return await self._request_data(
+            "post",
+            "/api/v1/other/plug/control/",
+            token,
+            json={
+                "instruction": "on_off",
+                "is_on_off": 1 if is_on else 0,
+                "hardware_number": str(hardware_number),
+            },
+            timeout=15,
+        )

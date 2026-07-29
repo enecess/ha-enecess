@@ -46,6 +46,20 @@
           "password": "Hasło"
         }
       },
+      "ecoplug_cloud_login": {
+        "title": "Logowanie do konta EcoPlug",
+        "data": {
+          "username": "Nazwa użytkownika",
+          "password": "Hasło"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Wybierz EcoPlug",
+        "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
+        "data": {
+          "ecoplug_selected": "Wybierz gniazdka do dodania"
+        }
+      },
       "ecomain_cloud_master": {
         "title": "Wybierz EcoMain",
         "data": {
@@ -116,6 +130,9 @@
       "unsupported_add_mode": "Ta metoda dodawania nie jest obsługiwana.",
       "no_source_entities": "Brak zgodnych encji źródłowych.",
       "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji."
+    },
+    "abort": {
+      "already_configured": "To urządzenie zostało już skonfigurowane."
     }
   },
   "options": {
@@ -126,6 +143,13 @@
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
           "extra_action": "Następna akcja"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Dostosuj EcoPlug",
+        "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
+        "data": {
+          "ecoplug_selected": "Wybierz gniazdka do dodania"
         }
       },
       "extra_transform": {
@@ -162,6 +186,7 @@
       "no_source_entities": "Brak zgodnych encji źródłowych.",
       "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
       "no_devices_found": "Nie znaleziono zgodnych urządzeń.",
+      "no_devices_selected": "Wybierz co najmniej jedno gniazdko do dodania.",
       "auth_failed": "Nieprawidłowa nazwa użytkownika lub hasło.",
       "cannot_connect": "Nie można połączyć się z usługą chmury.",
       "cannot_connect_local": "Nie można połączyć się z urządzeniem.",
@@ -178,7 +203,8 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain"
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
       }
     },
     "ecomain_selected_slaves": {

@@ -11,8 +11,10 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
 - **EcoMain**
     - Local (Modbus TCP, with zeroconf / mDNS discovery)
     - Cloud (Enecess cloud)
-
-> More enecess devices may be added in future versions.
+- **EcoPlug**
+    - Cloud only (Enecess cloud)
+    - One account entry can select one or more plugs by name and serial number.
+    - Open the entry's **Configure** options to change the selected plugs later.
 
 ---
 
@@ -99,11 +101,9 @@ When your EcoMain is powered on and in the same network as Home Assistant:
 1. Go to **Settings → Devices & services**.
 2. Click **Add Integration**.
 3. Search for **enecess**.
-4. Select device type: **EcoMain**.
-5. Choose an add method:
-    - **Automatic Discovery (Local)**
-    - **Manual Setup (Local)**
-    - **Account Login (Cloud)**
+4. Select a device type:
+    - **EcoMain**: choose **Automatic Discovery (Local)**, **Manual Setup (Local)**, or **Account Login (Cloud)**.
+    - **EcoPlug**: continue directly to cloud account login.
 
 > **Process Screenshot:**  
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
@@ -274,6 +274,29 @@ Notes:
 
 ---
 
+## EcoPlug Cloud Setup and Entity Behavior
+
+EcoPlug is supported through the **Enecess cloud only**. The integration does not provide local EcoPlug setup or extra-entity configuration.
+
+Steps:
+
+1. Go to **Settings → Devices & services → Add Integration** and select **enecess**.
+2. Select device type **EcoPlug**.
+3. Enter the username and password used by your enecess App account.
+4. After login, select **one or more** plugs from the list. Each choice shows the plug name and serial number.
+5. Finish to create one EcoPlug integration entry for that account and all selected plugs.
+6. To change the selection later, open **Settings → Devices & services → enecess → Configure**, then add or remove plugs and save the options.
+
+Each selected EcoPlug creates exactly these entities:
+
+- A **switch** that turns the plug on or off through the cloud.
+- `power_rt`: a real-time power sensor reporting current power in **W**.
+- `energy_total`: a total energy sensor reporting accumulated energy in **kWh**.
+
+EcoPlug data is polled from the cloud approximately every **60 seconds**. After a control request succeeds, the switch state is updated immediately to the accepted target state. Later cloud polling remains authoritative and can correct the state if the plug or cloud reports a different value.
+
+---
+
 ## Current Limitations / Important Notes
 
 ### Editing an existing entry
@@ -282,14 +305,14 @@ Open **Settings → Devices & services → enecess → Configure** to adjust mut
 
 You can change:
 
-- Selected EcoSub slave devices.
-- Extra entity configuration.
+- For EcoMain entries: selected EcoSub slave devices and extra entity configuration.
+- For an EcoPlug account entry: the selected plugs.
 
 You cannot change:
 
 - Device type.
 - Add method.
-- The selected EcoMain master device / serial number.
+- For EcoMain entries, the selected master device / serial number.
 
 > **Process Screenshot:**  
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
@@ -584,7 +607,7 @@ If an entry with the same ID already exists, you cannot add it again.
 
 Open the entry’s **Configure** / **Options** flow from Home Assistant.
 
-You can change selected EcoSub slaves and extra entity configuration. Device type, add method, and the selected EcoMain master device cannot be changed in place.
+For EcoMain entries, you can change selected EcoSub slaves and extra entity configuration. For an EcoPlug account entry, you can change which plugs are selected. Device type, add method, and the selected EcoMain master device cannot be changed in place.
 
 To change immutable settings, remove the existing entry and add it again with the new parameters.
 

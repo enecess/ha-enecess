@@ -12,6 +12,7 @@ CONST_DEVICE_TYPE = "device_type"
 
 # device types
 CONST_DEVICE_ECOMAIN = "ecomain"
+CONST_DEVICE_ECOPLUG = "ecoplug"
 
 # local config
 CONST_MDNS_NAME = "mdns_name"
@@ -31,6 +32,10 @@ CONST_ADD_MODE_LOCAL = "local"
 CONST_ADD_MODE_LOCAL_AUTO = "auto"
 CONST_ADD_MODE_LOCAL_MANUAL = "manual"
 CONST_ADD_MODE_CLOUD = "cloud"
+
+# EcoPlug config
+CONST_ECOPLUG_SELECTED = "ecoplug_selected"
+CONST_ECOPLUG_DEVICES = "ecoplug_devices"
 
 # EcoMain config
 CONST_ECOMAIN_HOST = "ecomain_host"
@@ -108,4 +113,5 @@ DEVICE_CONFIGS: dict[str, DeviceType] = {
             mdns_prefix=CONF_ECOMAIN_MDNS_PREFIX,
         ),
     ),
+    CONST_DEVICE_ECOPLUG: DeviceType(discovery=None),
 }

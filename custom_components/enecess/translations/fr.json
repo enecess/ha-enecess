@@ -46,6 +46,20 @@
           "password": "Mot de passe"
         }
       },
+      "ecoplug_cloud_login": {
+        "title": "Connexion au compte EcoPlug",
+        "data": {
+          "username": "Nom d’utilisateur",
+          "password": "Mot de passe"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Sélectionner un EcoPlug",
+        "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
+        "data": {
+          "ecoplug_selected": "Sélectionner les prises à ajouter"
+        }
+      },
       "ecomain_cloud_master": {
         "title": "Sélectionner EcoMain",
         "data": {
@@ -116,6 +130,9 @@
       "unsupported_add_mode": "Cette méthode d'ajout n'est pas prise en charge.",
       "no_source_entities": "Aucune entité source compatible n'est disponible.",
       "no_extra_entities": "Aucune entité supplémentaire n'a été configurée."
+    },
+    "abort": {
+      "already_configured": "Cet appareil a déjà été configuré."
     }
   },
   "options": {
@@ -126,6 +143,13 @@
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "extra_action": "Action suivante"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Modifier EcoPlug",
+        "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
+        "data": {
+          "ecoplug_selected": "Sélectionner les prises à ajouter"
         }
       },
       "extra_transform": {
@@ -162,6 +186,7 @@
       "no_source_entities": "Aucune entité source compatible n'est disponible.",
       "no_extra_entities": "Aucune entité supplémentaire n'a été configurée.",
       "no_devices_found": "Aucun appareil compatible trouvé.",
+      "no_devices_selected": "Sélectionnez au moins une prise à ajouter.",
       "auth_failed": "Nom d'utilisateur ou mot de passe invalide.",
       "cannot_connect": "Impossible de se connecter au service cloud.",
       "cannot_connect_local": "Impossible de se connecter à l'appareil.",
@@ -178,7 +203,8 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain"
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
       }
     },
     "ecomain_selected_slaves": {

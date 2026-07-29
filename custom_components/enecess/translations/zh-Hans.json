@@ -46,6 +46,20 @@
           "password": "密码"
         }
       },
+      "ecoplug_cloud_login": {
+        "title": "EcoPlug 账号登录",
+        "data": {
+          "username": "用户名",
+          "password": "密码"
+        }
+      },
+      "ecoplug_select": {
+        "title": "选择 EcoPlug",
+        "description": "每个已选择的插座会创建一个通断开关、一个以 W 为单位的实时功率传感器，以及一个以 kWh 为单位的累计电能传感器。",
+        "data": {
+          "ecoplug_selected": "选择要添加的插座"
+        }
+      },
       "ecomain_cloud_master": {
         "title": "选择 EcoMain",
         "data": {
@@ -116,6 +130,9 @@
       "unsupported_add_mode": "不支持此添加方式。",
       "no_source_entities": "没有可用的兼容源实体。",
       "no_extra_entities": "尚未配置额外实体。"
+    },
+    "abort": {
+      "already_configured": "该设备已配置。"
     }
   },
   "options": {
@@ -126,6 +143,13 @@
         "data": {
           "ecomain_selected_slaves": "选择要添加的从机",
           "extra_action": "下一步操作"
+        }
+      },
+      "ecoplug_select": {
+        "title": "调整 EcoPlug",
+        "description": "每个已选择的插座会创建一个通断开关、一个以 W 为单位的实时功率传感器，以及一个以 kWh 为单位的累计电能传感器。",
+        "data": {
+          "ecoplug_selected": "选择要添加的插座"
         }
       },
       "extra_transform": {
@@ -162,6 +186,7 @@
       "no_source_entities": "没有可用的兼容源实体。",
       "no_extra_entities": "尚未配置额外实体。",
       "no_devices_found": "未找到兼容的设备。",
+      "no_devices_selected": "请至少选择一个要添加的插座。",
       "auth_failed": "用户名或密码无效。",
       "cannot_connect": "无法连接到云服务。",
       "cannot_connect_local": "无法连接到设备。",
@@ -178,7 +203,8 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain"
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
       }
     },
     "ecomain_selected_slaves": {

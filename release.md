@@ -1,5 +1,49 @@
 # enecess Home Assistant Integration Release Notes
 
+## v0.1.3
+
+Release date: 2026-07-29
+
+v0.1.3 adds cloud-only EcoPlug support, including multi-device account setup, plug control, real-time power and total-energy monitoring, and configurable plug selection after setup.
+
+### Highlights
+
+- Added **EcoPlug** as a supported device type through the Enecess cloud.
+- One cloud account entry can select and manage one or more EcoPlug devices by name and serial number.
+- Each selected EcoPlug creates:
+  - A cloud-controlled on/off switch.
+  - A real-time power sensor in watts.
+  - A total energy sensor in kilowatt-hours.
+- Added an **Options / Configure flow** for changing the plugs selected under an existing EcoPlug account entry.
+- Updated the English, German, French, Polish, and Simplified Chinese setup text and documentation for EcoPlug.
+
+### Changes
+
+- Added EcoPlug cloud API support for reading measurement data, reading switch state, and sending on/off commands.
+- Added a dedicated EcoPlug cloud coordinator with approximately 60-second polling.
+- EcoPlug data and state requests run independently per plug, so an ordinary request failure affects only the corresponding reading or state instead of discarding all available account data.
+- Expired cloud authentication is refreshed and the failed operation is retried once; refreshed tokens are saved back to the config entry.
+- Successful switch commands publish the accepted target state immediately, while later cloud polling remains authoritative.
+- EcoPlug setup validates cloud credentials, lists compatible hardware, requires at least one selected plug, and prevents duplicate entries for the same cloud account.
+- EcoPlug options refresh the account's current plug list and reload the entry after its selection changes.
+- Added shared registry cleanup so entities and devices belonging to deselected EcoPlug devices are removed safely; existing EcoMain cleanup now uses the same helper.
+- The integration now forwards both the sensor and switch platforms while preserving the existing EcoMain sensor behavior.
+
+### Upgrade Notes
+
+- Upgrade through HACS, then restart Home Assistant.
+- Existing EcoMain entries continue to use their current local or cloud setup and entities.
+- To add EcoPlug, select **EcoPlug** when adding the enecess integration, sign in with the enecess App account, and select one or more plugs.
+- To change the selected plugs later, open **Settings -> Devices & services -> enecess -> Configure**.
+
+### Known Limitations
+
+- EcoPlug is supported through the Enecess cloud only; local EcoPlug setup is not available.
+- EcoPlug entries do not support Extra Entities.
+- EcoPlug values and state depend on cloud availability and are normally refreshed approximately every 60 seconds.
+
+---
+
 ## v0.1.2
 
 Release date: 2026-07-27
@@ -119,13 +163,13 @@ v0.1.0 is the first test release of the enecess Home Assistant custom integratio
 - Local mode:
   - EcoMain L1/L2/L3 real-time power.
   - EcoMain total real-time power.
-  - EcoMain forward/reverse total energy.
-  - EcoMain branch channel power and energy.
-  - EcoSub branch channel power and energy.
+  - EcoMain forward/reverse accumulated energy.
+  - EcoMain branch channel real-time power and forward/reverse accumulated energy.
+  - EcoSub branch channel real-time power and forward/reverse accumulated energy.
 - Cloud mode:
-  - EcoMain total 1-minute average power and energy values.
-  - EcoMain branch channel 1-minute average power and energy values.
-  - EcoSub branch channel 1-minute average power and energy values.
+  - EcoMain total 1-minute average power and 1-minute energy increments.
+  - EcoMain branch channel 1-minute average power and 1-minute energy increments.
+  - EcoSub branch channel 1-minute average power and 1-minute energy increments.
 
 ### Known Limitations
 

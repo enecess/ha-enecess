@@ -11,8 +11,10 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
 - **EcoMain**
     - Local (Modbus TCP, avec découverte zeroconf / mDNS)
     - Cloud (cloud enecess)
-
-> D’autres appareils enecess pourront être ajoutés dans de futures versions.
+- **EcoPlug**
+    - Cloud uniquement (cloud enecess)
+    - Une entrée de compte peut sélectionner plusieurs prises par nom et numéro de série.
+    - **Configurer / Options** permet de modifier ensuite la sélection.
 
 ---
 
@@ -274,6 +276,29 @@ Remarques :
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
+
+---
+
+## Configuration cloud EcoPlug et comportement des entités
+
+EcoPlug est pris en charge **uniquement via le cloud Enecess**. L’intégration ne propose ni configuration locale d’EcoPlug ni configuration d’entités supplémentaires.
+
+Étapes :
+
+1. Accédez à **Paramètres → Appareils et services → Ajouter une intégration**, puis sélectionnez **enecess**.
+2. Sélectionnez le type d’appareil **EcoPlug**.
+3. Saisissez le nom d’utilisateur et le mot de passe de votre compte enecess App.
+4. Après la connexion, sélectionnez **une ou plusieurs** prises dans la liste. Chaque choix affiche le nom et le numéro de série de la prise.
+5. Terminez la configuration pour créer une entrée d’intégration EcoPlug pour ce compte et toutes les prises sélectionnées.
+6. Pour modifier la sélection ultérieurement, ouvrez **Paramètres → Appareils et services → enecess → Configurer**, ajoutez ou retirez des prises, puis enregistrez les options.
+
+Chaque EcoPlug sélectionné crée exactement les entités suivantes :
+
+- Un **interrupteur** qui commande la prise via le cloud.
+- `power_rt` : un capteur de puissance en temps réel en **W**.
+- `energy_total` : un capteur d’énergie totale en **kWh**.
+
+L’intégration récupère les données EcoPlug depuis le cloud environ toutes les **60 secondes**. Lorsqu’une commande réussit, l’état de l’interrupteur est immédiatement mis à jour avec l’état cible accepté par le cloud. Les actualisations ultérieures depuis le cloud font autorité et peuvent corriger l’état si la prise ou le cloud signale une valeur différente.
 
 ---
 

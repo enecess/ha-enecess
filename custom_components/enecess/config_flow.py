@@ -28,8 +28,11 @@ from .const import (
     CONST_EXTRA_ACTION, CONST_EXTRA_ACTION_ADD_AGGREGATE, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_REMOVE,
     CONST_EXTRA_ENTITIES, CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_REMOVE, CONST_EXTRA_ENTITY_SOURCE,
     CONST_EXTRA_ENTITY_SOURCE_KIND, CONST_EXTRA_ENTITY_SOURCES,
+    CONST_DEVICE_ECOPLUG, CONST_ECOPLUG_SELECTED, CONST_ECOPLUG_DEVICES,
 )
 from .local_validation import async_validate_local_device
+from .registry import async_remove_unconfigured_registry_entries
+from .ecoplug.model import build_plug_options, select_plugs
 from .extra import (
     EXTRA_AGGREGATE_OPERATIONS,
     EXTRA_SOURCE_KINDS,
@@ -69,6 +72,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._cloud_password: Optional[str] = None
         self._ecomain_local_config: dict[str, Any] = {}
         self._ecomain_cloud_config: dict[str, Any] = {}
+        self._ecoplug_devices: list[dict[str, Any]] = []
         self._entry_data: dict[str, Any] = {}
         self._extra_entities: list[dict[str, Any]] = []
 
@@ -104,6 +108,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._device_type = device_type
         if device_type == CONST_DEVICE_ECOMAIN:
             return await self.async_step_ecomain_mode()  # type: ignore[return-value]
+        if device_type == CONST_DEVICE_ECOPLUG:
+            self._mode = CONST_ADD_MODE_CLOUD
+            return await self.async_step_ecoplug_cloud_login()  # type: ignore[return-value]
 
         return self.async_abort(reason="unsupported_device_type")  # type: ignore[return-value]
 
@@ -491,6 +498,112 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._ecomain_cloud_config[CONST_ECOMAIN_MASTERS] = masters
                 return await self.async_step_ecomain_cloud_master()  # type: ignore[return-value]
 
+    def _show_ecoplug_cloud_login_form(
+            self, errors: Optional[dict[str, str]] = None
+    ) -> FlowResult:
+        return self.async_show_form(  # type: ignore[return-value]
+            step_id="ecoplug_cloud_login",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_CLOUD_USERNAME): str,
+                    vol.Required(CONST_CLOUD_PASSWORD): str,
+                }
+            ),
+            errors=errors or {},
+        )
+
+    async def async_step_ecoplug_cloud_login(
+            self, user_input: Optional[dict[str, Any]] = None
+    ) -> FlowResult:
+        if user_input is None:
+            return self._show_ecoplug_cloud_login_form()
+
+        username = str(user_input[CONST_CLOUD_USERNAME])
+        password = str(user_input[CONST_CLOUD_PASSWORD])
+        api = self._get_cloud_api()
+        try:
+            token = await api.generate_token(username, password)
+            devices = await api.get_hardware_list(token, hardware_type=2)
+        except EnecessAuthError:
+            return self._show_ecoplug_cloud_login_form(
+                {"base": "auth_failed"}
+            )
+        except Exception:
+            return self._show_ecoplug_cloud_login_form(
+                {"base": "cannot_connect"}
+            )
+
+        if not build_plug_options(devices):
+            return self._show_ecoplug_cloud_login_form(
+                {"base": "no_devices_found"}
+            )
+
+        self._cloud_username = username
+        self._cloud_password = password
+        self._cloud_token = token
+        self._ecoplug_devices = devices
+        return await self.async_step_ecoplug_select()  # type: ignore[return-value]
+
+    async def async_step_ecoplug_select(
+            self, user_input: Optional[dict[str, Any]] = None
+    ) -> FlowResult:
+        options = build_plug_options(self._ecoplug_devices)
+        if user_input is None:
+            return self._show_ecoplug_select_form(options)
+
+        selected = user_input.get(CONST_ECOPLUG_SELECTED) or []
+        devices = select_plugs(self._ecoplug_devices, selected)
+        if not devices:
+            return self._show_ecoplug_select_form(
+                options,
+                errors={"base": "no_devices_found"},
+            )
+
+        assert self._cloud_username is not None
+        assert self._cloud_password is not None
+        assert self._cloud_token is not None
+        unique_username = self._cloud_username.strip().casefold()
+        existing_entry = await self.async_set_unique_id(f"ecoplug:{unique_username}:mode_cloud")
+        if existing_entry is not None:
+            return self.async_abort(reason="already_configured")  # type: ignore[return-value]
+
+        return self.async_create_entry(
+            title=f"EcoPlug ({self._cloud_username})",
+            data={
+                CONST_DEVICE_TYPE: CONST_DEVICE_ECOPLUG,
+                CONST_ADD_MODE: CONST_ADD_MODE_CLOUD,
+                CONST_CLOUD_USERNAME: self._cloud_username,
+                CONST_CLOUD_PASSWORD: self._cloud_password,
+                CONST_CLOUD_TOKEN: self._cloud_token,
+                CONST_ECOPLUG_DEVICES: devices,
+            },
+            options={},
+        )
+
+    def _show_ecoplug_select_form(
+            self,
+            options: dict[str, str],
+            errors: Optional[dict[str, str]] = None,
+    ) -> FlowResult:
+        return self.async_show_form(  # type: ignore[return-value]
+            step_id="ecoplug_select",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONST_ECOPLUG_SELECTED): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                {"value": serial, "label": label}
+                                for serial, label in options.items()
+                            ],
+                            multiple=True,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    )
+                }
+            ),
+            errors=errors or {},
+        )
+
     async def async_step_ecomain_cloud_master(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         assert self._cloud_token is not None
         assert self._cloud_username is not None
@@ -825,11 +938,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class EnecessOptionsFlow(config_entries.OptionsFlow):
-    """Handle mutable EcoMain options."""
+    """Handle mutable Enecess options."""
 
     def __init__(self, entry: config_entries.ConfigEntry) -> None:
         self._entry = entry
-        self._options: dict[str, Any] = {
+        self._cloud_token: Optional[str] = entry.data.get(CONST_CLOUD_TOKEN)
+        if entry.data.get(CONST_DEVICE_TYPE) == CONST_DEVICE_ECOPLUG:
+            self._options: dict[str, Any] = {}
+            self._ecoplug_devices: list[dict[str, Any]] = []
+            return
+
+        self._options = {
             CONST_ECOMAIN_SELECTED_SLAVES: get_entry_slaves(entry.data, entry.options),
             CONST_EXTRA_ENTITIES: get_entry_extra_entities(entry.options),
         }
@@ -837,7 +956,6 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
-        self._cloud_token: Optional[str] = entry.data.get(CONST_CLOUD_TOKEN)
 
     @property
     def _extra_entities(self) -> list[dict[str, Any]]:
@@ -848,6 +966,9 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         self._options[CONST_EXTRA_ENTITIES] = value
 
     async def async_step_init(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if self._entry.data.get(CONST_DEVICE_TYPE) == CONST_DEVICE_ECOPLUG:
+            return await self.async_step_ecoplug_select(user_input)
+
         if user_input is None:
             errors = await self._async_refresh_available_slaves()
             return await self._show_options_menu(errors)
@@ -867,6 +988,91 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         self._async_remove_stale_sensor_entries()
         self._update_entry_data()
         return self.async_create_entry(title="", data=self._options)
+
+    async def async_step_ecoplug_select(
+            self, user_input: Optional[dict[str, Any]] = None
+    ) -> FlowResult:
+        if user_input is None:
+            errors = await self._async_refresh_ecoplug_devices()
+            return self._show_ecoplug_select_form(errors=errors)
+
+        selected = user_input.get(CONST_ECOPLUG_SELECTED) or []
+        devices = select_plugs(self._ecoplug_devices, selected)
+        if not devices:
+            return self._show_ecoplug_select_form(
+                errors={"base": "no_devices_selected"},
+            )
+
+        assert self._cloud_token is not None
+        data = {
+            **self._entry.data,
+            CONST_CLOUD_TOKEN: self._cloud_token,
+            CONST_ECOPLUG_DEVICES: devices,
+        }
+        async_remove_unconfigured_registry_entries(
+            self.hass,
+            self._entry,
+            data=data,
+        )
+        self.hass.config_entries.async_update_entry(self._entry, data=data)
+        return self.async_create_entry(title="", data={})
+
+    async def _async_refresh_ecoplug_devices(self) -> Optional[dict[str, str]]:
+        api = EnecessApi(
+            session=async_get_clientsession(self.hass),
+            base_url=CONF_CLOUD_BASE_URL,
+        )
+        try:
+            token = await api.generate_token(
+                self._entry.data[CONST_CLOUD_USERNAME],
+                self._entry.data[CONST_CLOUD_PASSWORD],
+            )
+            devices = await api.get_hardware_list(token, hardware_type=2)
+        except EnecessAuthError:
+            self._ecoplug_devices = []
+            return {"base": "auth_failed"}
+        except Exception:
+            self._ecoplug_devices = []
+            return {"base": "cannot_connect"}
+
+        if not build_plug_options(devices):
+            self._ecoplug_devices = []
+            return {"base": "no_devices_found"}
+
+        self._cloud_token = token
+        self._ecoplug_devices = devices
+        return None
+
+    def _show_ecoplug_select_form(
+            self, errors: Optional[dict[str, str]] = None
+    ) -> FlowResult:
+        options = build_plug_options(self._ecoplug_devices)
+        current = {
+            str(device.get("hardware_number"))
+            for device in self._entry.data.get(CONST_ECOPLUG_DEVICES, [])
+        }
+        default = [serial for serial in options if serial in current]
+        return self.async_show_form(
+            step_id="ecoplug_select",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONST_ECOPLUG_SELECTED,
+                        default=default,
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=[
+                                {"value": serial, "label": label}
+                                for serial, label in options.items()
+                            ],
+                            multiple=True,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    )
+                }
+            ),
+            errors=errors or {},
+        )
 
     async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_options = build_source_options(self._entry.data, self._options, source_kind="power", power_only=True)

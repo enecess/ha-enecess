@@ -11,8 +11,10 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 - **EcoMain**
     - Lokal (Modbus TCP, mit zeroconf / mDNS-Erkennung)
     - Cloud (Enecess Cloud)
-
-> Weitere enecess-Geräte können in zukünftigen Versionen hinzugefügt werden.
+- **EcoPlug**
+    - Nur Cloud (Enecess Cloud)
+    - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
+    - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
 
 ---
 
@@ -272,6 +274,29 @@ Hinweise:
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
+
+---
+
+## EcoPlug-Cloud-Einrichtung und Entitätsverhalten
+
+EcoPlug wird ausschließlich über die **Enecess Cloud** unterstützt. Die Integration bietet weder eine lokale EcoPlug-Einrichtung noch die Konfiguration zusätzlicher Entitäten.
+
+Schritte:
+
+1. Gehe zu **Einstellungen → Geräte & Dienste → Integration hinzufügen** und wähle **enecess**.
+2. Wähle als Gerätetyp **EcoPlug**.
+3. Gib den Benutzernamen und das Passwort deines enecess-App-Kontos ein.
+4. Wähle nach der Anmeldung **eine oder mehrere** Steckdosen aus der Liste aus. Jede Auswahl zeigt den Namen und die Seriennummer der Steckdose.
+5. Schließe die Einrichtung ab, um für dieses Konto einen EcoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
+6. Um die Auswahl später anzupassen, öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, füge Steckdosen hinzu oder entferne sie und speichere die Optionen.
+
+Jeder ausgewählte EcoPlug erstellt genau diese Entitäten:
+
+- Ein **Schalter**, der die Steckdose über die Cloud ein- oder ausschaltet.
+- `power_rt`: ein Echtzeit-Leistungssensor in **W**.
+- `energy_total`: ein Gesamtenergiesensor in **kWh**.
+
+EcoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nach einer erfolgreichen Steuerungsanfrage wird der Schalterstatus sofort auf den von der Cloud akzeptierten Zielstatus gesetzt. Die späteren Cloud-Abfragen bleiben maßgeblich und können den Status korrigieren, wenn die Steckdose oder die Cloud einen anderen Wert meldet.
 
 ---
 
