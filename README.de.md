@@ -1,4 +1,4 @@
-# enecess Home Assistant Integration (Testversion)
+# enecess Home Assistant Integration
 
 [English](README.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
@@ -18,9 +18,9 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 
 ---
 
-## Installation (HACS – Benutzerdefaktes Repository)
+## Installation mit HACS
 
-Diese Integration wird über **HACS** als **Custom Repository** installiert.
+Diese Integration kann über **HACS** installiert werden. Nach der Aufnahme in die HACS-Standardliste kannst du unter **Integrations** direkt nach **enecess** suchen. Füge dieses Repository während der Aufnahmeprüfung zunächst mit einer der folgenden Methoden zu HACS hinzu.
 
 ### 1) HACS installieren (falls noch nicht geschehen)
 
@@ -29,7 +29,7 @@ Folge der offiziellen HACS-Anleitung:
 - **HACS verwenden**  
   [👉Hier klicken](https://hacs.xyz/docs/use/)
 
-### 2) Dieses Repository in HACS hinzufügen
+### 2) Repository während der HACS-Aufnahmeprüfung hinzufügen
 
 #### Variante A: One-Click „Add Repository“ (empfohlen)
 
@@ -331,17 +331,6 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 
 > Eine Bearbeiten-Funktion ist für zukünftige Versionen geplant.
 
-### Testversion – Vorsicht
-
-Diese Integration befindet sich aktuell in einer **Testversion**:
-
-- Es können unerwartete Bugs auftreten.
-- Logik für Upgrades/Migration ist noch nicht vollständig.
-- Ein Test-Update kann bestehende Einträge unbrauchbar machen, sodass du die Integration neu hinzufügen musst.
-- Die minimal unterstützte Firmwareversion von EcoMain kann sich in zukünftigen Versionen ändern.
-
----
-
 ## Gerätenamen
 
 Beim Anlegen des Integrationseintrags wird der Titel wie folgt vergeben:
@@ -622,9 +611,7 @@ Für diese nicht änderbaren Werte entferne den bestehenden Eintrag und füge ih
 
 ### F9: Nach einem Update der Integration funktioniert mein bestehender Eintrag nicht mehr
 
-Die Integration befindet sich in einer **Testversion**. Die Upgrade/Migrations-Logik ist noch nicht vollständig – Änderungen können daher inkompatibel sein.
-
-Wenn ein Update eine inkompatible Änderung einführt, kann der vorhandene Eintrag ungültig werden.
+Prüfe vor der Installation einer neuen Version die Versionshinweise. Wenn ein Update eine inkompatible Konfigurationsänderung einführt, kann der vorhandene Eintrag ungültig werden.
 
 **Was du tun kannst:**
 
@@ -729,7 +716,7 @@ Wenn du dir Sorgen um die Sicherheit machst:
 
 ## Support / Feedback
 
-Dies ist ein Projekt im frühen Stadium. Wenn Probleme auftreten:
+Wenn Probleme auftreten:
 
 - Home-Assistant-Logs sammeln.
 - Die verwendete Hinzufügungsmethode angeben (Lokal Auto / Lokal Manuell / Cloud).

@@ -1,5 +1,32 @@
 # enecess Home Assistant Integration Release Notes
 
+## v1.0.0
+
+Release date: 2026-08-11
+
+v1.0.0 is the first stable release of the enecess Home Assistant integration. It preserves the EcoMain and EcoPlug functionality from v0.1.3 and prepares the repository for inclusion in the HACS default integration list.
+
+### Highlights
+
+- Promoted the integration from test status to its first stable release.
+- Added HACS repository validation and Home Assistant Hassfest workflows.
+- Added the MIT License for the repository.
+- Updated the English, German, French, Polish, and Simplified Chinese documentation for standard HACS installation.
+- Continued using the existing enecess assets in the Home Assistant Brands repository.
+
+### Compatibility
+
+- EcoMain remains available through local Modbus TCP and the Enecess cloud.
+- EcoPlug remains available through the Enecess cloud.
+- Existing v0.1.3 EcoMain and EcoPlug entries do not require configuration migration.
+
+### Upgrade Notes
+
+- Upgrade through HACS, then restart Home Assistant.
+- Review the release notes before upgrading and keep a current Home Assistant backup.
+
+---
+
 ## v0.1.3
 
 Release date: 2026-07-29

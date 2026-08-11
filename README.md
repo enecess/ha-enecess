@@ -1,4 +1,4 @@
-# enecess Home Assistant Integration (Test Version)
+# enecess Home Assistant Integration
 
 [Deutsch](README.de.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
@@ -18,9 +18,9 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
 
 ---
 
-## Installation (HACS Custom Repository)
+## Installation with HACS
 
-This integration is intended to be installed via **HACS** as a **custom repository**.
+This integration can be installed through **HACS**. After it is included in the HACS default repository list, search for **enecess** directly under **Integrations**. Until then, add this repository to HACS using one of the methods below.
 
 ### 1) Install HACS (if you haven’t yet)
 
@@ -29,7 +29,7 @@ Follow the official HACS usage guide:
 - **Start using HACS**  
   [👉Click to continue](https://hacs.xyz/docs/use/)
 
-### 2) Add this repository to HACS
+### 2) Add this repository during the HACS review period
 
 #### Option A: One-click “Add Repository” (recommended)
 
@@ -326,17 +326,6 @@ If you need to change immutable settings:
 3. Delete/remove the integration entry.
 4. Add it again with the new settings.
 
-### Test version warning
-
-This integration is currently a **test version**:
-
-- Unexpected bugs may exist.
-- Upgrade/migration logic is not fully finalized.
-- A test update may cause an existing entry to become invalid and require **re-adding** the integration.
-- Minimum supported firmware version for EcoMain may change in future versions.
-
----
-
 ## Device Naming
 
 When the integration entry is created, the title follows this format:
@@ -615,9 +604,7 @@ To change immutable settings, remove the existing entry and add it again with th
 
 ### Q9: After updating the integration, my existing entry stops working
 
-This integration is a **test version**. Upgrade/migration logic is not fully implemented, and breaking changes are possible.
-
-If a test update introduces an incompatible change, your existing entry may become invalid.
+Check the release notes for upgrade instructions before installing a new version. If an update introduces an incompatible configuration change, your existing entry may become invalid.
 
 **What you can do:**
 
@@ -722,7 +709,7 @@ If you are concerned about security:
 
 ## Support / Feedback
 
-This is an early-stage project. If you encounter issues:
+If you encounter issues:
 
 - Collect logs from Home Assistant.
 - Describe your add method (Local auto / Local manual / Cloud).

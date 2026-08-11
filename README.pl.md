@@ -1,4 +1,4 @@
-# Integracja enecess dla Home Assistant (wersja testowa)
+# Integracja enecess dla Home Assistant
 
 [English](README.md) • [Deutsch](README.de.md) • [Français](README.fr.md) • [中文](README.zh-CN.md)
 
@@ -18,9 +18,9 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
 
 ---
 
-## Instalacja (niestandardowe repozytorium HACS)
+## Instalacja przez HACS
 
-Integracja jest przeznaczona do instalacji przez **HACS** jako **niestandardowe repozytorium**.
+Integrację można zainstalować przez **HACS**. Po dodaniu jej do domyślnej listy repozytoriów HACS wyszukaj **enecess** bezpośrednio w sekcji **Integrations**. W okresie weryfikacji dodaj najpierw to repozytorium do HACS jedną z poniższych metod.
 
 ### 1) Zainstaluj HACS (jeśli nie jest jeszcze zainstalowany)
 
@@ -29,7 +29,7 @@ Skorzystaj z oficjalnego przewodnika HACS:
 - **Start using HACS**  
   [👉Kliknij, aby kontynuować](https://hacs.xyz/docs/use/)
 
-### 2) Dodaj to repozytorium do HACS
+### 2) Dodaj repozytorium w okresie weryfikacji HACS
 
 #### Opcja A: Jedno kliknięcie „Add Repository” (zalecane)
 
@@ -328,17 +328,6 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 3. Usuń wpis integracji.
 4. Dodaj integrację ponownie z nowymi ustawieniami.
 
-### Ostrzeżenie dotyczące wersji testowej
-
-Integracja jest obecnie **wersją testową**:
-
-- mogą występować nieoczekiwane błędy,
-- logika aktualizacji i migracji nie jest jeszcze w pełni ustalona,
-- aktualizacja testowa może spowodować, że istniejący wpis stanie się nieprawidłowy i będzie wymagał ponownego dodania,
-- minimalna obsługiwana wersja firmware EcoMain może zmienić się w przyszłych wersjach.
-
----
-
 ## Nazewnictwo urządzeń
 
 Po utworzeniu wpisu integracji tytuł ma następujący format:
@@ -543,7 +532,7 @@ Integracja odczytuje wersję firmware EcoMain przed kontynuowaniem konfiguracji 
 2. Zaktualizuj firmware, jeśli dostępna jest nowsza wersja.
 3. Spróbuj ponownie dodać integrację.
 
-> Minimalna obsługiwana wersja może zmieniać się w przyszłych wersjach testowych.
+> Minimalna obsługiwana wersja może zmieniać się w przyszłych wydaniach.
 
 ---
 
@@ -604,7 +593,7 @@ Aby zmienić ustawienia nieedytowalne, usuń istniejący wpis i dodaj go ponowni
 
 ### Q9: Po aktualizacji integracji istniejący wpis przestał działać
 
-Integracja jest nadal wersją testową. Struktura danych, obsługiwane encje i logika konfiguracji mogą zmieniać się między wersjami testowymi.
+Przed instalacją nowej wersji zapoznaj się z informacjami o wydaniu. Aktualizacja może zawierać niezgodną zmianę konfiguracji.
 
 **Zalecane działanie:**
 

@@ -1,5 +1,32 @@
 # enecess Home Assistant 集成发布说明
 
+## v1.0.0
+
+发布日期：2026-08-11
+
+v1.0.0 是 enecess Home Assistant 集成的首个稳定版本。本版本延续 v0.1.3 的 EcoMain 与 EcoPlug 功能，并为加入 HACS 默认集成列表完成仓库准备。
+
+### 亮点
+
+- 集成由测试状态转为首个稳定版本。
+- 新增 HACS 仓库校验与 Home Assistant Hassfest 工作流。
+- 为仓库添加 MIT License。
+- 更新英文、德文、法文、波兰文和简体中文文档，以说明标准 HACS 安装方式。
+- 继续使用 Home Assistant Brands 仓库中已有的 enecess 品牌素材。
+
+### 兼容性
+
+- EcoMain 继续支持本地 Modbus TCP 与 Enecess Cloud 两种方式。
+- EcoPlug 继续通过 Enecess Cloud 使用。
+- 已有 v0.1.3 EcoMain 与 EcoPlug 条目无需迁移配置。
+
+### 升级说明
+
+- 通过 HACS 升级，然后重启 Home Assistant。
+- 升级前请查看发布说明，并保留最新的 Home Assistant 备份。
+
+---
+
 ## v0.1.3
 
 发布日期：2026-07-29

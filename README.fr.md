@@ -1,4 +1,4 @@
-# Intégration enecess pour Home Assistant (Version de test)
+# Intégration enecess pour Home Assistant
 
 [English](README.md) • [Deutsch](README.de.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
 
@@ -18,9 +18,9 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
 
 ---
 
-## Installation (dépôt personnalisé HACS)
+## Installation avec HACS
 
-Cette intégration est prévue pour être installée via **HACS** en tant que **dépôt personnalisé**.
+Cette intégration peut être installée via **HACS**. Après son ajout à la liste des dépôts par défaut de HACS, recherchez directement **enecess** dans **Integrations**. Pendant l’examen de son ajout, ajoutez d’abord ce dépôt à HACS avec l’une des méthodes ci-dessous.
 
 ### 1) Installer HACS (si ce n’est pas déjà fait)
 
@@ -29,7 +29,7 @@ Suivez le guide officiel d’utilisation de HACS :
 - **Commencer avec HACS**  
   [👉 Cliquer pour continuer](https://hacs.xyz/docs/use/)
 
-### 2) Ajouter ce dépôt à HACS
+### 2) Ajouter le dépôt pendant l’examen HACS
 
 #### Option A : Ajout en un clic (recommandé)
 
@@ -333,17 +333,6 @@ Si vous devez modifier un réglage non modifiable :
 
 > Une gestion d’options est prévue pour une version ultérieure.
 
-### Avertissement : version de test
-
-Cette intégration est une **version de test** :
-
-- Des bugs imprévus peuvent subsister.
-- La logique de mise à jour/migration n’est pas totalement finalisée.
-- Une mise à jour de test peut rendre une entrée existante invalide et nécessiter de **ré-ajouter** l’intégration.
-- La version minimale de firmware EcoMain prise en charge peut évoluer dans le futur.
-
----
-
 ## Nom des appareils
 
 Lorsqu’une entrée d’intégration est créée, le titre suit ce format :
@@ -625,9 +614,7 @@ Pour ces réglages non modifiables, supprimez l’entrée existante puis ajoutez
 
 ### Q9 : Après une mise à jour de l’intégration, mon entrée ne fonctionne plus
 
-Cette intégration est une **version de test**. La logique de migration n’est pas entièrement en place et des changements incompatibles sont possibles.
-
-Si une mise à jour introduit une rupture :
+Consultez les notes de version avant d’installer une nouvelle version. Si une mise à jour introduit une modification de configuration incompatible :
 
 **Que faire :**
 
@@ -732,7 +719,7 @@ Si cela vous inquiète :
 
 ## Support / Retours
 
-Cette intégration est au stade initial. Si vous rencontrez des problèmes :
+Si vous rencontrez des problèmes :
 
 - Récupérez les journaux (logs) de Home Assistant.
 - Indiquez la méthode d’ajout utilisée (local auto / local manuel / cloud).
