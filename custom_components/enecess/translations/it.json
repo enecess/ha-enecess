@@ -1,0 +1,240 @@
+{
+  "config": {
+    "flow_title": "EcoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Aggiungi dispositivo",
+        "data": {
+          "device_type": "Tipo di dispositivo"
+        }
+      },
+      "ecomain_mode": {
+        "title": "Imposta EcoMain",
+        "data": {
+          "mode": "Aggiungi metodo"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Rilevamento automatico",
+        "description": "Seleziona EcoMain",
+        "data": {
+          "ecomain_serial": "Numero seriale Master"
+        }
+      },
+      "ecomain_local_confirm": {
+        "title": "Conferma dispositivo",
+        "description": "Numero seriale: {ecomain_serial}\nIndirizzo: {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Imposta Dispositivo",
+        "description": "Numero seriale: {ecomain_serial}\nIndirizzo: {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona Slave da aggiungere"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Impostazione manuale",
+        "data": {
+          "ecomain_serial": "Numero seriale Master",
+          "ecomain_host": "Indirizzo (IP o Hostname)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Login dell'account EcoPlug",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "ecoplug_cloud_login": {
+        "title": "Login dell'account EcoPlug",
+        "data": {
+          "username": "Nome utente",
+          "password": "Password"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Seleziona EcoPlug",
+        "description": "Ogni presa selezionata funge da interruttore on/off, da sensore di potenza in tempo reale in W e da sensore di energia totale in kWh.",
+        "data": {
+          "ecoplug_selected": "Seleziona Prese da aggiungere"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "Seleziona EcoMain",
+        "data": {
+          "ecomain_cloud_master_id": "Seleziona EcoMain"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Conferma dispositivo",
+        "description": "Numero seriale: {ecomain_serial}\n\nNota sull'energia in modalità cloud: *_energy_total_1m è l'incremento di energia grezzo su 1 minuto restituito dall'API del cloud. Utilizzare *_energy_accumulated per la dashboard Energia di Home Assistant. L'energia accumulata nel cloud è fornita “al meglio delle possibilità”, poiché l'API del cloud attualmente non espone un timestamp o un ID per ciascun campione.",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona Slave da aggiungere"
+        }
+      },
+      "extra_entities": {
+        "title": "Entità aggiuntiva",
+        "description": "Entità aggiuntiva configurate: {extra_entities}",
+        "data": {
+          "extra_action": "Prossima azione",
+          "extra_entity_name": "Nome dell'entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità della sorgente di Potenza",
+          "extra_entity_source_kind": "Tipo di sorgente",
+          "extra_entity_sources": "Entità sorgente",
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      },
+      "extra_transform": {
+        "title": "Agginugi entità di trasformazione potenza",
+        "data": {
+          "extra_entity_name": "Nome dell'entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità della sorgente di Potenza"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Seleziona il tipo di sorgente",
+        "data": {
+          "extra_entity_source_kind": "Tipo di sorgente"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Agginugi entità aggregata",
+        "data": {
+          "extra_entity_source_kind": "Tipo di sorgente",
+          "extra_entity_name": "Nome dell'entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_sources": "Entità sorgente"
+        }
+      },
+      "extra_remove": {
+        "title": "Rimuovi entità aggiuntiva",
+        "data": {
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "Nessun dispisitivo compatibile trovato.",
+      "invalid_input": "Input non valido.",
+      "auto_discovery_not_supported": "Rilevamento automatico non supportato per questa tipologia di dispositivo.",
+      "no_matching_discovery": "Il servizio rilevato non è un dispositivo supportato.",
+      "auth_failed": "Nome utente o password non validi.",
+      "cannot_connect": "Impossibile connettersi al servizio cloud.",
+      "cannot_connect_local": "Impossibile connettersi al dispositivo.",
+      "firmware_too_old": "La versione del firmware è troppo vecchia.",
+      "already_configured": "Questo dispositivo è già stato configurato.",
+      "unsupported_device_type": "Questo tipo di dispositivo non è supportato.",
+      "unsupported_add_mode": "Questo metodo di aggiunta non è supportato.",
+      "no_source_entities": "Non sono disponibili entità sorgente compatibili.",
+      "no_extra_entities": "Non sono state configurate entità aggiuntive."
+    },
+    "abort": {
+      "already_configured": "Questo dispositivo è già stato configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Regola EcoMain",
+        "description": "Tipo di dispositivo: {device_type}\nMetodo di aggiunta: {mode}\nNumero di serie EcoMain: {ecomain_serial}\nEntità aggiuntive configurate: {extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona Slave da aggiungere",
+          "extra_action": "Prossima azione"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Regola EcoPlug",
+        "description": "Ogni presa selezionata crea un interruttore on/off, un sensore di potenza in tempo reale (in W) e un sensore di energia totale (in kWh).",
+        "data": {
+          "ecoplug_selected": "Seleziona presa da aggiungere"
+        }
+      },
+      "extra_transform": {
+        "title": "Aggiungi entità di trasformazione di potenza",
+        "data": {
+          "extra_entity_name": "Nome Entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità sorgente di potenza"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Seleziona tipo di sorgente",
+        "data": {
+          "extra_entity_source_kind": "Tipo di sorgente"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Aggiungi entità aggregata",
+        "data": {
+          "extra_entity_source_kind": "Tipo di sorgente",
+          "extra_entity_name": "Nome Entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_sources": "Entità sorgente"
+        }
+      },
+      "extra_remove": {
+        "title": "Rimuovi entità aggiuntiva",
+        "data": {
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "Non sono disponibili entità sorgente compatibili.",
+      "no_extra_entities": "Nessuna entità aggiuntiva è stata configurata.",
+      "no_devices_found": "Nessun dispositivo compatibile trovato.",
+      "no_devices_selected": "Seleziona almeno uno presa da aggiungere.",
+      "auth_failed": "Nome utente o password non validi.",
+      "cannot_connect": "Impossibile connettersi al servizio cloud.",
+      "cannot_connect_local": "Impossibile connettersi al dispositivo.",
+      "firmware_too_old": "La versione del firmware del dispositivo è troppo datata."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Rilevamento automatico (Local)",
+        "manual": "Impostazione manual (Local)",
+        "cloud": "Account Login (Cloud)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "EcoMain",
+        "ecoplug": "EcoPlug"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "EcoSub 1",
+        "2": "EcoSub 2",
+        "3": "EcoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "Finito",
+        "add_transform": "Aggiungi entità di potenza Inverti/Valore assoluto",
+        "add_aggregate": "Aggiungi entità Somma/Media",
+        "remove": "Rimuovi entità aggiuntiva"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "Inverti",
+        "absolute": "Valore assoluto",
+        "sum": "Somma",
+        "average": "Media"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "Potenza",
+        "energy": "Energia"
+      }
+    }
+  }
+}
