@@ -1,0 +1,318 @@
+{
+  "config": {
+    "flow_title": "ecoMain {ecomain_serial}",
+    "step": {
+      "user": {
+        "title": "Aggiungi dispositivo",
+        "data": {
+          "device_type": "Tipo di dispositivo"
+        }
+      },
+      "ecomain_mode": {
+        "title": "Configura ecoMain",
+        "data": {
+          "mode": "Metodo di aggiunta"
+        }
+      },
+      "ecomain_auto_scan": {
+        "title": "Rilevamento automatico",
+        "description": "Seleziona ecoMain",
+        "data": {
+          "ecomain_serial": "Numero di serie del dispositivo principale"
+        }
+      },
+      "ecomain_local_confirm": {
+        "title": "Conferma dispositivo",
+        "description": "Numero di serie: {ecomain_serial}\nIndirizzo: {ecomain_host}"
+      },
+      "ecomain_local_setup": {
+        "title": "Configura dispositivo",
+        "description": "Numero di serie: {ecomain_serial}\nIndirizzo: {ecomain_host}",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona i dispositivi secondari da aggiungere"
+        }
+      },
+      "ecomain_manual": {
+        "title": "Configurazione manuale",
+        "data": {
+          "ecomain_serial": "Numero di serie del dispositivo principale",
+          "ecomain_host": "Indirizzo (IP o nome host)"
+        }
+      },
+      "ecomain_cloud_login": {
+        "title": "Accesso all’account",
+        "data": {
+          "username": "Nome utente",
+          "password": "Password"
+        }
+      },
+      "ecoplug_cloud_login": {
+        "title": "Accesso all’account ecoPlug",
+        "data": {
+          "username": "Nome utente",
+          "password": "Password"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Seleziona ecoPlug",
+        "description": "Ogni presa selezionata crea un interruttore di accensione/spegnimento, un sensore di potenza in tempo reale in W e un sensore di energia totale in kWh.",
+        "data": {
+          "ecoplug_selected": "Seleziona le prese da aggiungere"
+        }
+      },
+      "ecomain_cloud_master": {
+        "title": "Seleziona ecoMain",
+        "data": {
+          "ecomain_cloud_master_id": "Dispositivo principale ecoMain"
+        }
+      },
+      "ecomain_cloud_confirm": {
+        "title": "Conferma dispositivo",
+        "description": "Numero di serie: {ecomain_serial}\n\nNota sull’energia cloud: *_energy_total_1m è l’incremento di energia grezzo di 1 minuto restituito dall’API cloud. Usa *_energy_accumulated per la dashboard Energia di Home Assistant. L’energia accumulata dal cloud è una stima, poiché l’API cloud non fornisce attualmente un timestamp o un ID per ogni campione.",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona i dispositivi secondari da aggiungere"
+        }
+      },
+      "extra_entities": {
+        "title": "Entità aggiuntive",
+        "description": "Entità aggiuntive configurate: {extra_entities}",
+        "data": {
+          "extra_action": "Azione successiva",
+          "extra_entity_name": "Nome dell’entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità di potenza di origine",
+          "extra_entity_source_kind": "Tipo di origine",
+          "extra_entity_sources": "Entità di origine",
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      },
+      "extra_transform": {
+        "title": "Aggiungi entità di trasformazione della potenza",
+        "data": {
+          "extra_entity_name": "Nome dell’entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità di potenza di origine"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Seleziona il tipo di origine",
+        "data": {
+          "extra_entity_source_kind": "Tipo di origine"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Aggiungi entità aggregata",
+        "data": {
+          "extra_entity_source_kind": "Tipo di origine",
+          "extra_entity_name": "Nome dell’entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_sources": "Entità di origine"
+        }
+      },
+      "extra_remove": {
+        "title": "Rimuovi entità aggiuntiva",
+        "data": {
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      },
+      "measurement_types": {
+        "title": "Tipi di misurazione",
+        "description": "Seleziona le misurazioni da creare. È richiesto almeno un tipo. Non è possibile rimuovere misurazioni utilizzate da entità aggiuntive.\n\nIl firmware locale 136–138 supporta potenza attiva ed energia attiva diretta/inversa. Il firmware 139 o successivo abilita anche gli otto tipi di misurazione aggiuntivi. La configurazione delle fasi dei canali è disponibile dal firmware 139. Le misurazioni non supportate sono nascoste con firmware precedenti.",
+        "data": {
+          "measurement_types": "Tipi di misurazione"
+        }
+      }
+    },
+    "error": {
+      "no_devices_found": "Nessun dispositivo compatibile trovato.",
+      "invalid_input": "Dati inseriti non validi.",
+      "auto_discovery_not_supported": "Il rilevamento automatico non è supportato per questo tipo di dispositivo.",
+      "no_matching_discovery": "Il servizio rilevato non corrisponde a un dispositivo supportato.",
+      "auth_failed": "Nome utente o password non validi.",
+      "cannot_connect": "Impossibile connettersi al servizio cloud.",
+      "cannot_connect_local": "Impossibile connettersi al dispositivo.",
+      "firmware_too_old": "La versione del firmware del dispositivo è troppo vecchia.",
+      "already_configured": "Questo dispositivo è già stato configurato.",
+      "unsupported_device_type": "Questo tipo di dispositivo non è supportato.",
+      "unsupported_add_mode": "Questo metodo di aggiunta non è supportato.",
+      "no_source_entities": "Non sono disponibili entità di origine compatibili.",
+      "no_extra_entities": "Non sono state configurate entità aggiuntive.",
+      "no_measurements_selected": "Seleziona almeno un tipo di misurazione.",
+      "invalid_measurements": "Le misurazioni selezionate non sono supportate in questa modalità.",
+      "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla."
+    },
+    "abort": {
+      "already_configured": "Questo dispositivo è già stato configurato."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modifica ecoMain",
+        "description": "Tipo di dispositivo: {device_type}\nMetodo di aggiunta: {mode}\nNumero di serie ecoMain: {ecomain_serial}\nEntità aggiuntive configurate: {extra_entities}",
+        "data": {
+          "ecomain_selected_slaves": "Seleziona i dispositivi secondari da aggiungere",
+          "extra_action": "Azione successiva"
+        }
+      },
+      "ecoplug_select": {
+        "title": "Modifica ecoPlug",
+        "description": "Ogni presa selezionata crea un interruttore di accensione/spegnimento, un sensore di potenza in tempo reale in W e un sensore di energia totale in kWh.",
+        "data": {
+          "ecoplug_selected": "Seleziona le prese da aggiungere"
+        }
+      },
+      "extra_transform": {
+        "title": "Aggiungi entità di trasformazione della potenza",
+        "data": {
+          "extra_entity_name": "Nome dell’entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_source": "Entità di potenza di origine"
+        }
+      },
+      "extra_aggregate_kind": {
+        "title": "Seleziona il tipo di origine",
+        "data": {
+          "extra_entity_source_kind": "Tipo di origine"
+        }
+      },
+      "extra_aggregate": {
+        "title": "Aggiungi entità aggregata",
+        "data": {
+          "extra_entity_source_kind": "Tipo di origine",
+          "extra_entity_name": "Nome dell’entità",
+          "extra_entity_operation": "Operazione",
+          "extra_entity_sources": "Entità di origine"
+        }
+      },
+      "extra_remove": {
+        "title": "Rimuovi entità aggiuntiva",
+        "data": {
+          "extra_entity_remove": "Entità aggiuntiva"
+        }
+      },
+      "measurement_types": {
+        "title": "Tipi di misurazione",
+        "description": "Seleziona le misurazioni da creare. È richiesto almeno un tipo. Non è possibile rimuovere misurazioni utilizzate da entità aggiuntive.\n\nIl firmware locale 136–138 supporta potenza attiva ed energia attiva diretta/inversa. Il firmware 139 o successivo abilita anche gli otto tipi di misurazione aggiuntivi. La configurazione delle fasi dei canali è disponibile dal firmware 139. Le misurazioni non supportate sono nascoste con firmware precedenti.",
+        "data": {
+          "measurement_types": "Tipi di misurazione"
+        }
+      },
+      "phase_device": {
+        "title": "Fasi dei canali",
+        "data": {
+          "phase_device": "Dispositivo"
+        },
+        "description": "La configurazione delle fasi dei canali richiede il firmware 139 o successivo."
+      },
+      "channel_phases": {
+        "title": "Fasi dei canali",
+        "description": "Assegna L1, L2 o L3 ai canali di {device}. Il salvataggio scrive le fasi modificate sul dispositivo e le rilegge per verificarle.",
+        "data": {
+          "channel_1": "Canale 1",
+          "channel_2": "Canale 2",
+          "channel_3": "Canale 3",
+          "channel_4": "Canale 4",
+          "channel_5": "Canale 5",
+          "channel_6": "Canale 6",
+          "channel_7": "Canale 7",
+          "channel_8": "Canale 8",
+          "channel_9": "Canale 9",
+          "channel_10": "Canale 10"
+        }
+      }
+    },
+    "error": {
+      "no_source_entities": "Non sono disponibili entità di origine compatibili.",
+      "no_extra_entities": "Non sono state configurate entità aggiuntive.",
+      "no_devices_found": "Nessun dispositivo compatibile trovato.",
+      "no_devices_selected": "Seleziona almeno una presa da aggiungere.",
+      "auth_failed": "Nome utente o password non validi.",
+      "cannot_connect": "Impossibile connettersi al servizio cloud.",
+      "cannot_connect_local": "Impossibile connettersi al dispositivo.",
+      "firmware_too_old": "La versione del firmware del dispositivo è troppo vecchia.",
+      "no_measurements_selected": "Seleziona almeno un tipo di misurazione.",
+      "invalid_measurements": "Le misurazioni selezionate non sono supportate in questa modalità.",
+      "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla.",
+      "phase_read_failed": "Impossibile leggere le fasi dei canali dal dispositivo.",
+      "phase_write_failed": "Impossibile scrivere la fase di questo canale. Controlla il dispositivo e riprova.",
+      "phase_verify_failed": "La fase riletta non corrisponde al valore richiesto. Controlla questo canale e riprova.",
+      "invalid_phase": "Seleziona L1, L2 o L3.",
+      "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale.",
+      "phase_firmware_too_old": "La configurazione delle fasi dei canali richiede il firmware 139 o successivo."
+    },
+    "abort": {
+      "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale."
+    }
+  },
+  "selector": {
+    "mode": {
+      "options": {
+        "auto": "Rilevamento automatico (locale)",
+        "manual": "Configurazione manuale (locale)",
+        "cloud": "Accesso all’account (cloud)"
+      }
+    },
+    "device_type": {
+      "options": {
+        "ecomain": "ecoMain",
+        "ecoplug": "ecoPlug"
+      }
+    },
+    "ecomain_selected_slaves": {
+      "options": {
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
+      }
+    },
+    "extra_action": {
+      "options": {
+        "finish": "Fine",
+        "add_transform": "Aggiungi entità di potenza invertita/assoluta",
+        "add_aggregate": "Aggiungi entità somma/media",
+        "remove": "Rimuovi entità aggiuntiva",
+        "measurement_types": "Tipi di misurazione",
+        "channel_phases": "Fasi dei canali"
+      }
+    },
+    "extra_entity_operation": {
+      "options": {
+        "invert": "Inverti",
+        "absolute": "Valore assoluto",
+        "sum": "Somma",
+        "average": "Media"
+      }
+    },
+    "extra_entity_source_kind": {
+      "options": {
+        "power": "Potenza",
+        "energy": "Energia"
+      }
+    },
+    "measurement_types": {
+      "options": {
+        "power": "Potenza attiva",
+        "energy_forward": "Energia attiva diretta",
+        "energy_reverse": "Energia attiva inversa",
+        "reactive_energy_forward": "Energia reattiva diretta",
+        "reactive_energy_reverse": "Energia reattiva inversa",
+        "apparent_power": "Potenza apparente",
+        "reactive_power": "Potenza reattiva",
+        "voltage": "Tensione",
+        "current": "Corrente",
+        "power_factor": "Fattore di potenza",
+        "frequency": "Frequenza",
+        "energy": "Energia (accumulata e incremento di 1 minuto)"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
+      }
+    }
+  }
+}
