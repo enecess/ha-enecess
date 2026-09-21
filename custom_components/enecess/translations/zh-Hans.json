@@ -114,6 +114,13 @@
         "data": {
           "extra_entity_remove": "额外实体"
         }
+      },
+      "measurement_types": {
+        "title": "测量类型",
+        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量和通道相位设置。旧固件下不支持的测量选项会隐藏。",
+        "data": {
+          "measurement_types": "测量类型"
+        }
       }
     },
     "error": {
@@ -129,7 +136,10 @@
       "unsupported_device_type": "不支持此设备类型。",
       "unsupported_add_mode": "不支持此添加方式。",
       "no_source_entities": "没有可用的兼容源实体。",
-      "no_extra_entities": "尚未配置额外实体。"
+      "no_extra_entities": "尚未配置额外实体。",
+      "no_measurements_selected": "请至少选择一种测量类型。",
+      "invalid_measurements": "当前模式不支持所选测量类型。",
+      "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。"
     },
     "abort": {
       "already_configured": "该设备已配置。"
@@ -180,6 +190,13 @@
         "data": {
           "extra_entity_remove": "额外实体"
         }
+      },
+      "measurement_types": {
+        "title": "测量类型",
+        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量和通道相位设置。旧固件下不支持的测量选项会隐藏。",
+        "data": {
+          "measurement_types": "测量类型"
+        }
       }
     },
     "error": {
@@ -190,7 +207,10 @@
       "auth_failed": "用户名或密码无效。",
       "cannot_connect": "无法连接到云服务。",
       "cannot_connect_local": "无法连接到设备。",
-      "firmware_too_old": "设备固件版本过低。"
+      "firmware_too_old": "设备固件版本过低。",
+      "no_measurements_selected": "请至少选择一种测量类型。",
+      "invalid_measurements": "当前模式不支持所选测量类型。",
+      "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。"
     }
   },
   "selector": {
@@ -219,7 +239,8 @@
         "finish": "完成",
         "add_transform": "添加取反/绝对值功率实体",
         "add_aggregate": "添加总和/平均实体",
-        "remove": "移除额外实体"
+        "remove": "移除额外实体",
+        "measurement_types": "测量类型"
       }
     },
     "extra_entity_operation": {
@@ -234,6 +255,22 @@
       "options": {
         "power": "功率",
         "energy": "能耗"
+      }
+    },
+    "measurement_types": {
+      "options": {
+        "power": "有功功率",
+        "energy_forward": "正向有功电能",
+        "energy_reverse": "反向有功电能",
+        "reactive_energy_forward": "正向无功电能",
+        "reactive_energy_reverse": "反向无功电能",
+        "apparent_power": "视在功率",
+        "reactive_power": "无功功率",
+        "voltage": "电压",
+        "current": "电流",
+        "power_factor": "功率因数",
+        "frequency": "频率",
+        "energy": "电能（累计及每分钟增量）"
       }
     }
   }

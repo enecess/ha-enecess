@@ -114,6 +114,13 @@
         "data": {
           "extra_entity_remove": "Zusätzliche Entität"
         }
+      },
+      "measurement_types": {
+        "title": "Messgrößen",
+        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "data": {
+          "measurement_types": "Messgrößen"
+        }
       }
     },
     "error": {
@@ -129,7 +136,10 @@
       "unsupported_device_type": "Dieser Gerätetyp wird nicht unterstützt.",
       "unsupported_add_mode": "Diese Hinzufügungsmethode wird nicht unterstützt.",
       "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
-      "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert."
+      "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert.",
+      "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
+      "invalid_measurements": "Die ausgewählten Messgrößen werden in diesem Modus nicht unterstützt.",
+      "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden."
     },
     "abort": {
       "already_configured": "Dieses Gerät wurde bereits konfiguriert."
@@ -180,6 +190,13 @@
         "data": {
           "extra_entity_remove": "Zusätzliche Entität"
         }
+      },
+      "measurement_types": {
+        "title": "Messgrößen",
+        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "data": {
+          "measurement_types": "Messgrößen"
+        }
       }
     },
     "error": {
@@ -190,7 +207,10 @@
       "auth_failed": "Ungültiger Benutzername oder Passwort.",
       "cannot_connect": "Verbindung zum Cloud-Dienst fehlgeschlagen.",
       "cannot_connect_local": "Verbindung zum Gerät fehlgeschlagen.",
-      "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt."
+      "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt.",
+      "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
+      "invalid_measurements": "Die ausgewählten Messgrößen werden in diesem Modus nicht unterstützt.",
+      "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden."
     }
   },
   "selector": {
@@ -219,7 +239,8 @@
         "finish": "Fertigstellen",
         "add_transform": "Invertierte/absolute Leistungsentität hinzufügen",
         "add_aggregate": "Summen-/Durchschnittsentität hinzufügen",
-        "remove": "Zusätzliche Entität entfernen"
+        "remove": "Zusätzliche Entität entfernen",
+        "measurement_types": "Messgrößen"
       }
     },
     "extra_entity_operation": {
@@ -234,6 +255,22 @@
       "options": {
         "power": "Leistung",
         "energy": "Energie"
+      }
+    },
+    "measurement_types": {
+      "options": {
+        "power": "Wirkleistung",
+        "energy_forward": "Wirkenergie vorwärts",
+        "energy_reverse": "Wirkenergie rückwärts",
+        "reactive_energy_forward": "Blindenergie vorwärts",
+        "reactive_energy_reverse": "Blindenergie rückwärts",
+        "apparent_power": "Scheinleistung",
+        "reactive_power": "Blindleistung",
+        "voltage": "Spannung",
+        "current": "Strom",
+        "power_factor": "Leistungsfaktor",
+        "frequency": "Frequenz",
+        "energy": "Energie (kumuliert und 1-Minuten-Zuwachs)"
       }
     }
   }

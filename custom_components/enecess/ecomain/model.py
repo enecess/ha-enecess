@@ -6,20 +6,40 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfEnergy, UnitOfPower
 
-from ..const import CONF_ECOMAIN_AVAILABLE_SLAVES, CONF_SENSOR_DISPLAY_PRECISION
+from ..const import (
+    CONF_ECOMAIN_AVAILABLE_SLAVES,
+    CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION,
+    CONF_SENSOR_DISPLAY_PRECISION,
+)
+
+DEFAULT_LOCAL_MEASUREMENTS = ("power", "energy_forward", "energy_reverse")
+LOCAL_MEASUREMENTS = DEFAULT_LOCAL_MEASUREMENTS + (
+    "reactive_energy_forward", "reactive_energy_reverse", "apparent_power",
+    "reactive_power", "voltage", "current", "power_factor", "frequency",
+)
+DEFAULT_CLOUD_MEASUREMENTS = ("power", "energy")
+CLOUD_MEASUREMENTS = DEFAULT_CLOUD_MEASUREMENTS
+
+
+def available_local_measurements(firmware_version: int | None) -> tuple[str, ...]:
+    """Expose extended registers only after confirming compatible firmware."""
+    if firmware_version is not None and firmware_version >= CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION:
+        return LOCAL_MEASUREMENTS
+    return DEFAULT_LOCAL_MEASUREMENTS
 
 
 @dataclass(frozen=True)
 class RegisterSpec:
     key: str
-    kind: str  # "power", "energy", "energy_delta", "energy_accumulated"
-    device_index: int  # 0=main, 1..3=slaves
+    kind: str
+    device_index: int
     address: Optional[int] = None
-    regs: Optional[int] = None  # 2 for int32, 4 for int64
+    regs: Optional[int] = None
     scale: float = 1.0
     source_key: Optional[str] = None
+    measurement_type: Optional[str] = None
+    signed: bool = False
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -28,160 +48,100 @@ class EnecessSensorDescription(SensorEntityDescription):
     spec: RegisterSpec
 
 
-# ecoMain Modbus register mapping.
-_SLAVE_FWD_BASE: dict[int, int] = {1: 72, 2: 112, 3: 152}
-_SLAVE_REV_BASE: dict[int, int] = {1: 232, 2: 272, 3: 312}
-_SLAVE_PWR_BASE: dict[int, int] = {1: 1028, 2: 1048, 3: 1068}
+# Measurement: key suffix, main base, branch base, width, scale, signed, kind.
+_LOCAL_LAYOUT = {
+    "power": ("power_rt", 1000, 1008, 2, .01, True, "power"),
+    "energy_forward": ("energy_fwd_total", 0, 32, 4, .001, False, "energy"),
+    "energy_reverse": ("energy_rev_total", 16, 192, 4, .001, False, "energy"),
+    "reactive_energy_forward": ("reactive_energy_fwd_total", 500, 532, 4, .001, False, "reactive_energy"),
+    "reactive_energy_reverse": ("reactive_energy_rev_total", 516, 692, 4, .001, False, "reactive_energy"),
+    "apparent_power": ("apparent_power_rt", 900, 908, 2, .01, True, "apparent_power"),
+    "reactive_power": ("reactive_power_rt", 1100, 1108, 2, .01, True, "reactive_power"),
+    "voltage": ("voltage_rt", 1200, 1209, 1, .01, False, "voltage"),
+    "current": ("current_rt", 1201, 1210, 1, .01, False, "current"),
+    "power_factor": ("power_factor_rt", 1202, 1211, 1, .01, True, "power_factor"),
+}
 
 
 def _slave_list(slaves: Optional[list]) -> list[int]:
-    if slaves is None:
-        return [int(s) for s in CONF_ECOMAIN_AVAILABLE_SLAVES]
-    return sorted({int(s) for s in slaves})
+    return sorted({int(s) for s in (CONF_ECOMAIN_AVAILABLE_SLAVES if slaves is None else slaves)})
 
 
-def build_specs_local(slaves: Optional[list] = None) -> list[RegisterSpec]:
-    """Build RegisterSpec list for local Modbus mode."""
-    specs: list[RegisterSpec] = []
-    slave_indices = CONF_ECOMAIN_AVAILABLE_SLAVES if slaves is None else slaves
+def build_specs_local(slaves=None, measurement_types=None) -> list[RegisterSpec]:
+    """Build requested ecoMain and ecoSub registers before capability filtering."""
+    selected = set(DEFAULT_LOCAL_MEASUREMENTS if measurement_types is None else measurement_types)
+    specs = []
+    for measurement, (suffix, main, branch, width, scale, signed, kind) in _LOCAL_LAYOUT.items():
+        if measurement not in selected:
+            continue
 
-    def add_energy(key: str, addr: int, device_index: int) -> None:
-        specs.append(RegisterSpec(key=key, address=addr, regs=4, scale=0.001, kind="energy", device_index=device_index))
+        def add(prefix, address, device):
+            specs.append(RegisterSpec(
+                key=f"{prefix}_{suffix}", kind=kind, device_index=device,
+                address=address, regs=width, scale=scale,
+                measurement_type=measurement, signed=signed,
+            ))
 
-    def add_power(key: str, addr: int, device_index: int) -> None:
-        specs.append(RegisterSpec(key=key, address=addr, regs=2, scale=0.01, kind="power", device_index=device_index))
-
-    # Host main power
-    add_power("main_l1_power_rt", 1000, 0)
-    add_power("main_l2_power_rt", 1002, 0)
-    add_power("main_l3_power_rt", 1004, 0)
-    add_power("main_all_power_rt", 1006, 0)
-    # Host main energy (forward)
-    add_energy("main_l1_energy_fwd_total", 0, 0)
-    add_energy("main_l2_energy_fwd_total", 4, 0)
-    add_energy("main_l3_energy_fwd_total", 8, 0)
-    add_energy("main_all_energy_fwd_total", 12, 0)
-    # Host main energy (rev)
-    add_energy("main_l1_energy_rev_total", 16, 0)
-    add_energy("main_l2_energy_rev_total", 20, 0)
-    add_energy("main_l3_energy_rev_total", 24, 0)
-    add_energy("main_all_energy_rev_total", 28, 0)
-
-    # Host branch
-    for ch in range(1, 11):
-        add_power(f"main_ch{ch}_power_rt", 1008 + (ch - 1) * 2, 0)
-        add_energy(f"main_ch{ch}_energy_fwd_total", 32 + (ch - 1) * 4, 0)
-        add_energy(f"main_ch{ch}_energy_rev_total", 192 + (ch - 1) * 4, 0)
-
-    # Slave branch
-    for s, ch in ((s, ch) for s in slave_indices for ch in range(1, 11)):
-        base_pwr = _SLAVE_PWR_BASE[s]
-        base_fwd = _SLAVE_FWD_BASE[s]
-        base_rev = _SLAVE_REV_BASE[s]
-        add_power(f"sub{s}_ch{ch}_power_rt", base_pwr + (ch - 1) * 2, s)
-        add_energy(f"sub{s}_ch{ch}_energy_fwd_total", base_fwd + (ch - 1) * 4, s)
-        add_energy(f"sub{s}_ch{ch}_energy_rev_total", base_rev + (ch - 1) * 4, s)
-
+        step = 3 if width == 1 else width
+        phases = ("l1", "l2", "l3") if width == 1 else ("l1", "l2", "l3", "all")
+        for index, phase in enumerate(phases):
+            add(f"main_{phase}", main + index * step, 0)
+        for device in [0, *_slave_list(slaves)]:
+            prefix = "main" if device == 0 else f"sub{device}"
+            for channel in range(1, 11):
+                add(f"{prefix}_ch{channel}", branch + (device * 10 + channel - 1) * step, device)
+    if "frequency" in selected:
+        specs.append(RegisterSpec(
+            key="main_frequency_rt", kind="frequency", device_index=0,
+            address=1400, regs=1, scale=.01, measurement_type="frequency",
+        ))
     return specs
 
 
-def build_specs_cloud(slaves: Optional[list[int]] = None) -> list[RegisterSpec]:
-    """Build RegisterSpec list for cloud mode.
-
-    Cloud energy values are per-minute deltas, so expose:
-    - *_energy_total_1m: raw 1-minute delta
-    - *_energy_accumulated: restored cumulative meter for Energy Dashboard
-    """
-    specs: list[RegisterSpec] = []
-    slave_indices = CONF_ECOMAIN_AVAILABLE_SLAVES if slaves is None else slaves
-
-    def add_power(key: str, device_index: int) -> None:
-        specs.append(RegisterSpec(key=key, kind="power", device_index=device_index))
-
-    def add_energy_delta(key: str, device_index: int) -> None:
-        specs.append(RegisterSpec(key=key, kind="energy_delta", device_index=device_index))
-
-    def add_energy_accumulated(key: str, source_key: str, device_index: int) -> None:
-        specs.append(
-            RegisterSpec(
-                key=key,
-                kind="energy_accumulated",
-                device_index=device_index,
-                source_key=source_key,
-            )
-        )
-
-    add_power("main_all_power_avg_1m", 0)
-
-    main_delta_key = "main_all_energy_total_1m"
-    add_energy_delta(main_delta_key, 0)
-    add_energy_accumulated("main_all_energy_accumulated", main_delta_key, 0)
-
-    for ch in range(1, 11):
-        add_power(f"main_ch{ch}_power_avg_1m", 0)
-
-        delta_key = f"main_ch{ch}_energy_total_1m"
-        add_energy_delta(delta_key, 0)
-        add_energy_accumulated(f"main_ch{ch}_energy_accumulated", delta_key, 0)
-
-    for s, ch in ((s, ch) for s in slave_indices for ch in range(1, 11)):
-        add_power(f"sub{s}_ch{ch}_power_avg_1m", s)
-
-        delta_key = f"sub{s}_ch{ch}_energy_total_1m"
-        add_energy_delta(delta_key, s)
-        add_energy_accumulated(f"sub{s}_ch{ch}_energy_accumulated", delta_key, s)
-
+def build_specs_cloud(slaves=None, measurement_types=None) -> list[RegisterSpec]:
+    """Select cloud power or both delta and accumulated energy sensors."""
+    selected = set(DEFAULT_CLOUD_MEASUREMENTS if measurement_types is None else measurement_types)
+    specs = []
+    targets = [("main_all", 0)]
+    for device in [0, *_slave_list(slaves)]:
+        prefix = "main" if device == 0 else f"sub{device}"
+        targets.extend((f"{prefix}_ch{channel}", device) for channel in range(1, 11))
+    for prefix, device in targets:
+        if "power" in selected:
+            specs.append(RegisterSpec(key=f"{prefix}_power_avg_1m", kind="power", device_index=device, measurement_type="power"))
+        if "energy" in selected:
+            delta_key = f"{prefix}_energy_total_1m"
+            specs.append(RegisterSpec(key=delta_key, kind="energy_delta", device_index=device, measurement_type="energy"))
+            specs.append(RegisterSpec(key=f"{prefix}_energy_accumulated", kind="energy_accumulated", device_index=device, source_key=delta_key, measurement_type="energy"))
     return specs
 
 
 def build_sensor_descriptions(specs: list[RegisterSpec]) -> list[EnecessSensorDescription]:
-    """Convert RegisterSpecs to HA SensorEntityDescriptions."""
-    descs: list[EnecessSensorDescription] = []
+    """Convert register metadata to HA units and statistics semantics."""
+    metadata = {
+        "power": ("W", SensorDeviceClass.POWER),
+        "energy": ("Wh", SensorDeviceClass.ENERGY),
+        "energy_accumulated": ("Wh", SensorDeviceClass.ENERGY),
+        "energy_delta": ("Wh", None),
+        "reactive_energy": ("varh", SensorDeviceClass.REACTIVE_ENERGY),
+        "apparent_power": ("VA", SensorDeviceClass.APPARENT_POWER),
+        "reactive_power": ("var", SensorDeviceClass.REACTIVE_POWER),
+        "voltage": ("V", SensorDeviceClass.VOLTAGE),
+        "current": ("A", SensorDeviceClass.CURRENT),
+        "power_factor": (None, SensorDeviceClass.POWER_FACTOR),
+        "frequency": ("Hz", SensorDeviceClass.FREQUENCY),
+    }
+    descriptions = []
     for spec in specs:
-        if spec.kind == "power":
-            descs.append(
-                EnecessSensorDescription(
-                    key=spec.key,
-                    name=spec.key,
-                    native_unit_of_measurement=UnitOfPower.WATT,
-                    device_class=SensorDeviceClass.POWER,
-                    state_class=SensorStateClass.MEASUREMENT,
-                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
-                    spec=spec,
-                )
-            )
-        elif spec.kind == "energy":
-            descs.append(
-                EnecessSensorDescription(
-                    key=spec.key,
-                    name=spec.key,
-                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-                    device_class=SensorDeviceClass.ENERGY,
-                    state_class=SensorStateClass.TOTAL_INCREASING,
-                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
-                    spec=spec,
-                )
-            )
-        elif spec.kind == "energy_accumulated":
-            descs.append(
-                EnecessSensorDescription(
-                    key=spec.key,
-                    name=spec.key,
-                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-                    device_class=SensorDeviceClass.ENERGY,
-                    state_class=SensorStateClass.TOTAL_INCREASING,
-                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
-                    spec=spec,
-                )
-            )
+        unit, device_class = metadata[spec.kind]
+        state_class = SensorStateClass.MEASUREMENT
+        if spec.kind in ("energy", "energy_accumulated", "reactive_energy"):
+            state_class = SensorStateClass.TOTAL_INCREASING
         elif spec.kind == "energy_delta":
-            descs.append(
-                EnecessSensorDescription(
-                    key=spec.key,
-                    name=spec.key,
-                    native_unit_of_measurement=UnitOfEnergy.WATT_HOUR,
-                    suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
-                    spec=spec,
-                )
-            )
-    return descs
+            state_class = None
+        descriptions.append(EnecessSensorDescription(
+            key=spec.key, name=spec.key, native_unit_of_measurement=unit,
+            device_class=device_class, state_class=state_class,
+            suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION, spec=spec,
+        ))
+    return descriptions

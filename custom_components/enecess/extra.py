@@ -12,6 +12,8 @@ from .const import (
     CONST_ECOMAIN_SERIAL,
     CONST_ECOMAIN_SELECTED_SLAVES,
     CONST_EXTRA_ENTITIES,
+    CONST_MEASUREMENT_TYPES,
+    CONST_ECOMAIN_FIRMWARE_VERSION,
     CONST_EXTRA_ENTITY_NAME,
     CONST_EXTRA_ENTITY_OPERATION,
     CONST_EXTRA_ENTITY_SOURCE,
@@ -29,6 +31,9 @@ from .ecomain.model import (
     build_sensor_descriptions,
     build_specs_cloud,
     build_specs_local,
+    available_local_measurements,
+    DEFAULT_LOCAL_MEASUREMENTS,
+    DEFAULT_CLOUD_MEASUREMENTS,
 )
 
 EXTRA_TRANSFORM_OPERATIONS = [CONST_EXTRA_OPERATION_INVERT, CONST_EXTRA_OPERATION_ABSOLUTE]
@@ -49,12 +54,22 @@ def get_entry_extra_entities(entry_options: Optional[dict[str, Any]] = None) -> 
     return list(extras) if isinstance(extras, list) else []
 
 
-def build_entry_specs(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[RegisterSpec]:
+def get_entry_measurement_types(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[str]:
+    """Keep pre-selection entries on their original set of measurements."""
+    defaults = DEFAULT_CLOUD_MEASUREMENTS if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD else DEFAULT_LOCAL_MEASUREMENTS
+    return list((entry_options or {}).get(CONST_MEASUREMENT_TYPES, defaults))
+
+
+def build_entry_specs(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None, *, include_unsupported: bool = False) -> list[RegisterSpec]:
     """Build ecoMain specs using mutable options where applicable."""
     slaves = get_entry_slaves(entry_data, entry_options)
+    measurements = get_entry_measurement_types(entry_data, entry_options)
     if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
-        return build_specs_cloud(slaves)
-    return build_specs_local(slaves)
+        return build_specs_cloud(slaves, measurements)
+    if not include_unsupported:
+        available = available_local_measurements(entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION))
+        measurements = [item for item in measurements if item in available]
+    return build_specs_local(slaves, measurements)
 
 
 def build_entry_descriptions(

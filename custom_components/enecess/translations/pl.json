@@ -114,6 +114,13 @@
         "data": {
           "extra_entity_remove": "Dodatkowa encja"
         }
+      },
+      "measurement_types": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów i konfigurację faz kanałów. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów"
+        }
       }
     },
     "error": {
@@ -129,7 +136,10 @@
       "unsupported_device_type": "Ten typ urządzenia nie jest obsługiwany.",
       "unsupported_add_mode": "Ta metoda dodawania nie jest obsługiwana.",
       "no_source_entities": "Brak zgodnych encji źródłowych.",
-      "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji."
+      "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
+      "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
+      "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
+      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru."
     },
     "abort": {
       "already_configured": "To urządzenie zostało już skonfigurowane."
@@ -180,6 +190,13 @@
         "data": {
           "extra_entity_remove": "Dodatkowa encja"
         }
+      },
+      "measurement_types": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów i konfigurację faz kanałów. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów"
+        }
       }
     },
     "error": {
@@ -190,7 +207,10 @@
       "auth_failed": "Nieprawidłowa nazwa użytkownika lub hasło.",
       "cannot_connect": "Nie można połączyć się z usługą chmury.",
       "cannot_connect_local": "Nie można połączyć się z urządzeniem.",
-      "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara."
+      "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara.",
+      "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
+      "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
+      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru."
     }
   },
   "selector": {
@@ -219,7 +239,8 @@
         "finish": "Zakończ",
         "add_transform": "Dodaj encję odwrócenia/wartości bezwzględnej mocy",
         "add_aggregate": "Dodaj encję sumy/średniej",
-        "remove": "Usuń dodatkową encję"
+        "remove": "Usuń dodatkową encję",
+        "measurement_types": "Rodzaje pomiarów"
       }
     },
     "extra_entity_operation": {
@@ -234,6 +255,22 @@
       "options": {
         "power": "Moc",
         "energy": "Energia"
+      }
+    },
+    "measurement_types": {
+      "options": {
+        "power": "Moc czynna",
+        "energy_forward": "Energia czynna w kierunku zgodnym",
+        "energy_reverse": "Energia czynna w kierunku przeciwnym",
+        "reactive_energy_forward": "Energia bierna w kierunku zgodnym",
+        "reactive_energy_reverse": "Energia bierna w kierunku przeciwnym",
+        "apparent_power": "Moc pozorna",
+        "reactive_power": "Moc bierna",
+        "voltage": "Napięcie",
+        "current": "Prąd",
+        "power_factor": "Współczynnik mocy",
+        "frequency": "Częstotliwość",
+        "energy": "Energia (skumulowana i przyrost 1-minutowy)"
       }
     }
   }

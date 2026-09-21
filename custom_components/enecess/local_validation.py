@@ -15,6 +15,7 @@ class LocalModbusClient(Protocol):
 class LocalValidationResult:
     error: str | None = None
     online_slaves: list[str] | None = None
+    firmware_version: int | None = None
 
 
 async def async_validate_local_device(
@@ -50,7 +51,7 @@ async def async_validate_local_device(
                 for index, value in enumerate(response.registers, start=1)
                 if (int(value) & 0xFFFF) == 1 and str(index) in allowed_slaves
             ]
-            return LocalValidationResult(online_slaves=online_slaves)
+            return LocalValidationResult(online_slaves=online_slaves, firmware_version=firmware_version)
         except Exception:
             return LocalValidationResult(error="cannot_connect_local")
     finally:

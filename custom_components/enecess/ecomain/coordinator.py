@@ -7,30 +7,39 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .model import RegisterSpec
+from .model import RegisterSpec, available_local_measurements
 from .. import CONF_ECOMAIN_PORT
 from ..client_api import EnecessApi, EnecessApiError, EnecessAuthError
 from ..client_modbus import (
     EnecessModbusClient,
+    decode_int16,
     decode_int32_word_swap,
     decode_int64_word_swap,
 )
 from ..const import (
+    CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
+    CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
     CONF_CLOUD_UPDATE_INTERVAL, CONF_LOCAL_UPDATE_INTERVAL, CONST_ECOMAIN_PORT, CONST_ECOMAIN_SERIAL,
     CONST_ECOMAIN_CLOUD_SLAVE_MAP, CONST_CLOUD_TOKEN, CONST_CLOUD_USERNAME, CONST_CLOUD_PASSWORD, CONST_ECOMAIN_HOST
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-ENERGY_BLOCKS = [
-    (0, 120),
-    (120, 120),
-    (240, 112),  # up to 351
-]
-
-POWER_BLOCKS = [
-    (1000, 88),  # 1000..1087
-]
+def build_read_blocks(specs: list[RegisterSpec]) -> list[tuple[int, int]]:
+    """Coalesce adjacent complete values without reading unselected registers."""
+    blocks: list[tuple[int, int]] = []
+    intervals = sorted({(spec.address, spec.regs) for spec in specs
+                        if spec.address is not None and spec.regs is not None})
+    for address, width in intervals:
+        if width < 1 or width > 125:
+            raise ValueError(f"Unsupported register count: {width}")
+        if blocks:
+            start, count = blocks[-1]
+            if address == start + count and count + width <= 125:
+                blocks[-1] = (start, count + width)
+                continue
+        blocks.append((address, width))
+    return blocks
 
 
 class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
@@ -51,7 +60,10 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
         )
         self._entry = entry
         self._client = client
-        self.specs = specs
+        self._requested_specs = list(specs)
+        self.specs = list(specs)
+        self.firmware_version: int | None = None
+        self._validated_target: tuple[str, int] | None = None
 
     async def _async_update_data(self) -> dict[str, float]:
         try:
@@ -62,21 +74,43 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 raise UpdateFailed("No host target to connect")
 
             await self._client.async_set_target(host, port)
+            target = (host, port)
+            if self._validated_target != target:
+                firmware = await self._client.read_holding_registers(CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1)
+                if len(firmware.registers) != 1:
+                    raise UpdateFailed("Incomplete ecoMain firmware response")
+                version = firmware.registers[0]
+                if not isinstance(version, int) or isinstance(version, bool) or not 0 <= version <= 65535:
+                    raise UpdateFailed("Invalid ecoMain firmware response")
+                if version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
+                    raise UpdateFailed(f"ecoMain firmware {version} is unsupported; version {CONF_ECOMAIN_MIN_FIRMWARE_VERSION}+ is required")
+                available = available_local_measurements(version)
+                self.specs = [
+                    spec for spec in self._requested_specs
+                    if spec.measurement_type in available
+                    or (spec.measurement_type is None and spec.kind in ("power", "energy"))
+                ]
+                self.firmware_version = version
+                self._validated_target = target
 
             reg_map: dict[int, int] = {}
-            for start, count in ENERGY_BLOCKS + POWER_BLOCKS:
+            for start, count in build_read_blocks(self.specs):
                 rr = await self._client.read_holding_registers(start, count)
+                if len(rr.registers) != count:
+                    raise UpdateFailed(f"Incomplete register read at {start}: expected {count}, got {len(rr.registers)}")
                 reg_map.update(((start + i), r) for i, r in enumerate(rr.registers))
 
-            out: dict[str, float] = {spec.key: 0.0 for spec in self.specs}
+            out: dict[str, float] = {}
             for spec in self.specs:
                 if spec.address is None or spec.regs is None:
                     continue
-                regs = [reg_map.get(spec.address + i, 0) for i in range(spec.regs)]
-                if spec.regs == 2:
-                    raw = decode_int32_word_swap(regs, signed=True)
+                regs = [reg_map[spec.address + i] for i in range(spec.regs)]
+                if spec.regs == 1:
+                    raw = decode_int16(regs, signed=spec.signed)
+                elif spec.regs == 2:
+                    raw = decode_int32_word_swap(regs, signed=spec.signed)
                 elif spec.regs == 4:
-                    raw = decode_int64_word_swap(regs, signed=False)
+                    raw = decode_int64_word_swap(regs, signed=spec.signed)
                 else:
                     raise UpdateFailed(f"Unsupported register count: {spec.regs}")
                 out[spec.key] = float(raw) * spec.scale

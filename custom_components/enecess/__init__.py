@@ -16,6 +16,7 @@ from .const import (
     CONST_DEVICE_ECOPLUG,
     CONST_DEVICE_TYPE,
     CONST_ECOMAIN_HOST,
+    CONST_ECOMAIN_FIRMWARE_VERSION,
     CONST_ECOMAIN_PORT,
     CONST_ECOPLUG_DEVICES,
     CONST_ENTRY_COORDINATOR,
@@ -53,6 +54,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await hass.config_entries.async_reload(updated_entry.entry_id)
             return
         if (
+            device_type == CONST_DEVICE_ECOMAIN
+            and updated_entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
+            and updated_entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION) is not None
+            and updated_entry.data[CONST_ECOMAIN_FIRMWARE_VERSION] != coordinator.firmware_version
+        ):
+            await hass.config_entries.async_reload(updated_entry.entry_id)
+            return
+        if (
             device_type == CONST_DEVICE_ECOPLUG
             and updated_entry.data.get(CONST_ECOPLUG_DEVICES, [])
             != ecoplug_devices_at_setup
@@ -85,7 +94,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             host: Optional[str] = entry_data.get(CONST_ECOMAIN_HOST, "")
             port: int = entry_data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT)
             client = EnecessModbusClient(host, port)
-            specs = build_entry_specs(entry.data, entry.options)
+            specs = build_entry_specs(entry.data, entry.options, include_unsupported=True)
             coordinator = EcoMainModbusCoordinator(
                 hass=hass,
                 entry=entry,
@@ -108,6 +117,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return False
 
     await coordinator.async_config_entry_first_refresh()
+    if device_type == CONST_DEVICE_ECOMAIN and entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
+        firmware = coordinator.firmware_version
+        if entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION) != firmware:
+            hass.config_entries.async_update_entry(entry, data={**entry.data, CONST_ECOMAIN_FIRMWARE_VERSION: firmware})
     _async_remove_unconfigured_registry_entries(hass, entry)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

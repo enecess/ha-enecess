@@ -114,6 +114,13 @@
         "data": {
           "extra_entity_remove": "Extra Entity"
         }
+      },
+      "measurement_types": {
+        "title": "Measurement Types",
+        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types and channel phase configuration. Unsupported measurement choices are hidden on older firmware.",
+        "data": {
+          "measurement_types": "Measurement Types"
+        }
       }
     },
     "error": {
@@ -129,7 +136,10 @@
       "unsupported_device_type": "This device type is not supported.",
       "unsupported_add_mode": "This add method is not supported.",
       "no_source_entities": "No compatible source entities are available.",
-      "no_extra_entities": "No extra entities have been configured."
+      "no_extra_entities": "No extra entities have been configured.",
+      "no_measurements_selected": "Select at least one measurement type.",
+      "invalid_measurements": "The selected measurements are not supported in this mode.",
+      "measurement_in_use": "Remove extra entities using this measurement before deselecting it."
     },
     "abort": {
       "already_configured": "This device has already been configured."
@@ -180,6 +190,13 @@
         "data": {
           "extra_entity_remove": "Extra Entity"
         }
+      },
+      "measurement_types": {
+        "title": "Measurement Types",
+        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types and channel phase configuration. Unsupported measurement choices are hidden on older firmware.",
+        "data": {
+          "measurement_types": "Measurement Types"
+        }
       }
     },
     "error": {
@@ -190,7 +207,10 @@
       "auth_failed": "Invalid username or password.",
       "cannot_connect": "Unable to connect to the cloud service.",
       "cannot_connect_local": "Unable to connect to device.",
-      "firmware_too_old": "Device firmware version is too old."
+      "firmware_too_old": "Device firmware version is too old.",
+      "no_measurements_selected": "Select at least one measurement type.",
+      "invalid_measurements": "The selected measurements are not supported in this mode.",
+      "measurement_in_use": "Remove extra entities using this measurement before deselecting it."
     }
   },
   "selector": {
@@ -219,7 +239,8 @@
         "finish": "Finish",
         "add_transform": "Add Invert/Absolute Power Entity",
         "add_aggregate": "Add Sum/Average Entity",
-        "remove": "Remove Extra Entity"
+        "remove": "Remove Extra Entity",
+        "measurement_types": "Measurement Types"
       }
     },
     "extra_entity_operation": {
@@ -234,6 +255,22 @@
       "options": {
         "power": "Power",
         "energy": "Energy"
+      }
+    },
+    "measurement_types": {
+      "options": {
+        "power": "Active power",
+        "energy_forward": "Forward active energy",
+        "energy_reverse": "Reverse active energy",
+        "reactive_energy_forward": "Forward reactive energy",
+        "reactive_energy_reverse": "Reverse reactive energy",
+        "apparent_power": "Apparent power",
+        "reactive_power": "Reactive power",
+        "voltage": "Voltage",
+        "current": "Current",
+        "power_factor": "Power factor",
+        "frequency": "Frequency",
+        "energy": "Energy (accumulated and 1-minute increment)"
       }
     }
   }

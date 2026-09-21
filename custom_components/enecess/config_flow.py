@@ -29,7 +29,10 @@ from .const import (
     CONST_EXTRA_ENTITIES, CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_REMOVE, CONST_EXTRA_ENTITY_SOURCE,
     CONST_EXTRA_ENTITY_SOURCE_KIND, CONST_EXTRA_ENTITY_SOURCES,
     CONST_DEVICE_ECOPLUG, CONST_ECOPLUG_SELECTED, CONST_ECOPLUG_DEVICES,
+    CONST_MEASUREMENT_TYPES,
+    CONST_ECOMAIN_FIRMWARE_VERSION, CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION,
 )
+from .ecomain.model import available_local_measurements, CLOUD_MEASUREMENTS
 from .local_validation import async_validate_local_device
 from .registry import async_remove_unconfigured_registry_entries
 from .ecoplug.model import build_plug_options, select_plugs
@@ -42,6 +45,8 @@ from .extra import (
     build_source_options,
     get_entry_extra_entities,
     get_entry_slaves,
+    get_entry_measurement_types,
+    build_entry_specs,
     normalize_extra_entity,
 )
 
@@ -57,6 +62,25 @@ class DiscoveredDevice:
     hostname: str
     service_name: str
     ip: Optional[str]
+
+
+def _measurement_schema(entry_data: dict, selected: list[str]) -> vol.Schema:
+    choices = CLOUD_MEASUREMENTS if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD else available_local_measurements(entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION))
+    return vol.Schema({
+        vol.Required(CONST_MEASUREMENT_TYPES, default=[item for item in selected if item in choices]): selector.SelectSelector(
+            selector.SelectSelectorConfig(options=list(choices), multiple=True,
+                                          translation_key=CONST_MEASUREMENT_TYPES,
+                                          mode=SelectSelectorMode.LIST))
+    })
+
+
+def _measurement_error(entry_data: dict, selected: Any) -> Optional[str]:
+    if not selected:
+        return "no_measurements_selected"
+    choices = CLOUD_MEASUREMENTS if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD else available_local_measurements(entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION))
+    if not isinstance(selected, list) or any(item not in choices for item in selected):
+        return "invalid_measurements"
+    return None
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -75,6 +99,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._ecoplug_devices: list[dict[str, Any]] = []
         self._entry_data: dict[str, Any] = {}
         self._extra_entities: list[dict[str, Any]] = []
+        self._measurement_types: Optional[list[str]] = None
 
     @property
     def _ecomain_available_slaves(self) -> list[str]:
@@ -350,6 +375,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if result.error is not None:
             return {"base": result.error}
         self._ecomain_local_config[CONST_ECOMAIN_ONLINE_SLAVES] = result.online_slaves or []
+        self._ecomain_local_config[CONST_ECOMAIN_FIRMWARE_VERSION] = result.firmware_version
         return None
 
     async def async_step_ecomain_local_confirm(
@@ -386,9 +412,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONST_ECOMAIN_HOST: host,
                         CONST_ECOMAIN_PORT: CONF_ECOMAIN_PORT,
                         CONST_ECOMAIN_SERIAL: ecomain_serial,
+                        CONST_ECOMAIN_FIRMWARE_VERSION: self._ecomain_local_config.get(CONST_ECOMAIN_FIRMWARE_VERSION),
                         CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(selected),
                 }
-                return await self.async_step_extra_entities()
+                return await self.async_step_measurement_types()
 
             online_slaves = self._ecomain_local_config.get(CONST_ECOMAIN_ONLINE_SLAVES)
             return self.async_show_form(  # type: ignore[return-value]
@@ -434,9 +461,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONST_ECOMAIN_HOST: host,
                     CONST_ECOMAIN_PORT: CONF_ECOMAIN_PORT,
                     CONST_ECOMAIN_SERIAL: ecomain_serial,
+                    CONST_ECOMAIN_FIRMWARE_VERSION: self._ecomain_local_config.get(CONST_ECOMAIN_FIRMWARE_VERSION),
                     CONST_ECOMAIN_SELECTED_SLAVES: [],
             }
-            return await self.async_step_extra_entities()
+            return await self.async_step_measurement_types()
 
         return self.async_show_form(  # type: ignore[return-value]
             step_id="ecomain_local_setup",
@@ -706,7 +734,26 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(selected_slaves),
                 CONST_ECOMAIN_CLOUD_SLAVE_MAP: slave_map,
         }
-        return await self.async_step_extra_entities()
+        return await self.async_step_measurement_types()
+
+    async def async_step_measurement_types(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        selected = self._measurement_types
+        if selected is None:
+            selected = get_entry_measurement_types(self._entry_data)
+        errors = {}
+        if user_input is not None:
+            selected = user_input.get(CONST_MEASUREMENT_TYPES)
+            error = _measurement_error(self._entry_data, selected)
+            if error:
+                errors["base"] = error
+            else:
+                self._measurement_types = list(dict.fromkeys(selected))
+                return await self.async_step_extra_entities()
+        return self.async_show_form(
+            step_id="measurement_types",
+            data_schema=_measurement_schema(self._entry_data, selected or []),
+            errors=errors,
+        )
 
     async def async_step_extra_entities(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
@@ -872,6 +919,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return {
             CONST_ECOMAIN_SELECTED_SLAVES: self._entry_data.get(CONST_ECOMAIN_SELECTED_SLAVES, []),
             CONST_EXTRA_ENTITIES: self._extra_entities,
+            CONST_MEASUREMENT_TYPES: list(self._measurement_types) if self._measurement_types is not None else get_entry_measurement_types(self._entry_data),
         }
 
     def _show_extra_entities_menu(self, step_id: str) -> FlowResult:
@@ -949,13 +997,20 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
             return
 
         self._options = {
+            **entry.options,
+            CONST_MEASUREMENT_TYPES: get_entry_measurement_types(entry.data, entry.options),
             CONST_ECOMAIN_SELECTED_SLAVES: get_entry_slaves(entry.data, entry.options),
             CONST_EXTRA_ENTITIES: get_entry_extra_entities(entry.options),
         }
+        self._firmware_version = entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
         self._available_slaves: list[str] = []
         self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
+
+    @property
+    def _measurement_entry_data(self) -> dict[str, Any]:
+        return {**self._entry.data, CONST_ECOMAIN_FIRMWARE_VERSION: self._firmware_version}
 
     @property
     def _extra_entities(self) -> list[dict[str, Any]]:
@@ -978,6 +1033,8 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
                 user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
             )
         action = user_input[CONST_EXTRA_ACTION]
+        if action == "measurement_types":
+            return await self.async_step_measurement_types()
         if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
             return await self.async_step_extra_transform()
         if action == CONST_EXTRA_ACTION_ADD_AGGREGATE:
@@ -988,6 +1045,30 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         self._async_remove_stale_sensor_entries()
         self._update_entry_data()
         return self.async_create_entry(title="", data=self._options)
+
+    async def async_step_measurement_types(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        selected = self._options[CONST_MEASUREMENT_TYPES]
+        errors = {}
+        if user_input is not None:
+            selected = user_input.get(CONST_MEASUREMENT_TYPES)
+            error = _measurement_error(self._measurement_entry_data, selected)
+            if not error:
+                proposed = {**self._options, CONST_MEASUREMENT_TYPES: selected}
+                old_keys = {spec.key for spec in build_entry_specs(self._measurement_entry_data, self._options)}
+                new_keys = {spec.key for spec in build_entry_specs(self._measurement_entry_data, proposed)}
+                removed = old_keys - new_keys
+                if any(removed.intersection(extra.get("sources") or []) for extra in self._extra_entities):
+                    error = "measurement_in_use"
+            if error:
+                errors["base"] = error
+            else:
+                self._options[CONST_MEASUREMENT_TYPES] = list(dict.fromkeys(selected))
+                return await self._show_options_menu()
+        return self.async_show_form(
+            step_id="measurement_types",
+            data_schema=_measurement_schema(self._measurement_entry_data, selected or []),
+            errors=errors,
+        )
 
     async def async_step_ecoplug_select(
             self, user_input: Optional[dict[str, Any]] = None
@@ -1075,7 +1156,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         )
 
     async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
-        source_options = build_source_options(self._entry.data, self._options, source_kind="power", power_only=True)
+        source_options = build_source_options(self._measurement_entry_data, self._options, source_kind="power", power_only=True)
         if user_input is None:
             return self.async_show_form(
                 step_id="extra_transform",
@@ -1127,7 +1208,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
-        source_options = build_source_options(self._entry.data, self._options, source_kind=source_kind)
+        source_options = build_source_options(self._measurement_entry_data, self._options, source_kind=source_kind)
         if user_input is None or CONST_EXTRA_ENTITY_OPERATION not in user_input:
             return self.async_show_form(
                 step_id="extra_aggregate",
@@ -1181,6 +1262,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
 
     async def _show_options_menu(self, errors: Optional[dict[str, str]] = None) -> FlowResult:
         actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
+        actions.append("measurement_types")
         if self._extra_entities:
             actions.append(CONST_EXTRA_ACTION_REMOVE)
         selected_slaves = [
@@ -1230,6 +1312,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         return await self._async_refresh_local_slaves()
 
     async def _async_refresh_local_slaves(self) -> Optional[dict[str, str]]:
+        self._firmware_version = None
         host = self._entry.data.get(CONST_ECOMAIN_HOST)
         port = self._entry.data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT)
         if not host:
@@ -1240,6 +1323,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         try:
             rr = await client.read_holding_registers(CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1)
             firmware_version = decode_int16(rr.registers, signed=False)
+            self._firmware_version = firmware_version
             if firmware_version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
                 self._available_slaves = []
                 return {"base": "firmware_too_old"}
@@ -1298,6 +1382,8 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
 
     def _update_entry_data(self) -> None:
         if self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
+            if self._firmware_version is not None:
+                self.hass.config_entries.async_update_entry(self._entry, data=self._measurement_entry_data)
             return
 
         selected = {int(s) for s in self._options.get(CONST_ECOMAIN_SELECTED_SLAVES, [])}
@@ -1315,7 +1401,8 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
 
     def _async_remove_stale_sensor_entries(self) -> None:
         old_unique_ids = build_entry_sensor_unique_ids(self._entry.data, self._entry.options)
-        new_unique_ids = build_entry_sensor_unique_ids(self._entry.data, self._options)
+        verified_data = self._entry.data if self._firmware_version is None else self._measurement_entry_data
+        new_unique_ids = build_entry_sensor_unique_ids(verified_data, self._options)
         stale_unique_ids = old_unique_ids - new_unique_ids
         registry = er.async_get(self.hass)
         for unique_id in stale_unique_ids:
