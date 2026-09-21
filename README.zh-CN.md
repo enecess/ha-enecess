@@ -1,18 +1,47 @@
 # enecess Home Assistant 集成
 
-[English](README.md) • [Deutsch](README.de.md) • [Français](README.fr.md) • [Polski](README.pl.md)
+[English](README.md) • [Deutsch](README.de.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [Italiano](README.it.md)
 
 本仓库提供 **enecess** 品牌产品的 Home Assistant（简称 HA）自定义集成。
 
-> **固件要求（本地模式）：** 通过 Modbus TCP 在本地添加 EcoMain 时，设备固件版本必须为 **136 或更高版本**。如果固件版本低于 136，或设备未提供兼容的固件版本寄存器，集成会提示 **设备固件版本过低**。云端模式不执行此本地固件校验。
+> **固件要求（本地模式）：** 通过 Modbus TCP 在本地添加 ecoMain 时，设备固件版本必须为 **136 或更高版本**。如果固件版本低于 136，或设备未提供兼容的固件版本寄存器，集成会提示 **设备固件版本过低**。云端模式不执行此本地固件校验。
+
+本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量和通道相位设置。旧固件下不支持的测量选项会隐藏。
+
+## 测量类型选择与通道相位
+
+添加 ecoMain 时，在选择 ecoSub 后、配置额外实体前选择**测量类型**。之后可在条目的**配置**页面将下一步操作设为**测量类型**，再次调整。必须至少选择一项；若额外实体正在引用某类测量，需先移除相应额外实体，才能取消该测量类型。
+
+本地固件 139 及以上提供以下十一类测量；固件 136–138 仅支持前三类：
+
+| 类别 | 含义 | 默认启用 |
+| --- | --- | --- |
+| 有功功率 | 实时有功功率（W） | 是 |
+| 正向有功电能 | 沿 CT 箭头方向累计的有功电能（Wh） | 是 |
+| 反向有功电能 | 逆 CT 箭头方向累计的有功电能（Wh） | 是 |
+| 正向无功电能 | 正向累计无功电能（varh） | 否 |
+| 反向无功电能 | 反向累计无功电能（varh） | 否 |
+| 视在功率 | 视在功率（VA） | 否 |
+| 无功功率 | 无功功率（var） | 否 |
+| 电压 | 电压（V） | 否 |
+| 电流 | 电流（A） | 否 |
+| 功率因数 | 有功功率与视在功率之比，无单位 | 否 |
+| 频率 | 电网频率（Hz），仅 ecoMain 提供 | 否 |
+
+具体可用测量取决于设备寄存器，并非所有类别都具有三相总值或每通道值；ecoSub 提供通道测量。云端仅提供**有功功率**和**电能**，默认均启用；电能选项同时控制累计电能与每分钟原始增量。ecoPlug 仍使用固定的开关、功率、电能实体。
+
+本地 ecoMain 条目可在**配置**中选择下一步操作**通道相位**，再选择 ecoMain 或已配置且在线的 ecoSub。页面显示该设备十个通道的当前相位，每个通道可选 **L1、L2、L3**。保存时先读取当前值，仅写入变更项，并回读验证。写入或校验失败会标记相应字段；已成功的修改不会自动回滚，重试前请核对页面值。该页面会修改设备上的相位配置，云端模式不提供此功能。
+
+现有截图来自较早版本，可能尚未展示测量类型或通道相位页面，产品名称大小写也可能与当前版本不同。
+
 
 ## 当前支持的设备
 
-- **EcoMain**
+- **ecoMain**
     - 本地：Modbus TCP（支持 zeroconf / mDNS 自动发现）
-    - 云端：Enecess Cloud（enecess 云服务）
-- **EcoPlug**
-    - 仅支持云端（Enecess Cloud）。
+    - 云端：enecess Cloud（enecess 云服务）
+- **ecoPlug**
+    - 仅支持云端（enecess Cloud）。
     - 同一云端账号创建一个集成条目，可按名称和序列号多选一个或多个插座。
     - 添加后可通过该条目的**配置 / Options** 修改已选择的插座。
 
@@ -26,7 +55,7 @@
 
 请先参考 HACS 官方文档完成安装和基础配置：
 
-- **开始使用 HACS**  
+- **开始使用 HACS**
   [👉点击前往](https://hacs.xyz/docs/use/)
 
 ### 2）在 HACS 审核收录期间添加本仓库
@@ -35,12 +64,12 @@
 
 点击下面的按钮，将本仓库添加为 HACS 自定义集成：
 
-- **添加到 HACS（通过 My Home Assistant 重定向）：**  
+- **添加到 HACS（通过 My Home Assistant 重定向）：**
   [👉点击前往](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
 
 > 打开链接后，在新页面中填入你的 **Home Assistant 地址**，按提示完成添加。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
 
 #### 方式 B：在 HACS 手动添加
@@ -52,7 +81,7 @@
 5. Category（类别）选择：**Integration**。
 6. 点击 **Add**。
 
-> **流程截图：**  
+> **流程截图：**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
 ---
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
@@ -65,7 +94,7 @@
 4. 下载完成后，**重启 Home Assistant**：
     - 设置 → 系统 → 重启
 
-> **流程截图：**  
+> **流程截图：**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
 ---
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
@@ -76,20 +105,20 @@
 
 ## 在 Home Assistant 中添加集成
 
-EcoMain 的配置流程有 **两种入口**：
+ecoMain 的配置流程有 **两种入口**：
 
 ### 方式一：从“已发现”入口（zeroconf / mDNS 自动发现）
 
-本集成支持 **zeroconf（mDNS）扫描**。  
-当 EcoMain 上电并与 Home Assistant 处于同一网络时：
+本集成支持 **zeroconf（mDNS）扫描**。
+当 ecoMain 上电并与 Home Assistant 处于同一网络时：
 
 1. 进入 **设置 → 设备与服务**。
-2. 在页面上部的 **已发现（Discovered）** 区域，应该能看到 **enecess / EcoMain** 设备卡片。
+2. 在页面上部的 **已发现（Discovered）** 区域，应该能看到 **enecess / ecoMain** 设备卡片。
 3. 点击该卡片上的 **添加（Add）**。
 4. 集成会自动启动配置流程，使用 **自动发现（本地）** 模式，并自动填好发现到的序列号和 IP 地址。
 5. 接下来按照下文“自动发现（本地）”的步骤完成（选择从机、确认、完成）。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
 ---
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
@@ -102,10 +131,10 @@ EcoMain 的配置流程有 **两种入口**：
 2. 点击 **添加集成（Add Integration）**。
 3. 搜索 **enecess**。
 4. 选择设备类型：
-    - **EcoMain**：继续选择**自动发现（本地）**、**手动设置（本地）**或**账号登录（云端）**。
-    - **EcoPlug**：直接进入云端账号登录。
+    - **ecoMain**：继续选择**自动发现（本地）**、**手动设置（本地）**或**账号登录（云端）**。
+    - **ecoPlug**：直接进入云端账号登录。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
 ---
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
@@ -117,14 +146,14 @@ EcoMain 的配置流程有 **两种入口**：
 > ![Select add method](docs/images/select-add-method.png)
 ---
 
-## EcoMain 支持的添加方式与详细流程
+## ecoMain 支持的添加方式与详细流程
 
-EcoMain 目前支持三种添加方式：
+ecoMain 目前支持三种添加方式：
 
 1. **自动发现（本地）**
     - 入口：
-        - “添加集成” → enecess → EcoMain → 选择：*自动发现（本地）*
-        - 或从设备与服务页面点击 **已发现的 EcoMain 卡片**
+        - “添加集成” → enecess → ecoMain → 选择：*自动发现（本地）*
+        - 或从设备与服务页面点击 **已发现的 ecoMain 卡片**
 2. **手动设置（本地）**
 3. **账号登录（云端）**
 
@@ -134,26 +163,26 @@ EcoMain 目前支持三种添加方式：
 
 推荐在以下场景使用：
 
-- EcoMain 与 Home Assistant 处于同一局域网（同一网段 / VLAN）。
+- ecoMain 与 Home Assistant 处于同一局域网（同一网段 / VLAN）。
 - 网络中 mDNS / Bonjour / zeroconf 功能正常。
 
 该方式有两种启动方式：
 
 - **手动启动**：在“添加集成”时选择 **自动发现（本地）**。
-- **已发现启动**：在设备与服务页面点击 **已发现** 区域中的 EcoMain 卡片，进入配置流程。  
+- **已发现启动**：在设备与服务页面点击 **已发现** 区域中的 ecoMain 卡片，进入配置流程。
   此时集成会自动把 zeroconf 中发现到的序列号和 IP 带入后续步骤。
 
 通用步骤如下（两种入口后续流程相同）：
 
-1. 启动 EcoMain 配置：
-    - 从 **添加集成 → enecess → EcoMain → 自动发现（本地）**，
-    - 或点击 **已发现** 区域中的 EcoMain 卡片上的 **Add**。
+1. 启动 ecoMain 配置：
+    - 从 **添加集成 → enecess → ecoMain → 自动发现（本地）**，
+    - 或点击 **已发现** 区域中的 ecoMain 卡片上的 **Add**。
 2. 集成会通过 **mDNS** 在网络中扫描匹配的服务。
-3. 如果找到设备，将显示一个列表，请根据序列号及 IP / 主机名选择你的 EcoMain。
+3. 如果找到设备，将显示一个列表，请根据序列号及 IP / 主机名选择你的 ecoMain。
 4. 确认设备信息（序列号和地址）。
-5. 集成会先读取设备的 **固件版本**，若版本过低会中止并提示；版本符合要求后，会通过 **Modbus TCP** 连接并探测 **在线从机（EcoSub）**。
+5. 集成会先读取设备的 **固件版本**，若版本过低会中止并提示；版本符合要求后，会通过 **Modbus TCP** 连接并探测 **在线从机（ecoSub）**。
 6. 如果探测到从机，可以勾选需要添加的从机（可选）。
-7. 可选配置 **额外实体**：
+7. 选择**测量类型**，然后可选配置 **额外实体**：
     - 基于功率源实体创建取反或绝对值实体。
     - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
     - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
@@ -162,10 +191,10 @@ EcoMain 目前支持三种添加方式：
 排错提示：
 
 - 如扫描不到设备，可尝试改用 **手动设置（本地）**。
-- 请确保 Home Assistant 与 EcoMain 处于同一网段 / VLAN。
+- 请确保 Home Assistant 与 ecoMain 处于同一网段 / VLAN。
 - 部分路由器会隔离多播 / mDNS，需要在路由器中开启相关功能。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
 ---
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
@@ -184,26 +213,26 @@ EcoMain 目前支持三种添加方式：
 
 在以下情况使用：
 
-- 自动发现无法找到你的 EcoMain。
-- 你已经知道 EcoMain 的 IP / 主机名和主机序列号。
+- 自动发现无法找到你的 ecoMain。
+- 你已经知道 ecoMain 的 IP / 主机名和主机序列号。
 
 准备工作：
 
-- 从路由器 DHCP 列表或者设备网络配置中查到 EcoMain 的 **IP 地址**。
-- 准备好 EcoMain 的 **主机序列号**（通常贴在设备标签上）。
+- 从路由器 DHCP 列表或者设备网络配置中查到 ecoMain 的 **IP 地址**。
+- 准备好 ecoMain 的 **主机序列号**（通常贴在设备标签上）。
 
 步骤：
 
 1. 在添加集成流程中选择：
-    - 设备类型：**EcoMain**
+    - 设备类型：**ecoMain**
     - 添加方式：**手动设置（本地）**
 2. 按提示输入：
     - **主机序列号**
     - **地址（IP 或主机名）**
 3. 确认设备信息（序列号和 IP）。
-4. 集成会先读取 **固件版本**，若版本过低会停止并提示更新固件；版本符合要求后，会通过 **Modbus TCP** 连接并获取 **在线从机（EcoSub）**。
+4. 集成会先读取 **固件版本**，若版本过低会停止并提示更新固件；版本符合要求后，会通过 **Modbus TCP** 连接并获取 **在线从机（ecoSub）**。
 5. 如果探测到从机，可勾选需要添加的从机（可选）。
-6. 可选配置 **额外实体**：
+6. 选择**测量类型**，然后可选配置 **额外实体**：
     - 基于功率源实体创建取反或绝对值实体。
     - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
     - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
@@ -215,7 +244,7 @@ EcoMain 目前支持三种添加方式：
 - Modbus TCP 使用标准端口 **502**（本集成中固定为 502，前端暂不支持修改）。
 - 如果无法连接，请重新确认 IP / 主机名、网线连接及网络权限。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
 ---
 > ![Manual setup input 2](docs/images/ecomain-manual-input-2.png)
@@ -234,25 +263,25 @@ EcoMain 目前支持三种添加方式：
 
 在以下情况使用：
 
-- 希望通过 **enecess 云平台** 读取 EcoMain 数据。
-- 你的 EcoMain 已经绑定在 **enecess App 账号**（手机 App）下。
+- 希望通过 **enecess 云平台** 读取 ecoMain 数据。
+- 你的 ecoMain 已经绑定在 **enecess App 账号**（手机 App）下。
 
-> **重要说明：**  
-> 这里的云端登录使用的是你在 **enecess 官方 App（Android / iOS）** 上使用的账号和密码。  
+> **重要说明：**
+> 这里的云端登录使用的是你在 **enecess 官方 App（Android / iOS）** 上使用的账号和密码。
 > 本集成不会为你创建新的账号，请直接使用你在 App 中登录的同一套账户信息。
 
 步骤：
 
 1. 在添加集成流程中选择：
-    - 设备类型：**EcoMain**
+    - 设备类型：**ecoMain**
     - 添加方式：**账号登录（云端）**
 2. 输入你的云端账号（即 **enecess App** 的账号）：
     - **用户名**
     - **密码**
-3. 集成会调用云端接口登录，并列出账号下所有可用的 EcoMain 主机。
-4. 在列表中选择你要添加的 EcoMain 主机。
-5. 如果账号下还存在 EcoSub 从机，集成会继续读取并列出，从中勾选需要添加的从机（可选）。
-6. 可选配置 **额外实体**：
+3. 集成会调用云端接口登录，并列出账号下所有可用的 ecoMain 主机。
+4. 在列表中选择你要添加的 ecoMain 主机。
+5. 如果账号下还存在 ecoSub 从机，集成会继续读取并列出，从中勾选需要添加的从机（可选）。
+6. 选择**测量类型**，然后可选配置 **额外实体**：
     - 基于功率源实体创建取反或绝对值实体。
     - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
     - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
@@ -263,7 +292,7 @@ EcoMain 目前支持三种添加方式：
 - 云端返回的数据是根据远端配置处理后的数据。
 - 云端刷新频率通常比本地轮询慢（约 `60s` 一次，本地约为 `5s` 一次）。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
 ---
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
@@ -278,26 +307,26 @@ EcoMain 目前支持三种添加方式：
 
 ---
 
-## EcoPlug 云端添加流程与实体行为
+## ecoPlug 云端添加流程与实体行为
 
-EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug 本地添加方式，也不为 EcoPlug 提供额外实体配置。
+ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug 本地添加方式，也不为 ecoPlug 提供额外实体配置。
 
 添加步骤：
 
 1. 进入 **设置 → 设备与服务 → 添加集成**，选择 **enecess**。
-2. 设备类型选择 **EcoPlug**。
+2. 设备类型选择 **ecoPlug**。
 3. 输入 enecess App 云端账号的用户名和密码。
 4. 登录成功后，从列表中**多选一个或多个**插座；每个选项都会显示插座名称和序列号。
-5. 完成后，同一云端账号会创建一个 EcoPlug 集成条目，其中包含本次选择的全部插座。
+5. 完成后，同一云端账号会创建一个 ecoPlug 集成条目，其中包含本次选择的全部插座。
 6. 后续如需更改选择，进入 **设置 → 设备与服务 → enecess → 配置**，增加或移除插座并保存选项。
 
-每个已选择的 EcoPlug 只创建以下实体：
+每个已选择的 ecoPlug 只创建以下实体：
 
 - 一个用于通过云端开关插座的**开关实体**。
 - `power_rt`：一个以 **W（瓦）**为单位的实时功率传感器。
 - `energy_total`：一个以 **kWh（千瓦时）**为单位的累计电能传感器。
 
-集成大约每 **60 秒**从云端轮询一次 EcoPlug 数据。控制请求成功后，开关状态会立即更新为云端已接受的目标状态；后续云端轮询仍是权威状态来源，如果插座或云端返回不同状态，轮询结果会进行修正。
+集成大约每 **60 秒**从云端轮询一次 ecoPlug 数据。控制请求成功后，开关状态会立即更新为云端已接受的目标状态；后续云端轮询仍是权威状态来源，如果插座或云端返回不同状态，轮询结果会进行修正。
 
 ---
 
@@ -309,16 +338,16 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 可以修改：
 
-- EcoMain 条目：已选择的 EcoSub 从机和额外实体配置。
-- EcoPlug 账号条目：已选择的插座。
+- ecoMain 条目：已选择的 ecoSub 从机、测量类型、额外实体配置及本地通道相位。
+- ecoPlug 账号条目：已选择的插座。
 
 不可修改：
 
 - 设备类型。
 - 添加方式。
-- EcoMain 条目中已选择的主设备 / 序列号。
+- ecoMain 条目中已选择的主设备 / 序列号。
 
-> **流程截图：**  
+> **流程截图：**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
@@ -326,7 +355,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 如需修改不可变配置：
 
 1. 进入 **设置 → 设备与服务**。
-2. 找到 **enecess** 对应的 EcoMain 条目。
+2. 找到 **enecess** 对应的 ecoMain 条目。
 3. 删除该集成条目。
 4. 根据新的需求，重新添加一次集成。
 
@@ -334,13 +363,13 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 集成条目创建后，默认标题格式如下：
 
-- **本地模式：** `EcoMain <序列号> (Local)`
-- **云端模式：** `EcoMain <序列号> (Cloud)`
+- **本地模式：** `ecoMain <序列号> (Local)`
+- **云端模式：** `ecoMain <序列号> (Cloud)`
 
 示例：
 
-- `EcoMain 12345678 (Local)`
-- `EcoMain 12345678 (Cloud)`
+- `ecoMain 12345678 (Local)`
+- `ecoMain 12345678 (Cloud)`
 
 ---
 
@@ -350,8 +379,8 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 ### 通用命名模式
 
-- **主机（EcoMain）：** 以 `main_` 开头
-- **从机（EcoSub #）：** 以 `sub<从机编号>_` 开头  
+- **主机（ecoMain）：** 以 `main_` 开头
+- **从机（ecoSub #）：** 以 `sub<从机编号>_` 开头
   例如：`sub1_...`、`sub2_...`、`sub3_...`
 - **支路通道编号：** `ch1` ~ `ch10`，共 10 路
 
@@ -369,7 +398,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
     - 实时功率
     - 正向累计电能
     - 反向累计电能
-- **从机（EcoSub）仅含支路通道（ch1–ch10）：**
+- **从机（ecoSub）仅含支路通道（ch1–ch10）：**
     - 实时功率
     - 正向累计电能
     - 反向累计电能
@@ -382,7 +411,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 #### 电流互感器（CT）方向说明
 
-每一个支路通道都通过一个 **电流互感器（CT）** 采样电流。  
+每一个支路通道都通过一个 **电流互感器（CT）** 采样电流。
 互感器上一般会有一个 **箭头** 表示电流的正方向：
 
 - 如果实际电流方向与箭头方向一致，则认为是 **正向（forward）**；
@@ -431,7 +460,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 - **主机 10 路支路通道（ch1–ch10）：**
     - 1 分钟平均功率
     - 1 分钟累计电能
-- **从机（EcoSub）仅含支路通道（ch1–ch10）：**
+- **从机（ecoSub）仅含支路通道（ch1–ch10）：**
     - 1 分钟平均功率
     - 1 分钟累计电能
 
@@ -471,16 +500,16 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 ## 常见问题 / 故障排查
 
-### Q1：EcoMain 没有出现在“已发现（Discovered）”列表中
+### Q1：ecoMain 没有出现在“已发现（Discovered）”列表中
 
 **可能原因：**
 
-- EcoMain 和 Home Assistant 不在同一网段 / VLAN。
+- ecoMain 和 Home Assistant 不在同一网段 / VLAN。
 - 路由器或防火墙阻断了多播 / mDNS 流量。
 
 **排查建议：**
 
-1. 确认 EcoMain 与 Home Assistant 在同一网络（同一个子网或 VLAN）。
+1. 确认 ecoMain 与 Home Assistant 在同一网络（同一个子网或 VLAN）。
 2. 检查路由器设置，确保多播 / mDNS 被允许在相关接口之间转发。
 3. 如仍无法自动发现，可改用 **“手动设置（本地）”**，直接填入 IP 和序列号。
 
@@ -490,17 +519,17 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 该错误可能在多处出现：
 
-- 自动发现结束后，没有发现任何 EcoMain 设备。
-- 云端登录成功，但账号下没有绑定 EcoMain 主机。
+- 自动发现结束后，没有发现任何 ecoMain 设备。
+- 云端登录成功，但账号下没有绑定 ecoMain 主机。
 - 在云端选择的主机未返回有效数据。
 
 **排查建议：**
 
 - 对于 **本地模式**：
-    - 确认 EcoMain 已上电并接入局域网。
+    - 确认 ecoMain 已上电并接入局域网。
     - 尝试使用 **手动设置（本地）**，直接填写已知 IP。
 - 对于 **云端模式**：
-    - 登录 enecess App 或 Web 云平台，确认 EcoMain 已经绑定在当前 **enecess App 账号** 下。
+    - 登录 enecess App 或 Web 云平台，确认 ecoMain 已经绑定在当前 **enecess App 账号** 下。
 
 ---
 
@@ -512,15 +541,15 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 - IP / 主机名填写错误。
 - 防火墙阻断了 502 端口。
-- EcoMain 与 Home Assistant 不在可达网络中。
-- EcoMain 正在重启或异常。
+- ecoMain 与 Home Assistant 不在可达网络中。
+- ecoMain 正在重启或异常。
 
 **排查建议：**
 
-1. 检查 EcoMain IP / 主机名是否正确。
+1. 检查 ecoMain IP / 主机名是否正确。
 2. 在同一网络的其他终端上尝试 ping 此 IP。
 3. 确认路由器或防火墙未阻断 **TCP 502 端口**。
-4. 尝试重启 EcoMain，再重新添加集成。
+4. 尝试重启 ecoMain，再重新添加集成。
 
 ---
 
@@ -535,12 +564,12 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 **这代表什么？**
 
-- 当前 EcoMain 固件版本与本集成 **不兼容或过旧**。
+- 当前 ecoMain 固件版本与本集成 **不兼容或过旧**。
 - 设备可能运行的是早期固件版本。
 
 **建议处理方式：**
 
-1. 使用官方提供的 enecess 工具 / App / 升级方法，将 EcoMain 更新到 **最新固件版本**。
+1. 使用官方提供的 enecess 工具 / App / 升级方法，将 ecoMain 更新到 **最新固件版本**。
 2. 升级完成后，再次尝试通过本地模式添加集成。
 3. 如不清楚如何升级固件，可联系安装服务商或 enecess 官方支持，并说明 Home Assistant 集成提示 `firmware_too_old`。
 
@@ -582,7 +611,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 ### Q7：提示 “该设备已配置”（`already_configured`）
 
-本集成为每个 EcoMain 及模式组合设置了一个 **唯一 ID**：
+本集成为每个 ecoMain 及模式组合设置了一个 **唯一 ID**：
 
 - 本地模式：`ecomain:<序列号>:mode_local`
 - 云端模式：`ecomain:<序列号>:mode_cloud`
@@ -592,16 +621,16 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 **处理方式：**
 
 - 进入 **设置 → 设备与服务**。
-- 找到已有的 enecess / EcoMain 条目（序列号相同）。
+- 找到已有的 enecess / ecoMain 条目（序列号相同）。
 - 如果需要重新配置，请先删除原条目，再重新添加。
 
 ---
 
 ### Q8：添加后还能修改哪些配置？
 
-可以从 Home Assistant 的 **配置 / Options** 流程中修改配置：EcoMain 条目可修改已选择的 EcoSub 从机和额外实体，EcoPlug 账号条目可修改已选择的插座。
+可以从 Home Assistant 的 **配置 / Options** 流程中修改配置：ecoMain 条目可修改已选择的 ecoSub 从机、测量类型、额外实体及本地通道相位，ecoPlug 账号条目可修改已选择的插座。
 
-设备类型、添加方式、已选择的 EcoMain 主设备不可原地修改。如需修改这些不可变配置，请删除现有条目后按新参数重新添加。
+设备类型、添加方式、已选择的 ecoMain 主设备不可原地修改。如需修改这些不可变配置，请删除现有条目后按新参数重新添加。
 
 ---
 
@@ -635,7 +664,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 **如预期中的某个从机或通道没有出现：**
 
-- 检查从机 EcoSub 是否已上电、接线是否正确。
+- 检查从机 ecoSub 是否已上电、接线是否正确。
 - 删除并重新添加集成，在从机选择步骤中勾选需要的从机。
 
 ---
@@ -701,7 +730,7 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 它们会保存在 Home Assistant 的配置存储中（和其它集成的敏感信息一样），主要用于：
 
 - 调用云端接口生成 / 刷新 token；
-- 查询 EcoMain 主机与从机数据。
+- 查询 ecoMain 主机与从机数据。
 
 **安全建议：**
 
@@ -716,5 +745,5 @@ EcoPlug **仅支持通过 Enecess Cloud 添加**。本集成不提供 EcoPlug �
 
 - 尽量附上 Home Assistant 的相关日志。
 - 说明你的添加方式（本地自动 / 本地手动 / 云端）。
-- 描述你的 EcoMain / EcoSub 型号、安装方式及网络环境。
+- 描述你的 ecoMain / ecoSub 型号、安装方式及网络环境。
 - 说明看到的具体报错提示（如：`cannot_connect_local`、`firmware_too_old`、`auth_failed` 等）。

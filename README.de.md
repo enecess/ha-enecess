@@ -1,18 +1,47 @@
 # enecess Home Assistant Integration
 
-[English](README.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md)
+[English](README.md) • [Français](README.fr.md) • [Polski](README.pl.md) • [中文](README.zh-CN.md) • [Italiano](README.it.md)
 
 Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration für **enecess**-Produkte bereit.
 
-> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von EcoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
+> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von ecoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
+
+Lokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.
+
+## Messgrößen und Kanalphasen
+
+Wähle bei der Einrichtung von ecoMain nach den ecoSub-Geräten und vor den zusätzlichen Entitäten die **Messgrößen** aus. Später lässt sich die Auswahl über **Konfigurieren → Messgrößen** ändern. Mindestens eine Messgröße ist erforderlich. Entferne zusätzliche Entitäten, die eine Messgröße verwenden, bevor du diese abwählst.
+
+Ab Firmware 139 stehen im lokalen Modus elf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
+
+| Kategorie | Bedeutung | Standard |
+| --- | --- | --- |
+| Wirkleistung | Momentane Wirkleistung (W) | Ein |
+| Wirkenergie vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
+| Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
+| Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
+| Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
+| Scheinleistung | Scheinleistung (VA) | Aus |
+| Blindleistung | Blindleistung (var) | Aus |
+| Spannung | Elektrische Spannung (V) | Aus |
+| Strom | Stromstärke (A) | Aus |
+| Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Aus |
+| Frequenz | Netzfrequenz (Hz), nur ecoMain | Aus |
+
+Die verfügbaren Werte richten sich nach den Geräteregistern; nicht jede Kategorie besitzt einen Dreiphasen-Gesamtwert oder Werte für jeden Kanal. ecoSub stellt Kanalmessungen bereit. Im Cloud-Modus sind nur **Wirkleistung** und **Energie** verfügbar, beide standardmäßig ausgewählt. Energie umfasst den kumulierten Zähler und die rohen 1-Minuten-Zuwächse. Die festen ecoPlug-Entitäten bleiben unverändert.
+
+Wähle bei einem lokalen ecoMain-Eintrag unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub. Ordne jedem der zehn Kanäle **L1**, **L2** oder **L3** zu. Die Integration liest die aktuellen Phasen, schreibt nur Änderungen und liest sie zur Prüfung erneut. Schreib- und Prüffehler erscheinen an den betroffenen Feldern; erfolgreiche Änderungen werden nicht automatisch zurückgenommen. Prüfe die angezeigten Werte vor einem erneuten Versuch. Diese Seite verändert die Gerätekonfiguration und ist im Cloud-Modus nicht verfügbar.
+
+Vorhandene Screenshots zeigen ältere Versionen und enthalten möglicherweise noch nicht die neuen Seiten oder die aktuelle Schreibweise der Produktnamen.
+
 
 ## Unterstützte Geräte
 
-- **EcoMain**
+- **ecoMain**
     - Lokal (Modbus TCP, mit zeroconf / mDNS-Erkennung)
-    - Cloud (Enecess Cloud)
-- **EcoPlug**
-    - Nur Cloud (Enecess Cloud)
+    - Cloud (enecess Cloud)
+- **ecoPlug**
+    - Nur Cloud (enecess Cloud)
     - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
     - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
 
@@ -26,7 +55,7 @@ Diese Integration kann über **HACS** installiert werden. Nach der Aufnahme in d
 
 Folge der offiziellen HACS-Anleitung:
 
-- **HACS verwenden**  
+- **HACS verwenden**
   [👉Hier klicken](https://hacs.xyz/docs/use/)
 
 ### 2) Repository während der HACS-Aufnahmeprüfung hinzufügen
@@ -35,12 +64,12 @@ Folge der offiziellen HACS-Anleitung:
 
 Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HACS hinzuzufügen:
 
-- **Zu HACS hinzufügen (My Home Assistant Redirect):**  
+- **Zu HACS hinzufügen (My Home Assistant Redirect):**
   [👉Hier klicken](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
 
 > Nach dem Klick trage auf der neuen Seite die Adresse deiner **Home Assistant-Instanz** ein.
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
 
 #### Variante B: Manuell in HACS hinzufügen
@@ -52,7 +81,7 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 5. Kategorie: **Integration**
 6. Auf **Add** klicken.
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
 ---
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
@@ -65,7 +94,7 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 4. Anschließend **Home Assistant neu starten**:
     - Einstellungen → System → Neustart
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
 ---
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
@@ -76,21 +105,21 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 
 ## Integration in Home Assistant hinzufügen
 
-Es gibt **zwei Wege**, den Konfigurationsablauf für EcoMain zu starten:
+Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
 
 ### Weg 1: Über „Gefunden“ (zeroconf / mDNS Auto-Discovery)
 
-Diese Integration unterstützt **zeroconf** (mDNS-Scan).  
-Wenn dein EcoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assistant befindet:
+Diese Integration unterstützt **zeroconf** (mDNS-Scan).
+Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assistant befindet:
 
 1. Zu **Einstellungen → Geräte & Dienste** gehen.
-2. Unter **Gefunden** sollte ein **enecess / EcoMain**-Eintrag erscheinen.
+2. Unter **Gefunden** sollte ein **enecess / ecoMain**-Eintrag erscheinen.
 3. Auf **Hinzufügen** beim gefundenen Gerät klicken.
 4. Die Integration startet automatisch die Konfiguration mit der **Automatischen Erkennung (Lokal)**, wobei Seriennummer und IP-Adresse aus der zeroconf-Erkennung
    übernommen werden.
 5. Den Schritten der **Automatischen Erkennung (Lokal)** folgen (Slaves auswählen, bestätigen, fertigstellen).
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
 ---
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
@@ -102,13 +131,13 @@ Wenn dein EcoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 1. Zu **Einstellungen → Geräte & Dienste** gehen.
 2. Auf **Integration hinzufügen** klicken.
 3. Nach **enecess** suchen.
-4. Gerätetyp auswählen: **EcoMain**.
+4. Gerätetyp auswählen: **ecoMain**.
 5. Hinzufügungsmethode wählen:
     - **Automatische Erkennung (Lokal)**
     - **Manuelle Einrichtung (Lokal)**
     - **Kontoanmeldung (Cloud)**
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
 ---
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
@@ -120,14 +149,14 @@ Wenn dein EcoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 > ![Select add method](docs/images/select-add-method.png)
 ---
 
-## EcoMain – Hinzufügungsmethoden & Schritt-für-Schritt-Abläufe
+## ecoMain – Hinzufügungsmethoden & Schritt-für-Schritt-Abläufe
 
-EcoMain kann auf drei Arten hinzugefügt werden:
+ecoMain kann auf drei Arten hinzugefügt werden:
 
 1. **Automatische Erkennung (Lokal)**
     - Startbar über:
-        - „Integration hinzufügen“ → enecess → EcoMain → Methode: *Automatische Erkennung (Lokal)*
-        - Oder durch Klick auf eine **gefundene EcoMain-Karte** (zeroconf) auf der Seite „Geräte & Dienste“.
+        - „Integration hinzufügen“ → enecess → ecoMain → Methode: *Automatische Erkennung (Lokal)*
+        - Oder durch Klick auf eine **gefundene ecoMain-Karte** (zeroconf) auf der Seite „Geräte & Dienste“.
 2. **Manuelle Einrichtung (Lokal)**
 3. **Kontoanmeldung (Cloud)**
 
@@ -135,26 +164,26 @@ EcoMain kann auf drei Arten hinzugefügt werden:
 
 Verwende diese Methode, wenn:
 
-- EcoMain sich im gleichen LAN wie Home Assistant befindet.
+- ecoMain sich im gleichen LAN wie Home Assistant befindet.
 - mDNS / Bonjour / zeroconf im Netzwerk funktioniert.
 
 Sie wird in zwei Szenarien genutzt:
 
 - **Manueller Start**: du wählst explizit **Automatische Erkennung (Lokal)** als Hinzufügungsmethode.
-- **Gefundener Start**: du klickst auf die **gefundene EcoMain-Karte**.  
+- **Gefundener Start**: du klickst auf die **gefundene ecoMain-Karte**.
   Die Integration übernimmt Seriennummer und IP aus zeroconf und führt den gleichen Ablauf fort.
 
 Schritte (für beide Starts):
 
-1. EcoMain-Konfiguration starten:
-    - Entweder über **Integration hinzufügen → enecess → EcoMain → Automatische Erkennung (Lokal)**,
-    - oder über **Hinzufügen** auf der **gefundenen** EcoMain-Karte.
+1. ecoMain-Konfiguration starten:
+    - Entweder über **Integration hinzufügen → enecess → ecoMain → Automatische Erkennung (Lokal)**,
+    - oder über **Hinzufügen** auf der **gefundenen** ecoMain-Karte.
 2. Die Integration durchsucht das Netzwerk per **mDNS** nach passenden Diensten.
-3. Wenn Geräte gefunden wurden, den gewünschten EcoMain anhand der **Seriennummer** (und angezeigter IP/Hostname) auswählen.
+3. Wenn Geräte gefunden wurden, den gewünschten ecoMain anhand der **Seriennummer** (und angezeigter IP/Hostname) auswählen.
 4. Geräteinformationen (Seriennummer, Adresse) bestätigen.
-5. Die Integration prüft zuerst die **Firmwareversion** des Geräts und versucht danach, per **Modbus TCP** zu verbinden und **online Slaves** (EcoSub) zu erkennen.
+5. Die Integration prüft zuerst die **Firmwareversion** des Geräts und versucht danach, per **Modbus TCP** zu verbinden und **online Slaves** (ecoSub) zu erkennen.
 6. Falls Slaves entdeckt werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-7. Optional **zusätzliche Entitäten** konfigurieren:
+7. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
     - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
     - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
     - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
@@ -163,10 +192,10 @@ Schritte (für beide Starts):
 Tipps bei Problemen:
 
 - Wenn keine Geräte über mDNS gefunden werden, **Manuelle Einrichtung (Lokal)** ausprobieren.
-- Sicherstellen, dass Home Assistant und EcoMain im gleichen Subnetz/VLAN sind.
+- Sicherstellen, dass Home Assistant und ecoMain im gleichen Subnetz/VLAN sind.
 - Einige Router blockieren Multicast/mDNS zwischen WLAN/Ethernet-Segmenten.
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
 ---
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
@@ -185,26 +214,26 @@ Tipps bei Problemen:
 
 Verwende diese Methode, wenn:
 
-- Die automatische Erkennung deinen EcoMain nicht findet.
-- Du IP/Hostname und Seriennummer von EcoMain bereits kennst.
+- Die automatische Erkennung deinen ecoMain nicht findet.
+- Du IP/Hostname und Seriennummer von ecoMain bereits kennst.
 
 Vorbereitung:
 
-- **IP-Adresse** von EcoMain über Router/DHCP-Liste oder Geräteeinstellungen ermitteln.
+- **IP-Adresse** von ecoMain über Router/DHCP-Liste oder Geräteeinstellungen ermitteln.
 - **Master-Seriennummer** bereithalten.
 
 Schritte:
 
 1. In der Konfiguration wählen:
-    - Gerätetyp: **EcoMain**
+    - Gerätetyp: **ecoMain**
     - Hinzufügungsmethode: **Manuelle Einrichtung (Lokal)**
 2. Eingeben:
     - **Master-Seriennummer**
     - **Adresse (IP oder Hostname)**
 3. Geräteinformationen bestätigen.
-4. Die Integration prüft zuerst die **Firmwareversion**, verbindet sich anschließend per **Modbus TCP** und sucht nach **online Slaves** (EcoSub).
+4. Die Integration prüft zuerst die **Firmwareversion**, verbindet sich anschließend per **Modbus TCP** und sucht nach **online Slaves** (ecoSub).
 5. Falls Slaves gefunden werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. Optional **zusätzliche Entitäten** konfigurieren:
+6. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
     - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
     - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
     - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
@@ -216,7 +245,7 @@ Tipps bei Problemen:
 - Standard-Modbus-Port ist **502** (fest in der Integration hinterlegt, nicht per UI änderbar).
 - Bei Verbindungsfehlern IP/Hostname und Netzwerk-Erreichbarkeit erneut prüfen.
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
 ---
 > ![Manual setup input 2](docs/images/ecomain-manual-input-2.png)
@@ -235,23 +264,23 @@ Tipps bei Problemen:
 
 Verwende diese Methode, wenn:
 
-- Du EcoMain-Daten über die **Enecess Cloud** abrufen möchtest.
-- Dein EcoMain bereits in deinem **enecess App**-Konto registriert ist.
+- Du ecoMain-Daten über die **enecess Cloud** abrufen möchtest.
+- Dein ecoMain bereits in deinem **enecess App**-Konto registriert ist.
 
 > **Wichtig:** Die Cloud-Anmeldung verwendet **genau dasselbe Konto und Passwort** wie die offizielle **enecess App** (Android / iOS). Es wird kein neues Konto angelegt.
 
 Schritte:
 
 1. In der Konfiguration wählen:
-    - Gerätetyp: **EcoMain**
+    - Gerätetyp: **ecoMain**
     - Hinzufügungsmethode: **Kontoanmeldung (Cloud)**
 2. Cloud-Zugangsdaten eingeben (die gleichen wie in der **enecess App**):
     - **Benutzername**
     - **Passwort**
-3. Die Integration meldet sich an und listet verfügbare EcoMain-Master auf.
-4. Den gewünschten EcoMain-Master auswählen.
-5. Wenn im Cloud-Konto EcoSub-Geräte vorhanden sind, werden sie geladen und du kannst auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. Optional **zusätzliche Entitäten** konfigurieren:
+3. Die Integration meldet sich an und listet verfügbare ecoMain-Master auf.
+4. Den gewünschten ecoMain-Master auswählen.
+5. Wenn im Cloud-Konto ecoSub-Geräte vorhanden sind, werden sie geladen und du kannst auswählen, welche Slaves hinzugefügt werden sollen (optional).
+6. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
     - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
     - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
     - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
@@ -262,7 +291,7 @@ Hinweise:
 - Cloud-Daten werden als bereits verarbeitete Werte gemäß deiner Cloud-Konfiguration zurückgegeben.
 - Das Cloud-Abfrageintervall ist in der Regel länger als das lokale Polling (`~60 s` vs. `~5 s`).
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
 ---
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
@@ -277,26 +306,26 @@ Hinweise:
 
 ---
 
-## EcoPlug-Cloud-Einrichtung und Entitätsverhalten
+## ecoPlug-Cloud-Einrichtung und Entitätsverhalten
 
-EcoPlug wird ausschließlich über die **Enecess Cloud** unterstützt. Die Integration bietet weder eine lokale EcoPlug-Einrichtung noch die Konfiguration zusätzlicher Entitäten.
+ecoPlug wird ausschließlich über die **enecess Cloud** unterstützt. Die Integration bietet weder eine lokale ecoPlug-Einrichtung noch die Konfiguration zusätzlicher Entitäten.
 
 Schritte:
 
 1. Gehe zu **Einstellungen → Geräte & Dienste → Integration hinzufügen** und wähle **enecess**.
-2. Wähle als Gerätetyp **EcoPlug**.
+2. Wähle als Gerätetyp **ecoPlug**.
 3. Gib den Benutzernamen und das Passwort deines enecess-App-Kontos ein.
 4. Wähle nach der Anmeldung **eine oder mehrere** Steckdosen aus der Liste aus. Jede Auswahl zeigt den Namen und die Seriennummer der Steckdose.
-5. Schließe die Einrichtung ab, um für dieses Konto einen EcoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
+5. Schließe die Einrichtung ab, um für dieses Konto einen ecoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
 6. Um die Auswahl später anzupassen, öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, füge Steckdosen hinzu oder entferne sie und speichere die Optionen.
 
-Jeder ausgewählte EcoPlug erstellt genau diese Entitäten:
+Jeder ausgewählte ecoPlug erstellt genau diese Entitäten:
 
 - Ein **Schalter**, der die Steckdose über die Cloud ein- oder ausschaltet.
 - `power_rt`: ein Echtzeit-Leistungssensor in **W**.
 - `energy_total`: ein Gesamtenergiesensor in **kWh**.
 
-EcoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nach einer erfolgreichen Steuerungsanfrage wird der Schalterstatus sofort auf den von der Cloud akzeptierten Zielstatus gesetzt. Die späteren Cloud-Abfragen bleiben maßgeblich und können den Status korrigieren, wenn die Steckdose oder die Cloud einen anderen Wert meldet.
+ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nach einer erfolgreichen Steuerungsanfrage wird der Schalterstatus sofort auf den von der Cloud akzeptierten Zielstatus gesetzt. Die späteren Cloud-Abfragen bleiben maßgeblich und können den Status korrigieren, wenn die Steckdose oder die Cloud einen anderen Wert meldet.
 
 ---
 
@@ -308,16 +337,17 @@ EcoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 
 Änderbar:
 
-- Ausgewählte EcoSub-Slaves.
+- Ausgewählte ecoSub-Slaves.
 - Konfiguration zusätzlicher Entitäten.
+- Messgrößen und im lokalen Modus die Kanalphasen.
 
 Nicht änderbar:
 
 - Gerätetyp.
 - Hinzufügungsmethode.
-- Ausgewählter EcoMain-Master / Seriennummer.
+- Ausgewählter ecoMain-Master / Seriennummer.
 
-> **Ablauf-Screenshot:**  
+> **Ablauf-Screenshot:**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
@@ -335,13 +365,13 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 
 Beim Anlegen des Integrationseintrags wird der Titel wie folgt vergeben:
 
-- **Lokaler Modus:** `EcoMain <serial> (Local)`
-- **Cloud-Modus:** `EcoMain <serial> (Cloud)`
+- **Lokaler Modus:** `ecoMain <serial> (Local)`
+- **Cloud-Modus:** `ecoMain <serial> (Cloud)`
 
 Beispiele:
 
-- `EcoMain 12345678 (Local)`
-- `EcoMain 12345678 (Cloud)`
+- `ecoMain 12345678 (Local)`
+- `ecoMain 12345678 (Cloud)`
 
 ---
 
@@ -351,8 +381,8 @@ Die Integration erstellt Sensor-Entitäten mit vorhersagbaren Keys. Der Entität
 
 ### Allgemeines Namensschema
 
-- **Hauptgerät (EcoMain):** `main_...`
-- **Slave (EcoSub #):** `sub<slave_index>_...` (z. B. `sub1_...`, `sub2_...`, `sub3_...`)
+- **Hauptgerät (ecoMain):** `main_...`
+- **Slave (ecoSub #):** `sub<slave_index>_...` (z. B. `sub1_...`, `sub2_...`, `sub3_...`)
 - **Kanalindex:** `ch1` bis `ch10`
 
 ### Lokaler Modus (Modbus)
@@ -367,7 +397,7 @@ Im lokalen Modus werden u. a. folgende Entitäten erstellt:
     - Echtzeit-Leistung
     - Vorwärts-Energie-Total
     - Rückwärts-Energie-Total
-- **Slaves (EcoSub) besitzen nur Abzweigkanäle (ch1–ch10):**
+- **Slaves (ecoSub) besitzen nur Abzweigkanäle (ch1–ch10):**
     - Echtzeit-Leistung
     - Vorwärts-Energie-Total
     - Rückwärts-Energie-Total
@@ -380,7 +410,7 @@ Im lokalen Modus werden u. a. folgende Entitäten erstellt:
 
 #### Erklärung zur Stromwandler-Richtung (CT)
 
-Jeder Abzweigkanal ist mit einem **Stromwandler (CT)** verbunden.  
+Jeder Abzweigkanal ist mit einem **Stromwandler (CT)** verbunden.
 Der CT trägt in der Regel einen **Pfeil**, der die Messrichtung angibt. Fließt der Strom in Pfeilrichtung, gilt dies als **Vorwärtsrichtung (positiv)**; fließt er
 entgegengesetzt, gilt dies als **Rückwärtsrichtung (negativ)**.
 
@@ -429,7 +459,7 @@ Im Cloud-Modus werden u. a. folgende Entitäten erstellt:
     - 1-Minuten-Durchschnittsleistung
     - roher 1-Minuten-Energiezuwachs
     - in Home Assistant kumulierte Energie
-- **Slaves (EcoSub) mit Abzweigkanälen (ch1–ch10)**
+- **Slaves (ecoSub) mit Abzweigkanälen (ch1–ch10)**
     - 1-Minuten-Durchschnittsleistung
     - roher 1-Minuten-Energiezuwachs
     - in Home Assistant kumulierte Energie
@@ -470,16 +500,16 @@ Slave Abzweig:
 
 ## FAQ / Fehlerbehebung
 
-### F1: EcoMain erscheint nicht unter „Gefunden“
+### F1: ecoMain erscheint nicht unter „Gefunden“
 
 **Mögliche Ursachen:**
 
-- EcoMain und Home Assistant befinden sich nicht im selben Subnetz/VLAN.
+- ecoMain und Home Assistant befinden sich nicht im selben Subnetz/VLAN.
 - Multicast / mDNS-Traffic wird durch Router oder Firewall blockiert.
 
 **Was du tun kannst:**
 
-1. Prüfen, ob sich EcoMain und Home Assistant im selben Netzwerksegment befinden.
+1. Prüfen, ob sich ecoMain und Home Assistant im selben Netzwerksegment befinden.
 2. Router-Einstellungen kontrollieren und Multicast/mDNS zwischen Interfaces erlauben.
 3. Wenn die Erkennung weiterhin fehlschlägt, **„Manuelle Einrichtung (Lokal)“** verwenden und IP + Seriennummer direkt eintragen.
 
@@ -489,17 +519,17 @@ Slave Abzweig:
 
 Diese Meldung kann an mehreren Stellen auftreten:
 
-- Automatische Erkennung abgeschlossen, aber kein EcoMain-Dienst gefunden.
-- Cloud-Login erfolgreich, aber kein EcoMain-Master in deinem Konto vorhanden.
+- Automatische Erkennung abgeschlossen, aber kein ecoMain-Dienst gefunden.
+- Cloud-Login erfolgreich, aber kein ecoMain-Master in deinem Konto vorhanden.
 - Der im Cloud-Ablauf ausgewählte Master liefert keine gültigen Daten.
 
 **Was du tun kannst:**
 
 - Für **lokale** Verbindungen:
-    - Prüfen, ob EcoMain eingeschaltet und im LAN erreichbar ist.
+    - Prüfen, ob ecoMain eingeschaltet und im LAN erreichbar ist.
     - **Manuelle Einrichtung (Lokal)** mit bekannter IP ausprobieren.
 - Für **Cloud**:
-    - In der enecess App oder im Web-Portal prüfen, ob EcoMain deinem **enecess App**-Konto korrekt hinzugefügt und zugewiesen ist.
+    - In der enecess App oder im Web-Portal prüfen, ob ecoMain deinem **enecess App**-Konto korrekt hinzugefügt und zugewiesen ist.
 
 ---
 
@@ -511,15 +541,15 @@ Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät nach der Firmwa
 
 - Falsche IP/Hostname.
 - Port 502 wird durch eine Firewall blockiert.
-- EcoMain ist aus dem Home-Assistant-Netzwerk nicht erreichbar.
-- EcoMain befindet sich in einem fehlerhaften Zustand oder startet gerade neu.
+- ecoMain ist aus dem Home-Assistant-Netzwerk nicht erreichbar.
+- ecoMain befindet sich in einem fehlerhaften Zustand oder startet gerade neu.
 
 **Was du tun kannst:**
 
-1. IP/Hostname von EcoMain kontrollieren.
+1. IP/Hostname von ecoMain kontrollieren.
 2. Die IP von einem anderen Gerät im gleichen Netzwerk anpingen.
 3. Sicherstellen, dass **TCP-Port 502** nicht blockiert ist.
-4. EcoMain neu starten und erneut versuchen.
+4. ecoMain neu starten und erneut versuchen.
 
 ---
 
@@ -534,12 +564,12 @@ erscheint der Fehler **„Device firmware version is too old“** (`firmware_too
 
 **Bedeutung:**
 
-- Die aktuell installierte EcoMain-Firmware ist mit dieser Integration nicht kompatibel.
+- Die aktuell installierte ecoMain-Firmware ist mit dieser Integration nicht kompatibel.
 - Eventuell läuft eine sehr alte oder nicht unterstützte Firmware.
 
 **Was du tun kannst:**
 
-1. EcoMain mit den offiziellen enecess-Tools / der App / dem vorgesehenen Verfahren auf die **neueste Firmware** aktualisieren.
+1. ecoMain mit den offiziellen enecess-Tools / der App / dem vorgesehenen Verfahren auf die **neueste Firmware** aktualisieren.
 2. Anschließend das lokale Hinzufügen erneut versuchen.
 3. Falls du nicht weißt, wie die Firmware aktualisiert wird, den Installateur oder den enecess-Support kontaktieren und erwähnen, dass die Home-Assistant-Integration
    `firmware_too_old` meldet.
@@ -551,7 +581,7 @@ erscheint der Fehler **„Device firmware version is too old“** (`firmware_too
 
 ### F5: Ich bekomme „Unable to connect to the cloud service“ (`cannot_connect`)
 
-Die Integration kann den Enecess-Cloud-Server nicht erreichen.
+Die Integration kann den enecess-Cloud-Server nicht erreichen.
 
 **Mögliche Ursachen:**
 
@@ -569,7 +599,7 @@ Die Integration kann den Enecess-Cloud-Server nicht erreichen.
 
 ### F6: Ich bekomme „Invalid username or password“ (`auth_failed`)
 
-Der Cloud-Login wurde vom Enecess-API-Server abgelehnt.
+Der Cloud-Login wurde vom enecess-API-Server abgelehnt.
 
 **Wichtig:** Die Integration nutzt **genau dasselbe Konto wie die enecess App**. Wenn die Zugangsdaten in der App nicht funktionieren, funktionieren sie hier ebenfalls
 nicht.
@@ -584,7 +614,7 @@ nicht.
 
 ### F7: Es erscheint „This device has already been configured“ (`already_configured`)
 
-Die Integration verwendet pro EcoMain und Modus eine **eindeutige ID**:
+Die Integration verwendet pro ecoMain und Modus eine **eindeutige ID**:
 
 - Lokaler Modus: `ecomain:<serial>:mode_local`
 - Cloud-Modus: `ecomain:<serial>:mode_cloud`
@@ -594,7 +624,7 @@ Wenn bereits ein Eintrag mit derselben ID existiert, kann das Gerät nicht nochm
 **Was du tun kannst:**
 
 - Zu **Einstellungen → Geräte & Dienste** wechseln.
-- Den vorhandenen enecess / EcoMain-Eintrag mit derselben Seriennummer suchen.
+- Den vorhandenen enecess / ecoMain-Eintrag mit derselben Seriennummer suchen.
 - Diesen Eintrag entfernen und den Konfigurationsablauf erneut starten, falls du neu konfigurieren möchtest.
 
 ---
@@ -603,7 +633,7 @@ Wenn bereits ein Eintrag mit derselben ID existiert, kann das Gerät nicht nochm
 
 Öffne den **Konfigurieren**- / **Optionen**-Dialog des bestehenden Eintrags in Home Assistant.
 
-Du kannst ausgewählte EcoSub-Slaves und zusätzliche Entitäten ändern. Gerätetyp, Hinzufügungsmethode und ausgewählter EcoMain-Master können nicht direkt geändert werden.
+Du kannst ausgewählte ecoSub-Slaves, Messgrößen, zusätzliche Entitäten und im lokalen Modus die Kanalphasen ändern. Gerätetyp, Hinzufügungsmethode und ausgewählter ecoMain-Master können nicht direkt geändert werden.
 
 Für diese nicht änderbaren Werte entferne den bestehenden Eintrag und füge ihn mit den neuen Parametern erneut hinzu.
 
@@ -705,7 +735,7 @@ Wenn du die **Kontoanmeldung (Cloud)** verwendest, speichert die Integration:
 Diese Daten werden in der Home-Assistant-Konfiguration (wie bei anderen Integrationen) abgelegt und genutzt, um:
 
 - Zugriffstokens zu erzeugen/zu erneuern,
-- deine EcoMain-Master und Slaves aus der Cloud zu lesen.
+- deine ecoMain-Master und Slaves aus der Cloud zu lesen.
 
 Wenn du dir Sorgen um die Sicherheit machst:
 
