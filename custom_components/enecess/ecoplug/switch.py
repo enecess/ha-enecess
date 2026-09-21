@@ -24,7 +24,7 @@ _CONTROL_ERRORS = (
 
 
 class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
-    """Control one selected EcoPlug through the cloud coordinator."""
+    """Control one selected ecoPlug through the cloud coordinator."""
 
     _attr_has_entity_name = True
     _attr_name = None
@@ -36,8 +36,8 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={device_identifier(plug.hardware_number)},
             manufacturer="enecess",
-            model="EcoPlug",
-            name=plug.name or f"EcoPlug {plug.hardware_number}",
+            model="ecoPlug",
+            name=plug.name or f"ecoPlug {plug.hardware_number}",
         )
 
     @property
@@ -82,7 +82,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up EcoPlug switches from a config entry."""
+    """Set up ecoPlug switches from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id][CONST_ENTRY_COORDINATOR]
     async_add_entities(
         EcoPlugSwitch(coordinator, EcoPlugConfig(**item))

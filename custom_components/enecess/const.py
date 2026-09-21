@@ -33,11 +33,11 @@ CONST_ADD_MODE_LOCAL_AUTO = "auto"
 CONST_ADD_MODE_LOCAL_MANUAL = "manual"
 CONST_ADD_MODE_CLOUD = "cloud"
 
-# EcoPlug config
+# ecoPlug config
 CONST_ECOPLUG_SELECTED = "ecoplug_selected"
 CONST_ECOPLUG_DEVICES = "ecoplug_devices"
 
-# EcoMain config
+# ecoMain config
 CONST_ECOMAIN_HOST = "ecomain_host"
 CONST_ECOMAIN_PORT = "ecomain_port"
 CONF_ECOMAIN_PORT = 502

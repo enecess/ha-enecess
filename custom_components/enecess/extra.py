@@ -50,7 +50,7 @@ def get_entry_extra_entities(entry_options: Optional[dict[str, Any]] = None) -> 
 
 
 def build_entry_specs(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[RegisterSpec]:
-    """Build EcoMain specs using mutable options where applicable."""
+    """Build ecoMain specs using mutable options where applicable."""
     slaves = get_entry_slaves(entry_data, entry_options)
     if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
         return build_specs_cloud(slaves)
@@ -61,19 +61,19 @@ def build_entry_descriptions(
     entry_data: dict[str, Any],
     entry_options: Optional[dict[str, Any]] = None,
 ) -> list[EnecessSensorDescription]:
-    """Build EcoMain sensor descriptions using mutable options."""
+    """Build ecoMain sensor descriptions using mutable options."""
     return build_sensor_descriptions(build_entry_specs(entry_data, entry_options))
 
 
 def sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
-    """Build the unique id used by EcoMain sensor entities."""
+    """Build the unique id used by ecoMain sensor entities."""
     mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
     sub = f":sub_{idx}" if idx != 0 else ""
     return f"ecomain:{serial}{sub}:key_{key}:mode_{mode_key}"
 
 
 def device_identifier(serial: str, idx: int, mode: str) -> tuple[str, str]:
-    """Build the device identifier used by EcoMain/EcoSub devices."""
+    """Build the device identifier used by ecoMain/ecoSub devices."""
     mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
     sub = f":sub_{idx}" if idx != 0 else ""
     return DOMAIN, f"ecomain:{serial}{sub}:mode_{mode_key}"
@@ -117,7 +117,7 @@ def extra_entity_device_index(
     descriptions: list[EnecessSensorDescription],
     extra: dict[str, Any],
 ) -> int:
-    """Return the target EcoMain/EcoSub device index for an extra entity."""
+    """Return the target ecoMain/ecoSub device index for an extra entity."""
     desc_by_key = {desc.key: desc for desc in descriptions}
     indices = {
         desc_by_key[source].spec.device_index

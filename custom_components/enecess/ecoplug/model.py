@@ -20,7 +20,7 @@ class EcoPlugSnapshot:
 
 
 def normalize_plug(plug: dict[str, Any]) -> dict[str, str] | None:
-    """Return the persisted EcoPlug fields, or None for an invalid serial."""
+    """Return the persisted ecoPlug fields, or None for an invalid serial."""
     hardware_number = plug.get("hardware_number")
     if not isinstance(hardware_number, str) or not hardware_number.strip():
         return None
@@ -90,7 +90,7 @@ def _parse_non_negative_finite(value: Any) -> float | None:
 
 
 def parse_latest_plug_data(payload: Any) -> tuple[float | None, float | None]:
-    """Return power and total energy from an EcoPlug data payload."""
+    """Return power and total energy from an ecoPlug data payload."""
     if not isinstance(payload, dict):
         return None, None
     samples = payload.get("data")

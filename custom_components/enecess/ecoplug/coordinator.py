@@ -39,7 +39,7 @@ _ORDINARY_REQUEST_ERRORS = (
 class EcoPlugCloudCoordinator(
     DataUpdateCoordinator[dict[str, EcoPlugSnapshot]]
 ):
-    """Coordinate cloud polling and control for one EcoPlug account."""
+    """Coordinate cloud polling and control for one ecoPlug account."""
 
     def __init__(
         self,
@@ -50,7 +50,7 @@ class EcoPlugCloudCoordinator(
         super().__init__(
             hass,
             logger=_LOGGER,
-            name="Enecess EcoPlug Cloud Coordinator",
+            name="enecess ecoPlug Cloud Coordinator",
             update_interval=timedelta(seconds=CONF_CLOUD_UPDATE_INTERVAL),
         )
         self._entry = entry
@@ -72,7 +72,7 @@ class EcoPlugCloudCoordinator(
             if self._token != failed_token:
                 return
 
-            _LOGGER.warning("EcoPlug account token rejected; refreshing credentials")
+            _LOGGER.warning("ecoPlug account token rejected; refreshing credentials")
             token = await self._api.generate_token(self._username, self._password)
             if not token:
                 raise EnecessAuthError("Cloud auth succeeded but token missing")
@@ -121,7 +121,7 @@ class EcoPlugCloudCoordinator(
 
         message = str(result)
         _LOGGER.error(
-            "EcoPlug %s %s request failed: %s",
+            "ecoPlug %s %s request failed: %s",
             plug.hardware_number,
             operation,
             message,
@@ -202,7 +202,7 @@ class EcoPlugCloudCoordinator(
     async def async_control(self, hardware_number: str, is_on: bool) -> None:
         """Set one selected plug and publish the accepted state immediately."""
         if hardware_number not in self._hardware_numbers:
-            raise ValueError(f"EcoPlug is not selected: {hardware_number}")
+            raise ValueError(f"ecoPlug is not selected: {hardware_number}")
 
         await self._request_with_auth_retry(
             lambda token: self._api.control_plug(token, hardware_number, is_on)

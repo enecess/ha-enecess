@@ -34,7 +34,7 @@ POWER_BLOCKS = [
 
 
 class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
-    """Coordinator for EcoMain local Modbus polling."""
+    """Coordinator for ecoMain local Modbus polling."""
 
     def __init__(
             self,
@@ -46,7 +46,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
         super().__init__(
             hass,
             logger=_LOGGER,
-            name="Enecess EcoMain Local Coordinator",
+            name="enecess ecoMain Local Coordinator",
             update_interval=timedelta(seconds=CONF_LOCAL_UPDATE_INTERVAL),
         )
         self._entry = entry
@@ -88,13 +88,13 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
 
 class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
-    """Coordinator for EcoMain cloud polling."""
+    """Coordinator for ecoMain cloud polling."""
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry, api: EnecessApi) -> None:
         super().__init__(
             hass,
             logger=_LOGGER,
-            name="Enecess EcoMain Cloud Coordinator",
+            name="enecess ecoMain Cloud Coordinator",
             update_interval=timedelta(seconds=CONF_CLOUD_UPDATE_INTERVAL),
         )
         self._entry = entry

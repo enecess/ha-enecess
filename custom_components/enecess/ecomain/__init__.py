@@ -1,1 +1,1 @@
-"""EcoMain device support for the enecess integration."""
+"""ecoMain device support for the enecess integration."""

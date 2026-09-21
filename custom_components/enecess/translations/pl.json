@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "EcoMain {ecomain_serial}",
+    "flow_title": "ecoMain {ecomain_serial}",
     "step": {
       "user": {
         "title": "Dodaj urządzenie",
@@ -9,14 +9,14 @@
         }
       },
       "ecomain_mode": {
-        "title": "Konfiguracja EcoMain",
+        "title": "Konfiguracja ecoMain",
         "data": {
           "mode": "Metoda dodawania"
         }
       },
       "ecomain_auto_scan": {
         "title": "Automatyczne wykrywanie",
-        "description": "Wybierz EcoMain",
+        "description": "Wybierz ecoMain",
         "data": {
           "ecomain_serial": "Numer seryjny urządzenia głównego"
         }
@@ -47,23 +47,23 @@
         }
       },
       "ecoplug_cloud_login": {
-        "title": "Logowanie do konta EcoPlug",
+        "title": "Logowanie do konta ecoPlug",
         "data": {
           "username": "Nazwa użytkownika",
           "password": "Hasło"
         }
       },
       "ecoplug_select": {
-        "title": "Wybierz EcoPlug",
+        "title": "Wybierz ecoPlug",
         "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania"
         }
       },
       "ecomain_cloud_master": {
-        "title": "Wybierz EcoMain",
+        "title": "Wybierz ecoMain",
         "data": {
-          "ecomain_cloud_master_id": "EcoMain główny"
+          "ecomain_cloud_master_id": "ecoMain główny"
         }
       },
       "ecomain_cloud_confirm": {
@@ -138,15 +138,15 @@
   "options": {
     "step": {
       "init": {
-        "title": "Dostosuj EcoMain",
-        "description": "Typ urządzenia: {device_type}\nMetoda dodawania: {mode}\nNumer seryjny EcoMain: {ecomain_serial}\nSkonfigurowane dodatkowe encje: {extra_entities}",
+        "title": "Dostosuj ecoMain",
+        "description": "Typ urządzenia: {device_type}\nMetoda dodawania: {mode}\nNumer seryjny ecoMain: {ecomain_serial}\nSkonfigurowane dodatkowe encje: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
           "extra_action": "Następna akcja"
         }
       },
       "ecoplug_select": {
-        "title": "Dostosuj EcoPlug",
+        "title": "Dostosuj ecoPlug",
         "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania"
@@ -203,15 +203,15 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain",
-        "ecoplug": "EcoPlug"
+        "ecomain": "ecoMain",
+        "ecoplug": "ecoPlug"
       }
     },
     "ecomain_selected_slaves": {
       "options": {
-        "1": "EcoSub 1",
-        "2": "EcoSub 2",
-        "3": "EcoSub 3"
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     },
     "extra_action": {

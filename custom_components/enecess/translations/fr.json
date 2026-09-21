@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "EcoMain {ecomain_serial}",
+    "flow_title": "ecoMain {ecomain_serial}",
     "step": {
       "user": {
         "title": "Ajouter un appareil",
@@ -9,14 +9,14 @@
         }
       },
       "ecomain_mode": {
-        "title": "Configurer EcoMain",
+        "title": "Configurer ecoMain",
         "data": {
           "mode": "Méthode d'ajout"
         }
       },
       "ecomain_auto_scan": {
         "title": "Découverte automatique",
-        "description": "Sélectionner EcoMain",
+        "description": "Sélectionner ecoMain",
         "data": {
           "ecomain_serial": "Numéro de série du maître"
         }
@@ -47,23 +47,23 @@
         }
       },
       "ecoplug_cloud_login": {
-        "title": "Connexion au compte EcoPlug",
+        "title": "Connexion au compte ecoPlug",
         "data": {
           "username": "Nom d’utilisateur",
           "password": "Mot de passe"
         }
       },
       "ecoplug_select": {
-        "title": "Sélectionner un EcoPlug",
+        "title": "Sélectionner un ecoPlug",
         "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter"
         }
       },
       "ecomain_cloud_master": {
-        "title": "Sélectionner EcoMain",
+        "title": "Sélectionner ecoMain",
         "data": {
-          "ecomain_cloud_master_id": "Maître EcoMain"
+          "ecomain_cloud_master_id": "Maître ecoMain"
         }
       },
       "ecomain_cloud_confirm": {
@@ -138,15 +138,15 @@
   "options": {
     "step": {
       "init": {
-        "title": "Ajuster EcoMain",
-        "description": "Type d'appareil : {device_type}\nMéthode d'ajout : {mode}\nNuméro de série EcoMain : {ecomain_serial}\nEntités supplémentaires configurées : {extra_entities}",
+        "title": "Ajuster ecoMain",
+        "description": "Type d'appareil : {device_type}\nMéthode d'ajout : {mode}\nNuméro de série ecoMain : {ecomain_serial}\nEntités supplémentaires configurées : {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "extra_action": "Action suivante"
         }
       },
       "ecoplug_select": {
-        "title": "Modifier EcoPlug",
+        "title": "Modifier ecoPlug",
         "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter"
@@ -203,15 +203,15 @@
     },
     "device_type": {
       "options": {
-        "ecomain": "EcoMain",
-        "ecoplug": "EcoPlug"
+        "ecomain": "ecoMain",
+        "ecoplug": "ecoPlug"
       }
     },
     "ecomain_selected_slaves": {
       "options": {
-        "1": "EcoSub 1",
-        "2": "EcoSub 2",
-        "3": "EcoSub 3"
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     },
     "extra_action": {

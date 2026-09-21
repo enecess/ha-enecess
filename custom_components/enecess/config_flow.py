@@ -227,7 +227,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     description_placeholders={},
                 )
 
-            options = {d.serial: f'EcoMain {d.serial} ({d.ip})' for d in self._discovered}
+            options = {d.serial: f'ecoMain {d.serial} ({d.ip})' for d in self._discovered}
             return self.async_show_form(  # type: ignore[return-value]
                 step_id="ecomain_auto_scan",
                 data_schema=vol.Schema({vol.Required(CONST_ECOMAIN_SERIAL): vol.In(options)}),
@@ -568,7 +568,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
         return self.async_create_entry(
-            title=f"EcoPlug ({self._cloud_username})",
+            title=f"ecoPlug ({self._cloud_username})",
             data={
                 CONST_DEVICE_TYPE: CONST_DEVICE_ECOPLUG,
                 CONST_ADD_MODE: CONST_ADD_MODE_CLOUD,
@@ -915,7 +915,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _build_title(self) -> str:
         ecomain_serial = self._ecomain_local_config.get(CONST_ECOMAIN_SERIAL) or self._ecomain_cloud_config.get(CONST_ECOMAIN_SERIAL)
         mode_key = CONST_ADD_MODE_CLOUD if self._mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
-        return f"EcoMain {ecomain_serial} ({mode_key.title()})"
+        return f"ecoMain {ecomain_serial} ({mode_key.title()})"
 
     def _normalize_slaves(self, slaves: Optional[list[str]]) -> list[int]:
         if not slaves:
@@ -938,7 +938,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class EnecessOptionsFlow(config_entries.OptionsFlow):
-    """Handle mutable Enecess options."""
+    """Handle mutable enecess options."""
 
     def __init__(self, entry: config_entries.ConfigEntry) -> None:
         self._entry = entry
@@ -1216,7 +1216,7 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
             step_id="init",
             data_schema=vol.Schema(schema_fields),
             description_placeholders={
-                CONST_DEVICE_TYPE: str(self._entry.data.get(CONST_DEVICE_TYPE)),
+                CONST_DEVICE_TYPE: {"ecomain": "ecoMain", "ecoplug": "ecoPlug"}.get(self._entry.data.get(CONST_DEVICE_TYPE), ""),
                 CONST_ADD_MODE: str(self._entry.data.get(CONST_ADD_MODE)),
                 CONST_ECOMAIN_SERIAL: str(self._entry.data.get(CONST_ECOMAIN_SERIAL)),
                 CONST_EXTRA_ENTITIES: str(len(self._extra_entities)),

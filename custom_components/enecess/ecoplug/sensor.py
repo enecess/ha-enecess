@@ -41,7 +41,7 @@ SENSOR_DESCRIPTIONS = (
 
 
 class EcoPlugSensor(CoordinatorEntity, SensorEntity):
-    """Expose one cloud reading for a selected EcoPlug."""
+    """Expose one cloud reading for a selected ecoPlug."""
 
     _attr_has_entity_name = True
 
@@ -61,8 +61,8 @@ class EcoPlugSensor(CoordinatorEntity, SensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={device_identifier(plug.hardware_number)},
             manufacturer="enecess",
-            model="EcoPlug",
-            name=plug.name or f"EcoPlug {plug.hardware_number}",
+            model="ecoPlug",
+            name=plug.name or f"ecoPlug {plug.hardware_number}",
         )
 
     @property
@@ -97,7 +97,7 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up EcoPlug sensors from a config entry."""
+    """Set up ecoPlug sensors from a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id][CONST_ENTRY_COORDINATOR]
     plugs = (EcoPlugConfig(**item) for item in entry.data[CONST_ECOPLUG_DEVICES])
     async_add_entities(

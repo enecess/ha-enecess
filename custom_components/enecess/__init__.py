@@ -25,6 +25,7 @@ from .const import (
 )
 from .extra import build_entry_specs
 from .registry import (
+    normalize_entry_title,
     async_remove_unconfigured_registry_entries as _async_remove_unconfigured_registry_entries,
 )
 
@@ -33,6 +34,9 @@ PLATFORMS: tuple[Platform, ...] = (Platform.SENSOR, Platform.SWITCH)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up enecess from a config entry."""
+    title = normalize_entry_title(entry.data, entry.title)
+    if title != entry.title:
+        hass.config_entries.async_update_entry(entry, title=title)
     options_at_setup = dict(entry.options)
     device_type = entry.data.get(CONST_DEVICE_TYPE)
     ecoplug_devices_at_setup = (

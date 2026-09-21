@@ -18,6 +18,21 @@ from .extra import (
 )
 
 
+
+def normalize_entry_title(data: dict[str, Any], title: str) -> str:
+    """Update only integration-generated legacy product titles."""
+    if data.get(CONST_DEVICE_TYPE) == CONST_DEVICE_ECOPLUG:
+        legacy = f"EcoPlug ({data.get('username')})"
+        replacement = f"ecoPlug ({data.get('username')})"
+    elif data.get(CONST_DEVICE_TYPE) == "ecomain":
+        mode = "Cloud" if data.get("mode") == "cloud" else "Local"
+        suffix = f"{data.get('ecomain_serial')} ({mode})"
+        legacy, replacement = f"EcoMain {suffix}", f"ecoMain {suffix}"
+    else:
+        return title
+    return replacement if title == legacy else title
+
+
 def async_remove_unconfigured_registry_entries(
     hass: HomeAssistant,
     entry: ConfigEntry,

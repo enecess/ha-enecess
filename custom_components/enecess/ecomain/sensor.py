@@ -38,7 +38,7 @@ def _sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
 
 
 class EcoMainSensor(CoordinatorEntity, SensorEntity):
-    """EcoMain sensor backed by a DataUpdateCoordinator."""
+    """ecoMain sensor backed by a DataUpdateCoordinator."""
 
     entity_description: EnecessSensorDescription
 
@@ -52,16 +52,16 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
-                model="EcoMain",
-                name=f"EcoMain {serial} ({mode_key.title()})",
+                model="ecoMain",
+                name=f"ecoMain {serial} ({mode_key.title()})",
             )
             self._unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
         else:
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
-                model="EcoSub",
-                name=f"EcoSub {serial} #{spec.device_index} ({mode_key.title()})",
+                model="ecoSub",
+                name=f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
             self._unique_id = _sensor_unique_id(serial, spec.device_index, spec.key, mode_key)
@@ -106,16 +106,16 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
-                model="EcoMain",
-                name=f"EcoMain {serial} ({mode_key.title()})",
+                model="ecoMain",
+                name=f"ecoMain {serial} ({mode_key.title()})",
             )
             self._unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
         else:
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
-                model="EcoSub",
-                name=f"EcoSub {serial} #{spec.device_index} ({mode_key.title()})",
+                model="ecoSub",
+                name=f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
             self._unique_id = _sensor_unique_id(serial, spec.device_index, spec.key, mode_key)
@@ -191,7 +191,7 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
 
 
 class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
-    """Derived EcoMain sensor from one or more source sensors."""
+    """Derived ecoMain sensor from one or more source sensors."""
 
     entity_description: SensorEntityDescription
 
@@ -222,15 +222,15 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
-                model="EcoMain",
-                name=f"EcoMain {serial} ({mode_key.title()})",
+                model="ecoMain",
+                name=f"ecoMain {serial} ({mode_key.title()})",
             )
         else:
             self._device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, device_index, mode_key)},
                 manufacturer="enecess",
-                model="EcoSub",
-                name=f"EcoSub {serial} #{device_index} ({mode_key.title()})",
+                model="ecoSub",
+                name=f"ecoSub {serial} #{device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
         self._unique_id = _sensor_unique_id(serial, device_index, extra_config["key"], mode_key)
@@ -276,7 +276,7 @@ async def async_setup_entry(
         entry: ConfigEntry,
         async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up EcoMain sensors from config entry."""
+    """Set up ecoMain sensors from config entry."""
     entry_data = entry.data
     device_type = entry_data.get(CONST_DEVICE_TYPE)
     mode = entry_data.get(CONST_ADD_MODE)

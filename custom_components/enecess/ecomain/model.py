@@ -28,7 +28,7 @@ class EnecessSensorDescription(SensorEntityDescription):
     spec: RegisterSpec
 
 
-# EcoMain Modbus register mapping.
+# ecoMain Modbus register mapping.
 _SLAVE_FWD_BASE: dict[int, int] = {1: 72, 2: 112, 3: 152}
 _SLAVE_REV_BASE: dict[int, int] = {1: 232, 2: 272, 3: 312}
 _SLAVE_PWR_BASE: dict[int, int] = {1: 1028, 2: 1048, 3: 1068}
