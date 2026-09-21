@@ -117,7 +117,7 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types and channel phase configuration. Unsupported measurement choices are hidden on older firmware.",
+        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.",
         "data": {
           "measurement_types": "Measurement Types"
         }
@@ -193,9 +193,32 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types and channel phase configuration. Unsupported measurement choices are hidden on older firmware.",
+        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.",
         "data": {
           "measurement_types": "Measurement Types"
+        }
+      },
+      "phase_device": {
+        "title": "Channel Phases",
+        "data": {
+          "phase_device": "Device"
+        },
+        "description": "Channel phase configuration requires firmware 139 or later."
+      },
+      "channel_phases": {
+        "title": "Channel Phases",
+        "description": "Assign L1, L2 or L3 to channels on {device}. Saving writes changed phases to the device and reads them back to verify.",
+        "data": {
+          "channel_1": "Channel 1",
+          "channel_2": "Channel 2",
+          "channel_3": "Channel 3",
+          "channel_4": "Channel 4",
+          "channel_5": "Channel 5",
+          "channel_6": "Channel 6",
+          "channel_7": "Channel 7",
+          "channel_8": "Channel 8",
+          "channel_9": "Channel 9",
+          "channel_10": "Channel 10"
         }
       }
     },
@@ -210,7 +233,16 @@
       "firmware_too_old": "Device firmware version is too old.",
       "no_measurements_selected": "Select at least one measurement type.",
       "invalid_measurements": "The selected measurements are not supported in this mode.",
-      "measurement_in_use": "Remove extra entities using this measurement before deselecting it."
+      "measurement_in_use": "Remove extra entities using this measurement before deselecting it.",
+      "phase_read_failed": "Unable to read channel phases from the device.",
+      "phase_write_failed": "Unable to write this channel phase. Check the device and try again.",
+      "phase_verify_failed": "The phase read back does not match the requested value. Check this channel and try again.",
+      "invalid_phase": "Select L1, L2 or L3.",
+      "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",
+      "phase_firmware_too_old": "Channel phase configuration requires firmware 139 or later."
+    },
+    "abort": {
+      "phase_unavailable": "Channel phase settings are only available for online devices in local mode."
     }
   },
   "selector": {
@@ -240,7 +272,8 @@
         "add_transform": "Add Invert/Absolute Power Entity",
         "add_aggregate": "Add Sum/Average Entity",
         "remove": "Remove Extra Entity",
-        "measurement_types": "Measurement Types"
+        "measurement_types": "Measurement Types",
+        "channel_phases": "Channel Phases"
       }
     },
     "extra_entity_operation": {
@@ -271,6 +304,14 @@
         "power_factor": "Power factor",
         "frequency": "Frequency",
         "energy": "Energy (accumulated and 1-minute increment)"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     }
   }

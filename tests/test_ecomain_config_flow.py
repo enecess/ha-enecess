@@ -1,9 +1,11 @@
-"""Offline configuration regression tests."""
+"""Exercise persisted measurement selections and phase UI without networking."""
 
 import types
 import unittest
 from unittest.mock import AsyncMock, patch
+
 from flow_test_support import load_flow
+
 
 class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -88,7 +90,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
             flow._async_remove_stale_sensor_entries()
         self.assertEqual([], removed)
 
-    async def test_options_on_old_firmware_hide_new_types_and_phase_action(self):
+    async def test_firmware_136_hides_new_measurements_and_phase_action(self):
         entry = self.entry()
         entry.data["ecomain_firmware_version"] = 136
         flow = self.module.EnecessOptionsFlow(entry)
@@ -98,6 +100,17 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await flow._show_options_menu()
         actions = next(value.config["options"] for key, value in result["data_schema"].schema.items() if str(key) == "extra_action")
         self.assertNotIn("channel_phases", actions)
+
+    async def test_phase_action_requires_firmware_139_or_later(self):
+        for version in (None, 135, 136, 138, 139, 140):
+            with self.subTest(version=version):
+                entry = self.entry()
+                entry.data["ecomain_firmware_version"] = version
+                flow = self.module.EnecessOptionsFlow(entry)
+                result = await flow._show_options_menu()
+                actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
+                               if str(key) == "extra_action")
+                self.assertEqual(version is not None and version >= 139, "channel_phases" in actions)
 
     async def test_entry_specs_filter_unsupported_saved_selections(self):
         data = {**self.entry().data, "ecomain_firmware_version": 138}
@@ -134,8 +147,29 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_init({'extra_action': 'measurement_types'})
         self.assertEqual('measurement_types', result['step_id'])
 
+    async def test_cloud_does_not_offer_phase_writes(self):
+        flow = self.module.EnecessOptionsFlow(self.entry('cloud'))
+        result = await flow._show_options_menu()
+        actions = next(value.config['options'] for key, value in result['data_schema'].schema.items()
+                       if str(key) == 'extra_action')
+        self.assertNotIn('channel_phases', actions)
+        self.assertTrue(hasattr(flow, 'async_step_phase_device'))
+        result = await flow.async_step_phase_device({'phase_device': '0'})
+        self.assertEqual('phase_unavailable', result['reason'])
 
+    async def test_phase_device_tracks_current_selection_and_online_slaves(self):
+        flow = self.module.EnecessOptionsFlow(self.entry())
+        flow._available_slaves = ["2", "3"]
+        flow._options["ecomain_selected_slaves"] = [1, 2]
+        result = await flow.async_step_phase_device()
+        values = next(iter(result["data_schema"].schema.values())).config["options"]
+        self.assertEqual(["0", "2"], values)
 
+    async def test_phase_device_only_allows_configured_devices(self):
+        flow = self.module.EnecessOptionsFlow(self.entry())
+        self.assertTrue(hasattr(flow, 'async_step_phase_device'))
+        result = await flow.async_step_phase_device({'phase_device': '3'})
+        self.assertEqual('phase_unavailable', result['errors']['base'])
 
 
 class FirmwareTests(unittest.IsolatedAsyncioTestCase):
@@ -154,6 +188,94 @@ class FirmwareTests(unittest.IsolatedAsyncioTestCase):
                 if expected is None:
                     self.assertEqual(version, result.firmware_version)
                 client.async_close.assert_awaited_once()
+
+
+class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.module = load_flow(self)
+        from test_ecomain_phase import Transport
+        self.transport = Transport()
+        self.transport.values[3009] = 139
+        client = self.module.EnecessModbusClient("unused", 502)
+        client._client = self.transport
+        entry = types.SimpleNamespace(data={"device_type": "ecomain", "mode": "manual", "ecomain_serial": "test"},
+                                      options={}, entry_id="test")
+        self.flow = self.module.EnecessOptionsFlow(entry)
+        self.flow.hass = types.SimpleNamespace(data={"enecess": {"test": {"modbus_client": client}}})
+
+    async def test_old_firmware_blocks_phase_read_and_save(self):
+        for version in (135, 136, 138):
+            with self.subTest(version=version, operation="read"):
+                self.transport.values[3009] = version
+                result = await self.flow.async_step_phase_device({"phase_device": "0"})
+                self.assertEqual({"base": "phase_firmware_too_old"}, result["errors"])
+                self.assertFalse(any(2000 <= command[1] <= 2039 for command in self.transport.commands))
+        self.transport.values[3009] = 139
+        await self.flow.async_step_channel_phases({})
+        desired = {f"channel_{n}": "L2" for n in range(1, 11)}
+        for version in (135, 136, 138):
+            with self.subTest(version=version, operation="write"):
+                self.transport.values[3009] = version
+                self.transport.commands.clear()
+                result = await self.flow.async_step_channel_phases(desired)
+                self.assertEqual({"base": "phase_firmware_too_old"}, result["errors"])
+                self.assertFalse(any(2000 <= command[1] <= 2039 for command in self.transport.commands))
+                self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
+
+    async def test_firmware_139_or_later_allows_phase_read_and_write(self):
+        for version in (139, 140):
+            with self.subTest(version=version):
+                self.transport.values[3009] = version
+                self.transport.values[2000] = 0
+                result = await self.flow.async_step_phase_device({"phase_device": "0"})
+                self.assertEqual({}, result["errors"])
+                values = result["data_schema"]({})
+                values["channel_1"] = "L2"
+                result = await self.flow.async_step_channel_phases(values)
+                self.assertEqual("init", result["step_id"])
+                self.assertEqual(1, self.transport.values[2000])
+
+    async def test_read_defaults_and_partial_write_retry(self):
+        result = await self.flow.async_step_phase_device({"phase_device": "0"})
+        desired = result["data_schema"]({})
+        self.assertEqual({f"channel_{n}": "L1" for n in range(1, 11)}, desired)
+        self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
+        desired.update(channel_1="L2", channel_2="L3")
+        self.transport.fail_writes.add(2001)
+        result = await self.flow.async_step_channel_phases(desired)
+        self.assertEqual({"channel_2": "phase_write_failed"}, result["errors"])
+        self.assertEqual(1, self.transport.values[2000])
+        self.transport.fail_writes.clear()
+        result = await self.flow.async_step_channel_phases(desired)
+        self.assertEqual("init", result["step_id"])
+        self.assertEqual(2, self.transport.values[2001])
+        self.assertEqual(1, sum(command[0] == "write" and command[1] == 2000 for command in self.transport.commands))
+
+    async def test_failed_read_retry_only_reads(self):
+        self.transport.fail_reads.add(2000)
+        result = await self.flow.async_step_phase_device({"phase_device": "0"})
+        self.assertEqual({"base": "phase_read_failed"}, result["errors"])
+        self.assertEqual({}, result["data_schema"].schema)
+        self.transport.fail_reads.clear()
+        result = await self.flow.async_step_channel_phases({})
+        self.assertEqual({}, result["errors"])
+        self.assertEqual("L1", result["data_schema"]({})["channel_1"])
+        self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
+
+    async def test_invalid_phase_input_cannot_write(self):
+        await self.flow.async_step_phase_device({"phase_device": "0"})
+        result = await self.flow.async_step_channel_phases({"channel_1": "L4"})
+        self.assertEqual("invalid_phase", result["errors"]["channel_1"])
+        self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
+
+    async def test_unknown_hardware_phase_can_be_corrected(self):
+        self.transport.values[2000] = 3
+        result = await self.flow.async_step_phase_device({"phase_device": "0"})
+        self.assertEqual({}, result["errors"])
+        values = result["data_schema"]({"channel_1": "L3"})
+        result = await self.flow.async_step_channel_phases(values)
+        self.assertEqual("init", result["step_id"])
+        self.assertEqual(2, self.transport.values[2000])
 
 
 class BrandMigrationTests(unittest.TestCase):

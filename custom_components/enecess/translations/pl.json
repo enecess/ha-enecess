@@ -117,7 +117,7 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów i konfigurację faz kanałów. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 139. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
         "data": {
           "measurement_types": "Rodzaje pomiarów"
         }
@@ -193,9 +193,32 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów i konfigurację faz kanałów. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 139. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
         "data": {
           "measurement_types": "Rodzaje pomiarów"
+        }
+      },
+      "phase_device": {
+        "title": "Fazy kanałów",
+        "data": {
+          "phase_device": "Urządzenie"
+        },
+        "description": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej."
+      },
+      "channel_phases": {
+        "title": "Fazy kanałów",
+        "description": "Przypisz L1, L2 lub L3 do kanałów urządzenia {device}. Zapis wysyła zmienione fazy do urządzenia i ponownie je odczytuje w celu weryfikacji.",
+        "data": {
+          "channel_1": "Kanał 1",
+          "channel_2": "Kanał 2",
+          "channel_3": "Kanał 3",
+          "channel_4": "Kanał 4",
+          "channel_5": "Kanał 5",
+          "channel_6": "Kanał 6",
+          "channel_7": "Kanał 7",
+          "channel_8": "Kanał 8",
+          "channel_9": "Kanał 9",
+          "channel_10": "Kanał 10"
         }
       }
     },
@@ -210,7 +233,16 @@
       "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara.",
       "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
       "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
-      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru."
+      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru.",
+      "phase_read_failed": "Nie można odczytać faz kanałów z urządzenia.",
+      "phase_write_failed": "Nie można zapisać fazy tego kanału. Sprawdź urządzenie i spróbuj ponownie.",
+      "phase_verify_failed": "Odczytana faza nie odpowiada żądanej wartości. Sprawdź ten kanał i spróbuj ponownie.",
+      "invalid_phase": "Wybierz L1, L2 lub L3.",
+      "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
+      "phase_firmware_too_old": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej."
+    },
+    "abort": {
+      "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym."
     }
   },
   "selector": {
@@ -240,7 +272,8 @@
         "add_transform": "Dodaj encję odwrócenia/wartości bezwzględnej mocy",
         "add_aggregate": "Dodaj encję sumy/średniej",
         "remove": "Usuń dodatkową encję",
-        "measurement_types": "Rodzaje pomiarów"
+        "measurement_types": "Rodzaje pomiarów",
+        "channel_phases": "Fazy kanałów"
       }
     },
     "extra_entity_operation": {
@@ -271,6 +304,14 @@
         "power_factor": "Współczynnik mocy",
         "frequency": "Częstotliwość",
         "energy": "Energia (skumulowana i przyrost 1-minutowy)"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     }
   }

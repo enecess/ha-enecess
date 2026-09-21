@@ -117,7 +117,7 @@
       },
       "measurement_types": {
         "title": "测量类型",
-        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量和通道相位设置。旧固件下不支持的测量选项会隐藏。",
+        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量。通道相位设置支持固件 139 及以上。旧固件下不支持的测量选项会隐藏。",
         "data": {
           "measurement_types": "测量类型"
         }
@@ -193,9 +193,32 @@
       },
       "measurement_types": {
         "title": "测量类型",
-        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量和通道相位设置。旧固件下不支持的测量选项会隐藏。",
+        "description": "选择要创建的测量类型，至少选择一项。额外实体正在使用的测量类型不能取消。\n\n本地固件 136–138 支持有功功率、正向/反向有功电能。固件 139 及以上还支持其余八类新增测量。通道相位设置支持固件 139 及以上。旧固件下不支持的测量选项会隐藏。",
         "data": {
           "measurement_types": "测量类型"
+        }
+      },
+      "phase_device": {
+        "title": "通道相位",
+        "data": {
+          "phase_device": "设备"
+        },
+        "description": "通道相位设置需要固件 139 或更高版本。"
+      },
+      "channel_phases": {
+        "title": "通道相位",
+        "description": "为 {device} 的各通道选择 L1、L2 或 L3。保存时仅将修改的相位写入设备，并回读验证。",
+        "data": {
+          "channel_1": "通道 1",
+          "channel_2": "通道 2",
+          "channel_3": "通道 3",
+          "channel_4": "通道 4",
+          "channel_5": "通道 5",
+          "channel_6": "通道 6",
+          "channel_7": "通道 7",
+          "channel_8": "通道 8",
+          "channel_9": "通道 9",
+          "channel_10": "通道 10"
         }
       }
     },
@@ -210,7 +233,16 @@
       "firmware_too_old": "设备固件版本过低。",
       "no_measurements_selected": "请至少选择一种测量类型。",
       "invalid_measurements": "当前模式不支持所选测量类型。",
-      "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。"
+      "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。",
+      "phase_read_failed": "无法读取设备的通道相位。",
+      "phase_write_failed": "无法写入此通道相位，请检查设备后重试。",
+      "phase_verify_failed": "回读相位与设置值不一致，请检查此通道后重试。",
+      "invalid_phase": "请选择 L1、L2 或 L3。",
+      "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",
+      "phase_firmware_too_old": "通道相位设置需要固件 139 或更高版本。"
+    },
+    "abort": {
+      "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。"
     }
   },
   "selector": {
@@ -240,7 +272,8 @@
         "add_transform": "添加取反/绝对值功率实体",
         "add_aggregate": "添加总和/平均实体",
         "remove": "移除额外实体",
-        "measurement_types": "测量类型"
+        "measurement_types": "测量类型",
+        "channel_phases": "通道相位"
       }
     },
     "extra_entity_operation": {
@@ -271,6 +304,14 @@
         "power_factor": "功率因数",
         "frequency": "频率",
         "energy": "电能（累计及每分钟增量）"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     }
   }

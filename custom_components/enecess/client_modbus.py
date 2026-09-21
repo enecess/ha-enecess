@@ -69,7 +69,29 @@ class EnecessModbusClient:
                 raise
             if resp.isError():
                 raise ModbusException(str(resp))
+            if len(resp.registers) != count:
+                raise ModbusException(f"Expected {count} registers at {address}, got {len(resp.registers)}")
             return ModbusReadResult(registers=list(resp.registers))
+
+    async def write_register(self, address: int, value: int) -> None:
+        """Write one register and require a matching function-06 response echo."""
+        async with self._lock:
+            await self.async_connect()
+            assert self._client is not None
+            try:
+                resp = await self._client.write_register(
+                    address=address, value=value, device_id=CONF_ECOMAIN_UNIT_ID
+                )
+            except TypeError:
+                resp = await self._client.write_register(
+                    address=address, value=value, slave=CONF_ECOMAIN_UNIT_ID
+                )
+            if resp is None or resp.isError():
+                raise ModbusException(f"Register write failed at {address}: {resp}")
+            registers = getattr(resp, "registers", None)
+            echo = registers == [value] if registers is not None else getattr(resp, "value", None) == value
+            if getattr(resp, "address", None) != address or not echo:
+                raise ModbusException(f"Invalid register write echo at {address}: {resp}")
 
     async def async_set_target(self, host: str, port: int) -> None:
         if host == self._host and port == self._port:

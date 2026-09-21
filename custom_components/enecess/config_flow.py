@@ -24,15 +24,16 @@ from .const import (
     CONST_ECOMAIN_PORT, CONST_ECOMAIN_MASTERS, CONST_ECOMAIN_CLOUD_MASTER, CONST_ECOMAIN_CLOUD_SLAVES, CONST_ADD_MODE_LOCAL, CONST_MDNS_IP,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START, CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
     CONST_ECOMAIN_ONLINE_SLAVES, CONST_ECOMAIN_HOST, CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
-    CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
+    CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT, CONF_ECOMAIN_PHASE_FIRMWARE_VERSION,
     CONST_EXTRA_ACTION, CONST_EXTRA_ACTION_ADD_AGGREGATE, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_REMOVE,
     CONST_EXTRA_ENTITIES, CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_REMOVE, CONST_EXTRA_ENTITY_SOURCE,
     CONST_EXTRA_ENTITY_SOURCE_KIND, CONST_EXTRA_ENTITY_SOURCES,
     CONST_DEVICE_ECOPLUG, CONST_ECOPLUG_SELECTED, CONST_ECOPLUG_DEVICES,
-    CONST_MEASUREMENT_TYPES,
-    CONST_ECOMAIN_FIRMWARE_VERSION, CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION,
+    CONST_MEASUREMENT_TYPES, CONST_ENTRY_MODBUS_CLIENT,
+    CONST_ECOMAIN_FIRMWARE_VERSION,
 )
 from .ecomain.model import available_local_measurements, CLOUD_MEASUREMENTS
+from .ecomain.phase import async_read_phases, async_write_phases
 from .local_validation import async_validate_local_device
 from .registry import async_remove_unconfigured_registry_entries
 from .ecoplug.model import build_plug_options, select_plugs
@@ -1004,6 +1005,8 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         }
         self._firmware_version = entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
         self._available_slaves: list[str] = []
+        self._phase_device: Optional[int] = None
+        self._phase_values: dict[str, Optional[str]] = {}
         self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
@@ -1035,6 +1038,8 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         action = user_input[CONST_EXTRA_ACTION]
         if action == "measurement_types":
             return await self.async_step_measurement_types()
+        if action == "channel_phases":
+            return await self.async_step_phase_device()
         if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
             return await self.async_step_extra_transform()
         if action == CONST_EXTRA_ACTION_ADD_AGGREGATE:
@@ -1068,6 +1073,75 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
             step_id="measurement_types",
             data_schema=_measurement_schema(self._measurement_entry_data, selected or []),
             errors=errors,
+        )
+
+    async def async_step_phase_device(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
+            return self.async_abort(reason="phase_unavailable")
+        choices = ["0", *[str(index) for index in get_entry_slaves(self._entry.data, self._options)
+                           if str(index) in self._available_slaves]]
+        errors = {}
+        if user_input is not None:
+            selected = user_input.get("phase_device")
+            if selected not in choices:
+                errors["base"] = "phase_unavailable"
+            else:
+                self._phase_device = int(selected)
+                self._phase_values = {}
+                return await self.async_step_channel_phases()
+        return self.async_show_form(
+            step_id="phase_device",
+            data_schema=vol.Schema({vol.Required("phase_device", default="0"): selector.SelectSelector(
+                selector.SelectSelectorConfig(options=choices, translation_key="phase_device", mode=SelectSelectorMode.LIST))}),
+            errors=errors,
+        )
+
+    async def async_step_channel_phases(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
+        if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
+            return self.async_abort(reason="phase_unavailable")
+        available = [0, *[index for index in get_entry_slaves(self._entry.data, self._options)
+                           if str(index) in self._available_slaves]]
+        if self._phase_device not in available:
+            return await self.async_step_phase_device()
+        errors = {}
+        client = self.hass.data.get(DOMAIN, {}).get(self._entry.entry_id, {}).get(CONST_ENTRY_MODBUS_CLIENT)
+        if client is None:
+            errors["base"] = "phase_unavailable"
+        else:
+            try:
+                response = await client.read_holding_registers(CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1)
+                if decode_int16(response.registers, signed=False) < CONF_ECOMAIN_PHASE_FIRMWARE_VERSION:
+                    errors["base"] = "phase_firmware_too_old"
+            except Exception:
+                errors["base"] = "phase_read_failed"
+        if not errors and user_input is not None and self._phase_values:
+            desired = {f"channel_{channel}": user_input.get(f"channel_{channel}") for channel in range(1, 11)}
+            errors = {key: "invalid_phase" for key, value in desired.items() if value not in ("L1", "L2", "L3")}
+            if not errors:
+                try:
+                    errors = await async_write_phases(client, self._phase_device, desired)
+                except Exception:
+                    errors = {"base": "phase_write_failed"}
+                if not errors:
+                    return await self._show_options_menu()
+            self._phase_values = desired
+        elif not errors:
+            try:
+                self._phase_values = await async_read_phases(client, self._phase_device)
+            except Exception:
+                errors["base"] = "phase_read_failed"
+        fields = {}
+        # A failed read must never turn a default phase into an unintended write.
+        if self._phase_values:
+            for channel in range(1, 11):
+                key = f"channel_{channel}"
+                value = self._phase_values.get(key)
+                field = vol.Required(key, default=value) if value in ("L1", "L2", "L3") else vol.Required(key)
+                fields[field] = selector.SelectSelector(selector.SelectSelectorConfig(
+                    options=["L1", "L2", "L3"], mode=SelectSelectorMode.DROPDOWN))
+        return self.async_show_form(
+            step_id="channel_phases", data_schema=vol.Schema(fields), errors=errors,
+            description_placeholders={"device": "ecoMain" if self._phase_device == 0 else f"ecoSub {self._phase_device}"},
         )
 
     async def async_step_ecoplug_select(
@@ -1263,6 +1337,9 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
     async def _show_options_menu(self, errors: Optional[dict[str, str]] = None) -> FlowResult:
         actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
         actions.append("measurement_types")
+        if (self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
+                and (self._firmware_version or 0) >= CONF_ECOMAIN_PHASE_FIRMWARE_VERSION):
+            actions.append("channel_phases")
         if self._extra_entities:
             actions.append(CONST_EXTRA_ACTION_REMOVE)
         selected_slaves = [

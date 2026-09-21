@@ -117,7 +117,7 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 139 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
         "data": {
           "measurement_types": "Messgrößen"
         }
@@ -193,9 +193,32 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 139 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
         "data": {
           "measurement_types": "Messgrößen"
+        }
+      },
+      "phase_device": {
+        "title": "Kanalphasen",
+        "data": {
+          "phase_device": "Gerät"
+        },
+        "description": "Die Kanalphasenkonfiguration erfordert Firmware 139 oder neuer."
+      },
+      "channel_phases": {
+        "title": "Kanalphasen",
+        "description": "Ordnen Sie den Kanälen von {device} L1, L2 oder L3 zu. Beim Speichern werden geänderte Phasen auf das Gerät geschrieben und zur Prüfung zurückgelesen.",
+        "data": {
+          "channel_1": "Kanal 1",
+          "channel_2": "Kanal 2",
+          "channel_3": "Kanal 3",
+          "channel_4": "Kanal 4",
+          "channel_5": "Kanal 5",
+          "channel_6": "Kanal 6",
+          "channel_7": "Kanal 7",
+          "channel_8": "Kanal 8",
+          "channel_9": "Kanal 9",
+          "channel_10": "Kanal 10"
         }
       }
     },
@@ -210,7 +233,16 @@
       "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt.",
       "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
       "invalid_measurements": "Die ausgewählten Messgrößen werden in diesem Modus nicht unterstützt.",
-      "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden."
+      "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden.",
+      "phase_read_failed": "Die Kanalphasen konnten nicht vom Gerät gelesen werden.",
+      "phase_write_failed": "Diese Kanalphase konnte nicht geschrieben werden. Prüfen Sie das Gerät und versuchen Sie es erneut.",
+      "phase_verify_failed": "Die zurückgelesene Phase stimmt nicht mit dem gewünschten Wert überein. Prüfen Sie diesen Kanal und versuchen Sie es erneut.",
+      "invalid_phase": "Wählen Sie L1, L2 oder L3.",
+      "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar.",
+      "phase_firmware_too_old": "Die Kanalphasenkonfiguration erfordert Firmware 139 oder neuer."
+    },
+    "abort": {
+      "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar."
     }
   },
   "selector": {
@@ -240,7 +272,8 @@
         "add_transform": "Invertierte/absolute Leistungsentität hinzufügen",
         "add_aggregate": "Summen-/Durchschnittsentität hinzufügen",
         "remove": "Zusätzliche Entität entfernen",
-        "measurement_types": "Messgrößen"
+        "measurement_types": "Messgrößen",
+        "channel_phases": "Kanalphasen"
       }
     },
     "extra_entity_operation": {
@@ -271,6 +304,14 @@
         "power_factor": "Leistungsfaktor",
         "frequency": "Frequenz",
         "energy": "Energie (kumuliert und 1-Minuten-Zuwachs)"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     }
   }

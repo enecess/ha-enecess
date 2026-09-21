@@ -117,7 +117,7 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires et la configuration des phases des canaux. Les mesures non prises en charge sont masquées avec un ancien firmware.",
+        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 139. Les mesures non prises en charge sont masquées avec un ancien firmware.",
         "data": {
           "measurement_types": "Types de mesures"
         }
@@ -193,9 +193,32 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires et la configuration des phases des canaux. Les mesures non prises en charge sont masquées avec un ancien firmware.",
+        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 139. Les mesures non prises en charge sont masquées avec un ancien firmware.",
         "data": {
           "measurement_types": "Types de mesures"
+        }
+      },
+      "phase_device": {
+        "title": "Phases des canaux",
+        "data": {
+          "phase_device": "Appareil"
+        },
+        "description": "La configuration des phases des canaux nécessite le firmware 139 ou ultérieur."
+      },
+      "channel_phases": {
+        "title": "Phases des canaux",
+        "description": "Attribuez L1, L2 ou L3 aux canaux de {device}. L’enregistrement écrit les phases modifiées sur l’appareil et les relit pour vérification.",
+        "data": {
+          "channel_1": "Canal 1",
+          "channel_2": "Canal 2",
+          "channel_3": "Canal 3",
+          "channel_4": "Canal 4",
+          "channel_5": "Canal 5",
+          "channel_6": "Canal 6",
+          "channel_7": "Canal 7",
+          "channel_8": "Canal 8",
+          "channel_9": "Canal 9",
+          "channel_10": "Canal 10"
         }
       }
     },
@@ -210,7 +233,16 @@
       "firmware_too_old": "La version du firmware de l'appareil est trop ancienne.",
       "no_measurements_selected": "Sélectionnez au moins un type de mesure.",
       "invalid_measurements": "Les mesures sélectionnées ne sont pas prises en charge dans ce mode.",
-      "measurement_in_use": "Supprimez les entités supplémentaires utilisant cette mesure avant de la désélectionner."
+      "measurement_in_use": "Supprimez les entités supplémentaires utilisant cette mesure avant de la désélectionner.",
+      "phase_read_failed": "Impossible de lire les phases des canaux sur l’appareil.",
+      "phase_write_failed": "Impossible d’écrire la phase de ce canal. Vérifiez l’appareil et réessayez.",
+      "phase_verify_failed": "La phase relue ne correspond pas à la valeur demandée. Vérifiez ce canal et réessayez.",
+      "invalid_phase": "Sélectionnez L1, L2 ou L3.",
+      "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local.",
+      "phase_firmware_too_old": "La configuration des phases des canaux nécessite le firmware 139 ou ultérieur."
+    },
+    "abort": {
+      "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local."
     }
   },
   "selector": {
@@ -240,7 +272,8 @@
         "add_transform": "Ajouter une puissance inversée/absolue",
         "add_aggregate": "Ajouter une somme/moyenne",
         "remove": "Supprimer une entité supplémentaire",
-        "measurement_types": "Types de mesures"
+        "measurement_types": "Types de mesures",
+        "channel_phases": "Phases des canaux"
       }
     },
     "extra_entity_operation": {
@@ -271,6 +304,14 @@
         "power_factor": "Facteur de puissance",
         "frequency": "Fréquence",
         "energy": "Énergie (cumulée et incrément de 1 minute)"
+      }
+    },
+    "phase_device": {
+      "options": {
+        "0": "ecoMain",
+        "1": "ecoSub 1",
+        "2": "ecoSub 2",
+        "3": "ecoSub 3"
       }
     }
   }
