@@ -6,7 +6,15 @@ Questa integrazione personalizzata per Home Assistant supporta i prodotti **enec
 
 > **Firmware richiesto in modalità locale:** ecoMain deve avere la versione **136 o successiva**. Se la versione è precedente o il registro della versione non è leggibile, viene visualizzato `firmware_too_old`. Questo controllo non si applica alla modalità cloud.
 
-Il firmware locale 136–138 supporta potenza attiva ed energia attiva diretta/inversa. Il firmware 139 o successivo abilita anche gli otto tipi di misurazione aggiuntivi e la configurazione delle fasi dei canali. Le misurazioni non supportate sono nascoste con firmware precedenti.
+Il firmware locale 136–138 supporta potenza attiva ed energia attiva diretta/inversa. Il firmware 139 o successivo abilita anche gli otto tipi di misurazione aggiuntivi. La configurazione delle fasi dei canali è disponibile dal firmware 136. Le misurazioni non supportate sono nascoste con firmware precedenti.
+
+## Entità formula personalizzate
+
+Durante la configurazione ecoMain o in **Configura**, scegli **Aggiungi entità formula**. Imposta nome, tipo di risultato/unità e misurazioni di base abilitate nella stessa voce. Tutte le categorie supportate possono essere sorgenti. La pagina successiva associa `a`, `b`, ecc. alle sorgenti. Esempi: `max(a-b,0)` e `(a+b)/2`. Vengono salvate solo le sorgenti usate.
+
+Sono ammessi numeri, `+`, `-`, `*`, `/`, segni, parentesi e `abs`, `min`, `max`, `round`. Non sono supportate entità Home Assistant arbitrarie, altre entità aggiuntive, Jinja o dati esterni. Sorgenti non disponibili, divisioni per zero o risultati non finiti rendono la formula non disponibile.
+
+Unità: potenza attiva W, energia attiva Wh, energia reattiva varh, potenza apparente VA, potenza reattiva var, tensione V, corrente A, fattore di potenza (senza unità), frequenza Hz o numero (senza unità). Verifica la coerenza dimensionale. L’energia calcolata usa `TOTAL`, poiché il valore può diminuire. La modifica conserva identità, variabili e tipo di risultato; per cambiare tipo crea una nuova entità. Rimuovi le formule tramite la rimozione delle entità aggiuntive prima di deselezionare una misurazione utilizzata.
 
 ## Dispositivi supportati
 

@@ -6,7 +6,15 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 
 > **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von ecoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
 
-Lokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen und die Kanalphasenkonfiguration verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.
+Lokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 136 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.
+
+## Benutzerdefinierte Formelentitäten
+
+Wähle bei der ecoMain-Einrichtung oder unter **Konfigurieren** die Aktion **Formelentität hinzufügen**. Gib Namen und Ergebnistyp/Einheit an und wähle aktivierte Basismessungen dieses Eintrags. Alle unterstützten Kategorien sind möglich. Die nächste Seite ordnet `a`, `b` usw. den Quellen zu. Beispiele: `max(a-b,0)` und `(a+b)/2`. Nur tatsächlich verwendete Quellen werden gespeichert.
+
+Erlaubt sind Zahlen, `+`, `-`, `*`, `/`, Vorzeichen, Klammern sowie `abs`, `min`, `max`, `round`. Beliebige Home-Assistant-Entitäten, andere Zusatzentitäten, Jinja und externe Daten sind nicht verfügbar. Fehlende Quellen, Division durch null oder nicht endliche Ergebnisse machen die Entität nicht verfügbar.
+
+Einheiten: Wirkleistung W, Wirkenergie Wh, Blindenergie varh, Scheinleistung VA, Blindleistung var, Spannung V, Strom A, Leistungsfaktor (dimensionslos), Frequenz Hz oder Zahl (dimensionslos). Prüfe die physikalische Bedeutung selbst. Formelenergie verwendet `TOTAL`, da Ergebnisse abnehmen können. Beim Bearbeiten bleiben Identität, Variablenzuordnung und Ergebnistyp erhalten. Für einen anderen Typ erstelle eine neue Entität. Entferne abhängige Formeln über die Aktion zum Entfernen zusätzlicher Entitäten, bevor du eine Messgröße abwählst.
 
 ## Messgrößen und Kanalphasen
 

@@ -6,7 +6,15 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
 
 > **Wymagania dotyczące oprogramowania układowego (tryb lokalny):** Lokalna konfiguracja ecoMain przez Modbus TCP wymaga wersji oprogramowania układowego **136 lub nowszej**. Jeśli wersja jest starsza albo urządzenie nie udostępnia zgodnego rejestru wersji oprogramowania, integracja wyświetli komunikat **Wersja oprogramowania urządzenia jest zbyt stara**. Ta lokalna kontrola wersji nie dotyczy trybu chmurowego.
 
-Lokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów i konfigurację faz kanałów. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.
+Lokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 136. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.
+
+## Własne encje formuł
+
+Podczas konfiguracji ecoMain lub w **Konfiguruj** wybierz **Dodaj encję formuły**. Podaj nazwę, typ wyniku/jednostkę i włączone pomiary bazowe tego wpisu. Źródłami mogą być wszystkie obsługiwane kategorie. Następna strona przypisuje `a`, `b` itd. do źródeł. Przykłady: `max(a-b,0)` i `(a+b)/2`. Zapisywane są tylko używane źródła.
+
+Dozwolone są liczby, `+`, `-`, `*`, `/`, znaki, nawiasy oraz `abs`, `min`, `max`, `round`. Dowolne encje Home Assistant, inne dodatkowe encje, Jinja i dane zewnętrzne nie są obsługiwane. Niedostępne źródło, dzielenie przez zero lub wynik nieskończony sprawiają, że encja jest niedostępna.
+
+Jednostki: moc czynna W, energia czynna Wh, energia bierna varh, moc pozorna VA, moc bierna var, napięcie V, prąd A, współczynnik mocy (bezwymiarowy), częstotliwość Hz lub liczba (bezwymiarowa). Sprawdź zgodność wymiarów fizycznych. Energia z formuły używa `TOTAL`, ponieważ wynik może maleć. Edycja zachowuje tożsamość, zmienne i typ wyniku; utwórz nową encję, aby zmienić typ. Usuń formuły przez usuwanie dodatkowych encji przed odznaczeniem wykorzystywanego pomiaru.
 
 ## Wybór pomiarów i fazy kanałów
 

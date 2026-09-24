@@ -3,10 +3,11 @@
 ## Unreleased
 
 - Standardized user-visible names to enecess, ecoMain, ecoSub and ecoPlug; added Italian translations and documentation.
-- Local ecoMain retains its minimum firmware requirement of 136. Firmware 136–138 supports the original active power and forward/reverse active energy; firmware 139 or later enables the eight additional local measurement types and channel phase configuration. Unsupported choices are hidden on older firmware.
+- Local ecoMain retains its minimum firmware requirement of 136. Firmware 136–138 supports the original active power and forward/reverse active energy. Channel phase configuration is available from firmware 136; firmware 139 or later enables the eight additional local measurement types. Unsupported measurement choices are hidden on older firmware.
 - Added measurement selection during ecoMain setup and in options. Local defaults remain active power and forward/reverse active energy; eight additional local categories are opt-in. Cloud offers power and energy, both selected by default.
 - Added local channel-phase configuration for ecoMain and configured online ecoSub devices, with changed-value writes and readback verification.
 - Measurement categories referenced by extra entities cannot be deselected until those entities are removed.
+- Added custom formula entities with selectable sources and result type/unit, restricted arithmetic and `abs`, `min`, `max`, `round`. Setup and options support adding formulas; options support editing with stable identity and fixed result type, and removing formulas. Invalid or unavailable calculations report unavailable. Formula energy uses `TOTAL`.
 
 
 ## v1.0.0

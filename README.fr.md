@@ -6,7 +6,15 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
 
 > **Prérequis du firmware (mode local) :** La configuration locale d’ecoMain via Modbus TCP nécessite la version **136 ou ultérieure** du firmware. Si le firmware est plus ancien ou si l’appareil n’expose pas de registre de version du firmware compatible, l’intégration affiche **La version du firmware de l’appareil est trop ancienne**. Ce contrôle local du firmware ne s’applique pas au mode cloud.
 
-Le firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires et la configuration des phases des canaux. Les mesures non prises en charge sont masquées avec un ancien firmware.
+Le firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 136. Les mesures non prises en charge sont masquées avec un ancien firmware.
+
+## Entités de formule personnalisées
+
+Pendant la configuration ecoMain ou via **Configurer**, choisissez **Ajouter une entité de formule**. Saisissez le nom, le type de résultat/unité et les mesures de base activées de cette entrée. Toutes les catégories prises en charge peuvent servir de sources. La page suivante associe `a`, `b`, etc. aux sources. Exemples : `max(a-b,0)` et `(a+b)/2`. Seules les sources utilisées sont enregistrées.
+
+Les nombres, `+`, `-`, `*`, `/`, les signes, les parenthèses et `abs`, `min`, `max`, `round` sont permis. Les entités Home Assistant arbitraires, les autres entités supplémentaires, Jinja et les données externes ne sont pas acceptés. Une source indisponible, une division par zéro ou un résultat non fini rend la formule indisponible.
+
+Unités : puissance active W, énergie active Wh, énergie réactive varh, puissance apparente VA, puissance réactive var, tension V, courant A, facteur de puissance (sans unité), fréquence Hz ou nombre (sans unité). Vérifiez la cohérence dimensionnelle. L’énergie calculée utilise `TOTAL`, car le résultat peut diminuer. La modification conserve l’identité, les variables et le type de résultat ; créez une nouvelle entité pour changer ce type. Supprimez les formules via la suppression des entités supplémentaires avant de désélectionner une mesure utilisée.
 
 ## Sélection des mesures et phases des canaux
 

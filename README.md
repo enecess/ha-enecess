@@ -6,7 +6,17 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
 
 > **Firmware requirement (local mode):** Local ecoMain setup over Modbus TCP requires firmware version **136 or later**. If the firmware is older or the device does not expose a compatible firmware-version register, the integration displays **Device firmware version is too old**. This local firmware check does not apply to cloud mode.
 
-Local firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types and channel phase configuration. Unsupported measurement choices are hidden on older firmware.
+Local firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.
+
+## Custom formula entities
+
+During ecoMain setup or in **Configure**, choose **Add Formula Entity**, enter a name, choose a result type/unit and select enabled base measurements from this entry. All supported measurement categories can be sources. The next page maps `a`, `b`, etc. to source names. Enter a formula such as `max(a-b,0)` or `(a+b)/2`. Only sources actually referenced by the expression are saved.
+
+Supported operations: scalar numbers, `+`, `-`, `*`, `/`, unary signs, parentheses and `abs`, `min`, `max`, `round`. Arbitrary Home Assistant entities, other extra entities, Jinja and external data are not supported. An unavailable source, division by zero or a non-finite result makes the formula entity unavailable.
+
+The result type determines the unit: active power W, active energy Wh, reactive energy varh, apparent power VA, reactive power var, voltage V, current A, power factor (unitless ratio), frequency Hz or number (unitless). Check the dimensional meaning yourself. Formula energy uses `TOTAL`, since calculations can decrease.
+
+Use **Edit Formula Entity** to change the name, sources or expression while preserving the entity identity and variable aliases. The result type/unit remains fixed; create a new entity to change it. Use **Remove Extra Entity** to delete a formula. Remove formulas referencing a measurement before deselecting it.
 
 ## Measurement selection and channel phases
 
