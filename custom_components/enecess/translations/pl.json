@@ -121,6 +121,28 @@
         "data": {
           "measurement_types": "Rodzaje pomiarów"
         }
+      },
+      "extra_formula": {
+        "title": "Dodaj encję formuły",
+        "description": "Wybierz źródła; następna strona pokaże ich zmienne. Typ wyniku pozostaje stały podczas edycji. Aby go zmienić, utwórz nową encję.",
+        "data": {
+          "extra_entity_name": "Nazwa encji",
+          "extra_formula_result_type": "Typ wyniku / jednostka",
+          "extra_entity_sources": "Encje źródłowe"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Wyrażenie",
+        "description": "Zmienne: {variables}\n\nDozwolone: +, -, *, /, nawiasy, abs, min, max i round. Przykłady: max(a-b,0), (a+b)/2. Typ wyniku ustala jednostkę; sprawdź zgodność wymiarów fizycznych.",
+        "data": {
+          "extra_formula_expression": "Wyrażenie"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Edytuj encję formuły",
+        "data": {
+          "extra_formula_entity": "Encja formuły"
+        }
       }
     },
     "error": {
@@ -139,7 +161,13 @@
       "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
       "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
       "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
-      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru."
+      "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru.",
+      "formula_invalid": "Nieprawidłowa składnia lub nieobsługiwane wyrażenie.",
+      "formula_sources_invalid": "Wybierz istniejące i obsługiwane encje źródłowe.",
+      "formula_name_required": "Podaj nazwę encji.",
+      "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
+      "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
+      "no_formula_entities": "Nie skonfigurowano encji formuł."
     },
     "abort": {
       "already_configured": "To urządzenie zostało już skonfigurowane."
@@ -220,6 +248,28 @@
           "channel_9": "Kanał 9",
           "channel_10": "Kanał 10"
         }
+      },
+      "extra_formula": {
+        "title": "Dodaj encję formuły",
+        "description": "Wybierz źródła; następna strona pokaże ich zmienne. Typ wyniku pozostaje stały podczas edycji. Aby go zmienić, utwórz nową encję.",
+        "data": {
+          "extra_entity_name": "Nazwa encji",
+          "extra_formula_result_type": "Typ wyniku / jednostka",
+          "extra_entity_sources": "Encje źródłowe"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Wyrażenie",
+        "description": "Zmienne: {variables}\n\nDozwolone: +, -, *, /, nawiasy, abs, min, max i round. Przykłady: max(a-b,0), (a+b)/2. Typ wyniku ustala jednostkę; sprawdź zgodność wymiarów fizycznych.",
+        "data": {
+          "extra_formula_expression": "Wyrażenie"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Edytuj encję formuły",
+        "data": {
+          "extra_formula_entity": "Encja formuły"
+        }
       }
     },
     "error": {
@@ -239,7 +289,13 @@
       "phase_verify_failed": "Odczytana faza nie odpowiada żądanej wartości. Sprawdź ten kanał i spróbuj ponownie.",
       "invalid_phase": "Wybierz L1, L2 lub L3.",
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
-      "phase_firmware_too_old": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej."
+      "phase_firmware_too_old": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej.",
+      "formula_invalid": "Nieprawidłowa składnia lub nieobsługiwane wyrażenie.",
+      "formula_sources_invalid": "Wybierz istniejące i obsługiwane encje źródłowe.",
+      "formula_name_required": "Podaj nazwę encji.",
+      "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
+      "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
+      "no_formula_entities": "Nie skonfigurowano encji formuł."
     },
     "abort": {
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym."
@@ -273,7 +329,9 @@
         "add_aggregate": "Dodaj encję sumy/średniej",
         "remove": "Usuń dodatkową encję",
         "measurement_types": "Rodzaje pomiarów",
-        "channel_phases": "Fazy kanałów"
+        "channel_phases": "Fazy kanałów",
+        "add_formula": "Dodaj encję formuły",
+        "edit_formula": "Edytuj encję formuły"
       }
     },
     "extra_entity_operation": {
@@ -312,6 +370,20 @@
         "1": "ecoSub 1",
         "2": "ecoSub 2",
         "3": "ecoSub 3"
+      }
+    },
+    "extra_formula_result_type": {
+      "options": {
+        "power": "Moc czynna (W)",
+        "energy": "Energia czynna (Wh)",
+        "reactive_energy": "Energia bierna (varh)",
+        "apparent_power": "Moc pozorna (VA)",
+        "reactive_power": "Moc bierna (var)",
+        "voltage": "Napięcie (V)",
+        "current": "Prąd (A)",
+        "power_factor": "Współczynnik mocy",
+        "frequency": "Częstotliwość (Hz)",
+        "number": "Liczba (bez jednostki)"
       }
     }
   }

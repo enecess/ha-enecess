@@ -121,6 +121,28 @@
         "data": {
           "measurement_types": "Measurement Types"
         }
+      },
+      "extra_formula": {
+        "title": "Add Formula Entity",
+        "description": "Select sources first. The next page shows their variables. When editing, keep the existing result type; create a new entity to change it.",
+        "data": {
+          "extra_entity_name": "Entity Name",
+          "extra_formula_result_type": "Result Type / Unit",
+          "extra_entity_sources": "Source Entities"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Expression",
+        "description": "Variables: {variables}\n\nUse +, -, *, /, parentheses, abs, min, max and round. Examples: max(a-b,0), (a+b)/2. Choose the result type to set the unit; you are responsible for the dimensional meaning.",
+        "data": {
+          "extra_formula_expression": "Expression"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Edit Formula Entity",
+        "data": {
+          "extra_formula_entity": "Formula Entity"
+        }
       }
     },
     "error": {
@@ -139,7 +161,13 @@
       "no_extra_entities": "No extra entities have been configured.",
       "no_measurements_selected": "Select at least one measurement type.",
       "invalid_measurements": "The selected measurements are not supported in this mode.",
-      "measurement_in_use": "Remove extra entities using this measurement before deselecting it."
+      "measurement_in_use": "Remove extra entities using this measurement before deselecting it.",
+      "formula_invalid": "Invalid syntax or unsupported expression.",
+      "formula_sources_invalid": "Select existing supported source entities.",
+      "formula_name_required": "Enter an entity name.",
+      "formula_result_type_invalid": "Select a supported result type.",
+      "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
+      "no_formula_entities": "No formula entities have been configured."
     },
     "abort": {
       "already_configured": "This device has already been configured."
@@ -220,6 +248,28 @@
           "channel_9": "Channel 9",
           "channel_10": "Channel 10"
         }
+      },
+      "extra_formula": {
+        "title": "Add Formula Entity",
+        "description": "Select sources first. The next page shows their variables. When editing, keep the existing result type; create a new entity to change it.",
+        "data": {
+          "extra_entity_name": "Entity Name",
+          "extra_formula_result_type": "Result Type / Unit",
+          "extra_entity_sources": "Source Entities"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Expression",
+        "description": "Variables: {variables}\n\nUse +, -, *, /, parentheses, abs, min, max and round. Examples: max(a-b,0), (a+b)/2. Choose the result type to set the unit; you are responsible for the dimensional meaning.",
+        "data": {
+          "extra_formula_expression": "Expression"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Edit Formula Entity",
+        "data": {
+          "extra_formula_entity": "Formula Entity"
+        }
       }
     },
     "error": {
@@ -239,7 +289,13 @@
       "phase_verify_failed": "The phase read back does not match the requested value. Check this channel and try again.",
       "invalid_phase": "Select L1, L2 or L3.",
       "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",
-      "phase_firmware_too_old": "Channel phase configuration requires firmware 139 or later."
+      "phase_firmware_too_old": "Channel phase configuration requires firmware 139 or later.",
+      "formula_invalid": "Invalid syntax or unsupported expression.",
+      "formula_sources_invalid": "Select existing supported source entities.",
+      "formula_name_required": "Enter an entity name.",
+      "formula_result_type_invalid": "Select a supported result type.",
+      "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
+      "no_formula_entities": "No formula entities have been configured."
     },
     "abort": {
       "phase_unavailable": "Channel phase settings are only available for online devices in local mode."
@@ -273,7 +329,9 @@
         "add_aggregate": "Add Sum/Average Entity",
         "remove": "Remove Extra Entity",
         "measurement_types": "Measurement Types",
-        "channel_phases": "Channel Phases"
+        "channel_phases": "Channel Phases",
+        "add_formula": "Add Formula Entity",
+        "edit_formula": "Edit Formula Entity"
       }
     },
     "extra_entity_operation": {
@@ -312,6 +370,20 @@
         "1": "ecoSub 1",
         "2": "ecoSub 2",
         "3": "ecoSub 3"
+      }
+    },
+    "extra_formula_result_type": {
+      "options": {
+        "power": "Active power (W)",
+        "energy": "Active energy (Wh)",
+        "reactive_energy": "Reactive energy (varh)",
+        "apparent_power": "Apparent power (VA)",
+        "reactive_power": "Reactive power (var)",
+        "voltage": "Voltage (V)",
+        "current": "Current (A)",
+        "power_factor": "Power factor",
+        "frequency": "Frequency (Hz)",
+        "number": "Number (no unit)"
       }
     }
   }

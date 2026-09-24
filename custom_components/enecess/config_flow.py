@@ -34,6 +34,7 @@ from .const import (
 )
 from .ecomain.model import available_local_measurements, CLOUD_MEASUREMENTS
 from .ecomain.phase import async_read_phases, async_write_phases
+from .formula_flow import FormulaFlowMixin
 from .local_validation import async_validate_local_device
 from .registry import async_remove_unconfigured_registry_entries
 from .ecoplug.model import build_plug_options, select_plugs
@@ -84,7 +85,7 @@ def _measurement_error(entry_data: dict, selected: Any) -> Optional[str]:
     return None
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     def __init__(self) -> None:
@@ -761,6 +762,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self._show_extra_entities_menu("extra_entities")
 
         action = user_input.get(CONST_EXTRA_ACTION)
+        if action == "add_formula":
+            self._reset_formula()
+            return await self.async_step_extra_formula()
+        if action == "edit_formula":
+            return await self.async_step_extra_formula_edit()
         if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
             if CONST_EXTRA_ENTITY_OPERATION not in user_input:
                 return self._show_extra_transform_form()
@@ -916,6 +922,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._extra_entities = [extra for extra in self._extra_entities if extra.get("key") != remove_key]
         return self._show_extra_entities_menu("extra_entities")
 
+    @property
+    def _formula_context(self):
+        return self._entry_data, self._options_data()
+
+    async def _async_formula_done(self):
+        return self._show_extra_entities_menu("extra_entities")
+
     def _options_data(self) -> dict[str, Any]:
         return {
             CONST_ECOMAIN_SELECTED_SLAVES: self._entry_data.get(CONST_ECOMAIN_SELECTED_SLAVES, []),
@@ -925,6 +938,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     def _show_extra_entities_menu(self, step_id: str) -> FlowResult:
         actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
+        actions.append("add_formula")
+        if any(extra.get("operation") == "formula" for extra in self._extra_entities):
+            actions.append("edit_formula")
         if self._extra_entities:
             actions.append(CONST_EXTRA_ACTION_REMOVE)
         return self.async_show_form(
@@ -986,7 +1002,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class EnecessOptionsFlow(config_entries.OptionsFlow):
+class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
     """Handle mutable enecess options."""
 
     def __init__(self, entry: config_entries.ConfigEntry) -> None:
@@ -1010,6 +1026,13 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
         self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
+
+    @property
+    def _formula_context(self):
+        return self._measurement_entry_data, self._options
+
+    async def _async_formula_done(self):
+        return await self._show_options_menu()
 
     @property
     def _measurement_entry_data(self) -> dict[str, Any]:
@@ -1036,6 +1059,11 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
                 user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
             )
         action = user_input[CONST_EXTRA_ACTION]
+        if action == "add_formula":
+            self._reset_formula()
+            return await self.async_step_extra_formula()
+        if action == "edit_formula":
+            return await self.async_step_extra_formula_edit()
         if action == "measurement_types":
             return await self.async_step_measurement_types()
         if action == "channel_phases":
@@ -1336,6 +1364,9 @@ class EnecessOptionsFlow(config_entries.OptionsFlow):
 
     async def _show_options_menu(self, errors: Optional[dict[str, str]] = None) -> FlowResult:
         actions = [CONST_EXTRA_ACTION_FINISH, CONST_EXTRA_ACTION_ADD_TRANSFORM, CONST_EXTRA_ACTION_ADD_AGGREGATE]
+        actions.append("add_formula")
+        if any(extra.get("operation") == "formula" for extra in self._extra_entities):
+            actions.append("edit_formula")
         actions.append("measurement_types")
         if (self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
                 and (self._firmware_version or 0) >= CONF_ECOMAIN_PHASE_FIRMWARE_VERSION):

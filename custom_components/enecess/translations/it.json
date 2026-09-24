@@ -121,6 +121,28 @@
         "data": {
           "measurement_types": "Tipi di misurazione"
         }
+      },
+      "extra_formula": {
+        "title": "Aggiungi entità formula",
+        "description": "Seleziona le sorgenti; la pagina successiva mostra le variabili. Il tipo di risultato resta invariato durante la modifica. Crea una nuova entità per cambiarlo.",
+        "data": {
+          "extra_entity_name": "Nome dell’entità",
+          "extra_formula_result_type": "Tipo di risultato / unità",
+          "extra_entity_sources": "Entità di origine"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Espressione",
+        "description": "Variabili: {variables}\n\nSono ammessi +, -, *, /, parentesi, abs, min, max e round. Esempi: max(a-b,0), (a+b)/2. Il tipo di risultato determina l'unità; verifica la coerenza dimensionale.",
+        "data": {
+          "extra_formula_expression": "Espressione"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Modifica entità formula",
+        "data": {
+          "extra_formula_entity": "Entità formula"
+        }
       }
     },
     "error": {
@@ -139,7 +161,13 @@
       "no_extra_entities": "Non sono state configurate entità aggiuntive.",
       "no_measurements_selected": "Seleziona almeno un tipo di misurazione.",
       "invalid_measurements": "Le misurazioni selezionate non sono supportate in questa modalità.",
-      "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla."
+      "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla.",
+      "formula_invalid": "Sintassi non valida o espressione non supportata.",
+      "formula_sources_invalid": "Seleziona entità sorgente esistenti e supportate.",
+      "formula_name_required": "Inserisci un nome per l'entità.",
+      "formula_result_type_invalid": "Seleziona un tipo di risultato supportato.",
+      "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
+      "no_formula_entities": "Nessuna entità formula configurata."
     },
     "abort": {
       "already_configured": "Questo dispositivo è già stato configurato."
@@ -220,6 +248,28 @@
           "channel_9": "Canale 9",
           "channel_10": "Canale 10"
         }
+      },
+      "extra_formula": {
+        "title": "Aggiungi entità formula",
+        "description": "Seleziona le sorgenti; la pagina successiva mostra le variabili. Il tipo di risultato resta invariato durante la modifica. Crea una nuova entità per cambiarlo.",
+        "data": {
+          "extra_entity_name": "Nome dell’entità",
+          "extra_formula_result_type": "Tipo di risultato / unità",
+          "extra_entity_sources": "Entità di origine"
+        }
+      },
+      "extra_formula_expression": {
+        "title": "Espressione",
+        "description": "Variabili: {variables}\n\nSono ammessi +, -, *, /, parentesi, abs, min, max e round. Esempi: max(a-b,0), (a+b)/2. Il tipo di risultato determina l'unità; verifica la coerenza dimensionale.",
+        "data": {
+          "extra_formula_expression": "Espressione"
+        }
+      },
+      "extra_formula_edit": {
+        "title": "Modifica entità formula",
+        "data": {
+          "extra_formula_entity": "Entità formula"
+        }
       }
     },
     "error": {
@@ -239,7 +289,13 @@
       "phase_verify_failed": "La fase riletta non corrisponde al valore richiesto. Controlla questo canale e riprova.",
       "invalid_phase": "Seleziona L1, L2 o L3.",
       "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale.",
-      "phase_firmware_too_old": "La configurazione delle fasi dei canali richiede il firmware 139 o successivo."
+      "phase_firmware_too_old": "La configurazione delle fasi dei canali richiede il firmware 139 o successivo.",
+      "formula_invalid": "Sintassi non valida o espressione non supportata.",
+      "formula_sources_invalid": "Seleziona entità sorgente esistenti e supportate.",
+      "formula_name_required": "Inserisci un nome per l'entità.",
+      "formula_result_type_invalid": "Seleziona un tipo di risultato supportato.",
+      "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
+      "no_formula_entities": "Nessuna entità formula configurata."
     },
     "abort": {
       "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale."
@@ -273,7 +329,9 @@
         "add_aggregate": "Aggiungi entità somma/media",
         "remove": "Rimuovi entità aggiuntiva",
         "measurement_types": "Tipi di misurazione",
-        "channel_phases": "Fasi dei canali"
+        "channel_phases": "Fasi dei canali",
+        "add_formula": "Aggiungi entità formula",
+        "edit_formula": "Modifica entità formula"
       }
     },
     "extra_entity_operation": {
@@ -312,6 +370,20 @@
         "1": "ecoSub 1",
         "2": "ecoSub 2",
         "3": "ecoSub 3"
+      }
+    },
+    "extra_formula_result_type": {
+      "options": {
+        "power": "Potenza attiva (W)",
+        "energy": "Energia attiva (Wh)",
+        "reactive_energy": "Energia reattiva (varh)",
+        "apparent_power": "Potenza apparente (VA)",
+        "reactive_power": "Potenza reattiva (var)",
+        "voltage": "Tensione (V)",
+        "current": "Corrente (A)",
+        "power_factor": "Fattore di potenza",
+        "frequency": "Frequenza (Hz)",
+        "number": "Numero (senza unità)"
       }
     }
   }
