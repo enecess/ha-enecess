@@ -1,3 +1,4 @@
+import math
 
 from homeassistant.components.sensor import RestoreSensor, SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
@@ -139,7 +140,7 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
 
     @property
     def available(self) -> bool:
-        return self.coordinator.last_update_success
+        return self.coordinator.last_update_success and self._current_delta() is not None
 
     @property
     def native_value(self) -> float:
@@ -148,7 +149,10 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
     def _sync_accumulated_value(self) -> None:
         data = self.coordinator.data
         if data is not None:
-            data[self.entity_description.key] = self.native_value
+            if self._current_delta() is None:
+                data.pop(self.entity_description.key, None)
+            else:
+                data[self.entity_description.key] = self.native_value
 
     async def async_added_to_hass(self) -> None:
         """Restore accumulated value after Home Assistant restart."""
@@ -178,25 +182,30 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
         self.async_write_ha_state()
 
     def _add_current_delta(self) -> None:
+        delta = self._current_delta()
+        if delta is not None:
+            self._total += delta
+
+    def _current_delta(self) -> float | None:
+        """Keep missing or invalid samples separate from a real zero increment."""
         source_key = self.entity_description.spec.source_key
         if not source_key:
-            return
+            return None
 
         raw_delta = (self.coordinator.data or {}).get(source_key)
-        if raw_delta is None:
-            return
+        if raw_delta is None or isinstance(raw_delta, bool):
+            return None
 
         try:
             delta = float(raw_delta)
-        except (TypeError, ValueError):
-            return
+        except (TypeError, ValueError, OverflowError):
+            return None
 
         # Cloud energy should be a positive per-minute increment.
         # Ignore negative values to keep TOTAL_INCREASING safe.
-        if delta < 0:
-            return
-
-        self._total += delta
+        if not math.isfinite(delta) or delta < 0:
+            return None
+        return delta
 
 
 class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):

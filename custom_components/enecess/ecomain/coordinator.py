@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import math
 from datetime import timedelta
 from typing import Any
 
@@ -165,7 +166,17 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
     async def _fetch_and_transform(self) -> dict[str, float]:
         data = await self._fetch()
-        values: dict[str, float] = {spec.key: 0.0 for spec in self.specs}
+        values: dict[str, float] = {}
+
+        def _store(key: str, raw: Any) -> None:
+            if raw is None or isinstance(raw, bool):
+                return
+            try:
+                value = float(raw)
+            except (TypeError, ValueError, OverflowError):
+                return
+            if math.isfinite(value):
+                values[key] = value
 
         def _apply(index: int) -> None:
             hw_data = data.get(index) or {}
@@ -175,10 +186,8 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 if main_data:
                     pwr = main_data.get("power")
                     eng = main_data.get("energy")
-                    if pwr is not None:
-                        values["main_all_power_avg_1m"] = float(pwr)
-                    if eng is not None:
-                        values["main_all_energy_total_1m"] = float(eng)
+                    _store("main_all_power_avg_1m", pwr)
+                    _store("main_all_energy_total_1m", eng)
             else:
                 prefix = f"sub{index}"
 
@@ -193,10 +202,8 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                     continue
                 power = ch.get("power")
                 energy = ch.get("energy")
-                if power is not None:
-                    values[f"{prefix}_ch{ch_no}_power_avg_1m"] = float(power)
-                if energy is not None:
-                    values[f"{prefix}_ch{ch_no}_energy_total_1m"] = float(energy)
+                _store(f"{prefix}_ch{ch_no}_power_avg_1m", power)
+                _store(f"{prefix}_ch{ch_no}_energy_total_1m", energy)
 
         _apply(0)
         for idx in sorted((self._slave_map or {}).keys()):
