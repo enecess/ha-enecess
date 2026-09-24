@@ -1,4 +1,5 @@
-from homeassistant.components.sensor import RestoreSensor, SensorEntity, SensorEntityDescription
+
+from homeassistant.components.sensor import RestoreSensor, SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -22,6 +23,14 @@ from ..const import (
     DOMAIN,
 )
 from ..extra import build_entry_descriptions, build_entry_specs, extra_entity_device_index, find_source_description, get_entry_extra_entities
+from ..formula import FORMULA_RESULT_TYPES, FormulaError, evaluate_formula, validate_formula
+
+
+_FORMULA_UNITS = {
+    "power": "W", "energy": "Wh", "reactive_energy": "varh", "apparent_power": "VA",
+    "reactive_power": "var", "voltage": "V", "current": "A", "power_factor": None,
+    "frequency": "Hz", "number": None,
+}
 
 
 def _device_identifier(serial: str, idx: int, mode: str) -> tuple[str, str]:
@@ -201,13 +210,35 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
         mode: str,
         serial: str,
         extra_config: dict,
-        source_description: SensorEntityDescription,
+        source_description: SensorEntityDescription | None,
         device_index: int,
     ) -> None:
         super().__init__(coordinator)
         self._extra_config = extra_config
-        self._sources = list(extra_config.get("sources") or [])
+        self._sources = list(extra_config.get("sources") or []) if isinstance(extra_config.get("sources"), list) else []
         self._operation = extra_config.get("operation")
+        self._formula = None
+        self._variables = {}
+        if self._operation == "formula":
+            device_index = 0
+            result_type = extra_config.get("result_type")
+            valid_type = isinstance(result_type, str) and result_type in FORMULA_RESULT_TYPES
+            variables = extra_config.get("variables")
+            try:
+                if not valid_type or not isinstance(variables, dict) or not variables:
+                    raise FormulaError("Invalid saved formula configuration")
+                if not all(isinstance(name, str) and isinstance(source, str) and source in self._sources for name, source in variables.items()):
+                    raise FormulaError("Invalid saved variable mapping")
+                self._formula = validate_formula(extra_config.get("expression"), variables)
+                self._variables = {name: variables[name] for name in self._formula.referenced_variables}
+            except FormulaError:
+                self._formula = None
+            source_description = SensorEntityDescription(
+                key=extra_config["key"],
+                native_unit_of_measurement=_FORMULA_UNITS.get(result_type) if valid_type else None,
+                device_class=getattr(SensorDeviceClass, result_type.upper(), None) if valid_type else None,
+                state_class=SensorStateClass.TOTAL if result_type in ("energy", "reactive_energy") else SensorStateClass.MEASUREMENT,
+            )
         self.entity_description = SensorEntityDescription(
             key=extra_config["key"],
             name=extra_config.get("name") or extra_config["key"],
@@ -247,12 +278,21 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
     def available(self) -> bool:
         if not self.coordinator.last_update_success:
             return False
+        if self._operation == "formula":
+            return self.native_value is not None
         data = self.coordinator.data or {}
         return all(source in data and data[source] is not None for source in self._sources)
 
     @property
     def native_value(self):
         data = self.coordinator.data or {}
+        if self._operation == "formula":
+            if self._formula is None:
+                return None
+            try:
+                return evaluate_formula(self._formula, {name: data.get(source) for name, source in self._variables.items()})
+            except FormulaError:
+                return None
         try:
             values = [float(data[source]) for source in self._sources]
         except (KeyError, TypeError, ValueError):
@@ -299,6 +339,11 @@ async def async_setup_entry(
 
     source_descs = build_entry_descriptions(entry.data, entry.options)
     for extra in get_entry_extra_entities(entry.options):
+        if not isinstance(extra.get("key"), str) or not extra["key"]:
+            continue
+        if extra.get("operation") == "formula":
+            entities.append(EcoMainExtraSensor(coordinator, mode, serial, extra, None, 0))
+            continue
         sources = extra.get("sources") or []
         if not sources:
             continue

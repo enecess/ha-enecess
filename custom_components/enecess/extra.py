@@ -51,7 +51,7 @@ def get_entry_extra_entities(entry_options: Optional[dict[str, Any]] = None) -> 
     """Return configured extra entities from options."""
     entry_options = entry_options or {}
     extras = entry_options.get(CONST_EXTRA_ENTITIES, [])
-    return list(extras) if isinstance(extras, list) else []
+    return [extra for extra in extras if isinstance(extra, dict)] if isinstance(extras, list) else []
 
 
 def get_entry_measurement_types(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[str]:
@@ -133,6 +133,8 @@ def extra_entity_device_index(
     extra: dict[str, Any],
 ) -> int:
     """Return the target ecoMain/ecoSub device index for an extra entity."""
+    if extra.get("operation") == "formula":
+        return 0
     desc_by_key = {desc.key: desc for desc in descriptions}
     indices = {
         desc_by_key[source].spec.device_index

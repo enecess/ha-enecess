@@ -67,6 +67,7 @@ def load_flow(test):
 
     module('homeassistant.helpers.selector', SelectSelector=Selector,
            SelectSelectorConfig=lambda **kwargs: kwargs,
+           TextSelector=Selector, TextSelectorConfig=lambda **kwargs: kwargs,
            SelectSelectorMode=types.SimpleNamespace(LIST='list', DROPDOWN='dropdown'))
 
     @dataclass(frozen=True, kw_only=True)
@@ -83,7 +84,7 @@ def load_flow(test):
         'VOLTAGE', 'CURRENT', 'POWER_FACTOR', 'FREQUENCY')})
     module('homeassistant.components.sensor', SensorDeviceClass=classes,
            SensorEntityDescription=Description,
-           SensorStateClass=types.SimpleNamespace(MEASUREMENT='measurement', TOTAL_INCREASING='total_increasing'))
+           SensorStateClass=types.SimpleNamespace(MEASUREMENT='measurement', TOTAL_INCREASING='total_increasing', TOTAL='total'))
     module('homeassistant.const', Platform=types.SimpleNamespace(SENSOR='sensor', SWITCH='switch'),
            UnitOfEnergy=types.SimpleNamespace(WATT_HOUR='Wh', KILO_WATT_HOUR='kWh'),
            UnitOfPower=types.SimpleNamespace(WATT='W', VOLT_AMPERE='VA'),
