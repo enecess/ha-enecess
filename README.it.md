@@ -4,23 +4,17 @@
 
 Questa integrazione personalizzata per Home Assistant supporta i prodotti **enecess**.
 
-> **Firmware richiesto in modalità locale:** ecoMain deve avere la versione **136 o successiva**. Se la versione è precedente o il registro della versione non è leggibile, viene visualizzato `firmware_too_old`. Questo controllo non si applica alla modalità cloud.
-
-Il firmware locale 136–138 supporta potenza attiva ed energia attiva diretta/inversa. Il firmware 139 o successivo abilita anche gli otto tipi di misurazione aggiuntivi. La configurazione delle fasi dei canali è disponibile dal firmware 136. Le misurazioni non supportate sono nascoste con firmware precedenti.
-
-## Entità formula personalizzate
-
-Durante la configurazione ecoMain o in **Configura**, scegli **Aggiungi entità formula**. Imposta nome, tipo di risultato/unità e misurazioni di base abilitate nella stessa voce. Tutte le categorie supportate possono essere sorgenti. La pagina successiva associa `a`, `b`, ecc. alle sorgenti. Esempi: `max(a-b,0)` e `(a+b)/2`. Vengono salvate solo le sorgenti usate.
-
-Sono ammessi numeri, `+`, `-`, `*`, `/`, segni, parentesi e `abs`, `min`, `max`, `round`. Non sono supportate entità Home Assistant arbitrarie, altre entità aggiuntive, Jinja o dati esterni. Sorgenti non disponibili, divisioni per zero o risultati non finiti rendono la formula non disponibile.
-
-Unità: potenza attiva W, energia attiva Wh, energia reattiva varh, potenza apparente VA, potenza reattiva var, tensione V, corrente A, fattore di potenza (senza unità), frequenza Hz o numero (senza unità). Verifica la coerenza dimensionale. L’energia calcolata usa `TOTAL`, poiché il valore può diminuire. La modifica conserva identità, variabili e tipo di risultato; per cambiare tipo crea una nuova entità. Rimuovi le formule tramite la rimozione delle entità aggiuntive prima di deselezionare una misurazione utilizzata.
-
 ## Dispositivi supportati
 
 - **ecoMain**: connessione locale Modbus TCP, con rilevamento zeroconf/mDNS o configurazione manuale; in alternativa, connessione al cloud enecess.
 - **ecoSub**: fino a tre dispositivi secondari, selezionabili attraverso il relativo ecoMain. Ogni dispositivo dispone di dieci canali.
 - **ecoPlug**: connessione solo cloud. Un’unica voce dell’integrazione può contenere più prese dello stesso account; la selezione è modificabile nelle opzioni.
+
+> **Firmware richiesto in modalità locale:** ecoMain deve avere la versione **136 o successiva**. Se la versione è precedente o il registro della versione non è leggibile, viene visualizzato `firmware_too_old`. Questo controllo non si applica alla modalità cloud.
+
+- Firmware locale 136–138: potenza attiva ed energia attiva diretta/inversa.
+- Firmware locale 139 o successivo: anche gli altri otto tipi e le impostazioni delle fasi dei canali.
+- I tipi non supportati sono nascosti con firmware precedenti.
 
 ## Installazione con HACS
 
@@ -32,9 +26,53 @@ Unità: potenza attiva W, energia attiva Wh, energia reattiva varh, potenza appa
 
 Dopo l’inclusione nel catalogo predefinito di HACS sarà possibile cercare direttamente enecess senza aggiungere un repository personalizzato.
 
+> **Aggiungere il repository a HACS**
+>
+> ![Aggiungere il repository a HACS](docs/images/hacs-add-repo-redirect.png)
+
+> **Aprire i repository personalizzati**
+>
+> ![Aprire i repository personalizzati](docs/images/hacs-custom-repositories-1.png)
+
+> **Aggiungere il repository manualmente**
+>
+> ![Aggiungere il repository manualmente](docs/images/hacs-custom-repositories-2.png)
+
+> **Trovare enecess in HACS**
+>
+> ![Trovare enecess in HACS](docs/images/hacs-integration-download-1.png)
+
+> **Scaricare l’integrazione**
+>
+> ![Scaricare l’integrazione](docs/images/hacs-integration-download-2.png)
+
+> **Riavviare Home Assistant**
+>
+> ![Riavviare Home Assistant](docs/images/ha-restart.png)
+
 ## Aggiunta di ecoMain
 
 Apri **Impostazioni → Dispositivi e servizi → Aggiungi integrazione**, cerca **enecess**, seleziona **ecoMain** e scegli il metodo di aggiunta. Puoi anche iniziare da una scheda ecoMain nella sezione dei dispositivi rilevati: verrà avviata la procedura locale con i dati di rete rilevati.
+
+> **Aprire Dispositivi e servizi**
+>
+> ![Aprire Dispositivi e servizi](docs/images/ha-add-integration-1.png)
+
+> **Aggiungere un’integrazione**
+>
+> ![Aggiungere un’integrazione](docs/images/ha-add-integration-2.png)
+
+> **Cercare enecess**
+>
+> ![Cercare enecess](docs/images/ha-add-integration-3.png)
+
+> **Scegliere il dispositivo**
+>
+> ![Scegliere il dispositivo](docs/images/select-device-type.png)
+
+> **Scegliere il metodo di aggiunta**
+>
+> ![Scegliere il metodo di aggiunta](docs/images/select-add-method.png)
 
 ### Rilevamento automatico (locale)
 
@@ -48,6 +86,37 @@ Apri **Impostazioni → Dispositivi e servizi → Aggiungi integrazione**, cerca
 
 Se il rilevamento non trova ecoMain, verifica la configurazione multicast del router oppure usa la configurazione manuale.
 
+> **Ricerca automatica**
+>
+> ![Ricerca automatica](docs/images/ecomain-auto-scan.png)
+
+> **Selezionare ecoMain**
+>
+> ![Selezionare ecoMain](docs/images/ecomain-select-discovered.png)
+
+> **Confermare il dispositivo**
+>
+> ![Confermare il dispositivo](docs/images/ecomain-local-confirm.png)
+
+> **Selezionare gli ecoSub online**
+>
+> ![Selezionare gli ecoSub online](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Schermata da aggiungere: Tipi di misurazione (locale)**
+>
+> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
+
+
+> **Scegliere le entità aggiuntive**
+>
+> ![Scegliere le entità aggiuntive](docs/images/ecomain-extra-entities-placeholder.png)
+
+> **Configurazione locale completata**
+>
+> ![Configurazione locale completata](docs/images/ecomain-local-accomplish.png)
+
 ### Configurazione manuale (locale)
 
 1. Recupera l’indirizzo IP o il nome host di ecoMain e il suo numero di serie.
@@ -57,6 +126,37 @@ Se il rilevamento non trova ecoMain, verifica la configurazione multicast del ro
 5. Scegli i tipi di misurazione, configura le eventuali entità aggiuntive e termina.
 
 La porta Modbus TCP è **502** e non è modificabile nell’interfaccia. Home Assistant deve poter raggiungere il dispositivo attraverso la rete e il firewall.
+
+> **Aprire la configurazione manuale**
+>
+> ![Aprire la configurazione manuale](docs/images/ecomain-manual-input-1.png)
+
+> **Inserire i dati del dispositivo**
+>
+> ![Inserire i dati del dispositivo](docs/images/ecomain-manual-input-2.png)
+
+> **Confermare il dispositivo**
+>
+> ![Confermare il dispositivo](docs/images/ecomain-local-confirm.png)
+
+> **Selezionare gli ecoSub online**
+>
+> ![Selezionare gli ecoSub online](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Schermata da aggiungere: Tipi di misurazione (locale)**
+>
+> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
+
+
+> **Scegliere le entità aggiuntive**
+>
+> ![Scegliere le entità aggiuntive](docs/images/ecomain-extra-entities-placeholder.png)
+
+> **Configurazione locale completata**
+>
+> ![Configurazione locale completata](docs/images/ecomain-local-accomplish.png)
 
 ### Accesso all’account (cloud)
 
@@ -69,9 +169,115 @@ La porta Modbus TCP è **502** e non è modificabile nell’interfaccia. Home As
 
 Il cloud restituisce valori elaborati in base alla configurazione remota. L’aggiornamento avviene circa ogni **60 secondi**, rispetto ai circa **5 secondi** della modalità locale.
 
-## Tipi di misurazione
+> **Aprire l’accesso cloud**
+>
+> ![Aprire l’accesso cloud](docs/images/ecomain-cloud-login-1.png)
 
-La selezione avviene durante l’aggiunta di ecoMain, prima delle entità aggiuntive. Per modificarla in seguito, apri **Configura** sulla voce dell’integrazione e scegli **Tipi di misurazione** come azione successiva. Devi mantenere almeno un tipo selezionato. Prima di deselezionare un tipo utilizzato da un’entità aggiuntiva, rimuovi l’entità che lo utilizza.
+> **Accedere all’account**
+>
+> ![Accedere all’account](docs/images/ecomain-cloud-login-2.png)
+
+> **Selezionare ecoMain**
+>
+> ![Selezionare ecoMain](docs/images/ecomain-cloud-master-select.png)
+
+> **Selezionare gli ecoSub**
+>
+> ![Selezionare gli ecoSub](docs/images/ecomain-cloud-slaves-select.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Schermata da aggiungere: Tipi di misurazione (cloud)**
+>
+> ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
+
+
+> **Scegliere le entità aggiuntive**
+>
+> ![Scegliere le entità aggiuntive](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+
+> **Configurazione cloud completata**
+>
+> ![Configurazione cloud completata](docs/images/ecomain-cloud-accomplish.png)
+
+## Configurazione cloud di ecoPlug
+
+1. Aggiungi l’integrazione enecess e seleziona **ecoPlug**.
+2. Accedi con le credenziali dell’app enecess.
+3. Seleziona una o più prese. Ogni voce mostra nome e numero di serie.
+4. Termina per creare una voce dell’integrazione per quell’account e tutte le prese selezionate.
+5. Per aggiungere o rimuovere prese in seguito, apri **Configura** sulla voce dell’integrazione.
+
+<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+
+> **Schermata da aggiungere: Accesso cloud ecoPlug**
+>
+> ![Schermata da aggiungere: Accesso cloud ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+
+> **Schermata da aggiungere: Selezionare le prese ecoPlug**
+>
+> ![Schermata da aggiungere: Selezionare le prese ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+
+> **Schermata da aggiungere: Aggiunta ecoPlug completata**
+>
+> ![Schermata da aggiungere: Aggiunta ecoPlug completata](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+
+> **Schermata da aggiungere: Modificare le prese ecoPlug selezionate**
+>
+> ![Schermata da aggiungere: Modificare le prese ecoPlug selezionate](docs/images/0_default.png)
+
+Ogni presa crea esattamente tre entità:
+
+- Un interruttore per accensione e spegnimento tramite cloud.
+- `power_rt`: potenza in tempo reale, in **W**.
+- `energy_total`: energia totale accumulata, in **kWh**.
+
+Il polling avviene circa ogni **60 secondi**. Dopo un comando accettato, lo stato dell’interruttore viene aggiornato subito al valore richiesto. Le letture successive dal cloud restano la fonte autorevole e possono correggerlo. ecoPlug non supporta configurazione locale, selezione dei tipi di misurazione o entità aggiuntive.
+
+## Configurazione e opzioni
+
+### Modifica della configurazione
+
+Da **Configura** puoi modificare gli ecoSub selezionati, i tipi di misurazione e le entità aggiuntive di ecoMain, oppure le prese selezionate di un account ecoPlug. Per ecoMain locale puoi anche impostare le fasi dei canali.
+
+Tipo di dispositivo, metodo di connessione e dispositivo principale ecoMain non sono modificabili nella stessa voce. Per cambiarli, rimuovi la voce e aggiungila nuovamente.
+
+> **Aprire l’integrazione**
+>
+> ![Aprire l’integrazione](docs/images/ecomain-options-placeholder-1.png)
+
+> **Aprire le opzioni**
+>
+> ![Aprire le opzioni](docs/images/ecomain-options-placeholder-2.png)
+
+> **Modificare la configurazione**
+>
+> ![Modificare la configurazione](docs/images/ecomain-options-placeholder-3.png)
+
+### Tipi di misurazione
+
+- La selezione avviene durante l’aggiunta di ecoMain, prima delle entità aggiuntive.
+- Per modificarla in seguito, apri **Configura** sulla voce dell’integrazione e scegli **Tipi di misurazione** come azione successiva.
+- Devi mantenere almeno un tipo selezionato.
+- Prima di deselezionare un tipo utilizzato da un’entità aggiuntiva, rimuovi l’entità che lo utilizza.
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Schermata da aggiungere: Tipi di misurazione (locale)**
+>
+> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Schermata da aggiungere: Tipi di misurazione (cloud)**
+>
+> ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
 
 Con il firmware 139 o successivo sono disponibili le seguenti undici categorie locali; con il firmware 136–138 sono disponibili soltanto le prime tre:
 
@@ -93,15 +299,7 @@ Le categorie si applicano alle misurazioni effettivamente disponibili sul dispos
 
 Nel cloud sono disponibili soltanto **Potenza attiva** ed **Energia**, entrambe selezionate inizialmente. L’opzione Energia controlla sia `*_energy_accumulated` sia `*_energy_total_1m`. Le nuove categorie locali non sono disponibili nel cloud. Gli account ecoPlug mantengono il proprio insieme fisso di entità.
 
-## Fasi dei canali in modalità locale
-
-Apri **Impostazioni → Dispositivi e servizi → enecess → Configura**, scegli **Fasi dei canali** e seleziona ecoMain oppure un ecoSub configurato e online. La pagina mostra la fase corrente dei dieci canali del dispositivo selezionato.
-
-Assegna **L1**, **L2** o **L3** a ciascun canale. Al salvataggio, l’integrazione legge la configurazione corrente, scrive solo i valori modificati e li rilegge per verificare il risultato. Gli errori di scrittura o verifica vengono indicati sui canali interessati; un errore non annulla automaticamente le modifiche già riuscite. Controlla i valori visualizzati prima di riprovare.
-
-Questa funzione modifica la configurazione sul dispositivo e richiede la connessione locale. Non è disponibile per ecoMain cloud o ecoPlug. Le immagini nelle altre versioni del README possono mostrare etichette e pagine di versioni precedenti.
-
-## Entità aggiuntive
+### Entità aggiuntive
 
 Durante l’aggiunta di ecoMain e nelle opzioni successive puoi:
 
@@ -111,31 +309,79 @@ Durante l’aggiunta di ecoMain e nelle opzioni successive puoi:
 
 Le entità aggregate mantengono `device_class`, `state_class` e unità delle rispettive sorgenti. La selezione delle misurazioni determina quali sorgenti sono disponibili.
 
-## Configurazione cloud di ecoPlug
+> **Scegliere le entità aggiuntive**
+>
+> ![Scegliere le entità aggiuntive](docs/images/ecomain-extra-entities-placeholder.png)
 
-1. Aggiungi l’integrazione enecess e seleziona **ecoPlug**.
-2. Accedi con le credenziali dell’app enecess.
-3. Seleziona una o più prese. Ogni voce mostra nome e numero di serie.
-4. Termina per creare una voce dell’integrazione per quell’account e tutte le prese selezionate.
-5. Per aggiungere o rimuovere prese in seguito, apri **Configura** sulla voce dell’integrazione.
+### Entità formula personalizzate
 
-Ogni presa crea esattamente tre entità:
+Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due valori di potenza.
 
-- Un interruttore per accensione e spegnimento tramite cloud.
-- `power_rt`: potenza in tempo reale, in **W**.
-- `energy_total`: energia totale accumulata, in **kWh**.
+1. Scegli **Aggiungi entità formula** durante l’aggiunta di ecoMain o in **Configura**.
+2. Inserisci un nome, scegli il tipo di risultato e le misurazioni abilitate nella stessa voce.
+3. La pagina successiva mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
 
-Il polling avviene circa ogni **60 secondi**. Dopo un comando accettato, lo stato dell’interruttore viene aggiornato subito al valore richiesto. Le letture successive dal cloud restano la fonte autorevole e possono correggerlo. ecoPlug non supporta configurazione locale, selezione dei tipi di misurazione o entità aggiuntive.
+<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
-## Modifica della configurazione
+> **Schermata da aggiungere: Nome, tipo di risultato e sorgenti della formula**
+>
+> ![Schermata da aggiungere: Nome, tipo di risultato e sorgenti della formula](docs/images/0_default.png)
 
-Da **Configura** puoi modificare gli ecoSub selezionati, i tipi di misurazione e le entità aggiuntive di ecoMain, oppure le prese selezionate di un account ecoPlug. Per ecoMain locale puoi anche impostare le fasi dei canali.
+<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
 
-Tipo di dispositivo, metodo di connessione e dispositivo principale ecoMain non sono modificabili nella stessa voce. Per cambiarli, rimuovi la voce e aggiungila nuovamente.
+> **Schermata da aggiungere: Inserire la formula**
+>
+> ![Schermata da aggiungere: Inserire la formula](docs/images/0_default.png)
 
-I nomi delle voci ecoMain seguono i formati `ecoMain <serial> (Local)` e `ecoMain <serial> (Cloud)`. Gli identificatori univoci usano rispettivamente `ecomain:<serial>:mode_local` e `ecomain:<serial>:mode_cloud`.
+| Formula | Risultato per due valori di potenza |
+| --- | --- |
+| `max(a-b,0)` | a meno b, con risultato negativo portato a 0 |
+| `(a+b)/2` | Potenza media di a e b |
+
+- Supporta `+`, `-`, `*`, `/`, parentesi, `abs`, `min`, `max` e `round`.
+- Usa **Modifica entità formula** per cambiare nome, sorgenti o formula. Per un altro tipo di risultato o un’altra unità, crea una nuova entità.
+- Elimina una formula con **Rimuovi entità aggiuntiva**. Prima di deselezionare una misurazione, elimina le formule che la usano.
+- Se mancano dati o il calcolo non è possibile, il risultato non è disponibile.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
+
+> **Schermata da aggiungere: Scegliere una formula da modificare**
+>
+> ![Schermata da aggiungere: Scegliere una formula da modificare](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
+
+> **Schermata da aggiungere: Scegliere un’entità aggiuntiva da rimuovere**
+>
+> ![Schermata da aggiungere: Scegliere un’entità aggiuntiva da rimuovere](docs/images/0_default.png)
+
+### Fasi dei canali in modalità locale
+
+- Apri **Impostazioni → Dispositivi e servizi → enecess → Configura**, scegli **Fasi dei canali** e seleziona ecoMain oppure un ecoSub configurato e online.
+- La pagina mostra la fase corrente dei dieci canali del dispositivo selezionato.
+
+- Assegna **L1**, **L2** o **L3** a ciascun canale.
+- Al salvataggio, l’integrazione legge la configurazione corrente, scrive solo i valori modificati e li rilegge per verificare il risultato.
+- Gli errori di scrittura o verifica vengono indicati sui canali interessati; un errore non annulla automaticamente le modifiche già riuscite.
+- Controlla i valori visualizzati prima di riprovare.
+
+Questa funzione modifica la configurazione sul dispositivo e richiede la connessione locale. Non è disponibile per ecoMain cloud o ecoPlug. Le immagini nelle altre versioni del README possono mostrare etichette e pagine di versioni precedenti.
+
+<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+
+> **Schermata da aggiungere: Scegliere il dispositivo per le fasi**
+>
+> ![Schermata da aggiungere: Scegliere il dispositivo per le fasi](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+
+> **Schermata da aggiungere: Impostare le fasi dei canali**
+>
+> ![Schermata da aggiungere: Impostare le fasi dei canali](docs/images/0_default.png)
 
 ## Nomi delle entità e letture
+
+I nomi delle voci ecoMain seguono i formati `ecoMain <serial> (Local)` e `ecoMain <serial> (Cloud)`. Gli identificatori univoci usano rispettivamente `ecomain:<serial>:mode_local` e `ecomain:<serial>:mode_cloud`.
 
 I nomi dei sensori corrispondono alle rispettive chiavi:
 
@@ -162,9 +408,12 @@ Nel cloud sono disponibili il totale di ecoMain e i dieci canali di ecoMain e de
 - `main_all_energy_total_1m`: incremento grezzo di energia di un minuto restituito dall’API.
 - `main_all_energy_accumulated`: energia accumulata da Home Assistant.
 
-Lo stesso schema si applica a `main_ch1_...` e `sub1_ch1_...`. Per la dashboard Energia usa **`*_energy_accumulated`**. I sensori `*_energy_total_1m` sono incrementi, non contatori cumulativi.
+- Lo stesso schema si applica a `main_ch1_...` e `sub1_ch1_...`.
+- Per la dashboard Energia usa **`*_energy_accumulated`**.
+- I sensori `*_energy_total_1m` sono incrementi, non contatori cumulativi.
 
-L’API cloud attuale non fornisce un timestamp o un identificatore per ciascun campione di energia. Il totale accumulato è quindi una stima e può essere meno preciso dei contatori locali, in particolare con campioni ripetuti o riavvii.
+- L’energia accumulata dal cloud è una stima: l’API non fornisce data e ora né un ID per ogni valore di energia.
+- Può essere meno precisa dei contatori locali, soprattutto con valori ripetuti o riavvii.
 
 ## Risoluzione dei problemi
 

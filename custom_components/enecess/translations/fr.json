@@ -23,11 +23,11 @@
       },
       "ecomain_local_confirm": {
         "title": "Confirmer l'appareil",
-        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}"
+        "description": "- Numéro de série : {ecomain_serial}\n- Adresse : {ecomain_host}"
       },
       "ecomain_local_setup": {
         "title": "Configurer l'appareil",
-        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}",
+        "description": "- Numéro de série : {ecomain_serial}\n- Adresse : {ecomain_host}",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter"
         }
@@ -55,7 +55,7 @@
       },
       "ecoplug_select": {
         "title": "Sélectionner un ecoPlug",
-        "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
+        "description": "Chaque prise sélectionnée crée :\n\n- Un interrupteur marche/arrêt\n- Un capteur de puissance en temps réel (W)\n- Un capteur d’énergie totale (kWh)",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter"
         }
@@ -68,7 +68,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Confirmer l'appareil",
-        "description": "Numéro de série : {ecomain_serial}\n\nNote sur l'énergie cloud : *_energy_total_1m est l'incrément d'énergie brut sur 1 minute renvoyé par l'API cloud. Utilisez *_energy_accumulated dans le tableau de bord Énergie de Home Assistant. L'énergie cloud cumulée dans Home Assistant est une estimation au mieux, car l'API cloud ne fournit actuellement ni horodatage ni ID d'échantillon par valeur.",
+        "description": "Numéro de série : {ecomain_serial}\n\n- `*_energy_total_1m` : hausse brute d’énergie par minute fournie par l’API cloud.\n- Utilisez `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant.\n- L’énergie cloud cumulée dans Home Assistant reste une estimation : l’API ne donne ni date et heure ni identifiant pour chaque mesure.",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter"
         }
@@ -117,14 +117,14 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 139. Les mesures non prises en charge sont masquées avec un ancien firmware.",
+        "description": "- Sélectionnez au moins un type de mesure à créer.\n- Les types utilisés par des entités supplémentaires ne peuvent pas être décochés.\n- Firmware local 136–138 : puissance active et énergie active directe/inverse.\n- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.\n- Les types non pris en charge sont masqués avec un ancien firmware.",
         "data": {
           "measurement_types": "Types de mesures"
         }
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "Sélectionnez les sources ; la page suivante affiche leurs variables. Le type de résultat reste fixe lors de la modification. Créez une nouvelle entité pour le changer.",
+        "description": "- Sélectionnez les sources ; la page suivante affiche leurs variables.\n- Le type de résultat reste fixe lors de la modification. Pour le changer, créez une nouvelle entité.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
@@ -133,7 +133,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables : {variables}\n\nOpérations permises : +, -, *, /, parenthèses, abs, min, max et round. Exemples : max(a-b,0), (a+b)/2. Le type de résultat définit l'unité ; vérifiez la cohérence dimensionnelle.",
+        "description": "Variables : {variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Le type de résultat fixe l’unité. Vérifiez que l’unité obtenue par la formule correspond.",
         "data": {
           "extra_formula_expression": "Expression"
         }
@@ -177,7 +177,7 @@
     "step": {
       "init": {
         "title": "Ajuster ecoMain",
-        "description": "Type d'appareil : {device_type}\nMéthode d'ajout : {mode}\nNuméro de série ecoMain : {ecomain_serial}\nEntités supplémentaires configurées : {extra_entities}",
+        "description": "- Type d'appareil : {device_type}\n- Méthode d'ajout : {mode}\n- Numéro de série ecoMain : {ecomain_serial}\n- Entités supplémentaires configurées : {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "extra_action": "Action suivante"
@@ -185,7 +185,7 @@
       },
       "ecoplug_select": {
         "title": "Modifier ecoPlug",
-        "description": "Chaque prise sélectionnée crée un interrupteur marche/arrêt, un capteur de puissance en temps réel en W et un capteur d’énergie totale en kWh.",
+        "description": "Chaque prise sélectionnée crée :\n\n- Un interrupteur marche/arrêt\n- Un capteur de puissance en temps réel (W)\n- Un capteur d’énergie totale (kWh)",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter"
         }
@@ -221,7 +221,7 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "Sélectionnez les mesures à créer. Au moins un type est requis. Les mesures utilisées par des entités supplémentaires ne peuvent pas être supprimées.\n\nLe firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 139. Les mesures non prises en charge sont masquées avec un ancien firmware.",
+        "description": "- Sélectionnez au moins un type de mesure à créer.\n- Les types utilisés par des entités supplémentaires ne peuvent pas être décochés.\n- Firmware local 136–138 : puissance active et énergie active directe/inverse.\n- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.\n- Les types non pris en charge sont masqués avec un ancien firmware.",
         "data": {
           "measurement_types": "Types de mesures"
         }
@@ -231,11 +231,11 @@
         "data": {
           "phase_device": "Appareil"
         },
-        "description": "La configuration des phases des canaux nécessite le firmware 139 ou ultérieur."
+        "description": "Le réglage des phases des canaux nécessite le firmware 139 ou plus récent."
       },
       "channel_phases": {
         "title": "Phases des canaux",
-        "description": "Attribuez L1, L2 ou L3 aux canaux de {device}. L’enregistrement écrit les phases modifiées sur l’appareil et les relit pour vérification.",
+        "description": "- Choisissez L1, L2 ou L3 pour chaque canal de {device}.\n- À l’enregistrement, seules les phases modifiées sont écrites, puis relues pour vérification.",
         "data": {
           "channel_1": "Canal 1",
           "channel_2": "Canal 2",
@@ -251,7 +251,7 @@
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "Sélectionnez les sources ; la page suivante affiche leurs variables. Le type de résultat reste fixe lors de la modification. Créez une nouvelle entité pour le changer.",
+        "description": "- Sélectionnez les sources ; la page suivante affiche leurs variables.\n- Le type de résultat reste fixe lors de la modification. Pour le changer, créez une nouvelle entité.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
@@ -260,7 +260,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables : {variables}\n\nOpérations permises : +, -, *, /, parenthèses, abs, min, max et round. Exemples : max(a-b,0), (a+b)/2. Le type de résultat définit l'unité ; vérifiez la cohérence dimensionnelle.",
+        "description": "Variables : {variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Le type de résultat fixe l’unité. Vérifiez que l’unité obtenue par la formule correspond.",
         "data": {
           "extra_formula_expression": "Expression"
         }

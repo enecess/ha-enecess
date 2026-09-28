@@ -23,11 +23,11 @@
       },
       "ecomain_local_confirm": {
         "title": "Confirm Device",
-        "description": "Serial Number: {ecomain_serial}\nAddress: {ecomain_host}"
+        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}"
       },
       "ecomain_local_setup": {
         "title": "Setup Device",
-        "description": "Serial Number: {ecomain_serial}\nAddress: {ecomain_host}",
+        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add"
         }
@@ -55,7 +55,7 @@
       },
       "ecoplug_select": {
         "title": "Select ecoPlug",
-        "description": "Each selected plug creates an on/off switch, a real-time power sensor in W, and a total energy sensor in kWh.",
+        "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
         "data": {
           "ecoplug_selected": "Select Plugs to Add"
         }
@@ -68,7 +68,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Confirm Device",
-        "description": "Serial Number: {ecomain_serial}\n\nCloud energy note: *_energy_total_1m is the raw 1-minute energy increment returned by the cloud API. Use *_energy_accumulated for the Home Assistant Energy Dashboard. Cloud accumulated energy is best-effort because the cloud API does not currently expose a per-sample timestamp or ID.",
+        "description": "Serial Number: {ecomain_serial}\n\n- `*_energy_total_1m`: raw 1-minute energy increment from the cloud API.\n- Use `*_energy_accumulated` for the Home Assistant Energy Dashboard.\n- Cloud accumulated energy is an estimate: the API provides no timestamp or sample ID for each value.",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add"
         }
@@ -117,14 +117,14 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.",
+        "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
         "data": {
           "measurement_types": "Measurement Types"
         }
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Select sources first. The next page shows their variables. When editing, keep the existing result type; create a new entity to change it.",
+        "description": "- Select sources; the next page shows their variables.\n- Editing cannot change the result type. Create a new entity to change it.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -133,7 +133,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables: {variables}\n\nUse +, -, *, /, parentheses, abs, min, max and round. Examples: max(a-b,0), (a+b)/2. Choose the result type to set the unit; you are responsible for the dimensional meaning.",
+        "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
         "data": {
           "extra_formula_expression": "Expression"
         }
@@ -177,7 +177,7 @@
     "step": {
       "init": {
         "title": "Adjust ecoMain",
-        "description": "Device type: {device_type}\nAdd method: {mode}\necoMain serial number: {ecomain_serial}\nConfigured extra entities: {extra_entities}",
+        "description": "- Device type: {device_type}\n- Add method: {mode}\n- ecoMain serial number: {ecomain_serial}\n- Configured extra entities: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add",
           "extra_action": "Next Action"
@@ -185,7 +185,7 @@
       },
       "ecoplug_select": {
         "title": "Adjust ecoPlug",
-        "description": "Each selected plug creates an on/off switch, a real-time power sensor in W, and a total energy sensor in kWh.",
+        "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
         "data": {
           "ecoplug_selected": "Select Plugs to Add"
         }
@@ -221,7 +221,7 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "Select the measurements to create. At least one type is required. Measurements used by extra entities cannot be removed.\n\nLocal firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.",
+        "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
         "data": {
           "measurement_types": "Measurement Types"
         }
@@ -231,11 +231,11 @@
         "data": {
           "phase_device": "Device"
         },
-        "description": "Channel phase configuration requires firmware 139 or later."
+        "description": "Channel phase settings require firmware 139 or later."
       },
       "channel_phases": {
         "title": "Channel Phases",
-        "description": "Assign L1, L2 or L3 to channels on {device}. Saving writes changed phases to the device and reads them back to verify.",
+        "description": "- Select L1, L2 or L3 for each channel on {device}.\n- Saving writes only changed phases, then reads them back to check.",
         "data": {
           "channel_1": "Channel 1",
           "channel_2": "Channel 2",
@@ -251,7 +251,7 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Select sources first. The next page shows their variables. When editing, keep the existing result type; create a new entity to change it.",
+        "description": "- Select sources; the next page shows their variables.\n- Editing cannot change the result type. Create a new entity to change it.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -260,7 +260,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables: {variables}\n\nUse +, -, *, /, parentheses, abs, min, max and round. Examples: max(a-b,0), (a+b)/2. Choose the result type to set the unit; you are responsible for the dimensional meaning.",
+        "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
         "data": {
           "extra_formula_expression": "Expression"
         }

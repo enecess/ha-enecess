@@ -4,45 +4,6 @@
 
 To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla produktów marki **enecess**.
 
-> **Wymagania dotyczące oprogramowania układowego (tryb lokalny):** Lokalna konfiguracja ecoMain przez Modbus TCP wymaga wersji oprogramowania układowego **136 lub nowszej**. Jeśli wersja jest starsza albo urządzenie nie udostępnia zgodnego rejestru wersji oprogramowania, integracja wyświetli komunikat **Wersja oprogramowania urządzenia jest zbyt stara**. Ta lokalna kontrola wersji nie dotyczy trybu chmurowego.
-
-Lokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 136. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.
-
-## Własne encje formuł
-
-Podczas konfiguracji ecoMain lub w **Konfiguruj** wybierz **Dodaj encję formuły**. Podaj nazwę, typ wyniku/jednostkę i włączone pomiary bazowe tego wpisu. Źródłami mogą być wszystkie obsługiwane kategorie. Następna strona przypisuje `a`, `b` itd. do źródeł. Przykłady: `max(a-b,0)` i `(a+b)/2`. Zapisywane są tylko używane źródła.
-
-Dozwolone są liczby, `+`, `-`, `*`, `/`, znaki, nawiasy oraz `abs`, `min`, `max`, `round`. Dowolne encje Home Assistant, inne dodatkowe encje, Jinja i dane zewnętrzne nie są obsługiwane. Niedostępne źródło, dzielenie przez zero lub wynik nieskończony sprawiają, że encja jest niedostępna.
-
-Jednostki: moc czynna W, energia czynna Wh, energia bierna varh, moc pozorna VA, moc bierna var, napięcie V, prąd A, współczynnik mocy (bezwymiarowy), częstotliwość Hz lub liczba (bezwymiarowa). Sprawdź zgodność wymiarów fizycznych. Energia z formuły używa `TOTAL`, ponieważ wynik może maleć. Edycja zachowuje tożsamość, zmienne i typ wyniku; utwórz nową encję, aby zmienić typ. Usuń formuły przez usuwanie dodatkowych encji przed odznaczeniem wykorzystywanego pomiaru.
-
-## Wybór pomiarów i fazy kanałów
-
-Podczas dodawania ecoMain wybierz **Rodzaje pomiarów** po urządzeniach ecoSub, a przed dodatkowymi encjami. Później można zmienić wybór przez **Konfiguruj → Rodzaje pomiarów**. Wymagany jest co najmniej jeden rodzaj. Przed odznaczeniem pomiaru usuń dodatkowe encje, które z niego korzystają.
-
-Tryb lokalny oferuje jedenaście kategorii od wersji 139; wersje 136–138 obsługują tylko pierwsze trzy:
-
-| Kategoria | Znaczenie | Domyślnie |
-| --- | --- | --- |
-| Moc czynna | Chwilowa moc czynna (W) | Włączona |
-| Energia czynna w kierunku zgodnym | Energia czynna zgromadzona zgodnie ze strzałką przekładnika (Wh) | Włączona |
-| Energia czynna w kierunku przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
-| Energia bierna w kierunku zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
-| Energia bierna w kierunku przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
-| Moc pozorna | Moc pozorna (VA) | Wyłączona |
-| Moc bierna | Moc bierna (var) | Wyłączona |
-| Napięcie | Napięcie elektryczne (V) | Wyłączona |
-| Prąd | Natężenie prądu (A) | Wyłączona |
-| Współczynnik mocy | Stosunek mocy czynnej do pozornej, bez jednostki | Wyłączona |
-| Częstotliwość | Częstotliwość sieci (Hz), tylko ecoMain | Wyłączona |
-
-Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę trójfazową lub wartość dla każdego kanału. ecoSub udostępnia pomiary kanałów. Chmura oferuje tylko **Moc czynną** i **Energię**, obie domyślnie wybrane. Energia obejmuje licznik skumulowany oraz surowe przyrosty minutowe. Stały zestaw encji ecoPlug pozostaje bez zmian.
-
-Dla lokalnego wpisu ecoMain otwórz **Konfiguruj**, wybierz akcję **Fazy kanałów**, a następnie ecoMain lub skonfigurowany ecoSub online. Przypisz **L1**, **L2** lub **L3** do każdego z dziesięciu kanałów. Integracja odczytuje bieżące fazy, zapisuje tylko zmiany i ponownie je odczytuje w celu weryfikacji. Błędy zapisu lub weryfikacji są wskazywane przy odpowiednich polach; udane zmiany nie są automatycznie cofane. Sprawdź wyświetlane wartości przed ponowieniem próby. Strona zmienia konfigurację urządzenia i nie jest dostępna w trybie chmurowym.
-
-Istniejące zrzuty ekranu przedstawiają starsze wersje i mogą nie zawierać nowych stron ani aktualnej pisowni nazw produktów.
-
-
 ## Obsługiwane urządzenia
 
 - **ecoMain**
@@ -52,6 +13,12 @@ Istniejące zrzuty ekranu przedstawiają starsze wersje i mogą nie zawierać no
     - Tylko chmura (enecess cloud)
     - Jeden wpis konta może wybrać wiele gniazdek według nazwy i numeru seryjnego.
     - W **Konfiguruj / Opcje** można później zmienić wybór.
+
+> **Wymagania dotyczące oprogramowania układowego (tryb lokalny):** Lokalna konfiguracja ecoMain przez Modbus TCP wymaga wersji oprogramowania układowego **136 lub nowszej**. Jeśli wersja jest starsza albo urządzenie nie udostępnia zgodnego rejestru wersji oprogramowania, integracja wyświetli komunikat **Wersja oprogramowania urządzenia jest zbyt stara**. Ta lokalna kontrola wersji nie dotyczy trybu chmurowego.
+
+- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.
+- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.
+- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.
 
 ---
 
@@ -210,6 +177,13 @@ Wskazówki diagnostyczne:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
+>
+> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -260,6 +234,13 @@ Wskazówki diagnostyczne:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
+>
+> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -306,6 +287,13 @@ Uwagi:
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)**
+>
+> ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
@@ -326,6 +314,30 @@ Kroki:
 5. Zakończ konfigurację, aby utworzyć jeden wpis integracji ecoPlug dla tego konta i wszystkich wybranych gniazdek.
 6. Aby później zmienić wybór, otwórz **Ustawienia → Urządzenia i usługi → enecess → Konfiguruj**, dodaj lub usuń gniazdka i zapisz opcje.
 
+<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+
+> **Zrzut ekranu do dodania: Logowanie do chmury ecoPlug**
+>
+> ![Zrzut ekranu do dodania: Logowanie do chmury ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+
+> **Zrzut ekranu do dodania: Wybór gniazdek ecoPlug**
+>
+> ![Zrzut ekranu do dodania: Wybór gniazdek ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+
+> **Zrzut ekranu do dodania: Dodawanie ecoPlug zakończone**
+>
+> ![Zrzut ekranu do dodania: Dodawanie ecoPlug zakończone](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+
+> **Zrzut ekranu do dodania: Zmiana wybranych gniazdek ecoPlug**
+>
+> ![Zrzut ekranu do dodania: Zmiana wybranych gniazdek ecoPlug](docs/images/0_default.png)
+
 Każdy wybrany ecoPlug tworzy dokładnie następujące encje:
 
 - **Przełącznik** sterujący gniazdkiem przez chmurę.
@@ -336,7 +348,7 @@ Integracja pobiera dane ecoPlug z chmury mniej więcej co **60 sekund**. Po pomy
 
 ---
 
-## Aktualne ograniczenia / ważne uwagi
+## Konfiguracja i opcje
 
 ### Edycja istniejącego wpisu
 
@@ -365,6 +377,108 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 2. Znajdź **enecess**.
 3. Usuń wpis integracji.
 4. Dodaj integrację ponownie z nowymi ustawieniami.
+
+### Rodzaje pomiarów
+
+- Podczas dodawania ecoMain wybierz **Rodzaje pomiarów** po urządzeniach ecoSub, a przed dodatkowymi encjami.
+- Później można zmienić wybór przez **Konfiguruj → Rodzaje pomiarów**.
+- Wymagany jest co najmniej jeden rodzaj.
+- Przed odznaczeniem pomiaru usuń dodatkowe encje, które z niego korzystają.
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
+>
+> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)**
+>
+> ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
+
+Tryb lokalny oferuje jedenaście kategorii od wersji 139; wersje 136–138 obsługują tylko pierwsze trzy:
+
+| Kategoria | Znaczenie | Domyślnie |
+| --- | --- | --- |
+| Moc czynna | Chwilowa moc czynna (W) | Włączona |
+| Energia czynna w kierunku zgodnym | Energia czynna zgromadzona zgodnie ze strzałką przekładnika (Wh) | Włączona |
+| Energia czynna w kierunku przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
+| Energia bierna w kierunku zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
+| Energia bierna w kierunku przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
+| Moc pozorna | Moc pozorna (VA) | Wyłączona |
+| Moc bierna | Moc bierna (var) | Wyłączona |
+| Napięcie | Napięcie elektryczne (V) | Wyłączona |
+| Prąd | Natężenie prądu (A) | Wyłączona |
+| Współczynnik mocy | Stosunek mocy czynnej do pozornej, bez jednostki | Wyłączona |
+| Częstotliwość | Częstotliwość sieci (Hz), tylko ecoMain | Wyłączona |
+
+Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę trójfazową lub wartość dla każdego kanału. ecoSub udostępnia pomiary kanałów. Chmura oferuje tylko **Moc czynną** i **Energię**, obie domyślnie wybrane. Energia obejmuje licznik skumulowany oraz surowe przyrosty minutowe. Stały zestaw encji ecoPlug pozostaje bez zmian.
+
+### Własne encje formuł
+
+Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch wartości mocy.
+
+1. Wybierz **Dodaj encję formuły** podczas dodawania ecoMain lub w **Konfiguruj**.
+2. Podaj nazwę, wybierz typ wyniku i pomiary włączone w tym wpisie.
+3. Następna strona pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+
+> **Zrzut ekranu do dodania: Nazwa formuły, typ wyniku i źródła**
+>
+> ![Zrzut ekranu do dodania: Nazwa formuły, typ wyniku i źródła](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+
+> **Zrzut ekranu do dodania: Wpisanie wzoru**
+>
+> ![Zrzut ekranu do dodania: Wpisanie wzoru](docs/images/0_default.png)
+
+| Wzór | Wynik dla dwóch wartości mocy |
+| --- | --- |
+| `max(a-b,0)` | a minus b, wynik ujemny zastąpiony przez 0 |
+| `(a+b)/2` | Średnia moc a i b |
+
+- Obsługuje `+`, `-`, `*`, `/`, nawiasy, `abs`, `min`, `max` i `round`.
+- Użyj **Edytuj encję formuły**, aby zmienić nazwę, źródła lub wzór. Inny typ wyniku lub jednostka wymaga nowej encji.
+- Usuń wzór przez **Usuń dodatkową encję**. Przed odznaczeniem pomiaru usuń wzory, które go używają.
+- Brak danych lub niemożliwe obliczenie oznacza niedostępny wynik.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
+
+> **Zrzut ekranu do dodania: Wybór formuły do edycji**
+>
+> ![Zrzut ekranu do dodania: Wybór formuły do edycji](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
+
+> **Zrzut ekranu do dodania: Wybór dodatkowej encji do usunięcia**
+>
+> ![Zrzut ekranu do dodania: Wybór dodatkowej encji do usunięcia](docs/images/0_default.png)
+
+### Fazy kanałów (tylko lokalnie)
+
+- Dla lokalnego wpisu ecoMain otwórz **Konfiguruj**, wybierz akcję **Fazy kanałów**, a następnie ecoMain lub skonfigurowany ecoSub online.
+- Przypisz **L1**, **L2** lub **L3** do każdego z dziesięciu kanałów.
+- Integracja odczytuje bieżące fazy, zapisuje tylko zmiany i ponownie je odczytuje w celu weryfikacji.
+- Błędy zapisu lub weryfikacji są wskazywane przy odpowiednich polach; udane zmiany nie są automatycznie cofane.
+- Sprawdź wyświetlane wartości przed ponowieniem próby.
+- Strona zmienia konfigurację urządzenia i nie jest dostępna w trybie chmurowym.
+
+Istniejące zrzuty ekranu przedstawiają starsze wersje i mogą nie zawierać nowych stron ani aktualnej pisowni nazw produktów.
+
+<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+
+> **Zrzut ekranu do dodania: Wybór urządzenia do ustawienia faz**
+>
+> ![Zrzut ekranu do dodania: Wybór urządzenia do ustawienia faz](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+
+> **Zrzut ekranu do dodania: Ustawienie faz kanałów**
+>
+> ![Zrzut ekranu do dodania: Ustawienie faz kanałów](docs/images/0_default.png)
 
 ## Nazewnictwo urządzeń
 
@@ -476,9 +590,12 @@ W trybie chmury encje obejmują:
 - `total_1m` = **surowy 1-minutowy przyrost energii z API chmury**
 - `energy_accumulated` = **licznik energii skumulowanej po stronie Home Assistant**
 
-W Home Assistant Energy Dashboard używaj encji `*_energy_accumulated`. Do monitorowania mocy w czasie rzeczywistym używaj encji `*_power_avg_1m`. Surowe encje `*_energy_total_1m` pozostają dostępne, ale są przyrostami minutowymi, a nie licznikami skumulowanymi.
+- W Home Assistant Energy Dashboard używaj encji `*_energy_accumulated`.
+- Do monitorowania mocy w czasie rzeczywistym używaj encji `*_power_avg_1m`.
+- Surowe encje `*_energy_total_1m` pozostają dostępne, ale są przyrostami minutowymi, a nie licznikami skumulowanymi.
 
-Ponieważ API chmury obecnie nie udostępnia znacznika czasu ani identyfikatora próbki dla każdej minutowej wartości energii, energia skumulowana jest wyliczana metodą best-effort. Może być mniej dokładna niż lokalne liczniki Modbus, szczególnie przy powtórzonych próbkach lub restartach.
+- Łączna energia z chmury jest szacunkowa: API nie podaje czasu ani identyfikatora dla każdej minutowej wartości energii.
+- Może być mniej dokładna niż lokalne liczniki Modbus, zwłaszcza przy powtórzonych pomiarach lub restartach.
 
 #### Przykłady chmurowe
 

@@ -4,47 +4,6 @@
 
 This repository provides a Home Assistant (HA) custom integration for **enecess** brand products.
 
-> **Firmware requirement (local mode):** Local ecoMain setup over Modbus TCP requires firmware version **136 or later**. If the firmware is older or the device does not expose a compatible firmware-version register, the integration displays **Device firmware version is too old**. This local firmware check does not apply to cloud mode.
-
-Local firmware 136–138 supports active power and forward/reverse active energy. Firmware 139 or later also enables the eight additional measurement types. Channel phase configuration is available from firmware 139. Unsupported measurement choices are hidden on older firmware.
-
-## Custom formula entities
-
-During ecoMain setup or in **Configure**, choose **Add Formula Entity**, enter a name, choose a result type/unit and select enabled base measurements from this entry. All supported measurement categories can be sources. The next page maps `a`, `b`, etc. to source names. Enter a formula such as `max(a-b,0)` or `(a+b)/2`. Only sources actually referenced by the expression are saved.
-
-Supported operations: scalar numbers, `+`, `-`, `*`, `/`, unary signs, parentheses and `abs`, `min`, `max`, `round`. Arbitrary Home Assistant entities, other extra entities, Jinja and external data are not supported. An unavailable source, division by zero or a non-finite result makes the formula entity unavailable.
-
-The result type determines the unit: active power W, active energy Wh, reactive energy varh, apparent power VA, reactive power var, voltage V, current A, power factor (unitless ratio), frequency Hz or number (unitless). Check the dimensional meaning yourself. Formula energy uses `TOTAL`, since calculations can decrease.
-
-Use **Edit Formula Entity** to change the name, sources or expression while preserving the entity identity and variable aliases. The result type/unit remains fixed; create a new entity to change it. Use **Remove Extra Entity** to delete a formula. Remove formulas referencing a measurement before deselecting it.
-
-## Measurement selection and channel phases
-
-During ecoMain setup, select **Measurement Types** after choosing ecoSub devices and before configuring extra entities. Open **Configure → Measurement Types** to change them later. Select at least one type. Remove any extra entities that depend on a measurement before deselecting it.
-
-Local mode offers eleven measurement categories on firmware 139 or later; only the first three are available on firmware 136–138:
-
-| Category | Meaning | Default |
-| --- | --- | --- |
-| Active power | Instantaneous active power (W) | On |
-| Forward active energy | Accumulated active energy in the forward CT direction (Wh) | On |
-| Reverse active energy | Accumulated active energy in the reverse CT direction (Wh) | On |
-| Forward reactive energy | Accumulated reactive energy in the forward direction (varh) | Off |
-| Reverse reactive energy | Accumulated reactive energy in the reverse direction (varh) | Off |
-| Apparent power | Apparent power (VA) | Off |
-| Reactive power | Reactive power (var) | Off |
-| Voltage | Voltage (V) | Off |
-| Current | Current (A) | Off |
-| Power factor | Ratio of active to apparent power, without a unit | Off |
-| Frequency | Grid frequency (Hz), ecoMain only | Off |
-
-Availability follows the device registers: not every category has a three-phase total or a value for every channel. ecoSub exposes channel measurements. Cloud mode offers only **Active power** and **Energy**, both on by default. Energy controls both accumulated energy and raw one-minute increments. ecoPlug retains its fixed switch, power and energy entities.
-
-For a local ecoMain entry, open **Configure**, choose **Channel Phases** as the next action, and select ecoMain or a configured online ecoSub. Assign **L1**, **L2** or **L3** to each of its ten channels. The integration reads current phases, writes only changed values and reads them back to verify. Failed writes or verification are reported on the affected fields; successful changes are not automatically rolled back. Check the displayed values before retrying. This page changes settings on the device and is not available in cloud mode.
-
-Existing screenshots illustrate older versions and may not show the measurement-selection or channel-phase pages or current brand capitalization.
-
-
 ## Supported Devices
 
 - **ecoMain**
@@ -54,6 +13,12 @@ Existing screenshots illustrate older versions and may not show the measurement-
     - Cloud only (enecess cloud)
     - One account entry can select one or more plugs by name and serial number.
     - Open the entry's **Configure** options to change the selected plugs later.
+
+> **Firmware requirement (local mode):** Local ecoMain setup over Modbus TCP requires firmware version **136 or later**. If the firmware is older or the device does not expose a compatible firmware-version register, the integration displays **Device firmware version is too old**. This local firmware check does not apply to cloud mode.
+
+- Local firmware 136–138: active power and forward/reverse active energy.
+- Local firmware 139 or later: also supports the eight additional types and channel phase settings.
+- Unsupported types are hidden on older firmware.
 
 ---
 
@@ -210,6 +175,13 @@ Troubleshooting tips:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot pending: Measurement types (local)**
+>
+> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -260,6 +232,13 @@ Troubleshooting tips:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot pending: Measurement types (local)**
+>
+> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -306,6 +285,13 @@ Notes:
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Screenshot pending: Measurement types (cloud)**
+>
+> ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
@@ -326,6 +312,30 @@ Steps:
 5. Finish to create one ecoPlug integration entry for that account and all selected plugs.
 6. To change the selection later, open **Settings → Devices & services → enecess → Configure**, then add or remove plugs and save the options.
 
+<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+
+> **Screenshot pending: ecoPlug cloud login**
+>
+> ![Screenshot pending: ecoPlug cloud login](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+
+> **Screenshot pending: Select ecoPlug plugs**
+>
+> ![Screenshot pending: Select ecoPlug plugs](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+
+> **Screenshot pending: ecoPlug setup complete**
+>
+> ![Screenshot pending: ecoPlug setup complete](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+
+> **Screenshot pending: Change selected ecoPlug plugs**
+>
+> ![Screenshot pending: Change selected ecoPlug plugs](docs/images/0_default.png)
+
 Each selected ecoPlug creates exactly these entities:
 
 - A **switch** that turns the plug on or off through the cloud.
@@ -336,7 +346,7 @@ ecoPlug data is polled from the cloud approximately every **60 seconds**. After 
 
 ---
 
-## Current Limitations / Important Notes
+## Configuration and options
 
 ### Editing an existing entry
 
@@ -364,6 +374,108 @@ If you need to change immutable settings:
 2. Find **enecess**.
 3. Delete/remove the integration entry.
 4. Add it again with the new settings.
+
+### Measurement Types
+
+- During ecoMain setup, select **Measurement Types** after choosing ecoSub devices and before configuring extra entities.
+- Open **Configure → Measurement Types** to change them later.
+- Select at least one type.
+- Remove any extra entities that depend on a measurement before deselecting it.
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot pending: Measurement types (local)**
+>
+> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Screenshot pending: Measurement types (cloud)**
+>
+> ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
+
+Local mode offers eleven measurement categories on firmware 139 or later; only the first three are available on firmware 136–138:
+
+| Category | Meaning | Default |
+| --- | --- | --- |
+| Active power | Instantaneous active power (W) | On |
+| Forward active energy | Accumulated active energy in the forward CT direction (Wh) | On |
+| Reverse active energy | Accumulated active energy in the reverse CT direction (Wh) | On |
+| Forward reactive energy | Accumulated reactive energy in the forward direction (varh) | Off |
+| Reverse reactive energy | Accumulated reactive energy in the reverse direction (varh) | Off |
+| Apparent power | Apparent power (VA) | Off |
+| Reactive power | Reactive power (var) | Off |
+| Voltage | Voltage (V) | Off |
+| Current | Current (A) | Off |
+| Power factor | Ratio of active to apparent power, without a unit | Off |
+| Frequency | Grid frequency (Hz), ecoMain only | Off |
+
+Availability follows the device registers: not every category has a three-phase total or a value for every channel. ecoSub exposes channel measurements. Cloud mode offers only **Active power** and **Energy**, both on by default. Energy controls both accumulated energy and raw one-minute increments. ecoPlug retains its fixed switch, power and energy entities.
+
+### Custom formula entities
+
+Create a sensor from your measurements, such as the difference or average of two power readings.
+
+1. Choose **Add Formula Entity** during ecoMain setup or under **Configure**.
+2. Enter a name, choose a result type and select measurements enabled in this entry.
+3. Use the next page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+
+> **Screenshot pending: Formula name, result type and sources**
+>
+> ![Screenshot pending: Formula name, result type and sources](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+
+> **Screenshot pending: Enter the formula**
+>
+> ![Screenshot pending: Enter the formula](docs/images/0_default.png)
+
+| Formula | Result for two power readings |
+| --- | --- |
+| `max(a-b,0)` | a minus b, with negative results set to 0 |
+| `(a+b)/2` | Average power of a and b |
+
+- Supports `+`, `-`, `*`, `/`, parentheses, `abs`, `min`, `max` and `round`.
+- Use **Edit Formula Entity** to change the name, sources or formula. A different result type or unit needs a new entity.
+- Use **Remove Extra Entity** to delete a formula. Delete formulas using a measurement before deselecting it.
+- Missing data or a calculation that cannot be completed makes the result unavailable.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
+
+> **Screenshot pending: Select a formula to edit**
+>
+> ![Screenshot pending: Select a formula to edit](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
+
+> **Screenshot pending: Select an extra entity to remove**
+>
+> ![Screenshot pending: Select an extra entity to remove](docs/images/0_default.png)
+
+### Channel Phases (Local Only)
+
+- For a local ecoMain entry, open **Configure**, choose **Channel Phases** as the next action, and select ecoMain or a configured online ecoSub.
+- Assign **L1**, **L2** or **L3** to each of its ten channels.
+- The integration reads current phases, writes only changed values and reads them back to verify.
+- Failed writes or verification are reported on the affected fields; successful changes are not automatically rolled back.
+- Check the displayed values before retrying.
+- This page changes settings on the device and is not available in cloud mode.
+
+Existing screenshots illustrate older versions and may not show the measurement-selection or channel-phase pages or current brand capitalization.
+
+<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+
+> **Screenshot pending: Select a device for phase settings**
+>
+> ![Screenshot pending: Select a device for phase settings](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+
+> **Screenshot pending: Set channel phases**
+>
+> ![Screenshot pending: Set channel phases](docs/images/0_default.png)
 
 ## Device Naming
 
@@ -476,9 +588,12 @@ In cloud mode, entities include:
 - `total_1m` = **raw 1-minute energy increment from the cloud API**
 - `energy_accumulated` = **Home Assistant-side accumulated energy meter**
 
-Use `*_energy_accumulated` entities in the Home Assistant Energy Dashboard. Use `*_power_avg_1m` entities for real-time power monitoring. The raw cloud `*_energy_total_1m` entities remain available, but they are per-minute increments and are not cumulative meters.
+- Use `*_energy_accumulated` entities in the Home Assistant Energy Dashboard.
+- Use `*_power_avg_1m` entities for real-time power monitoring.
+- The raw cloud `*_energy_total_1m` entities remain available, but they are per-minute increments and are not cumulative meters.
 
-Because the cloud API currently does not expose a timestamp or sample ID for each per-minute energy value, accumulated cloud energy is best-effort. It may be less precise than local Modbus lifetime counters, especially around repeated cloud samples or restarts.
+- Cloud accumulated energy is an estimate: the API provides no timestamp or sample ID for each 1-minute energy value.
+- It may be less accurate than local Modbus lifetime totals, especially with repeated cloud samples or restarts.
 
 #### Cloud examples
 

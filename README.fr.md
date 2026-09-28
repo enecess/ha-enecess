@@ -4,45 +4,6 @@
 
 Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** destinée aux produits de la marque **enecess**.
 
-> **Prérequis du firmware (mode local) :** La configuration locale d’ecoMain via Modbus TCP nécessite la version **136 ou ultérieure** du firmware. Si le firmware est plus ancien ou si l’appareil n’expose pas de registre de version du firmware compatible, l’intégration affiche **La version du firmware de l’appareil est trop ancienne**. Ce contrôle local du firmware ne s’applique pas au mode cloud.
-
-Le firmware local 136–138 prend en charge la puissance active et l’énergie active directe/inverse. Le firmware 139 ou ultérieur permet aussi les huit mesures supplémentaires. La configuration des phases des canaux est disponible dès le firmware 136. Les mesures non prises en charge sont masquées avec un ancien firmware.
-
-## Entités de formule personnalisées
-
-Pendant la configuration ecoMain ou via **Configurer**, choisissez **Ajouter une entité de formule**. Saisissez le nom, le type de résultat/unité et les mesures de base activées de cette entrée. Toutes les catégories prises en charge peuvent servir de sources. La page suivante associe `a`, `b`, etc. aux sources. Exemples : `max(a-b,0)` et `(a+b)/2`. Seules les sources utilisées sont enregistrées.
-
-Les nombres, `+`, `-`, `*`, `/`, les signes, les parenthèses et `abs`, `min`, `max`, `round` sont permis. Les entités Home Assistant arbitraires, les autres entités supplémentaires, Jinja et les données externes ne sont pas acceptés. Une source indisponible, une division par zéro ou un résultat non fini rend la formule indisponible.
-
-Unités : puissance active W, énergie active Wh, énergie réactive varh, puissance apparente VA, puissance réactive var, tension V, courant A, facteur de puissance (sans unité), fréquence Hz ou nombre (sans unité). Vérifiez la cohérence dimensionnelle. L’énergie calculée utilise `TOTAL`, car le résultat peut diminuer. La modification conserve l’identité, les variables et le type de résultat ; créez une nouvelle entité pour changer ce type. Supprimez les formules via la suppression des entités supplémentaires avant de désélectionner une mesure utilisée.
-
-## Sélection des mesures et phases des canaux
-
-Pendant l’ajout d’ecoMain, sélectionnez les **Types de mesures** après les appareils ecoSub et avant les entités supplémentaires. Pour les modifier ensuite, ouvrez **Configurer → Types de mesures**. Au moins un type est requis. Supprimez les entités supplémentaires qui utilisent une mesure avant de la désélectionner.
-
-Le mode local propose onze catégories avec le firmware 139 ou ultérieur ; seules les trois premières sont disponibles avec le firmware 136–138 :
-
-| Catégorie | Signification | Par défaut |
-| --- | --- | --- |
-| Puissance active | Puissance active instantanée (W) | Activée |
-| Énergie active directe | Énergie active cumulée dans le sens de la flèche du TC (Wh) | Activée |
-| Énergie active inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
-| Énergie réactive directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
-| Énergie réactive inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
-| Puissance apparente | Puissance apparente (VA) | Désactivée |
-| Puissance réactive | Puissance réactive (var) | Désactivée |
-| Tension | Tension électrique (V) | Désactivée |
-| Courant | Intensité du courant (A) | Désactivée |
-| Facteur de puissance | Rapport entre puissances active et apparente, sans unité | Désactivée |
-| Fréquence | Fréquence du réseau (Hz), ecoMain uniquement | Désactivée |
-
-Les valeurs disponibles dépendent des registres de l’appareil : toutes les catégories ne possèdent pas de total triphasé ou de valeur pour chaque canal. ecoSub fournit les mesures des canaux. Le cloud propose uniquement **Puissance active** et **Énergie**, sélectionnées par défaut. Énergie comprend le compteur cumulé et les incréments bruts d’une minute. Les entités fixes d’ecoPlug restent inchangées.
-
-Pour une entrée ecoMain locale, ouvrez **Configurer**, choisissez l’action **Phases des canaux**, puis ecoMain ou un ecoSub configuré et en ligne. Attribuez **L1**, **L2** ou **L3** à chacun des dix canaux. L’intégration lit les phases actuelles, écrit uniquement les modifications et les relit pour vérification. Les erreurs d’écriture ou de vérification apparaissent sur les champs concernés ; les modifications réussies ne sont pas annulées automatiquement. Vérifiez les valeurs affichées avant de réessayer. Cette page modifie la configuration de l’appareil et n’est pas disponible en mode cloud.
-
-Les captures existantes montrent des versions antérieures et peuvent ne pas inclure les nouvelles pages ou la casse actuelle des noms de produits.
-
-
 ## Appareils pris en charge
 
 - **ecoMain**
@@ -52,6 +13,12 @@ Les captures existantes montrent des versions antérieures et peuvent ne pas inc
     - Cloud uniquement (cloud enecess)
     - Une entrée de compte peut sélectionner plusieurs prises par nom et numéro de série.
     - **Configurer / Options** permet de modifier ensuite la sélection.
+
+> **Prérequis du firmware (mode local) :** La configuration locale d’ecoMain via Modbus TCP nécessite la version **136 ou ultérieure** du firmware. Si le firmware est plus ancien ou si l’appareil n’expose pas de registre de version du firmware compatible, l’intégration affiche **La version du firmware de l’appareil est trop ancienne**. Ce contrôle local du firmware ne s’applique pas au mode cloud.
+
+- Firmware local 136–138 : puissance active et énergie active directe/inverse.
+- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.
+- Les types non pris en charge sont masqués avec un ancien firmware.
 
 ---
 
@@ -212,6 +179,13 @@ Conseils en cas de problème :
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Capture à ajouter: Types de mesures (local)**
+>
+> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -262,6 +236,13 @@ Conseils en cas de problème :
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Capture à ajouter: Types de mesures (local)**
+>
+> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -309,6 +290,13 @@ Remarques :
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Capture à ajouter: Types de mesures (cloud)**
+>
+> ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
@@ -329,6 +317,30 @@ ecoPlug est pris en charge **uniquement via le cloud enecess**. L’intégration
 5. Terminez la configuration pour créer une entrée d’intégration ecoPlug pour ce compte et toutes les prises sélectionnées.
 6. Pour modifier la sélection ultérieurement, ouvrez **Paramètres → Appareils et services → enecess → Configurer**, ajoutez ou retirez des prises, puis enregistrez les options.
 
+<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+
+> **Capture à ajouter: Connexion cloud ecoPlug**
+>
+> ![Capture à ajouter: Connexion cloud ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+
+> **Capture à ajouter: Choisir les prises ecoPlug**
+>
+> ![Capture à ajouter: Choisir les prises ecoPlug](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+
+> **Capture à ajouter: Ajout ecoPlug terminé**
+>
+> ![Capture à ajouter: Ajout ecoPlug terminé](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+
+> **Capture à ajouter: Modifier les prises ecoPlug sélectionnées**
+>
+> ![Capture à ajouter: Modifier les prises ecoPlug sélectionnées](docs/images/0_default.png)
+
 Chaque ecoPlug sélectionné crée exactement les entités suivantes :
 
 - Un **interrupteur** qui commande la prise via le cloud.
@@ -339,7 +351,7 @@ L’intégration récupère les données ecoPlug depuis le cloud environ toutes 
 
 ---
 
-## Limitations actuelles / Points importants
+## Configuration et options
 
 ### Modifier une entrée existante
 
@@ -370,6 +382,108 @@ Si vous devez modifier un réglage non modifiable :
 4. Ajoutez-la à nouveau avec les bons paramètres.
 
 > Une gestion d’options est prévue pour une version ultérieure.
+
+### Types de mesures
+
+- Pendant l’ajout d’ecoMain, sélectionnez les **Types de mesures** après les appareils ecoSub et avant les entités supplémentaires.
+- Pour les modifier ensuite, ouvrez **Configurer → Types de mesures**.
+- Au moins un type est requis.
+- Supprimez les entités supplémentaires qui utilisent une mesure avant de la désélectionner.
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Capture à ajouter: Types de mesures (local)**
+>
+> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Capture à ajouter: Types de mesures (cloud)**
+>
+> ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
+
+Le mode local propose onze catégories avec le firmware 139 ou ultérieur ; seules les trois premières sont disponibles avec le firmware 136–138 :
+
+| Catégorie | Signification | Par défaut |
+| --- | --- | --- |
+| Puissance active | Puissance active instantanée (W) | Activée |
+| Énergie active directe | Énergie active cumulée dans le sens de la flèche du TC (Wh) | Activée |
+| Énergie active inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
+| Énergie réactive directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
+| Énergie réactive inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
+| Puissance apparente | Puissance apparente (VA) | Désactivée |
+| Puissance réactive | Puissance réactive (var) | Désactivée |
+| Tension | Tension électrique (V) | Désactivée |
+| Courant | Intensité du courant (A) | Désactivée |
+| Facteur de puissance | Rapport entre puissances active et apparente, sans unité | Désactivée |
+| Fréquence | Fréquence du réseau (Hz), ecoMain uniquement | Désactivée |
+
+Les valeurs disponibles dépendent des registres de l’appareil : toutes les catégories ne possèdent pas de total triphasé ou de valeur pour chaque canal. ecoSub fournit les mesures des canaux. Le cloud propose uniquement **Puissance active** et **Énergie**, sélectionnées par défaut. Énergie comprend le compteur cumulé et les incréments bruts d’une minute. Les entités fixes d’ecoPlug restent inchangées.
+
+### Entités de formule personnalisées
+
+Créez un capteur à partir de vos mesures, par exemple la différence ou la moyenne de deux puissances.
+
+1. Choisissez **Ajouter une entité de formule** pendant l’ajout d’ecoMain ou via **Configurer**.
+2. Saisissez un nom, choisissez le type de résultat et des mesures activées dans cette entrée.
+3. La page suivante indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+
+> **Capture à ajouter: Nom, type de résultat et sources de la formule**
+>
+> ![Capture à ajouter: Nom, type de résultat et sources de la formule](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+
+> **Capture à ajouter: Saisir la formule**
+>
+> ![Capture à ajouter: Saisir la formule](docs/images/0_default.png)
+
+| Formule | Résultat pour deux puissances |
+| --- | --- |
+| `max(a-b,0)` | a moins b, ramené à 0 si le résultat est négatif |
+| `(a+b)/2` | Puissance moyenne de a et b |
+
+- Accepte `+`, `-`, `*`, `/`, les parenthèses, `abs`, `min`, `max` et `round`.
+- Utilisez **Modifier une entité de formule** pour changer le nom, les sources ou la formule. Un autre type de résultat ou une autre unité nécessite une nouvelle entité.
+- Supprimez une formule via **Supprimer une entité supplémentaire**. Avant de décocher une mesure, supprimez les formules qui l’utilisent.
+- Si des données manquent ou si le calcul est impossible, le résultat est indisponible.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
+
+> **Capture à ajouter: Choisir une formule à modifier**
+>
+> ![Capture à ajouter: Choisir une formule à modifier](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
+
+> **Capture à ajouter: Choisir une entité supplémentaire à supprimer**
+>
+> ![Capture à ajouter: Choisir une entité supplémentaire à supprimer](docs/images/0_default.png)
+
+### Phases des canaux (mode local uniquement)
+
+- Pour une entrée ecoMain locale, ouvrez **Configurer**, choisissez l’action **Phases des canaux**, puis ecoMain ou un ecoSub configuré et en ligne.
+- Attribuez **L1**, **L2** ou **L3** à chacun des dix canaux.
+- L’intégration lit les phases actuelles, écrit uniquement les modifications et les relit pour vérification.
+- Les erreurs d’écriture ou de vérification apparaissent sur les champs concernés ; les modifications réussies ne sont pas annulées automatiquement.
+- Vérifiez les valeurs affichées avant de réessayer.
+- Cette page modifie la configuration de l’appareil et n’est pas disponible en mode cloud.
+
+Les captures existantes montrent des versions antérieures et peuvent ne pas inclure les nouvelles pages ou la casse actuelle des noms de produits.
+
+<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+
+> **Capture à ajouter: Choisir l’appareil pour régler les phases**
+>
+> ![Capture à ajouter: Choisir l’appareil pour régler les phases](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+
+> **Capture à ajouter: Régler les phases des canaux**
+>
+> ![Capture à ajouter: Régler les phases des canaux](docs/images/0_default.png)
 
 ## Nom des appareils
 
@@ -483,9 +597,12 @@ En mode cloud, les entités incluent :
 - `total_1m` = **incrément d'énergie brut sur 1 minute provenant de l'API cloud**
 - `energy_accumulated` = **compteur d'énergie cumulée côté Home Assistant**
 
-Utilisez les entités `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant. Les entités `*_power_avg_1m` conviennent au suivi de puissance en temps réel. Les entités cloud brutes `*_energy_total_1m` restent disponibles, mais ce sont des incréments par minute et non des compteurs cumulatifs.
+- Utilisez les entités `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant.
+- Les entités `*_power_avg_1m` conviennent au suivi de puissance en temps réel.
+- Les entités cloud brutes `*_energy_total_1m` restent disponibles, mais ce sont des incréments par minute et non des compteurs cumulatifs.
 
-Comme l'API cloud ne fournit actuellement ni horodatage ni ID d'échantillon pour chaque valeur d'énergie par minute, l'énergie cloud cumulée est une estimation au mieux. Elle peut être moins précise que les compteurs de durée de vie Modbus locaux, en particulier autour des échantillons cloud répétés ou des redémarrages.
+- L’énergie cloud cumulée reste une estimation : l’API ne donne ni date et heure ni identifiant pour chaque valeur d’énergie par minute.
+- Elle peut être moins précise que les totaux Modbus locaux sur toute la durée de vie, surtout avec des mesures cloud répétées ou des redémarrages.
 
 #### Exemples (cloud)
 

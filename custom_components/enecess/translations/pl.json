@@ -23,11 +23,11 @@
       },
       "ecomain_local_confirm": {
         "title": "Potwierdź urządzenie",
-        "description": "Numer seryjny: {ecomain_serial}\nAdres: {ecomain_host}"
+        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}"
       },
       "ecomain_local_setup": {
         "title": "Konfiguracja urządzenia",
-        "description": "Numer seryjny: {ecomain_serial}\nAdres: {ecomain_host}",
+        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
         }
@@ -55,7 +55,7 @@
       },
       "ecoplug_select": {
         "title": "Wybierz ecoPlug",
-        "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
+        "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania"
         }
@@ -68,7 +68,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Potwierdź urządzenie",
-        "description": "Numer seryjny: {ecomain_serial}\n\nUwaga dotycząca energii w chmurze: *_energy_total_1m to surowy 1-minutowy przyrost energii zwracany przez API chmury. W panelu Home Assistant Energy Dashboard używaj *_energy_accumulated. Energia skumulowana w chmurze jest wyliczana metodą best-effort, ponieważ API chmury obecnie nie udostępnia znacznika czasu ani identyfikatora próbki.",
+        "description": "Numer seryjny: {ecomain_serial}\n\n- `*_energy_total_1m`: surowy przyrost energii na minutę z API chmury.\n- W panelu Energia Home Assistant używaj `*_energy_accumulated`.\n- Łączna energia z chmury jest szacunkowa: API nie podaje czasu ani identyfikatora dla każdego pomiaru.",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
         }
@@ -117,14 +117,14 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 139. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
         "data": {
           "measurement_types": "Rodzaje pomiarów"
         }
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Wybierz źródła; następna strona pokaże ich zmienne. Typ wyniku pozostaje stały podczas edycji. Aby go zmienić, utwórz nową encję.",
+        "description": "- Wybierz źródła; następna strona pokaże ich zmienne.\n- Podczas edycji nie można zmienić typu wyniku. Aby go zmienić, utwórz nową encję.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -133,7 +133,7 @@
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne: {variables}\n\nDozwolone: +, -, *, /, nawiasy, abs, min, max i round. Przykłady: max(a-b,0), (a+b)/2. Typ wyniku ustala jednostkę; sprawdź zgodność wymiarów fizycznych.",
+        "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
         "data": {
           "extra_formula_expression": "Wyrażenie"
         }
@@ -177,7 +177,7 @@
     "step": {
       "init": {
         "title": "Dostosuj ecoMain",
-        "description": "Typ urządzenia: {device_type}\nMetoda dodawania: {mode}\nNumer seryjny ecoMain: {ecomain_serial}\nSkonfigurowane dodatkowe encje: {extra_entities}",
+        "description": "- Typ urządzenia: {device_type}\n- Metoda dodawania: {mode}\n- Numer seryjny ecoMain: {ecomain_serial}\n- Skonfigurowane dodatkowe encje: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
           "extra_action": "Następna akcja"
@@ -185,7 +185,7 @@
       },
       "ecoplug_select": {
         "title": "Dostosuj ecoPlug",
-        "description": "Każde wybrane gniazdko tworzy przełącznik włącz/wyłącz, czujnik mocy chwilowej w W oraz czujnik energii całkowitej w kWh.",
+        "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania"
         }
@@ -221,7 +221,7 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "Wybierz pomiary do utworzenia. Wymagany jest co najmniej jeden rodzaj. Nie można usunąć pomiarów używanych przez dodatkowe encje.\n\nLokalne oprogramowanie 136–138 obsługuje moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym. Wersja 139 lub nowsza udostępnia również osiem dodatkowych rodzajów pomiarów. Konfiguracja faz kanałów jest dostępna od wersji 139. Nieobsługiwane pomiary są ukryte przy starszej wersji oprogramowania.",
+        "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
         "data": {
           "measurement_types": "Rodzaje pomiarów"
         }
@@ -231,11 +231,11 @@
         "data": {
           "phase_device": "Urządzenie"
         },
-        "description": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej."
+        "description": "Ustawienia faz kanałów wymagają oprogramowania w wersji 139 lub nowszej."
       },
       "channel_phases": {
         "title": "Fazy kanałów",
-        "description": "Przypisz L1, L2 lub L3 do kanałów urządzenia {device}. Zapis wysyła zmienione fazy do urządzenia i ponownie je odczytuje w celu weryfikacji.",
+        "description": "- Wybierz L1, L2 lub L3 dla każdego kanału urządzenia {device}.\n- Zapis wysyła tylko zmienione fazy, a następnie odczytuje je ponownie, aby je sprawdzić.",
         "data": {
           "channel_1": "Kanał 1",
           "channel_2": "Kanał 2",
@@ -251,7 +251,7 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Wybierz źródła; następna strona pokaże ich zmienne. Typ wyniku pozostaje stały podczas edycji. Aby go zmienić, utwórz nową encję.",
+        "description": "- Wybierz źródła; następna strona pokaże ich zmienne.\n- Podczas edycji nie można zmienić typu wyniku. Aby go zmienić, utwórz nową encję.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -260,7 +260,7 @@
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne: {variables}\n\nDozwolone: +, -, *, /, nawiasy, abs, min, max i round. Przykłady: max(a-b,0), (a+b)/2. Typ wyniku ustala jednostkę; sprawdź zgodność wymiarów fizycznych.",
+        "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
         "data": {
           "extra_formula_expression": "Wyrażenie"
         }

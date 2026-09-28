@@ -23,11 +23,11 @@
       },
       "ecomain_local_confirm": {
         "title": "Gerät bestätigen",
-        "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}"
+        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}"
       },
       "ecomain_local_setup": {
         "title": "Gerät konfigurieren",
-        "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}",
+        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
         }
@@ -55,7 +55,7 @@
       },
       "ecoplug_select": {
         "title": "ecoPlug auswählen",
-        "description": "Jede ausgewählte Steckdose erstellt einen Ein-/Aus-Schalter, einen Echtzeit-Leistungssensor in W und einen Gesamtenergiesensor in kWh.",
+        "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
         "data": {
           "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
         }
@@ -68,7 +68,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Gerät bestätigen",
-        "description": "Seriennummer: {ecomain_serial}\n\nHinweis zur Cloud-Energie: *_energy_total_1m ist der vom Cloud-API gelieferte rohe 1-Minuten-Energiezuwachs. Verwende *_energy_accumulated für das Home Assistant Energy Dashboard. Die in Home Assistant kumulierte Cloud-Energie ist bestmöglich berechnet, da das Cloud-API derzeit keinen Zeitstempel und keine Sample-ID pro Wert bereitstellt.",
+        "description": "Seriennummer: {ecomain_serial}\n\n- `*_energy_total_1m`: roher Energiezuwachs pro Minute aus der Cloud-API.\n- Nutze `*_energy_accumulated` für das Home Assistant Energy Dashboard.\n- Die in Home Assistant summierte Cloud-Energie ist ein Schätzwert: Die API liefert pro Wert weder Zeitstempel noch Messwert-ID.",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
         }
@@ -117,14 +117,14 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 139 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
         "data": {
           "measurement_types": "Messgrößen"
         }
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Wähle zuerst Quellen; die nächste Seite zeigt ihre Variablen. Der Ergebnistyp bleibt beim Bearbeiten unverändert. Für einen anderen Typ erstelle eine neue Entität.",
+        "description": "- Wähle Quellen; die nächste Seite zeigt ihre Variablen.\n- Der Ergebnistyp bleibt beim Bearbeiten gleich. Für einen anderen Typ erstelle eine neue Entität.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -133,7 +133,7 @@
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen: {variables}\n\nErlaubt: +, -, *, /, Klammern, abs, min, max und round. Beispiele: max(a-b,0), (a+b)/2. Der Ergebnistyp bestimmt die Einheit; prüfe selbst die physikalische Bedeutung.",
+        "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
         "data": {
           "extra_formula_expression": "Formelausdruck"
         }
@@ -177,7 +177,7 @@
     "step": {
       "init": {
         "title": "ecoMain anpassen",
-        "description": "Gerätetyp: {device_type}\nHinzufügungsmethode: {mode}\necoMain-Seriennummer: {ecomain_serial}\nKonfigurierte zusätzliche Entitäten: {extra_entities}",
+        "description": "- Gerätetyp: {device_type}\n- Hinzufügungsmethode: {mode}\n- ecoMain-Seriennummer: {ecomain_serial}\n- Konfigurierte zusätzliche Entitäten: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
           "extra_action": "Nächste Aktion"
@@ -185,7 +185,7 @@
       },
       "ecoplug_select": {
         "title": "ecoPlug anpassen",
-        "description": "Jede ausgewählte Steckdose erstellt einen Ein-/Aus-Schalter, einen Echtzeit-Leistungssensor in W und einen Gesamtenergiesensor in kWh.",
+        "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
         "data": {
           "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
         }
@@ -221,7 +221,7 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "Wählen Sie die anzulegenden Messgrößen. Mindestens eine ist erforderlich. Von zusätzlichen Entitäten verwendete Messgrößen können nicht entfernt werden.\n\nLokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 139 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.",
+        "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
         "data": {
           "measurement_types": "Messgrößen"
         }
@@ -231,11 +231,11 @@
         "data": {
           "phase_device": "Gerät"
         },
-        "description": "Die Kanalphasenkonfiguration erfordert Firmware 139 oder neuer."
+        "description": "Einstellungen der Kanalphasen erfordern Firmware ab 139."
       },
       "channel_phases": {
         "title": "Kanalphasen",
-        "description": "Ordnen Sie den Kanälen von {device} L1, L2 oder L3 zu. Beim Speichern werden geänderte Phasen auf das Gerät geschrieben und zur Prüfung zurückgelesen.",
+        "description": "- Wähle L1, L2 oder L3 für jeden Kanal von {device}.\n- Beim Speichern werden nur geänderte Phasen geschrieben und danach zur Kontrolle gelesen.",
         "data": {
           "channel_1": "Kanal 1",
           "channel_2": "Kanal 2",
@@ -251,7 +251,7 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Wähle zuerst Quellen; die nächste Seite zeigt ihre Variablen. Der Ergebnistyp bleibt beim Bearbeiten unverändert. Für einen anderen Typ erstelle eine neue Entität.",
+        "description": "- Wähle Quellen; die nächste Seite zeigt ihre Variablen.\n- Der Ergebnistyp bleibt beim Bearbeiten gleich. Für einen anderen Typ erstelle eine neue Entität.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -260,7 +260,7 @@
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen: {variables}\n\nErlaubt: +, -, *, /, Klammern, abs, min, max und round. Beispiele: max(a-b,0), (a+b)/2. Der Ergebnistyp bestimmt die Einheit; prüfe selbst die physikalische Bedeutung.",
+        "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
         "data": {
           "extra_formula_expression": "Formelausdruck"
         }

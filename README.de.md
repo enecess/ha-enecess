@@ -4,45 +4,6 @@
 
 Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration für **enecess**-Produkte bereit.
 
-> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von ecoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
-
-Lokale Firmware 136–138 unterstützt Wirkleistung sowie Wirkenergie vorwärts/rückwärts. Ab Firmware 139 sind auch die acht zusätzlichen Messgrößen verfügbar. Die Kanalphasenkonfiguration ist ab Firmware 136 verfügbar. Nicht unterstützte Messgrößen werden bei älterer Firmware ausgeblendet.
-
-## Benutzerdefinierte Formelentitäten
-
-Wähle bei der ecoMain-Einrichtung oder unter **Konfigurieren** die Aktion **Formelentität hinzufügen**. Gib Namen und Ergebnistyp/Einheit an und wähle aktivierte Basismessungen dieses Eintrags. Alle unterstützten Kategorien sind möglich. Die nächste Seite ordnet `a`, `b` usw. den Quellen zu. Beispiele: `max(a-b,0)` und `(a+b)/2`. Nur tatsächlich verwendete Quellen werden gespeichert.
-
-Erlaubt sind Zahlen, `+`, `-`, `*`, `/`, Vorzeichen, Klammern sowie `abs`, `min`, `max`, `round`. Beliebige Home-Assistant-Entitäten, andere Zusatzentitäten, Jinja und externe Daten sind nicht verfügbar. Fehlende Quellen, Division durch null oder nicht endliche Ergebnisse machen die Entität nicht verfügbar.
-
-Einheiten: Wirkleistung W, Wirkenergie Wh, Blindenergie varh, Scheinleistung VA, Blindleistung var, Spannung V, Strom A, Leistungsfaktor (dimensionslos), Frequenz Hz oder Zahl (dimensionslos). Prüfe die physikalische Bedeutung selbst. Formelenergie verwendet `TOTAL`, da Ergebnisse abnehmen können. Beim Bearbeiten bleiben Identität, Variablenzuordnung und Ergebnistyp erhalten. Für einen anderen Typ erstelle eine neue Entität. Entferne abhängige Formeln über die Aktion zum Entfernen zusätzlicher Entitäten, bevor du eine Messgröße abwählst.
-
-## Messgrößen und Kanalphasen
-
-Wähle bei der Einrichtung von ecoMain nach den ecoSub-Geräten und vor den zusätzlichen Entitäten die **Messgrößen** aus. Später lässt sich die Auswahl über **Konfigurieren → Messgrößen** ändern. Mindestens eine Messgröße ist erforderlich. Entferne zusätzliche Entitäten, die eine Messgröße verwenden, bevor du diese abwählst.
-
-Ab Firmware 139 stehen im lokalen Modus elf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
-
-| Kategorie | Bedeutung | Standard |
-| --- | --- | --- |
-| Wirkleistung | Momentane Wirkleistung (W) | Ein |
-| Wirkenergie vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
-| Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
-| Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
-| Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
-| Scheinleistung | Scheinleistung (VA) | Aus |
-| Blindleistung | Blindleistung (var) | Aus |
-| Spannung | Elektrische Spannung (V) | Aus |
-| Strom | Stromstärke (A) | Aus |
-| Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Aus |
-| Frequenz | Netzfrequenz (Hz), nur ecoMain | Aus |
-
-Die verfügbaren Werte richten sich nach den Geräteregistern; nicht jede Kategorie besitzt einen Dreiphasen-Gesamtwert oder Werte für jeden Kanal. ecoSub stellt Kanalmessungen bereit. Im Cloud-Modus sind nur **Wirkleistung** und **Energie** verfügbar, beide standardmäßig ausgewählt. Energie umfasst den kumulierten Zähler und die rohen 1-Minuten-Zuwächse. Die festen ecoPlug-Entitäten bleiben unverändert.
-
-Wähle bei einem lokalen ecoMain-Eintrag unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub. Ordne jedem der zehn Kanäle **L1**, **L2** oder **L3** zu. Die Integration liest die aktuellen Phasen, schreibt nur Änderungen und liest sie zur Prüfung erneut. Schreib- und Prüffehler erscheinen an den betroffenen Feldern; erfolgreiche Änderungen werden nicht automatisch zurückgenommen. Prüfe die angezeigten Werte vor einem erneuten Versuch. Diese Seite verändert die Gerätekonfiguration und ist im Cloud-Modus nicht verfügbar.
-
-Vorhandene Screenshots zeigen ältere Versionen und enthalten möglicherweise noch nicht die neuen Seiten oder die aktuelle Schreibweise der Produktnamen.
-
-
 ## Unterstützte Geräte
 
 - **ecoMain**
@@ -52,6 +13,12 @@ Vorhandene Screenshots zeigen ältere Versionen und enthalten möglicherweise no
     - Nur Cloud (enecess Cloud)
     - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
     - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
+
+> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von ecoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
+
+- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.
+- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.
+- Ältere Firmware blendet nicht unterstützte Messgrößen aus.
 
 ---
 
@@ -211,6 +178,13 @@ Tipps bei Problemen:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot folgt: Messgrößen (lokal)**
+>
+> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -261,6 +235,13 @@ Tipps bei Problemen:
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot folgt: Messgrößen (lokal)**
+>
+> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
@@ -307,6 +288,13 @@ Hinweise:
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Screenshot folgt: Messgrößen (Cloud)**
+>
+> ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
+
 ---
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
@@ -327,6 +315,30 @@ Schritte:
 5. Schließe die Einrichtung ab, um für dieses Konto einen ecoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
 6. Um die Auswahl später anzupassen, öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, füge Steckdosen hinzu oder entferne sie und speichere die Optionen.
 
+<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+
+> **Screenshot folgt: ecoPlug-Cloud-Anmeldung**
+>
+> ![Screenshot folgt: ecoPlug-Cloud-Anmeldung](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+
+> **Screenshot folgt: ecoPlug-Steckdosen auswählen**
+>
+> ![Screenshot folgt: ecoPlug-Steckdosen auswählen](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+
+> **Screenshot folgt: ecoPlug-Einrichtung abgeschlossen**
+>
+> ![Screenshot folgt: ecoPlug-Einrichtung abgeschlossen](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+
+> **Screenshot folgt: Ausgewählte ecoPlug-Steckdosen ändern**
+>
+> ![Screenshot folgt: Ausgewählte ecoPlug-Steckdosen ändern](docs/images/0_default.png)
+
 Jeder ausgewählte ecoPlug erstellt genau diese Entitäten:
 
 - Ein **Schalter**, der die Steckdose über die Cloud ein- oder ausschaltet.
@@ -337,7 +349,7 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 
 ---
 
-## Aktuelle Einschränkungen / Wichtige Hinweise
+## Konfiguration und Optionen
 
 ### Bestehenden Eintrag bearbeiten
 
@@ -368,6 +380,108 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 4. Die Integration mit den neuen Einstellungen erneut hinzufügen.
 
 > Eine Bearbeiten-Funktion ist für zukünftige Versionen geplant.
+
+### Messgrößen
+
+- Wähle bei der Einrichtung von ecoMain nach den ecoSub-Geräten und vor den zusätzlichen Entitäten die **Messgrößen** aus.
+- Später lässt sich die Auswahl über **Konfigurieren → Messgrößen** ändern.
+- Mindestens eine Messgröße ist erforderlich.
+- Entferne zusätzliche Entitäten, die eine Messgröße verwenden, bevor du diese abwählst.
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+
+> **Screenshot folgt: Messgrößen (lokal)**
+>
+> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+
+> **Screenshot folgt: Messgrößen (Cloud)**
+>
+> ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
+
+Ab Firmware 139 stehen im lokalen Modus elf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
+
+| Kategorie | Bedeutung | Standard |
+| --- | --- | --- |
+| Wirkleistung | Momentane Wirkleistung (W) | Ein |
+| Wirkenergie vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
+| Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
+| Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
+| Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
+| Scheinleistung | Scheinleistung (VA) | Aus |
+| Blindleistung | Blindleistung (var) | Aus |
+| Spannung | Elektrische Spannung (V) | Aus |
+| Strom | Stromstärke (A) | Aus |
+| Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Aus |
+| Frequenz | Netzfrequenz (Hz), nur ecoMain | Aus |
+
+Die verfügbaren Werte richten sich nach den Geräteregistern; nicht jede Kategorie besitzt einen Dreiphasen-Gesamtwert oder Werte für jeden Kanal. ecoSub stellt Kanalmessungen bereit. Im Cloud-Modus sind nur **Wirkleistung** und **Energie** verfügbar, beide standardmäßig ausgewählt. Energie umfasst den kumulierten Zähler und die rohen 1-Minuten-Zuwächse. Die festen ecoPlug-Entitäten bleiben unverändert.
+
+### Benutzerdefinierte Formelentitäten
+
+Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mittelwert zweier Leistungswerte.
+
+1. Wähle **Formelentität hinzufügen** bei der ecoMain-Einrichtung oder unter **Konfigurieren**.
+2. Gib einen Namen ein, wähle den Ergebnistyp und aktivierte Messgrößen dieses Eintrags.
+3. Die nächste Seite zeigt, wofür `a`, `b` usw. stehen. Gib die Formel ein und prüfe, ob ihre Einheit zum Ergebnistyp passt.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+
+> **Screenshot folgt: Formelname, Ergebnistyp und Quellen**
+>
+> ![Screenshot folgt: Formelname, Ergebnistyp und Quellen](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+
+> **Screenshot folgt: Formel eingeben**
+>
+> ![Screenshot folgt: Formel eingeben](docs/images/0_default.png)
+
+| Formel | Ergebnis für zwei Leistungswerte |
+| --- | --- |
+| `max(a-b,0)` | a minus b, negative Ergebnisse werden zu 0 |
+| `(a+b)/2` | Mittlere Leistung von a und b |
+
+- Erlaubt sind `+`, `-`, `*`, `/`, Klammern, `abs`, `min`, `max` und `round`.
+- Unter **Formelentität bearbeiten** änderst du Namen, Quellen oder Formel. Für einen anderen Ergebnistyp oder eine andere Einheit erstelle eine neue Entität.
+- Lösche Formeln über **Zusätzliche Entität entfernen**. Lösche Formeln, die eine Messgröße nutzen, bevor du diese abwählst.
+- Fehlen Daten oder lässt sich die Formel nicht berechnen, ist das Ergebnis nicht verfügbar.
+
+<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
+
+> **Screenshot folgt: Formel zum Bearbeiten auswählen**
+>
+> ![Screenshot folgt: Formel zum Bearbeiten auswählen](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
+
+> **Screenshot folgt: Zusätzliche Entität zum Entfernen auswählen**
+>
+> ![Screenshot folgt: Zusätzliche Entität zum Entfernen auswählen](docs/images/0_default.png)
+
+### Kanalphasen (nur lokal)
+
+- Wähle bei einem lokalen ecoMain-Eintrag unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub.
+- Ordne jedem der zehn Kanäle **L1**, **L2** oder **L3** zu.
+- Die Integration liest die aktuellen Phasen, schreibt nur Änderungen und liest sie zur Prüfung erneut.
+- Schreib- und Prüffehler erscheinen an den betroffenen Feldern; erfolgreiche Änderungen werden nicht automatisch zurückgenommen.
+- Prüfe die angezeigten Werte vor einem erneuten Versuch.
+- Diese Seite verändert die Gerätekonfiguration und ist im Cloud-Modus nicht verfügbar.
+
+Vorhandene Screenshots zeigen ältere Versionen und enthalten möglicherweise noch nicht die neuen Seiten oder die aktuelle Schreibweise der Produktnamen.
+
+<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+
+> **Screenshot folgt: Gerät für die Phaseneinstellungen auswählen**
+>
+> ![Screenshot folgt: Gerät für die Phaseneinstellungen auswählen](docs/images/0_default.png)
+
+<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+
+> **Screenshot folgt: Kanalphasen einstellen**
+>
+> ![Screenshot folgt: Kanalphasen einstellen](docs/images/0_default.png)
 
 ## Gerätenamen
 
@@ -480,9 +594,12 @@ Im Cloud-Modus werden u. a. folgende Entitäten erstellt:
 - `total_1m` = **roher 1-Minuten-Energiezuwachs aus dem Cloud-API**
 - `energy_accumulated` = **in Home Assistant kumulierter Energiezähler**
 
-Verwende `*_energy_accumulated` im Home Assistant Energy Dashboard. `*_power_avg_1m` eignet sich für die Echtzeit-Leistungsüberwachung. Die rohen Cloud-Entitäten `*_energy_total_1m` bleiben verfügbar, sind aber Minuten-Zuwächse und keine kumulativen Zähler.
+- Verwende `*_energy_accumulated` im Home Assistant Energy Dashboard.
+- Nutze `*_power_avg_1m` zur Überwachung der aktuellen Leistung.
+- Die rohen Cloud-Entitäten `*_energy_total_1m` bleiben verfügbar, sind aber Minuten-Zuwächse und keine kumulativen Zähler.
 
-Da das Cloud-API derzeit keinen Zeitstempel und keine Sample-ID pro 1-Minuten-Energiewert bereitstellt, ist die kumulierte Cloud-Energie bestmöglich berechnet. Sie kann insbesondere bei wiederholten Cloud-Samples oder Neustarts weniger genau sein als lokale Modbus-Lebenszeitzähler.
+- Die summierte Cloud-Energie ist ein Schätzwert: Die API liefert pro 1-Minuten-Energiewert weder Zeitstempel noch Messwert-ID.
+- Sie kann ungenauer sein als lokale Modbus-Zähler für die gesamte Betriebszeit, besonders bei wiederholten Cloud-Messwerten oder Neustarts.
 
 #### Beispiele – Cloud-Modus
 
