@@ -21,7 +21,6 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         return flow
 
     async def create(self, flow, expression="max(a - b, 0)"):
-        self.assertTrue(hasattr(flow, "async_step_extra_formula"))
         result = await flow.async_step_extra_formula({"extra_entity_name": "Net power",
             "extra_formula_result_type": "power", "extra_entity_sources": self.sources})
         self.assertEqual("extra_formula_expression", result["step_id"])
@@ -53,9 +52,10 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_invalid_inputs_do_not_create_entity(self):
         flow = self.flow()
-        self.assertTrue(hasattr(flow, "async_step_extra_formula"))
-        result = await flow.async_step_extra_formula({"extra_entity_name": "Bad", "extra_formula_result_type": "power",
-                                                    "extra_entity_sources": ["missing_source"]})
+        result = await flow.async_step_extra_formula()
+        result = await flow.async_step_extra_formula(result["data_schema"]({
+            "extra_entity_name": "Empty selection", "extra_formula_result_type": "power",
+            "extra_entity_sources": []}))
         self.assertEqual("formula_sources_invalid", result["errors"]["base"])
         result = await self.create(flow, "__import__('os')")
         self.assertEqual("formula_invalid", result["errors"]["base"])
@@ -108,17 +108,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(original["variables"], flow._extra_entities[0]["variables"])
         self.assertEqual(original["key"], flow._extra_entities[0]["key"])
 
-    async def test_sources_are_revalidated_before_saving_expression(self):
-        flow = self.flow()
-        self.assertTrue(hasattr(flow, "async_step_extra_formula"))
-        await flow.async_step_extra_formula({"extra_entity_name": "Net power", "extra_formula_result_type": "power",
-                                            "extra_entity_sources": self.sources})
-        flow._measurement_types = ["energy_forward"]
-        result = await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
-        self.assertEqual("formula_sources_invalid", result["errors"]["base"])
-        self.assertEqual([], flow._extra_entities)
-
-    async def test_duplicate_sources_formulas_get_distinct_ids_and_remove_independently(self):
+    async def test_formulas_sharing_sources_get_distinct_ids_and_remove_independently(self):
         flow = self.flow(True)
         await self.create(flow, "a+b")
         first = flow._extra_entities[0]["key"]

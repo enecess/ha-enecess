@@ -167,6 +167,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Geben Sie einen Entitätsnamen ein.",
+      "aggregate_sources_required": "Wählen Sie mindestens zwei Quellentitäten aus.",
       "no_devices_found": "Keine kompatiblen Geräte gefunden.",
       "invalid_input": "Ungültige Eingabe.",
       "auto_discovery_not_supported": "Automatische Erkennung wird für diesen Gerätetyp nicht unterstützt.",
@@ -181,12 +183,10 @@
       "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
       "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert.",
       "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
-      "invalid_measurements": "Die ausgewählten Messgrößen werden in diesem Modus nicht unterstützt.",
       "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden.",
       "formula_invalid": "Ungültige Syntax oder nicht unterstützter Ausdruck.",
       "formula_sources_invalid": "Wähle vorhandene, unterstützte Quellentitäten.",
       "formula_name_required": "Gib einen Entitätsnamen ein.",
-      "formula_result_type_invalid": "Wähle einen unterstützten Ergebnistyp.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
       "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
       "slave_in_use": "Entferne zusätzliche Entitäten mit Messwerten dieses Untergeräts, bevor du es abwählst."
@@ -308,6 +308,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Geben Sie einen Entitätsnamen ein.",
+      "aggregate_sources_required": "Wählen Sie mindestens zwei Quellentitäten aus.",
       "no_source_entities": "Keine kompatiblen Quellentitäten verfügbar.",
       "no_extra_entities": "Es wurden keine zusätzlichen Entitäten konfiguriert.",
       "no_devices_found": "Keine kompatiblen Geräte gefunden.",
@@ -317,18 +319,15 @@
       "cannot_connect_local": "Verbindung zum Gerät fehlgeschlagen.",
       "firmware_too_old": "Die Firmwareversion des Geräts ist zu alt.",
       "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
-      "invalid_measurements": "Die ausgewählten Messgrößen werden in diesem Modus nicht unterstützt.",
       "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden.",
       "phase_read_failed": "Die Kanalphasen konnten nicht vom Gerät gelesen werden.",
       "phase_write_failed": "Diese Kanalphase konnte nicht geschrieben werden. Prüfen Sie das Gerät und versuchen Sie es erneut.",
       "phase_verify_failed": "Die zurückgelesene Phase stimmt nicht mit dem gewünschten Wert überein. Prüfen Sie diesen Kanal und versuchen Sie es erneut.",
-      "invalid_phase": "Wählen Sie L1, L2 oder L3.",
       "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar.",
       "phase_firmware_too_old": "Die Kanalphasenkonfiguration erfordert Firmware 139 oder neuer.",
       "formula_invalid": "Ungültige Syntax oder nicht unterstützter Ausdruck.",
       "formula_sources_invalid": "Wähle vorhandene, unterstützte Quellentitäten.",
       "formula_name_required": "Gib einen Entitätsnamen ein.",
-      "formula_result_type_invalid": "Wähle einen unterstützten Ergebnistyp.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
       "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
       "invalid_input": "Ungültige Eingabe.",
@@ -362,6 +361,8 @@
     },
     "extra_action": {
       "options": {
+        "back": "Zurück",
+        "cancel": "Abbrechen",
         "finish": "Fertigstellen",
         "add_transform": "Invertierte/absolute Leistungsentität hinzufügen",
         "add_aggregate": "Summen-/Durchschnittsentität hinzufügen",

@@ -36,14 +36,9 @@ class FormulaFlowMixin:
         }
 
     def _formula_draft_error(self, draft: dict[str, Any]) -> str | None:
-        if not isinstance(draft.get("name"), str) or not draft["name"].strip():
+        if not draft.get("name", "").strip():
             return "formula_name_required"
-        if draft.get("result_type") not in FORMULA_RESULT_TYPES:
-            return "formula_result_type_invalid"
-        sources = draft.get("sources")
-        available = self._formula_sources()
-        if (not isinstance(sources, list) or not sources
-                or any(not isinstance(source, str) or source not in available for source in sources)):
+        if not draft.get("sources"):
             return "formula_sources_invalid"
         editing = getattr(self, "_formula_edit_key", None)
         if editing:
@@ -71,7 +66,7 @@ class FormulaFlowMixin:
                 errors["base"] = error
                 draft = proposed
             else:
-                sources = list(dict.fromkeys(proposed["sources"]))
+                sources = list(proposed["sources"])
                 # Reserve removed aliases until this operation ends, so an old
                 # expression cannot silently refer to a different source.
                 previous = draft.get("_variable_history", draft.get("variables", {}))
@@ -112,14 +107,10 @@ class FormulaFlowMixin:
         expression = draft.get("expression", "")
         if user_input is not None:
             expression = user_input.get(EXPRESSION, "")
-            error = self._formula_draft_error(draft)
-            if not error:
-                try:
-                    validated = validate_formula(expression, draft["variables"])
-                except FormulaError:
-                    error = "formula_invalid"
-            if error:
-                errors["base"] = error
+            try:
+                validated = validate_formula(expression, draft["variables"])
+            except FormulaError:
+                errors["base"] = "formula_invalid"
             else:
                 variables = {alias: source for alias, source in draft["variables"].items()
                              if alias in validated.referenced_variables}

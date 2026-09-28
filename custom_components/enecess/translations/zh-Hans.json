@@ -167,6 +167,8 @@
       }
     },
     "error": {
+      "extra_name_required": "请输入实体名称。",
+      "aggregate_sources_required": "请至少选择两个来源实体。",
       "no_devices_found": "未找到兼容的设备。",
       "invalid_input": "输入无效。",
       "auto_discovery_not_supported": "此设备类型不支持自动发现。",
@@ -181,12 +183,10 @@
       "no_source_entities": "没有可用的兼容源实体。",
       "no_extra_entities": "尚未配置额外实体。",
       "no_measurements_selected": "请至少选择一种测量类型。",
-      "invalid_measurements": "当前模式不支持所选测量类型。",
       "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。",
       "formula_invalid": "公式语法无效或包含不支持的表达式。",
       "formula_sources_invalid": "请选择现有且受支持的源实体。",
       "formula_name_required": "请输入实体名称。",
-      "formula_result_type_invalid": "请选择受支持的结果类型。",
       "formula_result_type_locked": "不能更改结果类型，请新建公式实体。",
       "no_formula_entities": "尚未配置公式实体。",
       "slave_in_use": "请先移除使用此从机测量数据的额外实体，再取消选择从机。"
@@ -308,6 +308,8 @@
       }
     },
     "error": {
+      "extra_name_required": "请输入实体名称。",
+      "aggregate_sources_required": "请至少选择两个来源实体。",
       "no_source_entities": "没有可用的兼容源实体。",
       "no_extra_entities": "尚未配置额外实体。",
       "no_devices_found": "未找到兼容的设备。",
@@ -317,18 +319,15 @@
       "cannot_connect_local": "无法连接到设备。",
       "firmware_too_old": "设备固件版本过低。",
       "no_measurements_selected": "请至少选择一种测量类型。",
-      "invalid_measurements": "当前模式不支持所选测量类型。",
       "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。",
       "phase_read_failed": "无法读取设备的通道相位。",
       "phase_write_failed": "无法写入此通道相位，请检查设备后重试。",
       "phase_verify_failed": "回读相位与设置值不一致，请检查此通道后重试。",
-      "invalid_phase": "请选择 L1、L2 或 L3。",
       "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",
       "phase_firmware_too_old": "通道相位设置需要固件 139 或更高版本。",
       "formula_invalid": "公式语法无效或包含不支持的表达式。",
       "formula_sources_invalid": "请选择现有且受支持的源实体。",
       "formula_name_required": "请输入实体名称。",
-      "formula_result_type_invalid": "请选择受支持的结果类型。",
       "formula_result_type_locked": "不能更改结果类型，请新建公式实体。",
       "no_formula_entities": "尚未配置公式实体。",
       "invalid_input": "输入无效。",
@@ -362,6 +361,8 @@
     },
     "extra_action": {
       "options": {
+        "back": "返回上一步",
+        "cancel": "取消",
         "finish": "完成",
         "add_transform": "添加取反/绝对值功率实体",
         "add_aggregate": "添加总和/平均实体",

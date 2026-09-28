@@ -167,6 +167,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Wprowadź nazwę encji.",
+      "aggregate_sources_required": "Wybierz co najmniej dwie encje źródłowe.",
       "no_devices_found": "Nie znaleziono zgodnych urządzeń.",
       "invalid_input": "Nieprawidłowe dane wejściowe.",
       "auto_discovery_not_supported": "Automatyczne wykrywanie nie jest obsługiwane dla tego typu urządzenia.",
@@ -181,12 +183,10 @@
       "no_source_entities": "Brak zgodnych encji źródłowych.",
       "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
       "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
-      "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
       "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru.",
       "formula_invalid": "Nieprawidłowa składnia lub nieobsługiwane wyrażenie.",
       "formula_sources_invalid": "Wybierz istniejące i obsługiwane encje źródłowe.",
       "formula_name_required": "Podaj nazwę encji.",
-      "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
       "no_formula_entities": "Nie skonfigurowano encji formuł.",
       "slave_in_use": "Przed odznaczeniem urządzenia podrzędnego usuń dodatkowe encje korzystające z jego pomiarów."
@@ -308,6 +308,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Wprowadź nazwę encji.",
+      "aggregate_sources_required": "Wybierz co najmniej dwie encje źródłowe.",
       "no_source_entities": "Brak zgodnych encji źródłowych.",
       "no_extra_entities": "Nie skonfigurowano żadnych dodatkowych encji.",
       "no_devices_found": "Nie znaleziono zgodnych urządzeń.",
@@ -317,18 +319,15 @@
       "cannot_connect_local": "Nie można połączyć się z urządzeniem.",
       "firmware_too_old": "Wersja oprogramowania urządzenia jest zbyt stara.",
       "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
-      "invalid_measurements": "Wybrane pomiary nie są obsługiwane w tym trybie.",
       "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru.",
       "phase_read_failed": "Nie można odczytać faz kanałów z urządzenia.",
       "phase_write_failed": "Nie można zapisać fazy tego kanału. Sprawdź urządzenie i spróbuj ponownie.",
       "phase_verify_failed": "Odczytana faza nie odpowiada żądanej wartości. Sprawdź ten kanał i spróbuj ponownie.",
-      "invalid_phase": "Wybierz L1, L2 lub L3.",
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
       "phase_firmware_too_old": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej.",
       "formula_invalid": "Nieprawidłowa składnia lub nieobsługiwane wyrażenie.",
       "formula_sources_invalid": "Wybierz istniejące i obsługiwane encje źródłowe.",
       "formula_name_required": "Podaj nazwę encji.",
-      "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
       "no_formula_entities": "Nie skonfigurowano encji formuł.",
       "invalid_input": "Nieprawidłowe dane wejściowe.",
@@ -362,6 +361,8 @@
     },
     "extra_action": {
       "options": {
+        "back": "Wstecz",
+        "cancel": "Anuluj",
         "finish": "Zakończ",
         "add_transform": "Dodaj encję odwrócenia/wartości bezwzględnej mocy",
         "add_aggregate": "Dodaj encję sumy/średniej",

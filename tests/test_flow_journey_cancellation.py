@@ -5,7 +5,7 @@ import types
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from flow_test_support import load_flow
+from flow_test_support import load_flow, submit_values
 from test_ecomain_phase import Transport
 
 
@@ -20,7 +20,7 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
 
     async def submit(self, flow, result, **values):
         self.assertEqual('form', result['type'], 'A terminal flow cannot accept another submission')
-        return await getattr(flow, 'async_step_' + result['step_id'])(result['data_schema'](values))
+        return await getattr(flow, 'async_step_' + result['step_id'])(submit_values(result, values))
 
     def make_flow(self):
         flow = self.module.ConfigFlow()

@@ -4,7 +4,7 @@ import types
 import unittest
 from unittest.mock import AsyncMock
 
-from flow_test_support import load_flow
+from flow_test_support import load_flow, submit_values
 
 
 class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
@@ -17,7 +17,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
         return f
 
     async def submit(self, f, r, **values):
-        values = r['data_schema'](values)
+        values = submit_values(r, values)
         return await getattr(f, 'async_step_' + r['step_id'])(values)
 
     async def local(self, mode, slaves):

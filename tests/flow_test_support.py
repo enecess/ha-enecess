@@ -13,6 +13,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / '.superpowers/test-deps'))
 
 
+def submit_values(result, values):
+    """Select navigation from the action field actually displayed by the form."""
+    values = dict(values)
+    fields = {str(key) for key in result['data_schema'].schema}
+    if 'flow_action' in values and 'flow_action' not in fields and 'extra_action' in fields:
+        values['extra_action'] = values.pop('flow_action')
+    return result['data_schema'](values)
+
+
 def load_flow(test):
     saved = patch.dict(sys.modules)
     saved.start()

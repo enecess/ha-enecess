@@ -77,20 +77,21 @@ def _measurement_schema(entry_data: dict, selected: list[str]) -> vol.Schema:
     })
 
 
-def _measurement_error(entry_data: dict, selected: Any) -> Optional[str]:
-    if not selected:
-        return "no_measurements_selected"
-    choices = CLOUD_MEASUREMENTS if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD else available_local_measurements(entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION))
-    if not isinstance(selected, list) or any(item not in choices for item in selected):
-        return "invalid_measurements"
-    return None
-
-
 def _selection_removes_extra_sources(entry_data: dict, current: dict, proposed: dict) -> bool:
     old_keys = {spec.key for spec in build_entry_specs(entry_data, current, include_unsupported=True)}
     new_keys = {spec.key for spec in build_entry_specs(entry_data, proposed, include_unsupported=True)}
     removed = old_keys - new_keys
     return any(removed.intersection(extra.get("sources") or []) for extra in current.get(CONST_EXTRA_ENTITIES, []))
+
+
+def _extra_entity_errors(user_input: dict[str, Any], *, aggregate: bool = False) -> dict[str, str]:
+    """Validate names and aggregate source counts before saving an extra entity."""
+    errors = {}
+    if not user_input.get(CONST_EXTRA_ENTITY_NAME, "").strip():
+        errors[CONST_EXTRA_ENTITY_NAME] = "extra_name_required"
+    if aggregate and len(user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []) < 2:
+        errors[CONST_EXTRA_ENTITY_SOURCES] = "aggregate_sources_required"
+    return errors
 
 
 class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
@@ -139,9 +140,6 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             )
 
         device_type = user_input[CONST_DEVICE_TYPE]
-        if device_type not in DEVICE_CONFIGS:
-            return self.async_abort(reason="unsupported_device_type")  # type: ignore[return-value]
-
         self._device_type = device_type
         if device_type == CONST_DEVICE_ECOMAIN:
             return await self.async_step_ecomain_mode()  # type: ignore[return-value]
@@ -531,7 +529,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             )
 
         username = str(user_input[CONST_CLOUD_USERNAME]).strip()
-        password = str(user_input[CONST_CLOUD_PASSWORD]).strip()
+        password = str(user_input[CONST_CLOUD_PASSWORD])
 
         api = self._get_cloud_api()
         try:
@@ -792,7 +790,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
         errors = {}
         if user_input is not None:
             selected = user_input.get(CONST_MEASUREMENT_TYPES)
-            error = _measurement_error(self._entry_data, selected)
+            error = "no_measurements_selected" if not selected else None
             if not error:
                 options = self._options_data()
                 proposed = {**options, CONST_MEASUREMENT_TYPES: selected}
@@ -801,7 +799,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             if error:
                 errors["base"] = error
             else:
-                self._measurement_types = list(dict.fromkeys(selected))
+                self._measurement_types = list(selected)
                 return await self.async_step_extra_entities()
         return self.async_show_form(
             step_id="measurement_types",
@@ -850,7 +848,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             return self._show_extra_transform_form()
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_TRANSFORM})
 
-    def _show_extra_transform_form(self) -> FlowResult:
+    def _show_extra_transform_form(self, errors: Optional[dict[str, str]] = None) -> FlowResult:
         source_options = build_source_options(self._entry_data, self._options_data(), source_kind="power", power_only=True)
         return self.async_show_form(
             step_id="extra_transform",
@@ -867,17 +865,13 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
                     vol.Required(CONST_EXTRA_ENTITY_SOURCE): vol.In(source_options),
                 }
             ),
-            errors={} if source_options else {"base": "no_source_entities"},
+            errors=errors or ({} if source_options else {"base": "no_source_entities"}),
             description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
         )
 
     def _handle_extra_transform(self, user_input: dict[str, Any]) -> FlowResult:
-        if not all(
-            user_input.get(key)
-            for key in (CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_SOURCE)
-        ):
-            return self._show_extra_transform_form()
-
+        if errors := _extra_entity_errors(user_input):
+            return self._show_extra_transform_form(errors)
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return self._show_extra_entities_menu("extra_entities")
 
@@ -911,7 +905,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             return self._show_extra_aggregate_form("power")
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_AGGREGATE})
 
-    def _show_extra_aggregate_form(self, source_kind: str) -> FlowResult:
+    def _show_extra_aggregate_form(self, source_kind: str, errors: Optional[dict[str, str]] = None) -> FlowResult:
         source_options = build_source_options(self._entry_data, self._options_data(), source_kind=source_kind)
         return self.async_show_form(
             step_id="extra_aggregate",
@@ -941,15 +935,15 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
                     ),
                 }
             ),
-            errors={} if source_options else {"base": "no_source_entities"},
+            errors=errors or ({} if source_options else {"base": "no_source_entities"}),
             description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
         )
 
     def _handle_extra_aggregate(self, user_input: dict[str, Any]) -> FlowResult:
         source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
-        selected = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []
-        if not user_input.get(CONST_EXTRA_ENTITY_NAME) or not user_input.get(CONST_EXTRA_ENTITY_OPERATION) or len(selected) < 2:
-            return self._show_extra_aggregate_form(source_kind)
+        errors = _extra_entity_errors(user_input, aggregate=True)
+        if errors:
+            return self._show_extra_aggregate_form(source_kind, errors)
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return self._show_extra_entities_menu("extra_entities")
 
@@ -973,8 +967,6 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
         )
 
     def _handle_extra_remove(self, user_input: dict[str, Any]) -> FlowResult:
-        if not user_input.get(CONST_EXTRA_ENTITY_REMOVE):
-            return self._show_extra_remove_form()
         remove_key = user_input[CONST_EXTRA_ENTITY_REMOVE]
         self._extra_entities = [extra for extra in self._extra_entities if extra.get("key") != remove_key]
         return self._show_extra_entities_menu("extra_entities")
@@ -1115,12 +1107,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
             return await self._show_options_menu(errors)
 
         if CONST_ECOMAIN_SELECTED_SLAVES in user_input:
-            allowed = set(self._available_slaves) | {
-                str(index) for index in self._options[CONST_ECOMAIN_SELECTED_SLAVES]
-            }
-            selected = sorted({int(index) for index in
-                               (user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or [])
-                               if str(index) in allowed})
+            selected = sorted(int(index) for index in user_input[CONST_ECOMAIN_SELECTED_SLAVES])
             proposed = {**self._options, CONST_ECOMAIN_SELECTED_SLAVES: selected}
             if _selection_removes_extra_sources(self._entry.data, self._options, proposed):
                 return await self._show_options_menu({"base": "slave_in_use"})
@@ -1152,7 +1139,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
         errors = {}
         if user_input is not None:
             selected = user_input.get(CONST_MEASUREMENT_TYPES)
-            error = _measurement_error(self._measurement_entry_data, selected)
+            error = "no_measurements_selected" if not selected else None
             if not error:
                 proposed = {**self._options, CONST_MEASUREMENT_TYPES: selected}
                 if _selection_removes_extra_sources(self._measurement_entry_data, self._options, proposed):
@@ -1160,7 +1147,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
             if error:
                 errors["base"] = error
             else:
-                self._options[CONST_MEASUREMENT_TYPES] = list(dict.fromkeys(selected))
+                self._options[CONST_MEASUREMENT_TYPES] = list(selected)
                 return await self._show_options_menu()
         return self.async_show_form(
             step_id="measurement_types",
@@ -1170,24 +1157,17 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
 
     @navigable_step
     async def async_step_phase_device(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
-        if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
-            return self.async_abort(reason="phase_unavailable")
         choices = ["0", *[str(index) for index in get_entry_slaves(self._entry.data, self._options)
                            if str(index) in self._available_slaves]]
-        errors = {}
         if user_input is not None:
-            selected = user_input.get("phase_device")
-            if selected not in choices:
-                errors["base"] = "phase_unavailable"
-            else:
-                self._phase_device = int(selected)
-                self._phase_values = {}
-                return await self.async_step_channel_phases()
+            self._phase_device = int(user_input["phase_device"])
+            self._phase_values = {}
+            return await self.async_step_channel_phases()
         return self.async_show_form(
             step_id="phase_device",
             data_schema=vol.Schema({vol.Required("phase_device", default="0"): selector.SelectSelector(
                 selector.SelectSelectorConfig(options=choices, translation_key="phase_device", mode=SelectSelectorMode.LIST))}),
-            errors=errors,
+            errors={},
         )
 
     @navigable_step
@@ -1211,14 +1191,12 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                 errors["base"] = "phase_read_failed"
         if not errors and user_input is not None and self._phase_values:
             desired = {f"channel_{channel}": user_input.get(f"channel_{channel}") for channel in range(1, 11)}
-            errors = {key: "invalid_phase" for key, value in desired.items() if value not in ("L1", "L2", "L3")}
+            try:
+                errors = await async_write_phases(client, self._phase_device, desired)
+            except Exception:
+                errors = {"base": "phase_write_failed"}
             if not errors:
-                try:
-                    errors = await async_write_phases(client, self._phase_device, desired)
-                except Exception:
-                    errors = {"base": "phase_write_failed"}
-                if not errors:
-                    return await self._show_options_menu()
+                return await self._show_options_menu()
             self._phase_values = desired
         elif not errors:
             try:
@@ -1328,7 +1306,8 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
     @navigable_step
     async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_options = build_source_options(self._measurement_entry_data, self._options, source_kind="power", power_only=True)
-        if user_input is None:
+        errors = _extra_entity_errors(user_input) if user_input is not None else {}
+        if user_input is None or errors:
             return self.async_show_form(
                 step_id="extra_transform",
                 data_schema=vol.Schema(
@@ -1344,14 +1323,8 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                         vol.Required(CONST_EXTRA_ENTITY_SOURCE): vol.In(source_options),
                     }
                 ),
-                errors={} if source_options else {"base": "no_source_entities"},
+                errors=errors or ({} if source_options else {"base": "no_source_entities"}),
         )
-
-        if not all(
-            user_input.get(key)
-            for key in (CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_OPERATION, CONST_EXTRA_ENTITY_SOURCE)
-        ):
-            return await self.async_step_extra_transform()
 
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return await self._show_options_menu()
@@ -1374,15 +1347,15 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                 ),
                 errors={},
             )
-        if not user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND):
-            return await self.async_step_extra_aggregate_kind()
         return await self.async_step_extra_aggregate(user_input)
 
     @navigable_step
     async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
         source_options = build_source_options(self._measurement_entry_data, self._options, source_kind=source_kind)
-        if user_input is None or CONST_EXTRA_ENTITY_OPERATION not in user_input:
+        submitted = user_input is not None and CONST_EXTRA_ENTITY_OPERATION in user_input
+        errors = _extra_entity_errors(user_input, aggregate=True) if submitted else {}
+        if not submitted or errors:
             return self.async_show_form(
                 step_id="extra_aggregate",
                 data_schema=vol.Schema(
@@ -1411,12 +1384,9 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                         ),
                     }
                 ),
-                errors={} if source_options else {"base": "no_source_entities"},
+                errors=errors or ({} if source_options else {"base": "no_source_entities"}),
             )
 
-        selected = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []
-        if not user_input.get(CONST_EXTRA_ENTITY_NAME) or not user_input.get(CONST_EXTRA_ENTITY_OPERATION) or len(selected) < 2:
-            return await self.async_step_extra_aggregate_kind()
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return await self._show_options_menu()
 

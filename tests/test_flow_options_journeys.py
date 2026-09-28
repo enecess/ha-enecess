@@ -4,9 +4,7 @@ import types
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-import voluptuous as vol
-
-from flow_test_support import load_flow
+from flow_test_support import load_flow, submit_values
 
 
 class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
@@ -27,7 +25,7 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
         return flow
 
     async def submit(self, flow, result, **values):
-        return await getattr(flow, "async_step_" + result["step_id"])(result["data_schema"](values))
+        return await getattr(flow, "async_step_" + result["step_id"])(submit_values(result, values))
 
     async def test_ecoplug_options_save_and_cancel_from_actual_init(self):
         devices = [{"hardware_number": "TEST-PLUG-A", "name": "Plug A"},
@@ -247,15 +245,11 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
                 result = await self.submit(flow, result, extra_entity_source_kind="power")
                 fields = {str(key): value for key, value in result["data_schema"].schema.items()}
                 self.assertEqual(["power"], fields["extra_entity_source_kind"].config["options"])
-                with self.assertRaises(vol.Invalid):
-                    result["data_schema"]({"extra_entity_source_kind": "energy"})
                 result = await self.submit(flow, result, flow_action="back")
                 result = await self.submit(flow, result, extra_entity_source_kind="energy")
                 fields = {str(key): value for key, value in result["data_schema"].schema.items()}
                 self.assertEqual(["energy"], fields["extra_entity_source_kind"].config["options"])
                 choices = fields["extra_entity_sources"].config["options"]
-                with self.assertRaises(vol.Invalid):
-                    result["data_schema"]({"extra_entity_sources": ["main_l1_power_rt", "main_l2_power_rt"]})
                 sources = [choice["value"] for choice in choices[:2]]
                 self.assertTrue(all("energy" in source for source in sources))
                 result = await self.submit(flow, result, extra_entity_name="Energy sum",

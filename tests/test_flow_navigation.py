@@ -5,7 +5,7 @@ import types
 import unittest
 from unittest.mock import AsyncMock
 
-from flow_test_support import load_flow
+from flow_test_support import load_flow, submit_values
 
 
 class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
@@ -25,8 +25,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         return flow
 
     def navigation_input(self, result, action, **values):
-        self.assertIn("flow_action", [str(key) for key in result["data_schema"].schema])
-        return result["data_schema"]({**values, "flow_action": action})
+        return submit_values(result, {**values, "flow_action": action})
 
     async def menu(self, flow, options=False):
         return await flow._show_options_menu() if options else await flow.async_step_extra_entities()
@@ -34,6 +33,45 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
     async def choose(self, flow, action, options=False):
         handler = flow.async_step_init if options else flow.async_step_extra_entities
         return await handler({"extra_action": action})
+
+    async def test_menus_have_one_action_selector_with_navigation(self):
+        for options in (False, True):
+            with self.subTest(options=options):
+                flow = self.flow(options)
+                if not options:
+                    await flow.async_step_measurement_types()
+                result = await self.menu(flow, options)
+                fields = {str(key): value for key, value in result["data_schema"].schema.items()}
+                self.assertNotIn("flow_action", fields)
+                actions = fields["extra_action"].config["options"]
+                self.assertIn("finish", actions)
+                self.assertIn("add_formula", actions)
+                self.assertIn("cancel", actions)
+                self.assertEqual(not options, "back" in actions)
+                self.assertNotIn("continue", actions)
+
+    async def test_menu_cancel_does_not_finish_or_save_options(self):
+        for options in (False, True):
+            with self.subTest(options=options):
+                flow = self.flow(options)
+                result = await self.menu(flow, options)
+                handler = flow.async_step_init if options else flow.async_step_extra_entities
+                result = await handler(result["data_schema"]({"extra_action": "cancel"}))
+                self.assertEqual({"type": "abort", "reason": "user_cancelled"}, result)
+                if options:
+                    self.assertEqual({}, flow._entry.options)
+
+    async def test_menu_back_preserves_saved_extra_entities(self):
+        flow = self.flow()
+        await flow.async_step_measurement_types()
+        result = await flow.async_step_measurement_types({"measurement_types": ["power"]})
+        await self.choose(flow, "add_formula")
+        await flow.async_step_extra_formula(self.formula)
+        result = await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
+        original = deepcopy(flow._extra_entities)
+        result = await flow.async_step_extra_entities(result["data_schema"]({"extra_action": "back"}))
+        self.assertEqual("measurement_types", result["step_id"])
+        self.assertEqual(original, flow._extra_entities)
 
     async def test_formula_selectors_offer_dropdown_and_multiple_sources(self):
         for options in (False, True):

@@ -22,7 +22,11 @@ These tests do not replace validation in a complete Home Assistant runtime or fr
 
 Flow journey tests start at setup or options entry points and submit the schema
 returned by each page. The selector double rejects unavailable choices and wrong
-value types. The tests cover cancellation at every setup page, Back, successful
+value types. Flow cases should use values and actions available in the displayed
+form. Do not add forged duplicate selections, unavailable choices, or assertions
+that merely test the selector double. Keep validation tests for user-entered text,
+empty selections, persisted configuration, and device/API responses at their
+respective boundaries. The tests cover cancellation at every setup page, Back, successful
 creation, cloud errors and retries, changed devices and credentials, formula
 source changes, dependent entities, and preservation of offline selected devices.
 Cancellation assertions check both the destination and the absence of entry

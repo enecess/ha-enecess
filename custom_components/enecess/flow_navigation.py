@@ -7,6 +7,8 @@ import voluptuous as vol
 from homeassistant.helpers import selector
 from homeassistant.helpers.selector import SelectSelectorMode
 
+from .const import CONST_EXTRA_ACTION
+
 
 FLOW_ACTION = "flow_action"
 MENU_STEPS = {"user", "init", "extra_entities"}
@@ -38,6 +40,8 @@ def navigable_step(handler):
             if user_input is not None:
                 values = {key: value for key, value in user_input.items() if key != FLOW_ACTION}
                 action = user_input.get(FLOW_ACTION, "continue")
+                if step in CANCEL_MENUS and values.get(CONST_EXTRA_ACTION) in ("back", "cancel"):
+                    action = values.pop(CONST_EXTRA_ACTION)
                 old_values = self._navigation_inputs.get(step, {})
                 if action in ("back", "cancel"):
                     self._navigation_inputs[step] = {**old_values, **deepcopy(values)}
@@ -164,6 +168,12 @@ class FlowNavigationMixin:
                 self._navigation_root == "init" and step == "ecoplug_select"):
             actions.append("back")
         actions.append("cancel")
+        if step in CANCEL_MENUS:
+            for key, validator in fields.items():
+                if str(key) == CONST_EXTRA_ACTION:
+                    fields[key] = selector.SelectSelector(selector.SelectSelectorConfig(
+                        **{**validator.config, "options": [*validator.config["options"], *actions[1:]]}))
+                    return super().async_show_form(**{**form, "data_schema": vol.Schema(fields)})
         fields[vol.Required(FLOW_ACTION, default=action)] = selector.SelectSelector(
             selector.SelectSelectorConfig(options=actions, translation_key=FLOW_ACTION, mode=SelectSelectorMode.LIST))
         return super().async_show_form(**{**form, "data_schema": vol.Schema(fields)})

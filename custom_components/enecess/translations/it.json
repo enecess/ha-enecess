@@ -167,6 +167,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Inserisci un nome per l’entità.",
+      "aggregate_sources_required": "Seleziona almeno due entità sorgente.",
       "no_devices_found": "Nessun dispositivo compatibile trovato.",
       "invalid_input": "Dati inseriti non validi.",
       "auto_discovery_not_supported": "Il rilevamento automatico non è supportato per questo tipo di dispositivo.",
@@ -181,12 +183,10 @@
       "no_source_entities": "Non sono disponibili entità di origine compatibili.",
       "no_extra_entities": "Non sono state configurate entità aggiuntive.",
       "no_measurements_selected": "Seleziona almeno un tipo di misurazione.",
-      "invalid_measurements": "Le misurazioni selezionate non sono supportate in questa modalità.",
       "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla.",
       "formula_invalid": "Sintassi non valida o espressione non supportata.",
       "formula_sources_invalid": "Seleziona entità sorgente esistenti e supportate.",
       "formula_name_required": "Inserisci un nome per l'entità.",
-      "formula_result_type_invalid": "Seleziona un tipo di risultato supportato.",
       "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
       "no_formula_entities": "Nessuna entità formula configurata.",
       "slave_in_use": "Rimuovi le entità aggiuntive che usano le misure di questo dispositivo secondario prima di deselezionarlo."
@@ -308,6 +308,8 @@
       }
     },
     "error": {
+      "extra_name_required": "Inserisci un nome per l’entità.",
+      "aggregate_sources_required": "Seleziona almeno due entità sorgente.",
       "no_source_entities": "Non sono disponibili entità di origine compatibili.",
       "no_extra_entities": "Non sono state configurate entità aggiuntive.",
       "no_devices_found": "Nessun dispositivo compatibile trovato.",
@@ -317,18 +319,15 @@
       "cannot_connect_local": "Impossibile connettersi al dispositivo.",
       "firmware_too_old": "La versione del firmware del dispositivo è troppo vecchia.",
       "no_measurements_selected": "Seleziona almeno un tipo di misurazione.",
-      "invalid_measurements": "Le misurazioni selezionate non sono supportate in questa modalità.",
       "measurement_in_use": "Rimuovi le entità aggiuntive che utilizzano questa misurazione prima di deselezionarla.",
       "phase_read_failed": "Impossibile leggere le fasi dei canali dal dispositivo.",
       "phase_write_failed": "Impossibile scrivere la fase di questo canale. Controlla il dispositivo e riprova.",
       "phase_verify_failed": "La fase riletta non corrisponde al valore richiesto. Controlla questo canale e riprova.",
-      "invalid_phase": "Seleziona L1, L2 o L3.",
       "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale.",
       "phase_firmware_too_old": "La configurazione delle fasi dei canali richiede il firmware 139 o successivo.",
       "formula_invalid": "Sintassi non valida o espressione non supportata.",
       "formula_sources_invalid": "Seleziona entità sorgente esistenti e supportate.",
       "formula_name_required": "Inserisci un nome per l'entità.",
-      "formula_result_type_invalid": "Seleziona un tipo di risultato supportato.",
       "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
       "no_formula_entities": "Nessuna entità formula configurata.",
       "invalid_input": "Dati inseriti non validi.",
@@ -362,6 +361,8 @@
     },
     "extra_action": {
       "options": {
+        "back": "Indietro",
+        "cancel": "Annulla",
         "finish": "Fine",
         "add_transform": "Aggiungi entità di potenza invertita/assoluta",
         "add_aggregate": "Aggiungi entità somma/media",
