@@ -46,7 +46,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue({"power", "energy_forward", "energy_reverse"}.issubset(choices))
                 result = await flow.async_step_measurement_types({"measurement_types": ["voltage"]})
                 if version is None or version < 139:
-                    self.assertEqual("invalid_measurements", result["errors"]["base"])
+                    self.assertEqual("invalid_input", result["errors"]["measurement_types"])
                 else:
                     self.assertEqual("extra_entities", result["step_id"])
 
@@ -127,7 +127,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_measurement_types({'measurement_types': []})
         self.assertEqual('no_measurements_selected', result['errors']['base'])
         result = await flow.async_step_measurement_types({'measurement_types': ['voltage']})
-        self.assertEqual('invalid_measurements', result['errors']['base'])
+        self.assertEqual('invalid_input', result['errors']['measurement_types'])
 
     async def test_options_retain_legacy_default_and_unknown_options(self):
         flow = self.module.EnecessOptionsFlow(self.entry(options={'future_option': 1}))
@@ -267,7 +267,7 @@ class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
     async def test_invalid_phase_input_cannot_write(self):
         await self.flow.async_step_phase_device({"phase_device": "0"})
         result = await self.flow.async_step_channel_phases({"channel_1": "L4"})
-        self.assertEqual("invalid_phase", result["errors"]["channel_1"])
+        self.assertEqual("invalid_input", result["errors"]["channel_1"])
         self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
 
     async def test_unknown_hardware_phase_can_be_corrected(self):

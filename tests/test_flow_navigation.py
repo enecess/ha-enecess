@@ -128,11 +128,16 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
                     with self.subTest(options=options, step=step, navigation=navigation):
                         flow = self.flow(options)
                         await self.menu(flow, options)
+                        if action in ("edit_formula", "remove"):
+                            await self.choose(flow, "add_formula", options)
+                            await flow.async_step_extra_formula(self.formula)
+                            await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
+                        original = deepcopy(flow._extra_entities)
                         result = await self.choose(flow, action, options)
                         self.assertEqual(step, result["step_id"])
                         result = await getattr(flow, "async_step_" + step)(self.navigation_input(result, navigation))
                         self.assertEqual("init" if options else "extra_entities", result["step_id"])
-                        self.assertEqual([], flow._extra_entities)
+                        self.assertEqual(original, flow._extra_entities)
 
     async def test_aggregate_back_preserves_draft_and_cancel_does_not_add(self):
         for options in (False, True):
@@ -159,7 +164,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("init", result["step_id"])
         self.assertEqual(original, flow._options)
 
-    async def test_manual_back_restores_inputs_and_cancel_returns_to_start(self):
+    async def test_manual_back_restores_inputs_and_cancel_aborts(self):
         flow = self.flow()
         await flow.async_step_user()
         await flow.async_step_user({"device_type": "ecomain"})
@@ -169,8 +174,52 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("ecomain_manual", result["step_id"])
         self.assertEqual("example.invalid", result["data_schema"]({})["ecomain_host"])
         result = await flow.async_step_ecomain_manual(self.navigation_input(result, "cancel"))
-        self.assertEqual("user", result["step_id"])
-        self.assertEqual("ecomain", result["data_schema"]({})["device_type"])
+        self.assertEqual({"type": "abort", "reason": "user_cancelled"}, result)
+
+    async def test_discovered_entry_has_no_back_until_a_previous_page_exists(self):
+        flow = self.module.ConfigFlow()
+        flow.context = {"source": "zeroconf"}
+        discovery = self.module.DEVICE_CONFIGS["ecomain"].discovery
+        result = await flow.async_step_zeroconf(types.SimpleNamespace(
+            type=discovery.mdns_type,
+            name=f"{discovery.mdns_prefix}TEST-DISCOVERED-01.{discovery.mdns_type}",
+            hostname="test-device.local.", host="192.0.2.10"))
+        self.assertEqual("ecomain_local_confirm", result["step_id"])
+        actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
+                       if str(key) == "flow_action")
+        self.assertEqual(["continue", "cancel"], actions)
+
+        flow._ecomain_local_config.update(ecomain_online_slaves=[], ecomain_firmware_version=139)
+        result = await flow.async_step_ecomain_local_confirm(self.navigation_input(result, "continue"))
+        self.assertEqual("ecomain_local_setup", result["step_id"])
+        actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
+                       if str(key) == "flow_action")
+        self.assertIn("back", actions)
+        result = await flow.async_step_ecomain_local_setup(self.navigation_input(result, "back"))
+        self.assertEqual("ecomain_local_confirm", result["step_id"])
+        actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
+                       if str(key) == "flow_action")
+        self.assertEqual(["continue", "cancel"], actions)
+
+    async def test_user_started_local_confirmation_keeps_back_action(self):
+        for mode in ("manual", "auto"):
+            with self.subTest(mode=mode):
+                flow = self.flow()
+                flow._async_mdns_scan = AsyncMock(return_value=[self.module.DiscoveredDevice(
+                    serial="TEST-SCAN-01", hostname="test-device.local", service_name="test-service", ip="192.0.2.10")])
+                await flow.async_step_user()
+                await flow.async_step_user({"device_type": "ecomain"})
+                await flow.async_step_ecomain_mode({"mode": mode})
+                if mode == "manual":
+                    result = await flow.async_step_ecomain_manual({"ecomain_host": "192.0.2.10", "ecomain_serial": "TEST-SCAN-01"})
+                else:
+                    result = await flow.async_step_ecomain_auto_scan({"ecomain_serial": "TEST-SCAN-01"})
+                self.assertEqual("ecomain_local_confirm", result["step_id"])
+                actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
+                               if str(key) == "flow_action")
+                self.assertIn("back", actions)
+                result = await flow.async_step_ecomain_local_confirm(self.navigation_input(result, "back"))
+                self.assertEqual("ecomain_manual" if mode == "manual" else "ecomain_auto_scan", result["step_id"])
 
     async def test_all_initial_intermediate_forms_offer_navigation(self):
         steps = ("ecomain_mode", "ecomain_auto_scan", "ecomain_manual", "ecomain_local_confirm",
@@ -189,7 +238,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
                 flow._ecomain_cloud_config = {"ecomain_cloud_slaves": [], "ecomain_masters": []}
                 result = await getattr(flow, "async_step_" + step)()
                 result = await getattr(flow, "async_step_" + step)(self.navigation_input(result, "cancel"))
-                self.assertEqual("user", result["step_id"])
+                self.assertEqual({"type": "abort", "reason": "user_cancelled"}, result)
                 self.assertEqual({}, flow._entry_data)
                 self.assertIsNone(flow._cloud_token)
 

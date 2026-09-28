@@ -81,7 +81,9 @@ Cliquez sur le bouton ci-dessous pour ajouter ce dépôt à HACS en tant qu’in
 ## Ajouter l’intégration dans Home Assistant
 
 - Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
-- **Retour** garde vos saisies. **Annuler** abandonne l’opération et revient au menu ; depuis l’accueil des options, cela ferme la configuration sans enregistrer.
+- **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
+- **Annuler** ferme l’ajout d’un appareil. Pour une opération ouverte depuis un menu, il ramène à ce menu.
+- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
 
 Il existe **deux façons** de lancer le flux de configuration pour ecoMain :
 
@@ -357,7 +359,9 @@ L’intégration récupère les données ecoPlug depuis le cloud environ toutes 
 ## Configuration et options
 
 - Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
-- **Retour** garde vos saisies. **Annuler** abandonne l’opération et revient au menu ; depuis l’accueil des options, cela ferme la configuration sans enregistrer.
+- **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
+- **Annuler** ferme l’ajout d’un appareil. Pour une opération ouverte depuis un menu, il ramène à ce menu.
+- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
 
 ### Modifier une entrée existante
 

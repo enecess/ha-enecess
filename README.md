@@ -81,7 +81,9 @@ Click the button below to add this repository to HACS as a custom integration:
 ## Add the Integration in Home Assistant
 
 - Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
-- **Back** keeps your inputs. **Cancel** drops the current operation and returns to the menu; cancelling from the options home page exits without saving.
+- **Back** keeps your inputs and appears only when a previous page exists.
+- **Cancel** closes device setup without adding the device. In an operation opened from a menu, it returns to that menu.
+- Cancelling from the options home page exits without saving pending changes.
 
 There are **two ways** to start the configuration flow for ecoMain:
 
@@ -352,7 +354,9 @@ ecoPlug data is polled from the cloud approximately every **60 seconds**. After 
 ## Configuration and options
 
 - Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
-- **Back** keeps your inputs. **Cancel** drops the current operation and returns to the menu; cancelling from the options home page exits without saving.
+- **Back** keeps your inputs and appears only when a previous page exists.
+- **Cancel** closes device setup without adding the device. In an operation opened from a menu, it returns to that menu.
+- Cancelling from the options home page exits without saving pending changes.
 
 ### Editing an existing entry
 

@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "Select a supported result type.",
       "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
       "no_formula_entities": "No formula entities have been configured.",
-      "invalid_input": "Invalid input."
+      "invalid_input": "Invalid input.",
+      "slave_in_use": "Remove extra entities using this slave’s measurements before deselecting it."
     },
     "abort": {
       "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",

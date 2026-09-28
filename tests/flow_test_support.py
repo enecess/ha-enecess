@@ -7,6 +7,8 @@ import sys
 import types
 from unittest.mock import patch
 
+import voluptuous as vol
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / '.superpowers/test-deps'))
 
@@ -49,6 +51,10 @@ def load_flow(test):
         def _async_current_entries(self):
             return []
 
+        async def async_set_unique_id(self, unique_id, **kwargs):
+            self.context['unique_id'] = unique_id
+            return None
+
         def _set_confirm_only(self):
             self.context["confirm_only"] = True
 
@@ -66,6 +72,20 @@ def load_flow(test):
             self.config = config
 
         def __call__(self, value):
+            options = self.config.get('options')
+            if options is None:
+                if not isinstance(value, str):
+                    raise vol.Invalid('expected text')
+                return value
+            allowed = [item['value'] if isinstance(item, dict) else item for item in options]
+            if self.config.get('multiple'):
+                if not isinstance(value, list):
+                    raise vol.Invalid('expected a list')
+                values = value
+            else:
+                values = [value]
+            if any(not isinstance(item, str) or item not in allowed for item in values):
+                raise vol.Invalid('not an offered choice')
             return value
 
     module('homeassistant.helpers.selector', SelectSelector=Selector,

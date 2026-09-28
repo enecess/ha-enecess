@@ -81,7 +81,9 @@ Kliknij poniższy przycisk, aby dodać to repozytorium do HACS jako niestandardo
 ## Dodawanie integracji w Home Assistant
 
 - Na stronach pośrednich pole **Działanie** oferuje **Dalej**/**Zapisz**, **Wstecz** lub **Anuluj**.
-- **Wstecz** zachowuje wpisane dane. **Anuluj** porzuca bieżącą operację i wraca do menu; na stronie głównej opcji zamyka konfigurację bez zapisu.
+- **Wstecz** zachowuje wpisane dane i pojawia się tylko wtedy, gdy istnieje poprzednia strona.
+- **Anuluj** kończy dodawanie urządzenia. W operacji otwartej z menu wraca do tego menu.
+- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian.
 
 Istnieją dwa sposoby uruchomienia konfiguracji ecoMain:
 
@@ -354,7 +356,9 @@ Integracja pobiera dane ecoPlug z chmury mniej więcej co **60 sekund**. Po pomy
 ## Konfiguracja i opcje
 
 - Na stronach pośrednich pole **Działanie** oferuje **Dalej**/**Zapisz**, **Wstecz** lub **Anuluj**.
-- **Wstecz** zachowuje wpisane dane. **Anuluj** porzuca bieżącą operację i wraca do menu; na stronie głównej opcji zamyka konfigurację bez zapisu.
+- **Wstecz** zachowuje wpisane dane i pojawia się tylko wtedy, gdy istnieje poprzednia strona.
+- **Anuluj** kończy dodawanie urządzenia. W operacji otwartej z menu wraca do tego menu.
+- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian.
 
 ### Edycja istniejącego wpisu
 

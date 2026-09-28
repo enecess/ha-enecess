@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "Sélectionnez un type de résultat pris en charge.",
       "formula_result_type_locked": "Le type de résultat ne peut pas changer. Créez une nouvelle entité de formule.",
       "no_formula_entities": "Aucune entité de formule configurée.",
-      "invalid_input": "Saisie invalide."
+      "invalid_input": "Saisie invalide.",
+      "slave_in_use": "Supprimez les entités supplémentaires utilisant les mesures de cet appareil secondaire avant de le décocher."
     },
     "abort": {
       "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local.",

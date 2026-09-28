@@ -20,6 +20,14 @@ Coverage includes the firmware 136 baseline, firmware 139 channel-phase configur
 
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 
+Flow journey tests start at setup or options entry points and submit the schema
+returned by each page. The selector double rejects unavailable choices and wrong
+value types. The tests cover cancellation at every setup page, Back, successful
+creation, cloud errors and retries, changed devices and credentials, formula
+source changes, dependent entities, and preservation of offline selected devices.
+Cancellation assertions check both the destination and the absence of entry
+creation, registry changes, or additional network and device commands.
+
 ## Local hardware tests
 
 Keep any real-device scripts, credentials, device captures, and test results in `.superpowers/device-tests/`. That directory is ignored by Git and sits outside unit-test discovery. No real-device test scripts are included in this repository's committed test suite. Run local hardware tests only when explicitly requested.

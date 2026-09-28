@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "请选择受支持的结果类型。",
       "formula_result_type_locked": "不能更改结果类型，请新建公式实体。",
       "no_formula_entities": "尚未配置公式实体。",
-      "invalid_input": "输入无效。"
+      "invalid_input": "输入无效。",
+      "slave_in_use": "请先移除使用此从机测量数据的额外实体，再取消选择从机。"
     },
     "abort": {
       "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",

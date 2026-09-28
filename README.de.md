@@ -81,7 +81,9 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 ## Integration in Home Assistant hinzufügen
 
 - Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
-- **Zurück** behält deine Eingaben. **Abbrechen** verwirft den aktuellen Vorgang und öffnet das Menü; im Startmenü der Optionen wird ohne Speichern beendet.
+- **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
+- **Abbrechen** beendet das Hinzufügen eines Geräts. Bei einem Vorgang aus einem Menü kehrst du zu diesem Menü zurück.
+- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
 
 Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
 
@@ -355,7 +357,9 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 ## Konfiguration und Optionen
 
 - Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
-- **Zurück** behält deine Eingaben. **Abbrechen** verwirft den aktuellen Vorgang und öffnet das Menü; im Startmenü der Optionen wird ohne Speichern beendet.
+- **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
+- **Abbrechen** beendet das Hinzufügen eines Geräts. Bei einem Vorgang aus einem Menü kehrst du zu diesem Menü zurück.
+- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
 
 ### Bestehenden Eintrag bearbeiten
 

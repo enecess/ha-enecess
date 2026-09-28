@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "Wähle einen unterstützten Ergebnistyp.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
       "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
-      "invalid_input": "Ungültige Eingabe."
+      "invalid_input": "Ungültige Eingabe.",
+      "slave_in_use": "Entferne zusätzliche Entitäten mit Messwerten dieses Untergeräts, bevor du es abwählst."
     },
     "abort": {
       "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar.",

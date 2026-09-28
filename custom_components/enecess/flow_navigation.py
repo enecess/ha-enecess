@@ -10,6 +10,7 @@ from homeassistant.helpers.selector import SelectSelectorMode
 
 FLOW_ACTION = "flow_action"
 MENU_STEPS = {"user", "init", "extra_entities"}
+CANCEL_MENUS = {"init", "extra_entities"}
 SAVE_STEPS = {"extra_formula_expression", "extra_transform", "extra_aggregate", "measurement_types",
               "channel_phases", "ecoplug_select"}
 BRANCH_STEPS = {"user", "ecomain_mode", "ecomain_auto_scan", "ecomain_manual", "ecomain_cloud_login",
@@ -33,6 +34,7 @@ def navigable_step(handler):
         self._navigation_depth = 1
         try:
             step = handler.__name__.removeprefix("async_step_")
+            rollback = None
             if user_input is not None:
                 values = {key: value for key, value in user_input.items() if key != FLOW_ACTION}
                 action = user_input.get(FLOW_ACTION, "continue")
@@ -40,8 +42,19 @@ def navigable_step(handler):
                 if action in ("back", "cancel"):
                     self._navigation_inputs[step] = {**old_values, **deepcopy(values)}
                     return await self._async_navigate(action)
+                self._navigation_inputs[step] = deepcopy(values)
+                form = self._navigation_forms.get(step)
+                if form is not None and self._navigation_history[-1:] == [step]:
+                    try:
+                        values = form["data_schema"](values)
+                    except vol.Invalid as error:
+                        field = str(error.path[0]) if error.path else "base"
+                        return self.async_show_form(**{**form, "errors": {field: "invalid_input"}})
                 previous_choice = self._navigation_choices.get(step)
                 if step in BRANCH_STEPS and previous_choice is not None and values != previous_choice:
+                    rollback = (self._navigation_snapshot(), {
+                        name: dict(getattr(self, name)) for name in
+                        ("_navigation_forms", "_navigation_states", "_navigation_inputs", "_navigation_choices")})
                     self._discard_forward_drafts()
                     if self._navigation_root == "user" and step in {
                             "user", "ecomain_mode", "ecomain_auto_scan", "ecomain_manual",
@@ -51,16 +64,17 @@ def navigable_step(handler):
                         self._measurement_types = None
                 if step in BRANCH_STEPS:
                     self._navigation_choices[step] = deepcopy(values)
-                self._navigation_inputs[step] = deepcopy(values)
-                form = self._navigation_forms.get(step)
-                if form is not None and self._navigation_history[-1:] == [step]:
-                    try:
-                        values = form["data_schema"](values)
-                    except vol.Invalid as error:
-                        field = str(error.path[0]) if error.path else "base"
-                        return self.async_show_form(**{**form, "errors": {field: "invalid_input"}})
                 user_input = values
-            return await handler(self, user_input)
+            result = await handler(self, user_input)
+            if rollback is not None and result.get("step_id") == step and result.get("errors"):
+                # A rejected change must not erase completed work from the old branch.
+                current_form = self._navigation_forms.get(step)
+                self._navigation_restore(rollback[0])
+                for name, saved in rollback[1].items():
+                    setattr(self, name, saved)
+                if current_form is not None:
+                    self._navigation_forms[step] = current_form
+            return result
         finally:
             self._navigation_depth = 0
     return wrapped
@@ -144,7 +158,7 @@ class FlowNavigationMixin:
             return super().async_show_form(**{**form, "data_schema": vol.Schema(fields)})
         action = "save" if step in SAVE_STEPS else "continue"
         actions = [action]
-        if step not in {"init", self._navigation_root} and not (
+        if len(self._navigation_history) > 1 and step not in {"init", self._navigation_root} and not (
                 self._navigation_root == "init" and step == "ecoplug_select"):
             actions.append("back")
         actions.append("cancel")
@@ -158,16 +172,14 @@ class FlowNavigationMixin:
             target_index = len(history) - 2
         elif action == "cancel":
             target_index = next((index for index in range(len(history) - 2, -1, -1)
-                                 if history[index] in MENU_STEPS), None)
+                                 if history[index] in CANCEL_MENUS), None)
         else:
             target_index = None
         if target_index is None:
-            if self._navigation_root == "init" and history[-1:] in (["init"], ["ecoplug_select"]):
-                return self.async_abort(reason="user_cancelled")
+            if action == "back" and history:
+                return self._render_navigation_form(self._navigation_forms[history[-1]])
             self._reset_navigation_drafts()
-            if self._navigation_root == "init":
-                return await self._show_options_menu()
-            return await self.async_step_user()
+            return self.async_abort(reason="user_cancelled")
         target = history[target_index]
         self._navigation_restore(self._navigation_states[target], preserve_completed=action == "back")
         self._navigation_history = history[:target_index + 1]

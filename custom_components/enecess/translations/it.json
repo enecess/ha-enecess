@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "Seleziona un tipo di risultato supportato.",
       "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
       "no_formula_entities": "Nessuna entità formula configurata.",
-      "invalid_input": "Dati inseriti non validi."
+      "invalid_input": "Dati inseriti non validi.",
+      "slave_in_use": "Rimuovi le entità aggiuntive che usano le misure di questo dispositivo secondario prima di deselezionarlo."
     },
     "abort": {
       "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale.",

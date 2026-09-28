@@ -87,8 +87,8 @@ def _measurement_error(entry_data: dict, selected: Any) -> Optional[str]:
 
 
 def _selection_removes_extra_sources(entry_data: dict, current: dict, proposed: dict) -> bool:
-    old_keys = {spec.key for spec in build_entry_specs(entry_data, current)}
-    new_keys = {spec.key for spec in build_entry_specs(entry_data, proposed)}
+    old_keys = {spec.key for spec in build_entry_specs(entry_data, current, include_unsupported=True)}
+    new_keys = {spec.key for spec in build_entry_specs(entry_data, proposed, include_unsupported=True)}
     removed = old_keys - new_keys
     return any(removed.intersection(extra.get("sources") or []) for extra in current.get(CONST_EXTRA_ENTITIES, []))
 
@@ -537,18 +537,21 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             token = await api.generate_token(username, password)
             masters = await api.get_hardware_list(token, hardware_type=0)
         except EnecessAuthError:
-            return self.async_abort(reason="auth_failed")  # type: ignore[return-value]
+            error = "auth_failed"
         except Exception:
-            return self.async_abort(reason="cannot_connect")  # type: ignore[return-value]
+            error = "cannot_connect"
         else:
             if not masters:
-                return self.async_abort(reason="no_devices_found")  # type: ignore[return-value]
+                error = "no_devices_found"
             else:
                 self._cloud_username = username
                 self._cloud_password = password
                 self._cloud_token = token
                 self._ecomain_cloud_config[CONST_ECOMAIN_MASTERS] = masters
                 return await self.async_step_ecomain_cloud_master()  # type: ignore[return-value]
+        result = await self.async_step_ecomain_cloud_login()
+        result["errors"] = {"base": error}
+        return result
 
     def _show_ecoplug_cloud_login_form(
             self, errors: Optional[dict[str, str]] = None
@@ -689,11 +692,20 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
         serial = str(ecomain_cloud_master.get("hardware_number"))
         self._ecomain_cloud_config[CONST_ECOMAIN_SERIAL] = serial
 
-        ecomain_cloud_slaves = await api.get_hardware_list(
-            self._cloud_token,
-            hardware_type=1,
-            parent_id=master_id,
-        )
+        try:
+            ecomain_cloud_slaves = await api.get_hardware_list(
+                self._cloud_token,
+                hardware_type=1,
+                parent_id=master_id,
+            )
+        except EnecessAuthError:
+            result = await self.async_step_ecomain_cloud_master()
+            result["errors"] = {"base": "auth_failed"}
+            return result
+        except Exception:
+            result = await self.async_step_ecomain_cloud_master()
+            result["errors"] = {"base": "cannot_connect"}
+            return result
         for slave in ecomain_cloud_slaves:
             slave_index = self._get_slave_index(slave)
             if slave_index is not None:
@@ -906,7 +918,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
                 {
                     vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND, default=source_kind): selector.SelectSelector(
                         selector.SelectSelectorConfig(
-                            options=EXTRA_SOURCE_KINDS,
+                            options=[source_kind],
                             translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
                             mode=SelectSelectorMode.LIST,
                         )
@@ -1102,9 +1114,16 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
             return await self._show_options_menu(errors)
 
         if CONST_ECOMAIN_SELECTED_SLAVES in user_input:
-            self._options[CONST_ECOMAIN_SELECTED_SLAVES] = self._normalize_slaves(
-                user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
-            )
+            allowed = set(self._available_slaves) | {
+                str(index) for index in self._options[CONST_ECOMAIN_SELECTED_SLAVES]
+            }
+            selected = sorted({int(index) for index in
+                               (user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or [])
+                               if str(index) in allowed})
+            proposed = {**self._options, CONST_ECOMAIN_SELECTED_SLAVES: selected}
+            if _selection_removes_extra_sources(self._entry.data, self._options, proposed):
+                return await self._show_options_menu({"base": "slave_in_use"})
+            self._options[CONST_ECOMAIN_SELECTED_SLAVES] = selected
         action = user_input[CONST_EXTRA_ACTION]
         if action == "add_formula":
             self._reset_formula()
@@ -1369,7 +1388,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                     {
                         vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND, default=source_kind): selector.SelectSelector(
                             selector.SelectSelectorConfig(
-                                options=EXTRA_SOURCE_KINDS,
+                                options=[source_kind],
                                 translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
                                 mode=SelectSelectorMode.LIST,
                             )
@@ -1425,13 +1444,10 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
             actions.append("channel_phases")
         if self._extra_entities:
             actions.append(CONST_EXTRA_ACTION_REMOVE)
-        selected_slaves = [
-            str(s)
-            for s in self._options.get(CONST_ECOMAIN_SELECTED_SLAVES, [])
-            if str(s) in self._available_slaves
-        ]
+        selected_slaves = [str(index) for index in self._options.get(CONST_ECOMAIN_SELECTED_SLAVES, [])]
+        slave_choices = sorted(set(self._available_slaves) | set(selected_slaves), key=int)
         schema_fields: dict[Any, Any] = {}
-        if self._available_slaves:
+        if slave_choices:
             schema_fields[
                 vol.Optional(
                     CONST_ECOMAIN_SELECTED_SLAVES,
@@ -1439,7 +1455,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
                 )
             ] = selector.SelectSelector(
                 selector.SelectSelectorConfig(
-                    options=self._available_slaves,
+                    options=slave_choices,
                     multiple=True,
                     translation_key=CONST_ECOMAIN_SELECTED_SLAVES,
                     mode=SelectSelectorMode.LIST,
@@ -1531,7 +1547,7 @@ class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.O
         allowed = set(self._ecomain_available_slaves)
         self._cloud_token = token
         self._available_slaves = []
-        self._cloud_slave_map = {}
+        # A missing discovery result must not erase a selected device's identity.
         for slave in cloud_slaves:
             slave_index = self._get_slave_index(slave)
             if slave_index is not None and str(slave_index) in allowed:

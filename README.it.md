@@ -53,7 +53,9 @@ Dopo l’inclusione nel catalogo predefinito di HACS sarà possibile cercare dir
 ## Aggiunta di ecoMain
 
 - Le pagine intermedie offrono **Azione**: **Avanti**/**Salva**, **Indietro** o **Annulla**.
-- **Indietro** conserva i dati inseriti. **Annulla** abbandona l’operazione e torna al menu; dalla pagina iniziale delle opzioni esce senza salvare.
+- **Indietro** conserva i dati inseriti e appare solo se esiste una pagina precedente.
+- **Annulla** chiude l’aggiunta di un dispositivo. Per un’operazione aperta da un menu, torna a quel menu.
+- Dalla pagina iniziale delle opzioni, **Annulla** esce senza salvare le modifiche in attesa.
 
 Apri **Impostazioni → Dispositivi e servizi → Aggiungi integrazione**, cerca **enecess**, seleziona **ecoMain** e scegli il metodo di aggiunta. Puoi anche iniziare da una scheda ecoMain nella sezione dei dispositivi rilevati: verrà avviata la procedura locale con i dati di rete rilevati.
 
@@ -246,7 +248,9 @@ Il polling avviene circa ogni **60 secondi**. Dopo un comando accettato, lo stat
 ## Configurazione e opzioni
 
 - Le pagine intermedie offrono **Azione**: **Avanti**/**Salva**, **Indietro** o **Annulla**.
-- **Indietro** conserva i dati inseriti. **Annulla** abbandona l’operazione e torna al menu; dalla pagina iniziale delle opzioni esce senza salvare.
+- **Indietro** conserva i dati inseriti e appare solo se esiste una pagina precedente.
+- **Annulla** chiude l’aggiunta di un dispositivo. Per un’operazione aperta da un menu, torna a quel menu.
+- Dalla pagina iniziale delle opzioni, **Annulla** esce senza salvare le modifiche in attesa.
 
 ### Modifica della configurazione
 

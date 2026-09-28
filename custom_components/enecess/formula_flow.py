@@ -72,18 +72,21 @@ class FormulaFlowMixin:
                 draft = proposed
             else:
                 sources = list(dict.fromkeys(proposed["sources"]))
-                previous = draft.get("variables", {})
+                # Reserve removed aliases until this operation ends, so an old
+                # expression cannot silently refer to a different source.
+                previous = draft.get("_variable_history", draft.get("variables", {}))
                 variables = {alias: source for alias, source in previous.items() if source in sources}
                 aliases = iter(build_formula_variables([str(n) for n in range(len(sources) + len(previous))]))
                 for source in sources:
                     if source in variables.values():
                         continue
                     alias = next(aliases)
-                    while alias in variables:
+                    while alias in previous or alias in variables:
                         alias = next(aliases)
                     variables[alias] = source
                 self._formula_draft = {**proposed, "name": proposed["name"].strip(),
-                                       "sources": sources, "variables": variables}
+                                       "sources": sources, "variables": variables,
+                                       "_variable_history": {**previous, **variables}}
                 return await self.async_step_extra_formula_expression()
         return self.async_show_form(
             step_id="extra_formula",

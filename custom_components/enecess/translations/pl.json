@@ -331,7 +331,8 @@
       "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
       "no_formula_entities": "Nie skonfigurowano encji formuł.",
-      "invalid_input": "Nieprawidłowe dane wejściowe."
+      "invalid_input": "Nieprawidłowe dane wejściowe.",
+      "slave_in_use": "Przed odznaczeniem urządzenia podrzędnego usuń dodatkowe encje korzystające z jego pomiarów."
     },
     "abort": {
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
