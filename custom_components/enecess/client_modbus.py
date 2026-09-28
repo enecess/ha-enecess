@@ -1,12 +1,20 @@
 """Serialize ecoMain Modbus requests and decode its register byte order."""
 
 import asyncio
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
 from pymodbus import ModbusException
 from pymodbus.client import AsyncModbusTcpClient
 
-from .const import CONF_ECOMAIN_UNIT_ID
+from .const import (
+    CONF_ECOMAIN_UNIT_ID,
+    CONF_LOCAL_RECONNECT_DELAY,
+    CONF_LOCAL_RECONNECT_DELAY_MAX,
+    CONF_LOCAL_REQUEST_RETRIES,
+    CONF_LOCAL_REQUEST_TIMEOUT,
+)
 
 
 @dataclass
@@ -53,7 +61,18 @@ class EnecessModbusClient:
         """Connect on demand, reusing an established connection."""
         if self._client is not None and self._client.connected:
             return
-        self._client = AsyncModbusTcpClient(host=self._host, port=self._port)
+        if self._client is None:
+            self._client = AsyncModbusTcpClient(
+                host=self._host,
+                port=self._port,
+                timeout=CONF_LOCAL_REQUEST_TIMEOUT,
+                retries=CONF_LOCAL_REQUEST_RETRIES,
+                reconnect_delay=CONF_LOCAL_RECONNECT_DELAY,
+                reconnect_delay_max=CONF_LOCAL_RECONNECT_DELAY_MAX,
+            )
+        else:
+            # Stop any background reconnect before starting an explicit attempt.
+            self._client.close()
         ok = await self._client.connect()
         if not ok:
             raise ConnectionError(f"Failed to connect to {self._host}:{self._port}")
@@ -65,14 +84,31 @@ class EnecessModbusClient:
         self._client.close()
         self._client = None
 
+    @asynccontextmanager
+    async def _connection(self) -> AsyncIterator[AsyncModbusTcpClient]:
+        """Serialize requests and preserve cancellation across pymodbus versions."""
+        async with self._lock:
+            try:
+                await self.async_connect()
+                assert self._client is not None
+                yield self._client
+            except asyncio.CancelledError:
+                await self.async_close()
+                raise
+            except ModbusException as err:
+                # Some pymodbus versions translate cancellation into an I/O error.
+                task = asyncio.current_task()
+                if task is not None and task.cancelling():
+                    await self.async_close()
+                    raise asyncio.CancelledError from err
+                raise
+
     async def read_holding_registers(
         self, address: int, count: int
     ) -> ModbusReadResult:
         """Read a complete register range from the configured Modbus unit."""
-        async with self._lock:
-            await self.async_connect()
-            assert self._client is not None
-            resp = await self._client.read_holding_registers(
+        async with self._connection() as client:
+            resp = await client.read_holding_registers(
                 address=address, count=count, device_id=CONF_ECOMAIN_UNIT_ID
             )
             if resp.isError():
@@ -85,10 +121,10 @@ class EnecessModbusClient:
 
     async def write_register(self, address: int, value: int) -> None:
         """Write one register and require a matching function-06 response echo."""
-        async with self._lock:
-            await self.async_connect()
-            assert self._client is not None
-            resp = await self._client.write_register(
+        # Function 06 assigns an absolute value; a lost reply may cause the
+        # library to resend that same value once. Do not add an outer write retry.
+        async with self._connection() as client:
+            resp = await client.write_register(
                 address=address, value=value, device_id=CONF_ECOMAIN_UNIT_ID
             )
             if resp is None or resp.isError():

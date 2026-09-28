@@ -1,11 +1,12 @@
 """Authenticate and exchange validated payloads with the enecess cloud API."""
 
+import asyncio
 from dataclasses import dataclass
 from typing import Any, TypeVar
 
 import aiohttp
 
-from .const import CONST_CLOUD_HEADER_TOKEN
+from .const import CONF_CLOUD_RETRY_DELAY, CONST_CLOUD_HEADER_TOKEN
 
 _PayloadT = TypeVar("_PayloadT", dict, list)
 
@@ -16,6 +17,10 @@ class EnecessAuthError(Exception):
 
 class EnecessApiError(Exception):
     """API request failed."""
+
+
+class _TransientApiError(EnecessApiError):
+    """A transport failure that permits one retry of a read-only operation."""
 
 
 @dataclass
@@ -43,6 +48,29 @@ class EnecessApi:
         path: str,
         expected_type: type[_PayloadT],
         *,
+        retry_read: bool = False,
+        **request_kwargs: Any,
+    ) -> _PayloadT:
+        """Retry only explicitly read-only operations after transient failures."""
+        try:
+            return await self._request_payload_once(
+                method, path, expected_type, **request_kwargs
+            )
+        except _TransientApiError:
+            if not retry_read:
+                raise
+        # The failed response is closed before waiting or sending another request.
+        await asyncio.sleep(CONF_CLOUD_RETRY_DELAY)
+        return await self._request_payload_once(
+            method, path, expected_type, **request_kwargs
+        )
+
+    async def _request_payload_once(
+        self,
+        method: str,
+        path: str,
+        expected_type: type[_PayloadT],
+        *,
         login: bool = False,
         **request_kwargs: Any,
     ) -> _PayloadT:
@@ -53,10 +81,21 @@ class EnecessApi:
             ) as resp:
                 if resp.status in (401, 403):
                     raise EnecessAuthError("Cloud authentication failed")
+                if resp.status in (502, 503, 504):
+                    raise _TransientApiError("Cloud service temporarily unavailable")
                 if not 200 <= resp.status < 300:
                     raise EnecessApiError("Cloud HTTP request failed")
                 data = await self._json(resp)
-        except (aiohttp.ClientError, TimeoutError, OSError) as err:
+        except aiohttp.ClientSSLError as err:
+            raise EnecessApiError("Cloud TLS connection failed") from err
+        except (
+            aiohttp.ClientConnectionError,
+            aiohttp.ClientPayloadError,
+            TimeoutError,
+            OSError,
+        ) as err:
+            raise _TransientApiError("Cloud connection failed") from err
+        except aiohttp.ClientError as err:
             raise EnecessApiError("Cloud connection failed") from err
         status = data.get("status")
         if status in (401, 403) or (login and status in (400, 422)):
@@ -122,6 +161,7 @@ class EnecessApi:
             "get",
             "/api/v1/hardware/",
             list,
+            retry_read=True,
             headers={CONST_CLOUD_HEADER_TOKEN: token},
             params=params,
             timeout=20,
@@ -133,6 +173,7 @@ class EnecessApi:
             "get",
             "/api/v1/passageway/get_channel_info/",
             token,
+            retry_read=True,
             params={"hardware_number": str(hardware_number)},
             timeout=20,
         )
@@ -143,6 +184,7 @@ class EnecessApi:
             "get",
             "/api/v1/other/plug/data/",
             token,
+            retry_read=True,
             params={"hardware_number": str(hardware_number)},
             timeout=20,
         )
@@ -153,6 +195,7 @@ class EnecessApi:
             "post",
             "/api/v1/other/plug/control/",
             token,
+            retry_read=True,
             json={
                 "instruction": "plug_conf",
                 "query_conf": "106",

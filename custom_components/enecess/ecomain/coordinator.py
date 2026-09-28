@@ -21,10 +21,12 @@ from ..client_modbus import (
 )
 from ..const import (
     CONF_CLOUD_UPDATE_INTERVAL,
+    CONF_CLOUD_UPDATE_TIMEOUT,
     CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
     CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
     CONF_ECOMAIN_PORT,
     CONF_LOCAL_UPDATE_INTERVAL,
+    CONF_LOCAL_UPDATE_TIMEOUT,
     CONST_CLOUD_PASSWORD,
     CONST_CLOUD_TOKEN,
     CONST_CLOUD_USERNAME,
@@ -88,7 +90,8 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
     async def _async_update_data(self) -> dict[str, float]:
         try:
-            return await self._async_read_data()
+            async with asyncio.timeout(CONF_LOCAL_UPDATE_TIMEOUT):
+                return await self._async_read_data()
         except UpdateFailed:
             raise
         except (ModbusException, OSError, TimeoutError) as err:
@@ -202,7 +205,13 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         async def _get(idx: int, hw: Any) -> tuple[int, Any]:
             return idx, await self._api.get_passageway(self._token, str(hw))
 
-        results = await asyncio.gather(*(_get(i, hw) for i, hw in targets.items()))
+        # Keep every request inside the poll deadline, including failed attempts.
+        results = await asyncio.gather(
+            *(_get(i, hw) for i, hw in targets.items()), return_exceptions=True
+        )
+        for result in results:
+            if isinstance(result, BaseException):
+                raise result
         return dict(results)
 
     async def _fetch_and_transform(self) -> dict[str, float]:
@@ -254,11 +263,12 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
     async def _async_update_data(self) -> dict[str, float]:
         try:
-            try:
-                return await self._fetch_and_transform()
-            except EnecessAuthError:
-                await self._refresh_token_and_store()
-                return await self._fetch_and_transform()
+            async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
+                try:
+                    return await self._fetch_and_transform()
+                except EnecessAuthError:
+                    await self._refresh_token_and_store()
+                    return await self._fetch_and_transform()
         except EnecessAuthError as err:
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except (EnecessApiError, OSError, TimeoutError) as err:

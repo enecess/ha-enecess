@@ -64,7 +64,15 @@ error classification, transition-only logging and energy accumulation during
 failed polling. Tests do not cover frontend flows, complete HA startup,
 recorder restore or real devices/cloud services.
 
-As checked on 2026-09-28, the 134 offline tests and 35 real-HA runtime
+Network recovery regressions use fictional HTTP responses and a loopback Modbus
+TCP peer with the real installed pymodbus client. They cover a lost reply,
+retry exhaustion, background reconnect, client reuse, read/write cancellation,
+per-endpoint cloud recovery, partial ecoPlug availability, and whole-poll
+deadlines. No physical devices or cloud accounts are contacted. See the
+[network recovery policy](network-recovery.zh-CN.md) for parameters
+and the distinction between reads and writes.
+
+As checked on 2026-09-28, the 134 offline tests and 52 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

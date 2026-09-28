@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from ..client_api import EnecessApi, EnecessApiError, EnecessAuthError
 from ..const import (
     CONF_CLOUD_UPDATE_INTERVAL,
+    CONF_CLOUD_UPDATE_TIMEOUT,
     CONST_CLOUD_PASSWORD,
     CONST_CLOUD_TOKEN,
     CONST_CLOUD_USERNAME,
@@ -183,7 +184,8 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
 
     async def _async_update_data(self) -> dict[str, EcoPlugSnapshot]:
         try:
-            return await self._request_with_auth_retry(self._fetch_attempt)
+            async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
+                return await self._request_with_auth_retry(self._fetch_attempt)
         except EnecessAuthError as err:
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except _ORDINARY_REQUEST_ERRORS as err:
