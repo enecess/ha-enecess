@@ -176,7 +176,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_ecomain_manual(self.navigation_input(result, "cancel"))
         self.assertEqual({"type": "abort", "reason": "user_cancelled"}, result)
 
-    async def test_discovered_entry_has_no_back_until_a_previous_page_exists(self):
+    async def test_discovered_entry_confirmation_has_no_navigation_actions(self):
         flow = self.module.ConfigFlow()
         flow.context = {"source": "zeroconf"}
         discovery = self.module.DEVICE_CONFIGS["ecomain"].discovery
@@ -185,21 +185,20 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
             name=f"{discovery.mdns_prefix}TEST-DISCOVERED-01.{discovery.mdns_type}",
             hostname="test-device.local.", host="192.0.2.10"))
         self.assertEqual("ecomain_local_confirm", result["step_id"])
-        actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
-                       if str(key) == "flow_action")
-        self.assertEqual(["continue", "cancel"], actions)
+        self.assertEqual({}, result["data_schema"].schema)
+        self.assertFalse(flow.context.get("confirm_only", False))
 
         flow._ecomain_local_config.update(ecomain_online_slaves=[], ecomain_firmware_version=139)
-        result = await flow.async_step_ecomain_local_confirm(self.navigation_input(result, "continue"))
+        result = await flow.async_step_ecomain_local_confirm(result["data_schema"]({}))
         self.assertEqual("ecomain_local_setup", result["step_id"])
+        self.assertFalse(flow.context.get("confirm_only", False))
         actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
                        if str(key) == "flow_action")
         self.assertIn("back", actions)
         result = await flow.async_step_ecomain_local_setup(self.navigation_input(result, "back"))
         self.assertEqual("ecomain_local_confirm", result["step_id"])
-        actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
-                       if str(key) == "flow_action")
-        self.assertEqual(["continue", "cancel"], actions)
+        self.assertEqual({}, result["data_schema"].schema)
+        self.assertFalse(flow.context.get("confirm_only", False))
 
     async def test_user_started_local_confirmation_keeps_back_action(self):
         for mode in ("manual", "auto"):

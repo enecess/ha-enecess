@@ -82,7 +82,8 @@ Click the button below to add this repository to HACS as a custom integration:
 
 - Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
 - **Back** keeps your inputs and appears only when a previous page exists.
-- **Cancel** closes device setup without adding the device. In an operation opened from a menu, it returns to that menu.
+- From a discovery card: the first page has no action choices. **Cancel** on later setup pages clears this attempt and returns to the first page, keeping the discovery card.
+- From **Add integration**: **Cancel** ends setup. Cancelling an operation opened from a menu returns to that menu.
 - Cancelling from the options home page exits without saving pending changes.
 
 There are **two ways** to start the configuration flow for ecoMain:
@@ -355,7 +356,8 @@ ecoPlug data is polled from the cloud approximately every **60 seconds**. After 
 
 - Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
 - **Back** keeps your inputs and appears only when a previous page exists.
-- **Cancel** closes device setup without adding the device. In an operation opened from a menu, it returns to that menu.
+- From a discovery card: the first page has no action choices. **Cancel** on later setup pages clears this attempt and returns to the first page, keeping the discovery card.
+- From **Add integration**: **Cancel** ends setup. Cancelling an operation opened from a menu returns to that menu.
 - Cancelling from the options home page exits without saving pending changes.
 
 ### Editing an existing entry

@@ -82,7 +82,8 @@ Cliquez sur le bouton ci-dessous pour ajouter ce dépôt à HACS en tant qu’in
 
 - Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
 - **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
-- **Annuler** ferme l’ajout d’un appareil. Pour une opération ouverte depuis un menu, il ramène à ce menu.
+- Depuis une carte de découverte : la première page ne propose pas de choix d’action. Sur les pages suivantes, **Annuler** efface la configuration en cours et revient à la première page ; la carte reste disponible.
+- Depuis **Ajouter une intégration** : **Annuler** termine l’ajout. Une opération ouverte depuis un menu revient à ce menu.
 - Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
 
 Il existe **deux façons** de lancer le flux de configuration pour ecoMain :
@@ -360,7 +361,8 @@ L’intégration récupère les données ecoPlug depuis le cloud environ toutes 
 
 - Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
 - **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
-- **Annuler** ferme l’ajout d’un appareil. Pour une opération ouverte depuis un menu, il ramène à ce menu.
+- Depuis une carte de découverte : la première page ne propose pas de choix d’action. Sur les pages suivantes, **Annuler** efface la configuration en cours et revient à la première page ; la carte reste disponible.
+- Depuis **Ajouter une intégration** : **Annuler** termine l’ajout. Une opération ouverte depuis un menu revient à ce menu.
 - Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
 
 ### Modifier une entrée existante

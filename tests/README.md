@@ -27,6 +27,10 @@ creation, cloud errors and retries, changed devices and credentials, formula
 source changes, dependent entities, and preservation of offline selected devices.
 Cancellation assertions check both the destination and the absence of entry
 creation, registry changes, or additional network and device commands.
+For discovery-card flows, cancellation must return a form in the same flow,
+restore the original discovered device, and clear all settings and drafts.
+Tests also verify that the initial form has no action selector and that setup
+can complete with new selections after a reset.
 
 ## Local hardware tests
 

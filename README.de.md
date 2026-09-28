@@ -82,7 +82,8 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 
 - Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
 - **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
-- **Abbrechen** beendet das Hinzufügen eines Geräts. Bei einem Vorgang aus einem Menü kehrst du zu diesem Menü zurück.
+- Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
+- Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
 - Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
 
 Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
@@ -358,7 +359,8 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 
 - Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
 - **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
-- **Abbrechen** beendet das Hinzufügen eines Geräts. Bei einem Vorgang aus einem Menü kehrst du zu diesem Menü zurück.
+- Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
+- Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
 - Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
 
 ### Bestehenden Eintrag bearbeiten

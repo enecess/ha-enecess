@@ -138,6 +138,8 @@ class FlowNavigationMixin:
         step = form["step_id"]
         if hasattr(self, "context"):
             self.context.pop("confirm_only", None)
+        if step == "ecomain_local_confirm" and hasattr(self, "_navigation_discovery_state"):
+            return super().async_show_form(**form)
         fields = {}
         values = self._navigation_inputs.get(step, {})
         for key, validator in form["data_schema"].schema.items():
@@ -179,6 +181,10 @@ class FlowNavigationMixin:
             if action == "back" and history:
                 return self._render_navigation_form(self._navigation_forms[history[-1]])
             self._reset_navigation_drafts()
+            if hasattr(self, "_navigation_discovery_state"):
+                # Keep the pending discovery flow and its device identity alive.
+                self._navigation_restore(self._navigation_discovery_state)
+                return await self.async_step_ecomain_local_confirm()
             return self.async_abort(reason="user_cancelled")
         target = history[target_index]
         self._navigation_restore(self._navigation_states[target], preserve_completed=action == "back")

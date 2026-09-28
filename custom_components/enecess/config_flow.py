@@ -374,6 +374,7 @@ class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlo
             self.hass.config_entries.async_update_entry(existing_entry, data={**existing_entry.data, **updates})
             return self.async_abort(reason="already_configured")  # type: ignore[return-value]
 
+        self._navigation_discovery_state = self._navigation_snapshot()
         return await self.async_step_ecomain_local_confirm()  # type: ignore[return-value]
 
     async def _async_validate_local_device(self, host: str, port: int) -> Optional[dict[str, str]]:
