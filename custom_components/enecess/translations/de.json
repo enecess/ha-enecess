@@ -11,66 +11,78 @@
       "ecomain_mode": {
         "title": "ecoMain einrichten",
         "data": {
-          "mode": "Hinzufügungsmethode"
+          "mode": "Hinzufügungsmethode",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_auto_scan": {
         "title": "Automatische Erkennung",
         "description": "ecoMain auswählen",
         "data": {
-          "ecomain_serial": "Master-Seriennummer"
+          "ecomain_serial": "Master-Seriennummer",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_local_confirm": {
         "title": "Gerät bestätigen",
-        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}"
+        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
+        "data": {
+          "flow_action": "Aktion"
+        }
       },
       "ecomain_local_setup": {
         "title": "Gerät konfigurieren",
         "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
         "data": {
-          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
+          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_manual": {
         "title": "Manuelle Einrichtung",
         "data": {
           "ecomain_serial": "Master-Seriennummer",
-          "ecomain_host": "Adresse (IP oder Hostname)"
+          "ecomain_host": "Adresse (IP oder Hostname)",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_cloud_login": {
         "title": "Kontoanmeldung",
         "data": {
           "username": "Benutzername",
-          "password": "Passwort"
+          "password": "Passwort",
+          "flow_action": "Aktion"
         }
       },
       "ecoplug_cloud_login": {
         "title": "ecoPlug-Kontoanmeldung",
         "data": {
           "username": "Benutzername",
-          "password": "Passwort"
+          "password": "Passwort",
+          "flow_action": "Aktion"
         }
       },
       "ecoplug_select": {
         "title": "ecoPlug auswählen",
         "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
         "data": {
-          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
+          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_cloud_master": {
         "title": "ecoMain auswählen",
         "data": {
-          "ecomain_cloud_master_id": "ecoMain-Master"
+          "ecomain_cloud_master_id": "ecoMain-Master",
+          "flow_action": "Aktion"
         }
       },
       "ecomain_cloud_confirm": {
         "title": "Gerät bestätigen",
         "description": "Seriennummer: {ecomain_serial}\n\n- `*_energy_total_1m`: roher Energiezuwachs pro Minute aus der Cloud-API.\n- Nutze `*_energy_accumulated` für das Home Assistant Energy Dashboard.\n- Die in Home Assistant summierte Cloud-Energie ist ein Schätzwert: Die API liefert pro Wert weder Zeitstempel noch Messwert-ID.",
         "data": {
-          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen"
+          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "flow_action": "Aktion"
         }
       },
       "extra_entities": {
@@ -83,7 +95,8 @@
           "extra_entity_source": "Quell-Leistungsentität",
           "extra_entity_source_kind": "Quelltyp",
           "extra_entity_sources": "Quellentitäten",
-          "extra_entity_remove": "Zusätzliche Entität"
+          "extra_entity_remove": "Zusätzliche Entität",
+          "flow_action": "Aktion"
         }
       },
       "extra_transform": {
@@ -91,13 +104,15 @@
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_entity_operation": "Operation",
-          "extra_entity_source": "Quell-Leistungsentität"
+          "extra_entity_source": "Quell-Leistungsentität",
+          "flow_action": "Aktion"
         }
       },
       "extra_aggregate_kind": {
         "title": "Quelltyp auswählen",
         "data": {
-          "extra_entity_source_kind": "Quelltyp"
+          "extra_entity_source_kind": "Quelltyp",
+          "flow_action": "Aktion"
         }
       },
       "extra_aggregate": {
@@ -106,20 +121,23 @@
           "extra_entity_source_kind": "Quelltyp",
           "extra_entity_name": "Entitätsname",
           "extra_entity_operation": "Operation",
-          "extra_entity_sources": "Quellentitäten"
+          "extra_entity_sources": "Quellentitäten",
+          "flow_action": "Aktion"
         }
       },
       "extra_remove": {
         "title": "Zusätzliche Entität entfernen",
         "data": {
-          "extra_entity_remove": "Zusätzliche Entität"
+          "extra_entity_remove": "Zusätzliche Entität",
+          "flow_action": "Aktion"
         }
       },
       "measurement_types": {
         "title": "Messgrößen",
         "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
         "data": {
-          "measurement_types": "Messgrößen"
+          "measurement_types": "Messgrößen",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula": {
@@ -128,20 +146,23 @@
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
-          "extra_entity_sources": "Quellentitäten"
+          "extra_entity_sources": "Quellentitäten",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
         "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
         "data": {
-          "extra_formula_expression": "Formelausdruck"
+          "extra_formula_expression": "Formelausdruck",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula_edit": {
         "title": "Formelentität bearbeiten",
         "data": {
-          "extra_formula_entity": "Formelentität"
+          "extra_formula_entity": "Formelentität",
+          "flow_action": "Aktion"
         }
       }
     },
@@ -167,10 +188,12 @@
       "formula_name_required": "Gib einen Entitätsnamen ein.",
       "formula_result_type_invalid": "Wähle einen unterstützten Ergebnistyp.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
-      "no_formula_entities": "Es sind keine Formelentitäten konfiguriert."
+      "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
+      "slave_in_use": "Entferne zusätzliche Entitäten mit Messwerten dieses Untergeräts, bevor du es abwählst."
     },
     "abort": {
-      "already_configured": "Dieses Gerät wurde bereits konfiguriert."
+      "already_configured": "Dieses Gerät wurde bereits konfiguriert.",
+      "user_cancelled": "Abgebrochen."
     }
   },
   "options": {
@@ -180,14 +203,16 @@
         "description": "- Gerätetyp: {device_type}\n- Hinzufügungsmethode: {mode}\n- ecoMain-Seriennummer: {ecomain_serial}\n- Konfigurierte zusätzliche Entitäten: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
-          "extra_action": "Nächste Aktion"
+          "extra_action": "Nächste Aktion",
+          "flow_action": "Aktion"
         }
       },
       "ecoplug_select": {
         "title": "ecoPlug anpassen",
         "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
         "data": {
-          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen"
+          "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen",
+          "flow_action": "Aktion"
         }
       },
       "extra_transform": {
@@ -195,13 +220,15 @@
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_entity_operation": "Operation",
-          "extra_entity_source": "Quell-Leistungsentität"
+          "extra_entity_source": "Quell-Leistungsentität",
+          "flow_action": "Aktion"
         }
       },
       "extra_aggregate_kind": {
         "title": "Quelltyp auswählen",
         "data": {
-          "extra_entity_source_kind": "Quelltyp"
+          "extra_entity_source_kind": "Quelltyp",
+          "flow_action": "Aktion"
         }
       },
       "extra_aggregate": {
@@ -210,26 +237,30 @@
           "extra_entity_source_kind": "Quelltyp",
           "extra_entity_name": "Entitätsname",
           "extra_entity_operation": "Operation",
-          "extra_entity_sources": "Quellentitäten"
+          "extra_entity_sources": "Quellentitäten",
+          "flow_action": "Aktion"
         }
       },
       "extra_remove": {
         "title": "Zusätzliche Entität entfernen",
         "data": {
-          "extra_entity_remove": "Zusätzliche Entität"
+          "extra_entity_remove": "Zusätzliche Entität",
+          "flow_action": "Aktion"
         }
       },
       "measurement_types": {
         "title": "Messgrößen",
         "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
         "data": {
-          "measurement_types": "Messgrößen"
+          "measurement_types": "Messgrößen",
+          "flow_action": "Aktion"
         }
       },
       "phase_device": {
         "title": "Kanalphasen",
         "data": {
-          "phase_device": "Gerät"
+          "phase_device": "Gerät",
+          "flow_action": "Aktion"
         },
         "description": "Einstellungen der Kanalphasen erfordern Firmware ab 139."
       },
@@ -246,7 +277,8 @@
           "channel_7": "Kanal 7",
           "channel_8": "Kanal 8",
           "channel_9": "Kanal 9",
-          "channel_10": "Kanal 10"
+          "channel_10": "Kanal 10",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula": {
@@ -255,20 +287,23 @@
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
-          "extra_entity_sources": "Quellentitäten"
+          "extra_entity_sources": "Quellentitäten",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
         "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
         "data": {
-          "extra_formula_expression": "Formelausdruck"
+          "extra_formula_expression": "Formelausdruck",
+          "flow_action": "Aktion"
         }
       },
       "extra_formula_edit": {
         "title": "Formelentität bearbeiten",
         "data": {
-          "extra_formula_entity": "Formelentität"
+          "extra_formula_entity": "Formelentität",
+          "flow_action": "Aktion"
         }
       }
     },
@@ -295,10 +330,12 @@
       "formula_name_required": "Gib einen Entitätsnamen ein.",
       "formula_result_type_invalid": "Wähle einen unterstützten Ergebnistyp.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
-      "no_formula_entities": "Es sind keine Formelentitäten konfiguriert."
+      "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
+      "invalid_input": "Ungültige Eingabe."
     },
     "abort": {
-      "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar."
+      "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar.",
+      "user_cancelled": "Abgebrochen."
     }
   },
   "selector": {
@@ -384,6 +421,14 @@
         "power_factor": "Leistungsfaktor",
         "frequency": "Frequenz (Hz)",
         "number": "Zahl (ohne Einheit)"
+      }
+    },
+    "flow_action": {
+      "options": {
+        "continue": "Weiter",
+        "save": "Speichern",
+        "back": "Zurück",
+        "cancel": "Abbrechen"
       }
     }
   }

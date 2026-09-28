@@ -6,6 +6,7 @@ import voluptuous as vol
 from homeassistant.helpers import selector
 from homeassistant.helpers.selector import SelectSelectorMode
 
+from .flow_navigation import navigable_step
 from .const import CONST_EXTRA_ENTITY_NAME, CONST_EXTRA_ENTITY_SOURCES
 from .extra import build_entry_descriptions, make_extra_key
 from .formula import (
@@ -53,6 +54,7 @@ class FormulaFlowMixin:
                 return "formula_result_type_locked"
         return None
 
+    @navigable_step
     async def async_step_extra_formula(self, user_input=None):
         draft = getattr(self, "_formula_draft", None) or {}
         errors = {}
@@ -89,15 +91,16 @@ class FormulaFlowMixin:
                 vol.Required(CONST_EXTRA_ENTITY_NAME, default=draft.get("name") or ""): str,
                 vol.Required(RESULT_TYPE, default=draft.get("result_type") or "power"): selector.SelectSelector(
                     selector.SelectSelectorConfig(options=list(FORMULA_RESULT_TYPES), translation_key=RESULT_TYPE,
-                                                  mode=SelectSelectorMode.LIST)),
+                                                  mode=SelectSelectorMode.DROPDOWN)),
                 vol.Required(CONST_EXTRA_ENTITY_SOURCES,
                              default=[source for source in (draft.get("sources") or []) if source in available]): selector.SelectSelector(
                     selector.SelectSelectorConfig(options=[{"value": key, "label": label} for key, label in available.items()],
-                                                  multiple=True, mode=SelectSelectorMode.LIST)),
+                                                  multiple=True, mode=SelectSelectorMode.DROPDOWN)),
             }),
             errors=errors or ({} if available else {"base": "formula_sources_invalid"}),
         )
 
+    @navigable_step
     async def async_step_extra_formula_expression(self, user_input=None):
         draft = getattr(self, "_formula_draft", None)
         if not draft:
@@ -141,6 +144,7 @@ class FormulaFlowMixin:
             errors=errors,
         )
 
+    @navigable_step
     async def async_step_extra_formula_edit(self, user_input=None):
         formulas = {extra["key"]: extra for extra in self._extra_entities if extra.get("operation") == "formula"}
         errors = {}
@@ -155,6 +159,6 @@ class FormulaFlowMixin:
             step_id="extra_formula_edit",
             data_schema=vol.Schema({vol.Required(EDIT_ENTITY): selector.SelectSelector(
                 selector.SelectSelectorConfig(options=[{"value": key, "label": extra.get("name") or key}
-                                                       for key, extra in formulas.items()], mode=SelectSelectorMode.LIST))}),
+                                                       for key, extra in formulas.items()], mode=SelectSelectorMode.DROPDOWN))}),
             errors=errors or ({} if formulas else {"base": "no_formula_entities"}),
         )

@@ -238,7 +238,8 @@ class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
     async def test_read_defaults_and_partial_write_retry(self):
         result = await self.flow.async_step_phase_device({"phase_device": "0"})
         desired = result["data_schema"]({})
-        self.assertEqual({f"channel_{n}": "L1" for n in range(1, 11)}, desired)
+        self.assertEqual({f"channel_{n}": "L1" for n in range(1, 11)},
+                         {key: value for key, value in desired.items() if key.startswith("channel_")})
         self.assertFalse(any(command[0] == "write" for command in self.transport.commands))
         desired.update(channel_1="L2", channel_2="L3")
         self.transport.fail_writes.add(2001)
@@ -255,7 +256,8 @@ class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
         self.transport.fail_reads.add(2000)
         result = await self.flow.async_step_phase_device({"phase_device": "0"})
         self.assertEqual({"base": "phase_read_failed"}, result["errors"])
-        self.assertEqual({}, result["data_schema"].schema)
+        self.assertFalse(any(str(key).startswith("channel_") for key in result["data_schema"].schema))
+        self.assertIn("flow_action", [str(key) for key in result["data_schema"].schema])
         self.transport.fail_reads.clear()
         result = await self.flow.async_step_channel_phases({})
         self.assertEqual({}, result["errors"])

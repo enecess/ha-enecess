@@ -80,6 +80,9 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 
 ## Integration in Home Assistant hinzufügen
 
+- Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
+- **Zurück** behält deine Eingaben. **Abbrechen** verwirft den aktuellen Vorgang und öffnet das Menü; im Startmenü der Optionen wird ohne Speichern beendet.
+
 Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
 
 ### Weg 1: Über „Gefunden“ (zeroconf / mDNS Auto-Discovery)
@@ -351,6 +354,9 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 
 ## Konfiguration und Optionen
 
+- Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
+- **Zurück** behält deine Eingaben. **Abbrechen** verwirft den aktuellen Vorgang und öffnet das Menü; im Startmenü der Optionen wird ohne Speichern beendet.
+
 ### Bestehenden Eintrag bearbeiten
 
 Öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, um veränderbare Optionen anzupassen.
@@ -423,7 +429,7 @@ Die verfügbaren Werte richten sich nach den Geräteregistern; nicht jede Katego
 Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mittelwert zweier Leistungswerte.
 
 1. Wähle **Formelentität hinzufügen** bei der ecoMain-Einrichtung oder unter **Konfigurieren**.
-2. Gib einen Namen ein, wähle den Ergebnistyp und aktivierte Messgrößen dieses Eintrags.
+2. Gib einen Namen ein. Wähle den Ergebnistyp im Dropdown-Menü und eine oder mehrere aktivierte Messgrößen im Quellen-Dropdown.
 3. Die nächste Seite zeigt, wofür `a`, `b` usw. stehen. Gib die Formel ein und prüfe, ob ihre Einheit zum Ergebnistyp passt.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->

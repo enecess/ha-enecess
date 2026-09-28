@@ -35,6 +35,7 @@ from .const import (
 from .ecomain.model import available_local_measurements, CLOUD_MEASUREMENTS
 from .ecomain.phase import async_read_phases, async_write_phases
 from .formula_flow import FormulaFlowMixin
+from .flow_navigation import FlowNavigationMixin, navigable_step
 from .local_validation import async_validate_local_device
 from .registry import async_remove_unconfigured_registry_entries
 from .ecoplug.model import build_plug_options, select_plugs
@@ -85,7 +86,14 @@ def _measurement_error(entry_data: dict, selected: Any) -> Optional[str]:
     return None
 
 
-class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
+def _selection_removes_extra_sources(entry_data: dict, current: dict, proposed: dict) -> bool:
+    old_keys = {spec.key for spec in build_entry_specs(entry_data, current)}
+    new_keys = {spec.key for spec in build_entry_specs(entry_data, proposed)}
+    removed = old_keys - new_keys
+    return any(removed.intersection(extra.get("sources") or []) for extra in current.get(CONST_EXTRA_ENTITIES, []))
+
+
+class ConfigFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     def __init__(self) -> None:
@@ -102,6 +110,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         self._entry_data: dict[str, Any] = {}
         self._extra_entities: list[dict[str, Any]] = []
         self._measurement_types: Optional[list[str]] = None
+        self._navigation_initial_state = self._navigation_snapshot()
 
     @property
     def _ecomain_available_slaves(self) -> list[str]:
@@ -111,6 +120,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: config_entries.ConfigEntry) -> config_entries.OptionsFlow:
         return EnecessOptionsFlow(config_entry)
 
+    @navigable_step
     async def async_step_user(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self.async_show_form(  # type: ignore[return-value]
@@ -141,6 +151,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
 
         return self.async_abort(reason="unsupported_device_type")  # type: ignore[return-value]
 
+    @navigable_step
     async def async_step_ecomain_mode(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self.async_show_form(  # type: ignore[return-value]
@@ -239,6 +250,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
 
         return results
 
+    @navigable_step
     async def async_step_ecomain_auto_scan(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         discovery_config = DEVICE_CONFIGS[CONST_DEVICE_ECOMAIN].discovery
         if discovery_config is None:
@@ -274,6 +286,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_ecomain_local_confirm()  # type: ignore[return-value]
 
+    @navigable_step
     async def async_step_ecomain_manual(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self.async_show_form(  # type: ignore[return-value]
@@ -380,6 +393,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         self._ecomain_local_config[CONST_ECOMAIN_FIRMWARE_VERSION] = result.firmware_version
         return None
 
+    @navigable_step
     async def async_step_ecomain_local_confirm(
             self, user_input: Optional[dict[str, Any]] = None
     ) -> FlowResult:
@@ -395,6 +409,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             )
         return await self.async_step_ecomain_local_setup()  # type: ignore[return-value]
 
+    @navigable_step
     async def async_step_ecomain_local_setup(
             self, user_input: Optional[dict[str, Any]] = None
     ) -> FlowResult:
@@ -404,6 +419,12 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         if CONST_ECOMAIN_ONLINE_SLAVES in self._ecomain_local_config:
             if user_input is not None:
                 selected = user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or []
+                options = self._options_data()
+                proposed = {**options, CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(selected)}
+                if _selection_removes_extra_sources(self._entry_data, options, proposed):
+                    result = await self.async_step_ecomain_local_setup()
+                    result["errors"] = {"base": "slave_in_use"}
+                    return result
 
                 if self._entry_by_unique_id(f"ecomain:{ecomain_serial}:mode_local") is not None:
                     return self.async_abort(reason="already_configured")  # type: ignore[return-value]
@@ -494,6 +515,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             self._cloud_api = EnecessApi(session=session, base_url=CONF_CLOUD_BASE_URL)
         return self._cloud_api
 
+    @navigable_step
     async def async_step_ecomain_cloud_login(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self.async_show_form(  # type: ignore[return-value]
@@ -542,6 +564,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors or {},
         )
 
+    @navigable_step
     async def async_step_ecoplug_cloud_login(
             self, user_input: Optional[dict[str, Any]] = None
     ) -> FlowResult:
@@ -574,6 +597,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         self._ecoplug_devices = devices
         return await self.async_step_ecoplug_select()  # type: ignore[return-value]
 
+    @navigable_step
     async def async_step_ecoplug_select(
             self, user_input: Optional[dict[str, Any]] = None
     ) -> FlowResult:
@@ -634,6 +658,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors or {},
         )
 
+    @navigable_step
     async def async_step_ecomain_cloud_master(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         assert self._cloud_token is not None
         assert self._cloud_username is not None
@@ -677,6 +702,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_ecomain_cloud_confirm()  # type: ignore[return-value]
 
+    @navigable_step
     async def async_step_ecomain_cloud_confirm(
             self, user_input: Optional[dict[str, Any]] = None
     ):
@@ -706,6 +732,13 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
                     CONST_ECOMAIN_SERIAL: self._ecomain_cloud_config.get(CONST_ECOMAIN_SERIAL),
                 },
             )
+        options = self._options_data()
+        proposed = {**options, CONST_ECOMAIN_SELECTED_SLAVES: self._normalize_slaves(
+            user_input.get(CONST_ECOMAIN_SELECTED_SLAVES) or [])}
+        if _selection_removes_extra_sources(self._entry_data, options, proposed):
+            result = await self.async_step_ecomain_cloud_confirm()
+            result["errors"] = {"base": "slave_in_use"}
+            return result
         assert self._cloud_username is not None
         assert self._cloud_password is not None
         assert self._cloud_token is not None
@@ -738,6 +771,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         }
         return await self.async_step_measurement_types()
 
+    @navigable_step
     async def async_step_measurement_types(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         selected = self._measurement_types
         if selected is None:
@@ -746,6 +780,11 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             selected = user_input.get(CONST_MEASUREMENT_TYPES)
             error = _measurement_error(self._entry_data, selected)
+            if not error:
+                options = self._options_data()
+                proposed = {**options, CONST_MEASUREMENT_TYPES: selected}
+                if _selection_removes_extra_sources(self._entry_data, options, proposed):
+                    error = "measurement_in_use"
             if error:
                 errors["base"] = error
             else:
@@ -757,6 +796,7 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    @navigable_step
     async def async_step_extra_entities(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self._show_extra_entities_menu("extra_entities")
@@ -791,15 +831,16 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             return self._handle_extra_remove(user_input)
         return await self._create_config_entry()
 
+    @navigable_step
     async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
-            return self._show_extra_entities_menu("extra_entities")
+            return self._show_extra_transform_form()
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_TRANSFORM})
 
     def _show_extra_transform_form(self) -> FlowResult:
         source_options = build_source_options(self._entry_data, self._options_data(), source_kind="power", power_only=True)
         return self.async_show_form(
-            step_id="extra_entities",
+            step_id="extra_transform",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONST_EXTRA_ENTITY_NAME): str,
@@ -827,14 +868,15 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return self._show_extra_entities_menu("extra_entities")
 
+    @navigable_step
     async def async_step_extra_aggregate_kind(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
-            return self._show_extra_entities_menu("extra_entities")
+            return self._show_extra_aggregate_kind_form()
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_AGGREGATE})
 
     def _show_extra_aggregate_kind_form(self) -> FlowResult:
         return self.async_show_form(
-            step_id="extra_entities",
+            step_id="extra_aggregate_kind",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND): selector.SelectSelector(
@@ -850,15 +892,16 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
             description_placeholders={CONST_EXTRA_ENTITIES: str(len(self._extra_entities))},
         )
 
+    @navigable_step
     async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
-            return self._show_extra_entities_menu("extra_entities")
+            return self._show_extra_aggregate_form("power")
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_ADD_AGGREGATE})
 
     def _show_extra_aggregate_form(self, source_kind: str) -> FlowResult:
         source_options = build_source_options(self._entry_data, self._options_data(), source_kind=source_kind)
         return self.async_show_form(
-            step_id="extra_entities",
+            step_id="extra_aggregate",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONST_EXTRA_ENTITY_SOURCE_KIND, default=source_kind): selector.SelectSelector(
@@ -897,15 +940,16 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return self._show_extra_entities_menu("extra_entities")
 
+    @navigable_step
     async def async_step_extra_remove(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
-            return self._show_extra_entities_menu("extra_entities")
+            return self._show_extra_remove_form()
         return await self.async_step_extra_entities({**user_input, CONST_EXTRA_ACTION: CONST_EXTRA_ACTION_REMOVE})
 
     def _show_extra_remove_form(self) -> FlowResult:
         options = {extra["key"]: extra.get("name") or extra["key"] for extra in self._extra_entities}
         return self.async_show_form(
-            step_id="extra_entities",
+            step_id="extra_remove",
             data_schema=vol.Schema(
                 {
                     vol.Required(CONST_EXTRA_ENTITY_REMOVE): vol.In(options),
@@ -1002,8 +1046,10 @@ class ConfigFlow(FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN):
         )
 
 
-class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
+class EnecessOptionsFlow(FlowNavigationMixin, FormulaFlowMixin, config_entries.OptionsFlow):
     """Handle mutable enecess options."""
+
+    _navigation_root = "init"
 
     def __init__(self, entry: config_entries.ConfigEntry) -> None:
         self._entry = entry
@@ -1046,6 +1092,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
     def _extra_entities(self, value: list[dict[str, Any]]) -> None:
         self._options[CONST_EXTRA_ENTITIES] = value
 
+    @navigable_step
     async def async_step_init(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if self._entry.data.get(CONST_DEVICE_TYPE) == CONST_DEVICE_ECOPLUG:
             return await self.async_step_ecoplug_select(user_input)
@@ -1079,6 +1126,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
         self._update_entry_data()
         return self.async_create_entry(title="", data=self._options)
 
+    @navigable_step
     async def async_step_measurement_types(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         selected = self._options[CONST_MEASUREMENT_TYPES]
         errors = {}
@@ -1087,10 +1135,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             error = _measurement_error(self._measurement_entry_data, selected)
             if not error:
                 proposed = {**self._options, CONST_MEASUREMENT_TYPES: selected}
-                old_keys = {spec.key for spec in build_entry_specs(self._measurement_entry_data, self._options)}
-                new_keys = {spec.key for spec in build_entry_specs(self._measurement_entry_data, proposed)}
-                removed = old_keys - new_keys
-                if any(removed.intersection(extra.get("sources") or []) for extra in self._extra_entities):
+                if _selection_removes_extra_sources(self._measurement_entry_data, self._options, proposed):
                     error = "measurement_in_use"
             if error:
                 errors["base"] = error
@@ -1103,6 +1148,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             errors=errors,
         )
 
+    @navigable_step
     async def async_step_phase_device(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
             return self.async_abort(reason="phase_unavailable")
@@ -1124,6 +1170,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             errors=errors,
         )
 
+    @navigable_step
     async def async_step_channel_phases(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if self._entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
             return self.async_abort(reason="phase_unavailable")
@@ -1172,6 +1219,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             description_placeholders={"device": "ecoMain" if self._phase_device == 0 else f"ecoSub {self._phase_device}"},
         )
 
+    @navigable_step
     async def async_step_ecoplug_select(
             self, user_input: Optional[dict[str, Any]] = None
     ) -> FlowResult:
@@ -1257,6 +1305,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             errors=errors or {},
         )
 
+    @navigable_step
     async def async_step_extra_transform(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_options = build_source_options(self._measurement_entry_data, self._options, source_kind="power", power_only=True)
         if user_input is None:
@@ -1287,6 +1336,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return await self._show_options_menu()
 
+    @navigable_step
     async def async_step_extra_aggregate_kind(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         if user_input is None:
             return self.async_show_form(
@@ -1308,6 +1358,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
             return await self.async_step_extra_aggregate_kind()
         return await self.async_step_extra_aggregate(user_input)
 
+    @navigable_step
     async def async_step_extra_aggregate(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         source_kind = user_input.get(CONST_EXTRA_ENTITY_SOURCE_KIND, "power") if user_input else "power"
         source_options = build_source_options(self._measurement_entry_data, self._options, source_kind=source_kind)
@@ -1349,6 +1400,7 @@ class EnecessOptionsFlow(FormulaFlowMixin, config_entries.OptionsFlow):
         self._extra_entities.append(normalize_extra_entity(user_input, self._extra_entities))
         return await self._show_options_menu()
 
+    @navigable_step
     async def async_step_extra_remove(self, user_input: Optional[dict[str, Any]] = None) -> FlowResult:
         options = {extra["key"]: extra.get("name") or extra["key"] for extra in self._extra_entities}
         if user_input is None:

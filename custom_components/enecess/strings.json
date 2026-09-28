@@ -11,66 +11,78 @@
       "ecomain_mode": {
         "title": "Set Up ecoMain",
         "data": {
-          "mode": "Add Method"
+          "mode": "Add Method",
+          "flow_action": "Action"
         }
       },
       "ecomain_auto_scan": {
         "title": "Automatic Discovery",
         "description": "Select ecoMain",
         "data": {
-          "ecomain_serial": "Master Serial Number"
+          "ecomain_serial": "Master Serial Number",
+          "flow_action": "Action"
         }
       },
       "ecomain_local_confirm": {
         "title": "Confirm Device",
-        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}"
+        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}",
+        "data": {
+          "flow_action": "Action"
+        }
       },
       "ecomain_local_setup": {
         "title": "Setup Device",
         "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}",
         "data": {
-          "ecomain_selected_slaves": "Select Slaves to Add"
+          "ecomain_selected_slaves": "Select Slaves to Add",
+          "flow_action": "Action"
         }
       },
       "ecomain_manual": {
         "title": "Manual Setup",
         "data": {
           "ecomain_serial": "Master Serial Number",
-          "ecomain_host": "Address (IP or Hostname)"
+          "ecomain_host": "Address (IP or Hostname)",
+          "flow_action": "Action"
         }
       },
       "ecomain_cloud_login": {
         "title": "Account Login",
         "data": {
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "flow_action": "Action"
         }
       },
       "ecoplug_cloud_login": {
         "title": "ecoPlug Account Login",
         "data": {
           "username": "Username",
-          "password": "Password"
+          "password": "Password",
+          "flow_action": "Action"
         }
       },
       "ecoplug_select": {
         "title": "Select ecoPlug",
         "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
         "data": {
-          "ecoplug_selected": "Select Plugs to Add"
+          "ecoplug_selected": "Select Plugs to Add",
+          "flow_action": "Action"
         }
       },
       "ecomain_cloud_master": {
         "title": "Select ecoMain",
         "data": {
-          "ecomain_cloud_master_id": "ecoMain Master"
+          "ecomain_cloud_master_id": "ecoMain Master",
+          "flow_action": "Action"
         }
       },
       "ecomain_cloud_confirm": {
         "title": "Confirm Device",
         "description": "Serial Number: {ecomain_serial}\n\n- `*_energy_total_1m`: raw 1-minute energy increment from the cloud API.\n- Use `*_energy_accumulated` for the Home Assistant Energy Dashboard.\n- Cloud accumulated energy is an estimate: the API provides no timestamp or sample ID for each value.",
         "data": {
-          "ecomain_selected_slaves": "Select Slaves to Add"
+          "ecomain_selected_slaves": "Select Slaves to Add",
+          "flow_action": "Action"
         }
       },
       "extra_entities": {
@@ -83,7 +95,8 @@
           "extra_entity_source": "Source Power Entity",
           "extra_entity_source_kind": "Source Type",
           "extra_entity_sources": "Source Entities",
-          "extra_entity_remove": "Extra Entity"
+          "extra_entity_remove": "Extra Entity",
+          "flow_action": "Action"
         }
       },
       "extra_transform": {
@@ -91,13 +104,15 @@
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_entity_operation": "Operation",
-          "extra_entity_source": "Source Power Entity"
+          "extra_entity_source": "Source Power Entity",
+          "flow_action": "Action"
         }
       },
       "extra_aggregate_kind": {
         "title": "Select Source Type",
         "data": {
-          "extra_entity_source_kind": "Source Type"
+          "extra_entity_source_kind": "Source Type",
+          "flow_action": "Action"
         }
       },
       "extra_aggregate": {
@@ -106,20 +121,23 @@
           "extra_entity_source_kind": "Source Type",
           "extra_entity_name": "Entity Name",
           "extra_entity_operation": "Operation",
-          "extra_entity_sources": "Source Entities"
+          "extra_entity_sources": "Source Entities",
+          "flow_action": "Action"
         }
       },
       "extra_remove": {
         "title": "Remove Extra Entity",
         "data": {
-          "extra_entity_remove": "Extra Entity"
+          "extra_entity_remove": "Extra Entity",
+          "flow_action": "Action"
         }
       },
       "measurement_types": {
         "title": "Measurement Types",
         "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
         "data": {
-          "measurement_types": "Measurement Types"
+          "measurement_types": "Measurement Types",
+          "flow_action": "Action"
         }
       },
       "extra_formula": {
@@ -128,20 +146,23 @@
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
-          "extra_entity_sources": "Source Entities"
+          "extra_entity_sources": "Source Entities",
+          "flow_action": "Action"
         }
       },
       "extra_formula_expression": {
         "title": "Expression",
         "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
         "data": {
-          "extra_formula_expression": "Expression"
+          "extra_formula_expression": "Expression",
+          "flow_action": "Action"
         }
       },
       "extra_formula_edit": {
         "title": "Edit Formula Entity",
         "data": {
-          "extra_formula_entity": "Formula Entity"
+          "extra_formula_entity": "Formula Entity",
+          "flow_action": "Action"
         }
       }
     },
@@ -167,10 +188,12 @@
       "formula_name_required": "Enter an entity name.",
       "formula_result_type_invalid": "Select a supported result type.",
       "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
-      "no_formula_entities": "No formula entities have been configured."
+      "no_formula_entities": "No formula entities have been configured.",
+      "slave_in_use": "Remove extra entities using this slave’s measurements before deselecting it."
     },
     "abort": {
-      "already_configured": "This device has already been configured."
+      "already_configured": "This device has already been configured.",
+      "user_cancelled": "Cancelled."
     }
   },
   "options": {
@@ -180,14 +203,16 @@
         "description": "- Device type: {device_type}\n- Add method: {mode}\n- ecoMain serial number: {ecomain_serial}\n- Configured extra entities: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add",
-          "extra_action": "Next Action"
+          "extra_action": "Next Action",
+          "flow_action": "Action"
         }
       },
       "ecoplug_select": {
         "title": "Adjust ecoPlug",
         "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
         "data": {
-          "ecoplug_selected": "Select Plugs to Add"
+          "ecoplug_selected": "Select Plugs to Add",
+          "flow_action": "Action"
         }
       },
       "extra_transform": {
@@ -195,13 +220,15 @@
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_entity_operation": "Operation",
-          "extra_entity_source": "Source Power Entity"
+          "extra_entity_source": "Source Power Entity",
+          "flow_action": "Action"
         }
       },
       "extra_aggregate_kind": {
         "title": "Select Source Type",
         "data": {
-          "extra_entity_source_kind": "Source Type"
+          "extra_entity_source_kind": "Source Type",
+          "flow_action": "Action"
         }
       },
       "extra_aggregate": {
@@ -210,26 +237,30 @@
           "extra_entity_source_kind": "Source Type",
           "extra_entity_name": "Entity Name",
           "extra_entity_operation": "Operation",
-          "extra_entity_sources": "Source Entities"
+          "extra_entity_sources": "Source Entities",
+          "flow_action": "Action"
         }
       },
       "extra_remove": {
         "title": "Remove Extra Entity",
         "data": {
-          "extra_entity_remove": "Extra Entity"
+          "extra_entity_remove": "Extra Entity",
+          "flow_action": "Action"
         }
       },
       "measurement_types": {
         "title": "Measurement Types",
         "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
         "data": {
-          "measurement_types": "Measurement Types"
+          "measurement_types": "Measurement Types",
+          "flow_action": "Action"
         }
       },
       "phase_device": {
         "title": "Channel Phases",
         "data": {
-          "phase_device": "Device"
+          "phase_device": "Device",
+          "flow_action": "Action"
         },
         "description": "Channel phase settings require firmware 139 or later."
       },
@@ -246,7 +277,8 @@
           "channel_7": "Channel 7",
           "channel_8": "Channel 8",
           "channel_9": "Channel 9",
-          "channel_10": "Channel 10"
+          "channel_10": "Channel 10",
+          "flow_action": "Action"
         }
       },
       "extra_formula": {
@@ -255,20 +287,23 @@
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
-          "extra_entity_sources": "Source Entities"
+          "extra_entity_sources": "Source Entities",
+          "flow_action": "Action"
         }
       },
       "extra_formula_expression": {
         "title": "Expression",
         "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
         "data": {
-          "extra_formula_expression": "Expression"
+          "extra_formula_expression": "Expression",
+          "flow_action": "Action"
         }
       },
       "extra_formula_edit": {
         "title": "Edit Formula Entity",
         "data": {
-          "extra_formula_entity": "Formula Entity"
+          "extra_formula_entity": "Formula Entity",
+          "flow_action": "Action"
         }
       }
     },
@@ -295,10 +330,12 @@
       "formula_name_required": "Enter an entity name.",
       "formula_result_type_invalid": "Select a supported result type.",
       "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
-      "no_formula_entities": "No formula entities have been configured."
+      "no_formula_entities": "No formula entities have been configured.",
+      "invalid_input": "Invalid input."
     },
     "abort": {
-      "phase_unavailable": "Channel phase settings are only available for online devices in local mode."
+      "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",
+      "user_cancelled": "Cancelled."
     }
   },
   "selector": {
@@ -384,6 +421,14 @@
         "power_factor": "Power factor",
         "frequency": "Frequency (Hz)",
         "number": "Number (no unit)"
+      }
+    },
+    "flow_action": {
+      "options": {
+        "continue": "Continue",
+        "save": "Save",
+        "back": "Back",
+        "cancel": "Cancel"
       }
     }
   }

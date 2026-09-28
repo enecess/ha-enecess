@@ -80,6 +80,9 @@ Kliknij poniższy przycisk, aby dodać to repozytorium do HACS jako niestandardo
 
 ## Dodawanie integracji w Home Assistant
 
+- Na stronach pośrednich pole **Działanie** oferuje **Dalej**/**Zapisz**, **Wstecz** lub **Anuluj**.
+- **Wstecz** zachowuje wpisane dane. **Anuluj** porzuca bieżącą operację i wraca do menu; na stronie głównej opcji zamyka konfigurację bez zapisu.
+
 Istnieją dwa sposoby uruchomienia konfiguracji ecoMain:
 
 ### Sposób 1: Z sekcji „Discovered” (automatyczne wykrywanie zeroconf / mDNS)
@@ -350,6 +353,9 @@ Integracja pobiera dane ecoPlug z chmury mniej więcej co **60 sekund**. Po pomy
 
 ## Konfiguracja i opcje
 
+- Na stronach pośrednich pole **Działanie** oferuje **Dalej**/**Zapisz**, **Wstecz** lub **Anuluj**.
+- **Wstecz** zachowuje wpisane dane. **Anuluj** porzuca bieżącą operację i wraca do menu; na stronie głównej opcji zamyka konfigurację bez zapisu.
+
 ### Edycja istniejącego wpisu
 
 Otwórz **Settings -> Devices & services -> enecess -> Configure**, aby zmienić opcje, które mogą być edytowane.
@@ -420,7 +426,7 @@ Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę t
 Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch wartości mocy.
 
 1. Wybierz **Dodaj encję formuły** podczas dodawania ecoMain lub w **Konfiguruj**.
-2. Podaj nazwę, wybierz typ wyniku i pomiary włączone w tym wpisie.
+2. Podaj nazwę, wybierz typ wyniku z listy rozwijanej oraz jeden lub więcej włączonych pomiarów z listy rozwijanej źródeł.
 3. Następna strona pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->

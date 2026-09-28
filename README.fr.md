@@ -80,6 +80,9 @@ Cliquez sur le bouton ci-dessous pour ajouter ce dépôt à HACS en tant qu’in
 
 ## Ajouter l’intégration dans Home Assistant
 
+- Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
+- **Retour** garde vos saisies. **Annuler** abandonne l’opération et revient au menu ; depuis l’accueil des options, cela ferme la configuration sans enregistrer.
+
 Il existe **deux façons** de lancer le flux de configuration pour ecoMain :
 
 ### Méthode 1 : via la section « Découverts » (zeroconf / découverte mDNS)
@@ -353,6 +356,9 @@ L’intégration récupère les données ecoPlug depuis le cloud environ toutes 
 
 ## Configuration et options
 
+- Les pages intermédiaires proposent **Action** : **Continuer**/**Enregistrer**, **Retour** ou **Annuler**.
+- **Retour** garde vos saisies. **Annuler** abandonne l’opération et revient au menu ; depuis l’accueil des options, cela ferme la configuration sans enregistrer.
+
 ### Modifier une entrée existante
 
 Ouvrez **Paramètres → Appareils et services → enecess → Configurer** pour ajuster les options modifiables.
@@ -425,7 +431,7 @@ Les valeurs disponibles dépendent des registres de l’appareil : toutes les ca
 Créez un capteur à partir de vos mesures, par exemple la différence ou la moyenne de deux puissances.
 
 1. Choisissez **Ajouter une entité de formule** pendant l’ajout d’ecoMain ou via **Configurer**.
-2. Saisissez un nom, choisissez le type de résultat et des mesures activées dans cette entrée.
+2. Saisissez un nom, choisissez le type de résultat dans la liste déroulante, puis une ou plusieurs mesures activées dans la liste déroulante des sources.
 3. La page suivante indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->

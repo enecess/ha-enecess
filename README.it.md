@@ -52,6 +52,9 @@ Dopo l’inclusione nel catalogo predefinito di HACS sarà possibile cercare dir
 
 ## Aggiunta di ecoMain
 
+- Le pagine intermedie offrono **Azione**: **Avanti**/**Salva**, **Indietro** o **Annulla**.
+- **Indietro** conserva i dati inseriti. **Annulla** abbandona l’operazione e torna al menu; dalla pagina iniziale delle opzioni esce senza salvare.
+
 Apri **Impostazioni → Dispositivi e servizi → Aggiungi integrazione**, cerca **enecess**, seleziona **ecoMain** e scegli il metodo di aggiunta. Puoi anche iniziare da una scheda ecoMain nella sezione dei dispositivi rilevati: verrà avviata la procedura locale con i dati di rete rilevati.
 
 > **Aprire Dispositivi e servizi**
@@ -242,6 +245,9 @@ Il polling avviene circa ogni **60 secondi**. Dopo un comando accettato, lo stat
 
 ## Configurazione e opzioni
 
+- Le pagine intermedie offrono **Azione**: **Avanti**/**Salva**, **Indietro** o **Annulla**.
+- **Indietro** conserva i dati inseriti. **Annulla** abbandona l’operazione e torna al menu; dalla pagina iniziale delle opzioni esce senza salvare.
+
 ### Modifica della configurazione
 
 Da **Configura** puoi modificare gli ecoSub selezionati, i tipi di misurazione e le entità aggiuntive di ecoMain, oppure le prese selezionate di un account ecoPlug. Per ecoMain locale puoi anche impostare le fasi dei canali.
@@ -318,7 +324,7 @@ Le entità aggregate mantengono `device_class`, `state_class` e unità delle ris
 Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due valori di potenza.
 
 1. Scegli **Aggiungi entità formula** durante l’aggiunta di ecoMain o in **Configura**.
-2. Inserisci un nome, scegli il tipo di risultato e le misurazioni abilitate nella stessa voce.
+2. Inserisci un nome, scegli il tipo di risultato dal menu a tendina e una o più misurazioni abilitate dal menu a tendina delle sorgenti.
 3. La pagina successiva mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->

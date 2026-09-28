@@ -80,6 +80,9 @@ Click the button below to add this repository to HACS as a custom integration:
 
 ## Add the Integration in Home Assistant
 
+- Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
+- **Back** keeps your inputs. **Cancel** drops the current operation and returns to the menu; cancelling from the options home page exits without saving.
+
 There are **two ways** to start the configuration flow for ecoMain:
 
 ### Way 1: From “Discovered” (zeroconf / mDNS auto discovery)
@@ -348,6 +351,9 @@ ecoPlug data is polled from the cloud approximately every **60 seconds**. After 
 
 ## Configuration and options
 
+- Intermediate pages offer **Action**: **Continue**/**Save**, **Back** or **Cancel**.
+- **Back** keeps your inputs. **Cancel** drops the current operation and returns to the menu; cancelling from the options home page exits without saving.
+
 ### Editing an existing entry
 
 Open **Settings → Devices & services → enecess → Configure** to adjust mutable options.
@@ -417,7 +423,7 @@ Availability follows the device registers: not every category has a three-phase 
 Create a sensor from your measurements, such as the difference or average of two power readings.
 
 1. Choose **Add Formula Entity** during ecoMain setup or under **Configure**.
-2. Enter a name, choose a result type and select measurements enabled in this entry.
+2. Enter a name, choose a result type from the dropdown and select one or more enabled measurements from the sources dropdown.
 3. Use the next page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->

@@ -11,66 +11,78 @@
       "ecomain_mode": {
         "title": "Konfiguracja ecoMain",
         "data": {
-          "mode": "Metoda dodawania"
+          "mode": "Metoda dodawania",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_auto_scan": {
         "title": "Automatyczne wykrywanie",
         "description": "Wybierz ecoMain",
         "data": {
-          "ecomain_serial": "Numer seryjny urządzenia głównego"
+          "ecomain_serial": "Numer seryjny urządzenia głównego",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_local_confirm": {
         "title": "Potwierdź urządzenie",
-        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}"
+        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
+        "data": {
+          "flow_action": "Działanie"
+        }
       },
       "ecomain_local_setup": {
         "title": "Konfiguracja urządzenia",
         "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
         "data": {
-          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
+          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_manual": {
         "title": "Konfiguracja ręczna",
         "data": {
           "ecomain_serial": "Numer seryjny urządzenia głównego",
-          "ecomain_host": "Adres (IP lub nazwa hosta)"
+          "ecomain_host": "Adres (IP lub nazwa hosta)",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_cloud_login": {
         "title": "Logowanie do konta",
         "data": {
           "username": "Nazwa użytkownika",
-          "password": "Hasło"
+          "password": "Hasło",
+          "flow_action": "Działanie"
         }
       },
       "ecoplug_cloud_login": {
         "title": "Logowanie do konta ecoPlug",
         "data": {
           "username": "Nazwa użytkownika",
-          "password": "Hasło"
+          "password": "Hasło",
+          "flow_action": "Działanie"
         }
       },
       "ecoplug_select": {
         "title": "Wybierz ecoPlug",
         "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
         "data": {
-          "ecoplug_selected": "Wybierz gniazdka do dodania"
+          "ecoplug_selected": "Wybierz gniazdka do dodania",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_cloud_master": {
         "title": "Wybierz ecoMain",
         "data": {
-          "ecomain_cloud_master_id": "ecoMain główny"
+          "ecomain_cloud_master_id": "ecoMain główny",
+          "flow_action": "Działanie"
         }
       },
       "ecomain_cloud_confirm": {
         "title": "Potwierdź urządzenie",
         "description": "Numer seryjny: {ecomain_serial}\n\n- `*_energy_total_1m`: surowy przyrost energii na minutę z API chmury.\n- W panelu Energia Home Assistant używaj `*_energy_accumulated`.\n- Łączna energia z chmury jest szacunkowa: API nie podaje czasu ani identyfikatora dla każdego pomiaru.",
         "data": {
-          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania"
+          "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
+          "flow_action": "Działanie"
         }
       },
       "extra_entities": {
@@ -83,7 +95,8 @@
           "extra_entity_source": "Źródłowa encja mocy",
           "extra_entity_source_kind": "Typ źródła",
           "extra_entity_sources": "Encje źródłowe",
-          "extra_entity_remove": "Dodatkowa encja"
+          "extra_entity_remove": "Dodatkowa encja",
+          "flow_action": "Działanie"
         }
       },
       "extra_transform": {
@@ -91,13 +104,15 @@
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_entity_operation": "Operacja",
-          "extra_entity_source": "Źródłowa encja mocy"
+          "extra_entity_source": "Źródłowa encja mocy",
+          "flow_action": "Działanie"
         }
       },
       "extra_aggregate_kind": {
         "title": "Wybierz typ źródła",
         "data": {
-          "extra_entity_source_kind": "Typ źródła"
+          "extra_entity_source_kind": "Typ źródła",
+          "flow_action": "Działanie"
         }
       },
       "extra_aggregate": {
@@ -106,20 +121,23 @@
           "extra_entity_source_kind": "Typ źródła",
           "extra_entity_name": "Nazwa encji",
           "extra_entity_operation": "Operacja",
-          "extra_entity_sources": "Encje źródłowe"
+          "extra_entity_sources": "Encje źródłowe",
+          "flow_action": "Działanie"
         }
       },
       "extra_remove": {
         "title": "Usuń dodatkową encję",
         "data": {
-          "extra_entity_remove": "Dodatkowa encja"
+          "extra_entity_remove": "Dodatkowa encja",
+          "flow_action": "Działanie"
         }
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
         "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
         "data": {
-          "measurement_types": "Rodzaje pomiarów"
+          "measurement_types": "Rodzaje pomiarów",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula": {
@@ -128,20 +146,23 @@
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
-          "extra_entity_sources": "Encje źródłowe"
+          "extra_entity_sources": "Encje źródłowe",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
         "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
         "data": {
-          "extra_formula_expression": "Wyrażenie"
+          "extra_formula_expression": "Wyrażenie",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula_edit": {
         "title": "Edytuj encję formuły",
         "data": {
-          "extra_formula_entity": "Encja formuły"
+          "extra_formula_entity": "Encja formuły",
+          "flow_action": "Działanie"
         }
       }
     },
@@ -167,10 +188,12 @@
       "formula_name_required": "Podaj nazwę encji.",
       "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
-      "no_formula_entities": "Nie skonfigurowano encji formuł."
+      "no_formula_entities": "Nie skonfigurowano encji formuł.",
+      "slave_in_use": "Przed odznaczeniem urządzenia podrzędnego usuń dodatkowe encje korzystające z jego pomiarów."
     },
     "abort": {
-      "already_configured": "To urządzenie zostało już skonfigurowane."
+      "already_configured": "To urządzenie zostało już skonfigurowane.",
+      "user_cancelled": "Anulowano."
     }
   },
   "options": {
@@ -180,14 +203,16 @@
         "description": "- Typ urządzenia: {device_type}\n- Metoda dodawania: {mode}\n- Numer seryjny ecoMain: {ecomain_serial}\n- Skonfigurowane dodatkowe encje: {extra_entities}",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
-          "extra_action": "Następna akcja"
+          "extra_action": "Następna akcja",
+          "flow_action": "Działanie"
         }
       },
       "ecoplug_select": {
         "title": "Dostosuj ecoPlug",
         "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
         "data": {
-          "ecoplug_selected": "Wybierz gniazdka do dodania"
+          "ecoplug_selected": "Wybierz gniazdka do dodania",
+          "flow_action": "Działanie"
         }
       },
       "extra_transform": {
@@ -195,13 +220,15 @@
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_entity_operation": "Operacja",
-          "extra_entity_source": "Źródłowa encja mocy"
+          "extra_entity_source": "Źródłowa encja mocy",
+          "flow_action": "Działanie"
         }
       },
       "extra_aggregate_kind": {
         "title": "Wybierz typ źródła",
         "data": {
-          "extra_entity_source_kind": "Typ źródła"
+          "extra_entity_source_kind": "Typ źródła",
+          "flow_action": "Działanie"
         }
       },
       "extra_aggregate": {
@@ -210,26 +237,30 @@
           "extra_entity_source_kind": "Typ źródła",
           "extra_entity_name": "Nazwa encji",
           "extra_entity_operation": "Operacja",
-          "extra_entity_sources": "Encje źródłowe"
+          "extra_entity_sources": "Encje źródłowe",
+          "flow_action": "Działanie"
         }
       },
       "extra_remove": {
         "title": "Usuń dodatkową encję",
         "data": {
-          "extra_entity_remove": "Dodatkowa encja"
+          "extra_entity_remove": "Dodatkowa encja",
+          "flow_action": "Działanie"
         }
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
         "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
         "data": {
-          "measurement_types": "Rodzaje pomiarów"
+          "measurement_types": "Rodzaje pomiarów",
+          "flow_action": "Działanie"
         }
       },
       "phase_device": {
         "title": "Fazy kanałów",
         "data": {
-          "phase_device": "Urządzenie"
+          "phase_device": "Urządzenie",
+          "flow_action": "Działanie"
         },
         "description": "Ustawienia faz kanałów wymagają oprogramowania w wersji 139 lub nowszej."
       },
@@ -246,7 +277,8 @@
           "channel_7": "Kanał 7",
           "channel_8": "Kanał 8",
           "channel_9": "Kanał 9",
-          "channel_10": "Kanał 10"
+          "channel_10": "Kanał 10",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula": {
@@ -255,20 +287,23 @@
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
-          "extra_entity_sources": "Encje źródłowe"
+          "extra_entity_sources": "Encje źródłowe",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
         "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
         "data": {
-          "extra_formula_expression": "Wyrażenie"
+          "extra_formula_expression": "Wyrażenie",
+          "flow_action": "Działanie"
         }
       },
       "extra_formula_edit": {
         "title": "Edytuj encję formuły",
         "data": {
-          "extra_formula_entity": "Encja formuły"
+          "extra_formula_entity": "Encja formuły",
+          "flow_action": "Działanie"
         }
       }
     },
@@ -295,10 +330,12 @@
       "formula_name_required": "Podaj nazwę encji.",
       "formula_result_type_invalid": "Wybierz obsługiwany typ wyniku.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
-      "no_formula_entities": "Nie skonfigurowano encji formuł."
+      "no_formula_entities": "Nie skonfigurowano encji formuł.",
+      "invalid_input": "Nieprawidłowe dane wejściowe."
     },
     "abort": {
-      "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym."
+      "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
+      "user_cancelled": "Anulowano."
     }
   },
   "selector": {
@@ -384,6 +421,14 @@
         "power_factor": "Współczynnik mocy",
         "frequency": "Częstotliwość (Hz)",
         "number": "Liczba (bez jednostki)"
+      }
+    },
+    "flow_action": {
+      "options": {
+        "continue": "Dalej",
+        "save": "Zapisz",
+        "back": "Wstecz",
+        "cancel": "Anuluj"
       }
     }
   }

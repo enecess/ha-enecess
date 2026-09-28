@@ -49,6 +49,9 @@ def load_flow(test):
         def _async_current_entries(self):
             return []
 
+        def _set_confirm_only(self):
+            self.context["confirm_only"] = True
+
     module('homeassistant.config_entries', ConfigFlow=Flow, OptionsFlow=Flow,
            ConfigEntry=types.SimpleNamespace)
     module('homeassistant.data_entry_flow', FlowResult=dict)
