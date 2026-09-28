@@ -40,7 +40,7 @@ async def async_write_phases(
     try:
         current = (await client.read_holding_registers(base, 10)).registers
     except _IO_ERRORS:
-        return {channel: "phase_write_failed" for channel in desired}
+        return dict.fromkeys(desired, "phase_write_failed")
 
     errors = {}
     for channel, phase in desired.items():

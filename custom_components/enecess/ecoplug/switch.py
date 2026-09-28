@@ -1,8 +1,9 @@
+"""Control ecoPlug switches through the shared cloud coordinator."""
+
 import asyncio
 
 from aiohttp import ClientError
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -10,9 +11,9 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from ..client_api import EnecessApiError, EnecessAuthError
-from ..const import CONST_ECOPLUG_DEVICES, CONST_ENTRY_COORDINATOR, DOMAIN
+from ..const import CONST_ECOPLUG_DEVICES
+from ..runtime import EnecessConfigEntry
 from .model import EcoPlugConfig, device_identifier, switch_unique_id
-
 
 _CONTROL_ERRORS = (
     EnecessApiError,
@@ -30,6 +31,7 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
     _attr_name = None
 
     def __init__(self, coordinator, plug: EcoPlugConfig) -> None:
+        """Bind switch identity and control to a selected plug."""
         super().__init__(coordinator)
         self._hardware_number = plug.hardware_number
         self._attr_unique_id = switch_unique_id(plug.hardware_number)
@@ -41,15 +43,8 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
         )
 
     @property
-    def unique_id(self) -> str:
-        return self._attr_unique_id
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._attr_device_info
-
-    @property
     def available(self) -> bool:
+        """Return whether the latest plug state can be controlled."""
         if not self.coordinator.last_update_success:
             return False
         snapshot = (self.coordinator.data or {}).get(self._hardware_number)
@@ -61,6 +56,7 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
 
     @property
     def is_on(self) -> bool | None:
+        """Return the reported or successfully commanded switch state."""
         snapshot = (self.coordinator.data or {}).get(self._hardware_number)
         return None if snapshot is None else snapshot.is_on
 
@@ -71,19 +67,21 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
             raise HomeAssistantError(str(err)) from err
 
     async def async_turn_on(self, **kwargs) -> None:
+        """Turn on the plug and publish its accepted state."""
         await self._async_control(True)
 
     async def async_turn_off(self, **kwargs) -> None:
+        """Turn off the plug and publish its accepted state."""
         await self._async_control(False)
 
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: EnecessConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up ecoPlug switches from a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id][CONST_ENTRY_COORDINATOR]
+    coordinator = entry.runtime_data.coordinator
     async_add_entities(
         EcoPlugSwitch(coordinator, EcoPlugConfig(**item))
         for item in entry.data[CONST_ECOPLUG_DEVICES]

@@ -1,24 +1,20 @@
+"""Expose ecoPlug cloud power and energy readings."""
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from ..const import (
-    CONF_SENSOR_DISPLAY_PRECISION,
-    CONST_ECOPLUG_DEVICES,
-    CONST_ENTRY_COORDINATOR,
-    DOMAIN,
-)
+from ..const import CONF_SENSOR_DISPLAY_PRECISION, CONST_ECOPLUG_DEVICES
+from ..runtime import EnecessConfigEntry
 from .model import EcoPlugConfig, device_identifier, sensor_unique_id
-
 
 SENSOR_DESCRIPTIONS = (
     SensorEntityDescription(
@@ -51,6 +47,7 @@ class EcoPlugSensor(CoordinatorEntity, SensorEntity):
         plug: EcoPlugConfig,
         description: SensorEntityDescription,
     ) -> None:
+        """Bind a measurement to its plug and shared cloud coordinator."""
         super().__init__(coordinator)
         self.entity_description = description
         self._hardware_number = plug.hardware_number
@@ -66,15 +63,8 @@ class EcoPlugSensor(CoordinatorEntity, SensorEntity):
         )
 
     @property
-    def unique_id(self) -> str:
-        return self._attr_unique_id
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._attr_device_info
-
-    @property
     def available(self) -> bool:
+        """Return whether the latest plug data contains this measurement."""
         if not self.coordinator.last_update_success:
             return False
         snapshot = (self.coordinator.data or {}).get(self._hardware_number)
@@ -86,6 +76,7 @@ class EcoPlugSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
+        """Return the most recent value for this measurement."""
         snapshot = (self.coordinator.data or {}).get(self._hardware_number)
         if snapshot is None:
             return None
@@ -94,11 +85,11 @@ class EcoPlugSensor(CoordinatorEntity, SensorEntity):
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,
+    entry: EnecessConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up ecoPlug sensors from a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id][CONST_ENTRY_COORDINATOR]
+    coordinator = entry.runtime_data.coordinator
     plugs = (EcoPlugConfig(**item) for item in entry.data[CONST_ECOPLUG_DEVICES])
     async_add_entities(
         EcoPlugSensor(coordinator, plug, description)

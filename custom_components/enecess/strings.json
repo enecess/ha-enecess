@@ -164,6 +164,14 @@
           "extra_formula_entity": "Formula Entity",
           "flow_action": "Action"
         }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate cloud account",
+        "description": "Sign in again using the same cloud account to restore access.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -189,11 +197,13 @@
       "formula_name_required": "Enter an entity name.",
       "formula_result_type_locked": "The result type cannot be changed. Create a new formula entity instead.",
       "no_formula_entities": "No formula entities have been configured.",
-      "slave_in_use": "Remove extra entities using this slave’s measurements before deselecting it."
+      "slave_in_use": "Remove extra entities using this slave’s measurements before deselecting it.",
+      "account_mismatch": "Use the same cloud account as this integration."
     },
     "abort": {
       "already_configured": "This device has already been configured.",
-      "user_cancelled": "Cancelled."
+      "user_cancelled": "Cancelled.",
+      "reauth_successful": "Reauthentication successful."
     }
   },
   "options": {

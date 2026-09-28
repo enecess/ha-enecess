@@ -1,13 +1,19 @@
+"""Expose ecoMain measurements, accumulated cloud energy and derived sensors."""
+
 import math
 
-from homeassistant.components.sensor import RestoreSensor, SensorDeviceClass, SensorEntity, SensorEntityDescription, SensorStateClass
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.components.sensor import (
+    RestoreSensor,
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .model import EnecessSensorDescription, build_sensor_descriptions
 from ..const import (
     CONF_SENSOR_DISPLAY_PRECISION,
     CONST_ADD_MODE,
@@ -16,33 +22,55 @@ from ..const import (
     CONST_DEVICE_ECOMAIN,
     CONST_DEVICE_TYPE,
     CONST_ECOMAIN_SERIAL,
-    CONST_ENTRY_COORDINATOR,
     CONST_EXTRA_OPERATION_ABSOLUTE,
     CONST_EXTRA_OPERATION_AVERAGE,
     CONST_EXTRA_OPERATION_INVERT,
     CONST_EXTRA_OPERATION_SUM,
     DOMAIN,
 )
-from ..extra import build_entry_descriptions, build_entry_specs, extra_entity_device_index, find_source_description, get_entry_extra_entities
-from ..formula import FORMULA_RESULT_TYPES, FormulaError, evaluate_formula, validate_formula
-
+from ..extra import (
+    build_entry_descriptions,
+    build_entry_specs,
+    extra_entity_device_index,
+    find_source_description,
+    get_entry_extra_entities,
+)
+from ..formula import (
+    FORMULA_RESULT_TYPES,
+    FormulaError,
+    evaluate_formula,
+    validate_formula,
+)
+from ..runtime import EnecessConfigEntry
+from .model import EnecessSensorDescription, build_sensor_descriptions
 
 _FORMULA_UNITS = {
-    "power": "W", "energy": "Wh", "reactive_energy": "varh", "apparent_power": "VA",
-    "reactive_power": "var", "voltage": "V", "current": "A", "power_factor": None,
-    "frequency": "Hz", "number": None,
+    "power": "W",
+    "energy": "Wh",
+    "reactive_energy": "varh",
+    "apparent_power": "VA",
+    "reactive_power": "var",
+    "voltage": "V",
+    "current": "A",
+    "power_factor": None,
+    "frequency": "Hz",
+    "number": None,
 }
 
 
 def _device_identifier(serial: str, idx: int, mode: str) -> tuple[str, str]:
-    mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    mode_key = (
+        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    )
     sub = f":sub_{idx}" if idx != 0 else ""
     idt = f"ecomain:{serial}{sub}:mode_{mode_key}"
     return DOMAIN, idt
 
 
 def _sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
-    mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    mode_key = (
+        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    )
     sub = f":sub_{idx}" if idx != 0 else ""
     return f"ecomain:{serial}{sub}:key_{key}:mode_{mode_key}"
 
@@ -50,51 +78,53 @@ def _sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
 class EcoMainSensor(CoordinatorEntity, SensorEntity):
     """ecoMain sensor backed by a DataUpdateCoordinator."""
 
+    _attr_has_entity_name = True
+
     entity_description: EnecessSensorDescription
 
-    def __init__(self, coordinator, mode: str, serial: str, description: EnecessSensorDescription) -> None:
+    def __init__(
+        self, coordinator, mode: str, serial: str, description: EnecessSensorDescription
+    ) -> None:
+        """Bind a measurement to its stable device and entity identities."""
         super().__init__(coordinator)
         self.entity_description = description
-        mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+        mode_key = (
+            CONST_ADD_MODE_CLOUD
+            if mode == CONST_ADD_MODE_CLOUD
+            else CONST_ADD_MODE_LOCAL
+        )
 
         spec = description.spec
         if spec.device_index == 0:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
                 model="ecoMain",
                 name=f"ecoMain {serial} ({mode_key.title()})",
             )
-            self._unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
+            self._attr_unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
         else:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
                 model="ecoSub",
                 name=f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
-            self._unique_id = _sensor_unique_id(serial, spec.device_index, spec.key, mode_key)
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._device_info
-
-    @property
-    def unique_id(self) -> str:
-        return self._unique_id
-
-    @property
-    def available(self) -> bool:
-        return self.coordinator.last_update_success
+            self._attr_unique_id = _sensor_unique_id(
+                serial, spec.device_index, spec.key, mode_key
+            )
 
     @property
     def native_value(self):
+        """Return the current decoded measurement from the coordinator."""
         return (self.coordinator.data or {}).get(self.entity_description.key)
 
 
 class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
     """Cloud accumulated energy sensor built from per-minute energy deltas."""
+
+    _attr_has_entity_name = True
 
     entity_description: EnecessSensorDescription
 
@@ -105,45 +135,48 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
         serial: str,
         description: EnecessSensorDescription,
     ) -> None:
+        """Initialize a restorable total with stable measurement identity."""
         super().__init__(coordinator)
         self.entity_description = description
         self._total: float = 0.0
 
-        mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+        mode_key = (
+            CONST_ADD_MODE_CLOUD
+            if mode == CONST_ADD_MODE_CLOUD
+            else CONST_ADD_MODE_LOCAL
+        )
         spec = description.spec
 
         if spec.device_index == 0:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
                 model="ecoMain",
                 name=f"ecoMain {serial} ({mode_key.title()})",
             )
-            self._unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
+            self._attr_unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
         else:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
                 model="ecoSub",
                 name=f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
-            self._unique_id = _sensor_unique_id(serial, spec.device_index, spec.key, mode_key)
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._device_info
-
-    @property
-    def unique_id(self) -> str:
-        return self._unique_id
+            self._attr_unique_id = _sensor_unique_id(
+                serial, spec.device_index, spec.key, mode_key
+            )
 
     @property
     def available(self) -> bool:
-        return self.coordinator.last_update_success and self._current_delta() is not None
+        """Return whether the latest successful poll contains a valid delta."""
+        return (
+            self.coordinator.last_update_success and self._current_delta() is not None
+        )
 
     @property
     def native_value(self) -> float:
+        """Return accumulated energy rounded to the register precision."""
         return round(self._total, 3)
 
     def _sync_accumulated_value(self) -> None:
@@ -162,10 +195,11 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
         if restored is not None and restored.native_value is not None:
             try:
                 self._total = float(restored.native_value)
-                self._sync_accumulated_value()
-                return
             except (TypeError, ValueError):
                 self._total = 0.0
+            else:
+                self._sync_accumulated_value()
+                return
 
         # Fresh install only: count the already-fetched coordinator value once.
         # On restore we intentionally do not add the current pre-refresh delta,
@@ -176,9 +210,10 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
 
     @callback
     def _handle_coordinator_update(self) -> None:
-        """Add one cloud delta on each coordinator update."""
-        self._add_current_delta()
-        self._sync_accumulated_value()
+        """Add one cloud delta only after a successful coordinator refresh."""
+        if self.coordinator.last_update_success:
+            self._add_current_delta()
+            self._sync_accumulated_value()
         self.async_write_ha_state()
 
     def _add_current_delta(self) -> None:
@@ -211,6 +246,8 @@ class EcoMainAccumulatedEnergySensor(CoordinatorEntity, RestoreSensor):
 class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
     """Derived ecoMain sensor from one or more source sensors."""
 
+    _attr_has_entity_name = True
+
     entity_description: SensorEntityDescription
 
     def __init__(
@@ -222,31 +259,57 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
         source_description: SensorEntityDescription | None,
         device_index: int,
     ) -> None:
+        """Build a derived sensor while preserving saved formulas and names."""
         super().__init__(coordinator)
         self._extra_config = extra_config
-        self._sources = list(extra_config.get("sources") or []) if isinstance(extra_config.get("sources"), list) else []
+        self._sources = (
+            list(extra_config.get("sources") or [])
+            if isinstance(extra_config.get("sources"), list)
+            else []
+        )
         self._operation = extra_config.get("operation")
         self._formula = None
         self._variables = {}
         if self._operation == "formula":
             device_index = 0
             result_type = extra_config.get("result_type")
-            valid_type = isinstance(result_type, str) and result_type in FORMULA_RESULT_TYPES
+            valid_type = (
+                isinstance(result_type, str) and result_type in FORMULA_RESULT_TYPES
+            )
             variables = extra_config.get("variables")
-            try:
-                if not valid_type or not isinstance(variables, dict) or not variables:
-                    raise FormulaError("Invalid saved formula configuration")
-                if not all(isinstance(name, str) and isinstance(source, str) and source in self._sources for name, source in variables.items()):
-                    raise FormulaError("Invalid saved variable mapping")
-                self._formula = validate_formula(extra_config.get("expression"), variables)
-                self._variables = {name: variables[name] for name in self._formula.referenced_variables}
-            except FormulaError:
-                self._formula = None
+            if (
+                valid_type
+                and isinstance(variables, dict)
+                and variables
+                and all(
+                    isinstance(name, str)
+                    and isinstance(source, str)
+                    and source in self._sources
+                    for name, source in variables.items()
+                )
+            ):
+                try:
+                    self._formula = validate_formula(
+                        extra_config.get("expression"), variables
+                    )
+                except FormulaError:
+                    pass
+                else:
+                    self._variables = {
+                        name: variables[name]
+                        for name in self._formula.referenced_variables
+                    }
             source_description = SensorEntityDescription(
                 key=extra_config["key"],
-                native_unit_of_measurement=_FORMULA_UNITS.get(result_type) if valid_type else None,
-                device_class=getattr(SensorDeviceClass, result_type.upper(), None) if valid_type else None,
-                state_class=SensorStateClass.TOTAL if result_type in ("energy", "reactive_energy") else SensorStateClass.MEASUREMENT,
+                native_unit_of_measurement=_FORMULA_UNITS.get(result_type)
+                if valid_type
+                else None,
+                device_class=getattr(SensorDeviceClass, result_type.upper(), None)
+                if valid_type
+                else None,
+                state_class=SensorStateClass.TOTAL
+                if result_type in ("energy", "reactive_energy")
+                else SensorStateClass.MEASUREMENT,
             )
         self.entity_description = SensorEntityDescription(
             key=extra_config["key"],
@@ -257,49 +320,57 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
             suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
         )
 
-        mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+        mode_key = (
+            CONST_ADD_MODE_CLOUD
+            if mode == CONST_ADD_MODE_CLOUD
+            else CONST_ADD_MODE_LOCAL
+        )
         if device_index == 0:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
                 model="ecoMain",
                 name=f"ecoMain {serial} ({mode_key.title()})",
             )
         else:
-            self._device_info = DeviceInfo(
+            self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, device_index, mode_key)},
                 manufacturer="enecess",
                 model="ecoSub",
                 name=f"ecoSub {serial} #{device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
-        self._unique_id = _sensor_unique_id(serial, device_index, extra_config["key"], mode_key)
-
-    @property
-    def device_info(self) -> DeviceInfo:
-        return self._device_info
-
-    @property
-    def unique_id(self) -> str:
-        return self._unique_id
+        self._attr_unique_id = _sensor_unique_id(
+            serial, device_index, extra_config["key"], mode_key
+        )
 
     @property
     def available(self) -> bool:
+        """Return whether all required source values can produce a result."""
         if not self.coordinator.last_update_success:
             return False
         if self._operation == "formula":
             return self.native_value is not None
         data = self.coordinator.data or {}
-        return all(source in data and data[source] is not None for source in self._sources)
+        return all(
+            source in data and data[source] is not None for source in self._sources
+        )
 
     @property
     def native_value(self):
+        """Evaluate the saved formula or transformation over current sources."""
         data = self.coordinator.data or {}
         if self._operation == "formula":
             if self._formula is None:
                 return None
             try:
-                return evaluate_formula(self._formula, {name: data.get(source) for name, source in self._variables.items()})
+                return evaluate_formula(
+                    self._formula,
+                    {
+                        name: data.get(source)
+                        for name, source in self._variables.items()
+                    },
+                )
             except FormulaError:
                 return None
         try:
@@ -321,16 +392,16 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
 
 
 async def async_setup_entry(
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        async_add_entities: AddEntitiesCallback,
+    hass: HomeAssistant,
+    entry: EnecessConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up ecoMain sensors from config entry."""
     entry_data = entry.data
     device_type = entry_data.get(CONST_DEVICE_TYPE)
     mode = entry_data.get(CONST_ADD_MODE)
     serial = entry_data.get(CONST_ECOMAIN_SERIAL)
-    coordinator = hass.data[DOMAIN][entry.entry_id][CONST_ENTRY_COORDINATOR]
+    coordinator = entry.runtime_data.coordinator
     specs = getattr(coordinator, "specs", None)
     if specs is None:
         if device_type == CONST_DEVICE_ECOMAIN:
@@ -342,7 +413,9 @@ async def async_setup_entry(
     entities = []
     for desc in descs:
         if desc.spec.kind == "energy_accumulated":
-            entities.append(EcoMainAccumulatedEnergySensor(coordinator, mode, serial, desc))
+            entities.append(
+                EcoMainAccumulatedEnergySensor(coordinator, mode, serial, desc)
+            )
         else:
             entities.append(EcoMainSensor(coordinator, mode, serial, desc))
 
@@ -351,7 +424,9 @@ async def async_setup_entry(
         if not isinstance(extra.get("key"), str) or not extra["key"]:
             continue
         if extra.get("operation") == "formula":
-            entities.append(EcoMainExtraSensor(coordinator, mode, serial, extra, None, 0))
+            entities.append(
+                EcoMainExtraSensor(coordinator, mode, serial, extra, None, 0)
+            )
             continue
         sources = extra.get("sources") or []
         if not sources:
@@ -360,6 +435,10 @@ async def async_setup_entry(
         if source_desc is None:
             continue
         device_index = extra_entity_device_index(source_descs, extra)
-        entities.append(EcoMainExtraSensor(coordinator, mode, serial, extra, source_desc, device_index))
+        entities.append(
+            EcoMainExtraSensor(
+                coordinator, mode, serial, extra, source_desc, device_index
+            )
+        )
 
     async_add_entities(entities)

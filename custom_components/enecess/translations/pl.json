@@ -164,6 +164,14 @@
           "extra_formula_entity": "Encja formuły",
           "flow_action": "Działanie"
         }
+      },
+      "reauth_confirm": {
+        "title": "Ponowne uwierzytelnienie konta w chmurze",
+        "description": "Zaloguj się ponownie na to samo konto w chmurze, aby przywrócić dostęp.",
+        "data": {
+          "username": "Nazwa użytkownika",
+          "password": "Hasło"
+        }
       }
     },
     "error": {
@@ -189,11 +197,13 @@
       "formula_name_required": "Podaj nazwę encji.",
       "formula_result_type_locked": "Nie można zmienić typu wyniku. Utwórz nową encję formuły.",
       "no_formula_entities": "Nie skonfigurowano encji formuł.",
-      "slave_in_use": "Przed odznaczeniem urządzenia podrzędnego usuń dodatkowe encje korzystające z jego pomiarów."
+      "slave_in_use": "Przed odznaczeniem urządzenia podrzędnego usuń dodatkowe encje korzystające z jego pomiarów.",
+      "account_mismatch": "Użyj tego samego konta w chmurze co w tej integracji."
     },
     "abort": {
       "already_configured": "To urządzenie zostało już skonfigurowane.",
-      "user_cancelled": "Anulowano."
+      "user_cancelled": "Anulowano.",
+      "reauth_successful": "Ponowne uwierzytelnienie zakończone."
     }
   },
   "options": {

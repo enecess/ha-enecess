@@ -1,9 +1,10 @@
-from copy import deepcopy
-from typing import Optional
+"""Set up and unload enecess integrations."""
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from copy import deepcopy
+
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP, Platform
+from homeassistant.core import Event, HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .client_api import EnecessApi
 from .client_modbus import EnecessModbusClient
@@ -15,25 +16,24 @@ from .const import (
     CONST_DEVICE_ECOMAIN,
     CONST_DEVICE_ECOPLUG,
     CONST_DEVICE_TYPE,
-    CONST_ECOMAIN_HOST,
     CONST_ECOMAIN_FIRMWARE_VERSION,
+    CONST_ECOMAIN_HOST,
     CONST_ECOMAIN_PORT,
     CONST_ECOPLUG_DEVICES,
-    CONST_ENTRY_COORDINATOR,
-    CONST_ENTRY_ENECESS_API,
-    CONST_ENTRY_MODBUS_CLIENT,
-    DOMAIN,
 )
+from .ecomain.coordinator import EcoMainCloudCoordinator, EcoMainModbusCoordinator
+from .ecoplug.coordinator import EcoPlugCloudCoordinator
 from .extra import build_entry_specs
 from .registry import (
-    normalize_entry_title,
     async_remove_unconfigured_registry_entries as _async_remove_unconfigured_registry_entries,
+    normalize_entry_title,
 )
+from .runtime import EnecessConfigEntry, EnecessRuntimeData
 
 PLATFORMS: tuple[Platform, ...] = (Platform.SENSOR, Platform.SWITCH)
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> bool:
     """Set up enecess from a config entry."""
     title = normalize_entry_title(entry.data, entry.title)
     if title != entry.title:
@@ -48,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def _async_reload_on_entry_change(
         hass: HomeAssistant,
-        updated_entry: ConfigEntry,
+        updated_entry: EnecessConfigEntry,
     ) -> None:
         if dict(updated_entry.options) != options_at_setup:
             await hass.config_entries.async_reload(updated_entry.entry_id)
@@ -57,7 +57,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             device_type == CONST_DEVICE_ECOMAIN
             and updated_entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
             and updated_entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION) is not None
-            and updated_entry.data[CONST_ECOMAIN_FIRMWARE_VERSION] != coordinator.firmware_version
+            and updated_entry.data[CONST_ECOMAIN_FIRMWARE_VERSION]
+            != coordinator.firmware_version
         ):
             await hass.config_entries.async_reload(updated_entry.entry_id)
             return
@@ -68,84 +69,84 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ):
             await hass.config_entries.async_reload(updated_entry.entry_id)
 
-    entry.async_on_unload(entry.add_update_listener(_async_reload_on_entry_change))
-    hass.data.setdefault(DOMAIN, {})
-    entry_store: dict[str, object] = hass.data[DOMAIN].setdefault(
-        entry.entry_id,
-        {},
-    )
     entry_data = entry.data
+    client = None
 
     if device_type == CONST_DEVICE_ECOMAIN:
         mode = entry_data.get(CONST_ADD_MODE)
         if mode == CONST_ADD_MODE_CLOUD:
-            from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
-            from .ecomain.coordinator import EcoMainCloudCoordinator
-
             session = async_get_clientsession(hass)
             api = EnecessApi(session=session, base_url=CONF_CLOUD_BASE_URL)
             coordinator = EcoMainCloudCoordinator(hass=hass, entry=entry, api=api)
-            entry_store[CONST_ENTRY_ENECESS_API] = api
-            entry_store[CONST_ENTRY_COORDINATOR] = coordinator
         else:
-            from .ecomain.coordinator import EcoMainModbusCoordinator
-
-            host: Optional[str] = entry_data.get(CONST_ECOMAIN_HOST, "")
+            host: str = entry_data.get(CONST_ECOMAIN_HOST, "")
             port: int = entry_data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT)
             client = EnecessModbusClient(host, port)
-            specs = build_entry_specs(entry.data, entry.options, include_unsupported=True)
+            specs = build_entry_specs(
+                entry.data, entry.options, include_unsupported=True
+            )
             coordinator = EcoMainModbusCoordinator(
                 hass=hass,
                 entry=entry,
                 client=client,
                 specs=specs,
             )
-            entry_store[CONST_ENTRY_MODBUS_CLIENT] = client
-            entry_store[CONST_ENTRY_COORDINATOR] = coordinator
     elif device_type == CONST_DEVICE_ECOPLUG:
-        from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
-        from .ecoplug.coordinator import EcoPlugCloudCoordinator
-
         session = async_get_clientsession(hass)
         api = EnecessApi(session=session, base_url=CONF_CLOUD_BASE_URL)
         coordinator = EcoPlugCloudCoordinator(hass=hass, entry=entry, api=api)
-        entry_store[CONST_ENTRY_ENECESS_API] = api
-        entry_store[CONST_ENTRY_COORDINATOR] = coordinator
     else:
         return False
 
-    await coordinator.async_config_entry_first_refresh()
-    if device_type == CONST_DEVICE_ECOMAIN and entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
-        firmware = coordinator.firmware_version
-        if entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION) != firmware:
-            hass.config_entries.async_update_entry(entry, data={**entry.data, CONST_ECOMAIN_FIRMWARE_VERSION: firmware})
-    _async_remove_unconfigured_registry_entries(hass, entry)
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    setup_complete = False
+    platforms_started = False
+    try:
+        await coordinator.async_config_entry_first_refresh()
+        if isinstance(coordinator, EcoMainModbusCoordinator):
+            firmware = coordinator.firmware_version
+            if entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION) != firmware:
+                hass.config_entries.async_update_entry(
+                    entry, data={**entry.data, CONST_ECOMAIN_FIRMWARE_VERSION: firmware}
+                )
+        entry.runtime_data = EnecessRuntimeData(coordinator, client)
+        _async_remove_unconfigured_registry_entries(hass, entry)
+        platforms_started = True
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        if client is not None:
+
+            async def _async_close_on_stop(event: Event) -> None:
+                """Release the socket when HA stops without unloading entries."""
+                await client.async_close()
+
+            entry.async_on_unload(
+                hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, _async_close_on_stop)
+            )
+        entry.async_on_unload(entry.add_update_listener(_async_reload_on_entry_change))
+        setup_complete = True
+    finally:
+        # Cancelled setup must release the same resources as a failed attempt.
+        if not setup_complete:
+            try:
+                if platforms_started:
+                    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+            finally:
+                await coordinator.async_shutdown()
+                if client is not None:
+                    await client.async_close()
+                if hasattr(entry, "runtime_data"):
+                    del entry.runtime_data
     return True
 
 
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload a config entry after its runtime configuration changes."""
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)
-
-
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if not unload_ok:
         return False
-    domain_data = hass.data.get(DOMAIN)
-    if not domain_data:
-        return True
-    entry_data = domain_data.pop(entry.entry_id, None) or {}
-    client: Optional[EnecessModbusClient] = entry_data.get(
-        CONST_ENTRY_MODBUS_CLIENT
-    )
-    if client is not None:
-        await client.async_close()
-    if not domain_data:
-        hass.data.pop(DOMAIN, None)
+    runtime = getattr(entry, "runtime_data", None)
+    if runtime is not None:
+        await runtime.coordinator.async_shutdown()
+        if runtime.modbus_client is not None:
+            await runtime.modbus_client.async_close()
+        del entry.runtime_data
     return True

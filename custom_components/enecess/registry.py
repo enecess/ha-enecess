@@ -1,10 +1,11 @@
+"""Maintain generated titles and remove stale integration registry entries."""
+
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .const import (
     CONST_DEVICE_ECOPLUG,
@@ -12,11 +13,8 @@ from .const import (
     CONST_ECOPLUG_DEVICES,
     DOMAIN,
 )
-from .extra import (
-    build_entry_device_identifiers,
-    build_entry_sensor_unique_ids,
-)
-
+from .ecoplug.model import device_identifier, sensor_unique_id, switch_unique_id
+from .extra import build_entry_device_identifiers, build_entry_sensor_unique_ids
 
 
 def normalize_entry_title(data: dict[str, Any], title: str) -> str:
@@ -45,12 +43,6 @@ def async_remove_unconfigured_registry_entries(
     entry_options = entry.options if options is None else options
     device_type = entry_data.get(CONST_DEVICE_TYPE)
     if device_type == CONST_DEVICE_ECOPLUG:
-        from .ecoplug.model import (
-            device_identifier,
-            sensor_unique_id,
-            switch_unique_id,
-        )
-
         serials = [
             str(device["hardware_number"])
             for device in entry_data.get(CONST_ECOPLUG_DEVICES, [])

@@ -71,7 +71,13 @@ def load_ecoplug_runtime():
         TOTAL_INCREASING = "total_increasing"
 
     class SensorEntity:
-        pass
+        @property
+        def unique_id(self):
+            return self._attr_unique_id
+
+        @property
+        def device_info(self):
+            return self._attr_device_info
 
     class SensorEntityDescription:
         def __init__(self, **kwargs):
@@ -137,6 +143,9 @@ def load_ecoplug_runtime():
 
     class UpdateFailed(Exception):
         pass
+
+    exceptions = _module("homeassistant.exceptions")
+    exceptions.ConfigEntryAuthFailed = type("ConfigEntryAuthFailed", (Exception,), {})
 
     update_coordinator.CoordinatorEntity = CoordinatorEntity
     update_coordinator.DataUpdateCoordinator = DataUpdateCoordinator
@@ -388,6 +397,7 @@ class EcoPlugRuntimeNamingTests(unittest.TestCase):
     def test_coordinator_builds_snapshot_with_unified_fields(self):
         coordinator_module, model, _sensor_module = load_ecoplug_runtime()
         coordinator = object.__new__(coordinator_module.EcoPlugCloudCoordinator)
+        coordinator._failed_requests = set()
         plug = model.EcoPlugConfig(
             hardware_number="TEST-ECOPLUG-0001",
             name="Test Plug",

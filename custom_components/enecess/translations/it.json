@@ -164,6 +164,14 @@
           "extra_formula_entity": "Entità formula",
           "flow_action": "Azione"
         }
+      },
+      "reauth_confirm": {
+        "title": "Autentica nuovamente l'account cloud",
+        "description": "Accedi di nuovo con lo stesso account cloud per ripristinare l'accesso.",
+        "data": {
+          "username": "Nome utente",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -189,11 +197,13 @@
       "formula_name_required": "Inserisci un nome per l'entità.",
       "formula_result_type_locked": "Il tipo di risultato non può essere modificato. Crea una nuova entità formula.",
       "no_formula_entities": "Nessuna entità formula configurata.",
-      "slave_in_use": "Rimuovi le entità aggiuntive che usano le misure di questo dispositivo secondario prima di deselezionarlo."
+      "slave_in_use": "Rimuovi le entità aggiuntive che usano le misure di questo dispositivo secondario prima di deselezionarlo.",
+      "account_mismatch": "Usa lo stesso account cloud di questa integrazione."
     },
     "abort": {
       "already_configured": "Questo dispositivo è già stato configurato.",
-      "user_cancelled": "Annullato."
+      "user_cancelled": "Annullato.",
+      "reauth_successful": "Autenticazione completata."
     }
   },
   "options": {

@@ -4,6 +4,8 @@
 
 Questa integrazione personalizzata per Home Assistant supporta i prodotti **enecess**.
 
+> **Versione richiesta di Home Assistant: 2025.9.0 o successiva.**
+
 ## Dispositivi supportati
 
 - **ecoMain**: connessione locale Modbus TCP, con rilevamento zeroconf/mDNS o configurazione manuale; in alternativa, connessione al cloud enecess.

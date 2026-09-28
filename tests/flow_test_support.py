@@ -126,5 +126,7 @@ def load_flow(test):
            UnitOfElectricPotential=types.SimpleNamespace(VOLT='V'),
            UnitOfElectricCurrent=types.SimpleNamespace(AMPERE='A'),
            UnitOfFrequency=types.SimpleNamespace(HERTZ='Hz'), PERCENTAGE='%')
-    module('custom_components.enecess.client_api', EnecessApi=object, EnecessAuthError=type('AuthError', (Exception,), {}))
+    module('custom_components.enecess.client_api', EnecessApi=object,
+           EnecessAuthError=type('AuthError', (Exception,), {}),
+           EnecessApiError=type('ApiError', (Exception,), {}))
     return importlib.import_module('custom_components.enecess.config_flow')

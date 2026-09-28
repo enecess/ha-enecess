@@ -4,6 +4,8 @@
 
 To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla produktów marki **enecess**.
 
+> **Wymagana wersja Home Assistant: 2025.9.0 lub nowsza.**
+
 ## Obsługiwane urządzenia
 
 - **ecoMain**

@@ -5,7 +5,7 @@ import sys
 import types
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 
 ROOT = Path(__file__).resolve().parents[1] / "custom_components/enecess"
@@ -138,19 +138,19 @@ class PhaseTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(self.modbus.ModbusException):
                 await self.client.write_register(2000, 1)
 
-    async def test_legacy_slave_keyword_compatibility(self):
-        calls = []
+    async def test_transport_type_error_does_not_repeat_a_write(self):
+        request = AsyncMock(side_effect=TypeError("Invalid response payload"))
+        with patch.object(self.transport, "write_register", request):
+            with self.assertRaisesRegex(TypeError, "Invalid response payload"):
+                await self.client.write_register(2039, 2)
+        request.assert_awaited_once_with(address=2039, value=2, device_id=255)
 
-        async def legacy_write(*, address, value, slave):
-            calls.append((address, value, slave))
-            response = Response(address=address)
-            del response.registers
-            response.value = value
-            return response
-
-        with patch.object(self.transport, "write_register", legacy_write):
-            await self.client.write_register(2039, 2)
-        self.assertEqual(calls, [(2039, 2, 255)])
+    async def test_transport_type_error_does_not_repeat_a_read(self):
+        request = AsyncMock(side_effect=TypeError("Invalid response payload"))
+        with patch.object(self.transport, "read_holding_registers", request):
+            with self.assertRaisesRegex(TypeError, "Invalid response payload"):
+                await self.client.read_holding_registers(2030, 10)
+        request.assert_awaited_once_with(address=2030, count=10, device_id=255)
 
     async def test_readback_transport_failure_is_verification_failure(self):
         self.transport.fail_reads.add(2001)

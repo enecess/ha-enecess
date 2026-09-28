@@ -1,17 +1,23 @@
+"""Normalize ecoPlug cloud records, readings, and stable identifiers."""
+
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 import math
 from typing import Any
 
 
 @dataclass(frozen=True)
 class EcoPlugConfig:
+    """Identify a selected cloud plug and its display name."""
+
     hardware_number: str
     name: str
 
 
 @dataclass(frozen=True)
 class EcoPlugSnapshot:
+    """Store independent reading and switch results for one cloud refresh."""
+
     power_rt: float | None = None
     energy_total: float | None = None
     is_on: bool | None = None
@@ -75,7 +81,7 @@ def _parse_timestamp(value: Any) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
+        return parsed.replace(tzinfo=UTC)
     return parsed
 
 
@@ -146,12 +152,15 @@ def parse_plug_is_on(response: Any) -> bool | None:
 
 
 def device_identifier(hardware_number: str) -> tuple[str, str]:
+    """Return the stable cloud device registry identifier."""
     return "enecess", f"ecoplug:{hardware_number}:mode_cloud"
 
 
 def sensor_unique_id(hardware_number: str, sensor_key: str) -> str:
+    """Return the stable unique ID for a cloud plug reading."""
     return f"ecoplug:{hardware_number}:key_{sensor_key}:mode_cloud"
 
 
 def switch_unique_id(hardware_number: str) -> str:
+    """Return the stable unique ID for a cloud plug switch."""
     return f"ecoplug:{hardware_number}:switch:mode_cloud"

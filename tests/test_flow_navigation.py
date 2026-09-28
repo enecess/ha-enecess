@@ -318,7 +318,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         client = self.module.EnecessModbusClient("example.invalid", 502)
         client._client = transport
         flow = self.flow(True)
-        flow.hass = types.SimpleNamespace(data={"enecess": {"test": {"modbus_client": client}}})
+        flow._entry.runtime_data = types.SimpleNamespace(modbus_client=client)
         await self.menu(flow, True)
         await self.choose(flow, "channel_phases", True)
         result = await flow.async_step_phase_device({"phase_device": "0"})
@@ -343,7 +343,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         flow = self.flow(True)
         flow._options["ecomain_selected_slaves"] = [1]
         flow._available_slaves = ["1"]
-        flow.hass = types.SimpleNamespace(data={"enecess": {"test": {"modbus_client": client}}})
+        flow._entry.runtime_data = types.SimpleNamespace(modbus_client=client)
         await flow.async_step_phase_device()
         result = await flow.async_step_phase_device({"phase_device": "0"})
         await flow.async_step_channel_phases(self.navigation_input(result, "back", channel_1="L2"))
@@ -360,7 +360,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         flow = self.flow(True)
         flow._options["ecomain_selected_slaves"] = [1]
         flow._available_slaves = ["1"]
-        flow.hass = types.SimpleNamespace(data={"enecess": {"test": {"modbus_client": client}}})
+        flow._entry.runtime_data = types.SimpleNamespace(modbus_client=client)
         await self.menu(flow, True)
         await self.choose(flow, "channel_phases", True)
         result = await flow.async_step_phase_device({"phase_device": "0"})

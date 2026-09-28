@@ -20,6 +20,10 @@ Coverage includes the firmware 136 baseline, firmware 139 channel-phase configur
 
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 
+For isolated checks against installed Home Assistant releases from 2025.9.0 to
+2026.9.4, see [the compatibility matrix](compatibility/README.md). Its smoke
+suite uses real HA objects and runs separately from the framework doubles above.
+
 Flow journey tests start at setup or options entry points and submit the schema
 returned by each page. The selector double rejects unavailable choices and wrong
 value types. Flow cases should use values and actions available in the displayed

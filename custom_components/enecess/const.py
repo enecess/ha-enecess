@@ -1,12 +1,8 @@
+"""Configuration keys, supported products, and discovery defaults."""
+
 from dataclasses import dataclass
-from typing import Optional
 
 DOMAIN = "enecess"
-
-# entry config
-CONST_ENTRY_ENECESS_API = "enecess_api"
-CONST_ENTRY_MODBUS_CLIENT = "modbus_client"
-CONST_ENTRY_COORDINATOR = "coordinator"
 
 CONST_DEVICE_TYPE = "device_type"
 
@@ -95,18 +91,24 @@ CONF_SENSOR_DISPLAY_PRECISION = 3
 
 @dataclass(frozen=True)
 class DiscoveryConfig:
+    """Describe the mDNS service and serial prefix used for discovery."""
+
     mdns_type: str
     mdns_prefix: str
 
 
 @dataclass(frozen=True)
 class DeviceType:
-    discovery: Optional[DiscoveryConfig]
+    """Describe discovery support for an enecess product."""
+
+    discovery: DiscoveryConfig | None
 
 
 @dataclass(frozen=True)
 class EcoMainDeviceTyp(DeviceType):
-    available_slaves: Optional[list[str]]
+    """Describe the ecoMain product and its supported slave indexes."""
+
+    available_slaves: list[str] | None
 
 
 DEVICE_CONFIGS: dict[str, DeviceType] = {

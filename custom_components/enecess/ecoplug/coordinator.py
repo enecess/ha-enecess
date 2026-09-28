@@ -1,3 +1,5 @@
+"""Poll ecoPlug measurements and relay state with per-device availability."""
+
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import replace
@@ -8,6 +10,7 @@ from typing import TypeVar
 from aiohttp import ClientError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from ..client_api import EnecessApi, EnecessApiError, EnecessAuthError
@@ -36,9 +39,7 @@ _ORDINARY_REQUEST_ERRORS = (
 )
 
 
-class EcoPlugCloudCoordinator(
-    DataUpdateCoordinator[dict[str, EcoPlugSnapshot]]
-):
+class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]]):
     """Coordinate cloud polling and control for one ecoPlug account."""
 
     def __init__(
@@ -47,24 +48,25 @@ class EcoPlugCloudCoordinator(
         entry: ConfigEntry,
         api: EnecessApi,
     ) -> None:
+        """Initialize the coordinator and its entry-owned connection state."""
         super().__init__(
             hass,
             logger=_LOGGER,
+            config_entry=entry,
             name="enecess ecoPlug Cloud Coordinator",
             update_interval=timedelta(seconds=CONF_CLOUD_UPDATE_INTERVAL),
         )
         self._entry = entry
         self._api = api
         self._token_lock = asyncio.Lock()
+        self._failed_requests: set[tuple[str, str]] = set()
         self._token: str = entry.data[CONST_CLOUD_TOKEN]
         self._username: str = entry.data[CONST_CLOUD_USERNAME]
         self._password: str = entry.data[CONST_CLOUD_PASSWORD]
         self._plugs = tuple(
             EcoPlugConfig(**item) for item in entry.data[CONST_ECOPLUG_DEVICES]
         )
-        self._hardware_numbers = frozenset(
-            plug.hardware_number for plug in self._plugs
-        )
+        self._hardware_numbers = frozenset(plug.hardware_number for plug in self._plugs)
 
     async def _refresh_token(self, failed_token: str) -> None:
         """Refresh once when concurrent requests rejected the same token."""
@@ -96,14 +98,10 @@ class EcoPlugCloudCoordinator(
             await self._refresh_token(failed_token)
             return await request(self._token)
 
-    async def _fetch_data(
-        self, plug: EcoPlugConfig, token: str
-    ) -> dict[str, object]:
+    async def _fetch_data(self, plug: EcoPlugConfig, token: str) -> dict[str, object]:
         return await self._api.get_plug_data(token, plug.hardware_number)
 
-    async def _fetch_state(
-        self, plug: EcoPlugConfig, token: str
-    ) -> dict[str, object]:
+    async def _fetch_state(self, plug: EcoPlugConfig, token: str) -> dict[str, object]:
         return await self._api.get_plug_state(token, plug.hardware_number)
 
     def _request_error(
@@ -112,20 +110,21 @@ class EcoPlugCloudCoordinator(
         operation: str,
         result: object,
     ) -> str | None:
+        key = (plug.hardware_number, operation)
         if not isinstance(result, BaseException):
+            if key in self._failed_requests:
+                self._failed_requests.remove(key)
+                _LOGGER.info("ecoPlug %s %s request recovered", *key)
             return None
         if isinstance(result, EnecessAuthError):
             raise result
         if not isinstance(result, _ORDINARY_REQUEST_ERRORS):
             raise result
 
-        message = str(result)
-        _LOGGER.error(
-            "ecoPlug %s %s request failed: %s",
-            plug.hardware_number,
-            operation,
-            message,
-        )
+        message = "Cloud request failed"
+        if key not in self._failed_requests:
+            self._failed_requests.add(key)
+            _LOGGER.error("ecoPlug %s %s request failed", *key)
         return message
 
     async def _fetch_one(
@@ -163,9 +162,7 @@ class EcoPlugCloudCoordinator(
             state_error=state_error,
         )
 
-    async def _fetch_attempt(
-        self, token: str
-    ) -> dict[str, EcoPlugSnapshot]:
+    async def _fetch_attempt(self, token: str) -> dict[str, EcoPlugSnapshot]:
         results = await asyncio.gather(
             *(self._fetch_one(plug, token) for plug in self._plugs)
         )
@@ -178,26 +175,19 @@ class EcoPlugCloudCoordinator(
                     raise result
 
         return {
-            plug.hardware_number: self._build_snapshot(
-                plug, data_result, state_result
+            plug.hardware_number: self._build_snapshot(plug, data_result, state_result)
+            for plug, (data_result, state_result) in zip(
+                self._plugs, results, strict=True
             )
-            for plug, (data_result, state_result) in zip(self._plugs, results)
         }
 
     async def _async_update_data(self) -> dict[str, EcoPlugSnapshot]:
-        failed_token = self._token
         try:
-            return await self._fetch_attempt(failed_token)
-        except EnecessAuthError:
-            try:
-                await self._refresh_token(failed_token)
-            except (EnecessAuthError, *_ORDINARY_REQUEST_ERRORS) as err:
-                raise UpdateFailed(str(err)) from err
-
-        try:
-            return await self._fetch_attempt(self._token)
+            return await self._request_with_auth_retry(self._fetch_attempt)
         except EnecessAuthError as err:
-            raise UpdateFailed(str(err)) from err
+            raise ConfigEntryAuthFailed("Cloud authentication failed") from err
+        except _ORDINARY_REQUEST_ERRORS as err:
+            raise UpdateFailed("Cloud request failed") from err
 
     async def async_control(self, hardware_number: str, is_on: bool) -> None:
         """Set one selected plug and publish the accepted state immediately."""

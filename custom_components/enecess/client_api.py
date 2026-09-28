@@ -1,9 +1,13 @@
+"""Authenticate and exchange validated payloads with the enecess cloud API."""
+
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, TypeVar
 
 import aiohttp
 
 from .const import CONST_CLOUD_HEADER_TOKEN
+
+_PayloadT = TypeVar("_PayloadT", dict, list)
 
 
 class EnecessAuthError(Exception):
@@ -16,6 +20,8 @@ class EnecessApiError(Exception):
 
 @dataclass
 class EnecessApi:
+    """Wrap authenticated cloud requests and validate response envelopes."""
+
     session: aiohttp.ClientSession
     base_url: str
 
@@ -23,85 +29,116 @@ class EnecessApi:
         return f"{self.base_url.rstrip('/')}{path}"
 
     async def _json(self, resp: aiohttp.ClientResponse) -> dict[str, Any]:
-        return await resp.json(content_type=None)
+        try:
+            data = await resp.json(content_type=None)
+        except (ValueError, TypeError) as err:
+            raise EnecessApiError("Invalid cloud JSON response") from err
+        if not isinstance(data, dict):
+            raise EnecessApiError("Invalid cloud response")
+        return data
+
+    async def _request_payload(
+        self,
+        method: str,
+        path: str,
+        expected_type: type[_PayloadT],
+        *,
+        login: bool = False,
+        **request_kwargs: Any,
+    ) -> _PayloadT:
+        """Validate transport status and the API envelope without echoing secrets."""
+        try:
+            async with getattr(self.session, method)(
+                self._url(path), **request_kwargs
+            ) as resp:
+                if resp.status in (401, 403):
+                    raise EnecessAuthError("Cloud authentication failed")
+                if not 200 <= resp.status < 300:
+                    raise EnecessApiError("Cloud HTTP request failed")
+                data = await self._json(resp)
+        except (aiohttp.ClientError, TimeoutError, OSError) as err:
+            raise EnecessApiError("Cloud connection failed") from err
+        status = data.get("status")
+        if status in (401, 403) or (login and status in (400, 422)):
+            raise EnecessAuthError("Cloud authentication failed")
+        if status != 200:
+            raise EnecessApiError("Cloud API request failed")
+        payload = data.get("data")
+        if payload is None and not login:
+            return expected_type()
+        if not isinstance(payload, expected_type):
+            raise EnecessApiError("Invalid cloud response data")
+        if isinstance(payload, list) and any(
+            not isinstance(item, dict) for item in payload
+        ):
+            raise EnecessApiError("Invalid cloud hardware list")
+        return payload
 
     async def _request_data(
-            self,
-            method: str,
-            path: str,
-            token: str,
-            *,
-            timeout: int,
-            **request_kwargs: Any,
+        self,
+        method: str,
+        path: str,
+        token: str,
+        *,
+        timeout: int,
+        **request_kwargs: Any,
     ) -> dict[str, Any]:
         """Send an authenticated request and return successful business data."""
-        url = self._url(path)
-        headers = {CONST_CLOUD_HEADER_TOKEN: token}
-        request = getattr(self.session, method)
-
-        async with request(
-                url,
-                headers=headers,
-                timeout=timeout,
-                **request_kwargs,
-        ) as resp:
-            if resp.status in (401, 403):
-                raise EnecessAuthError("Token invalid or expired")
-            data = await self._json(resp)
-
-        if data.get("status") != 200:
-            raise EnecessApiError(data.get("msg") or "API request failed")
-        return data.get("data") or {}
+        return await self._request_payload(
+            method,
+            path,
+            dict,
+            headers={CONST_CLOUD_HEADER_TOKEN: token},
+            timeout=timeout,
+            **request_kwargs,
+        )
 
     async def generate_token(self, username: str, password: str) -> str:
-        url = self._url("/pb/generate/token/")
+        """Exchange account credentials for a validated access token."""
         payload = {"username": username, "password": password}
-
-        async with self.session.post(url, json=payload, timeout=20) as resp:
-            data = await self._json(resp)
-
-        if data.get("status") != 200 or not data.get("data", {}).get("token"):
-            raise EnecessAuthError(data.get("msg") or "Failed to obtain token")
-        return data["data"]["token"]
+        data = await self._request_payload(
+            "post",
+            "/pb/generate/token/",
+            dict,
+            login=True,
+            json=payload,
+            timeout=20,
+        )
+        token = data.get("token")
+        if not isinstance(token, str) or not token:
+            raise EnecessApiError("Invalid cloud token response")
+        return token
 
     async def get_hardware_list(
-            self,
-            token: str,
-            hardware_type: int,
-            parent_id: Optional[int] = None,
-            **kwargs
+        self, token: str, hardware_type: int, parent_id: int | None = None, **kwargs
     ) -> list[dict[str, Any]]:
-        url = self._url("/api/v1/hardware/")
-        headers = {CONST_CLOUD_HEADER_TOKEN: token}
+        """List cloud devices matching the requested type and parent."""
         params: dict[str, str] = {"hardware_type": str(hardware_type)}
         if parent_id is not None:
             params["parent_id"] = str(parent_id)
         params.update({k: str(v) for k, v in kwargs.items()})
 
-        async with self.session.get(url, headers=headers, params=params, timeout=20) as resp:
-            if resp.status in (401, 403):
-                raise EnecessAuthError("Token invalid or expired")
-            data = await self._json(resp)
-
-        if data.get("status") != 200:
-            raise EnecessApiError(data.get("msg") or "Failed to fetch hardware list")
-        return data.get("data") or []
+        return await self._request_payload(
+            "get",
+            "/api/v1/hardware/",
+            list,
+            headers={CONST_CLOUD_HEADER_TOKEN: token},
+            params=params,
+            timeout=20,
+        )
 
     async def get_passageway(self, token: str, hardware_number: str) -> dict[str, Any]:
-        url = self._url("/api/v1/passageway/get_channel_info/")
-        headers = {CONST_CLOUD_HEADER_TOKEN: token}
-        params = {"hardware_number": str(hardware_number)}
-
-        async with self.session.get(url, headers=headers, params=params, timeout=20) as resp:
-            if resp.status in (401, 403):
-                raise EnecessAuthError("Token invalid or expired")
-            data = await self._json(resp)
-
-        if data.get("status") != 200:
-            raise EnecessApiError(data.get("msg") or f"Failed to fetch passageway: {hardware_number}")
-        return data.get("data") or {}
+        """Read ecoMain channel measurements for one hardware serial."""
+        return await self._request_data(
+            "get",
+            "/api/v1/passageway/get_channel_info/",
+            token,
+            params={"hardware_number": str(hardware_number)},
+            timeout=20,
+        )
 
     async def get_plug_data(self, token: str, hardware_number: str) -> dict[str, Any]:
+        """Fetch the latest ecoPlug power and energy measurements."""
         return await self._request_data(
             "get",
             "/api/v1/other/plug/data/",
@@ -111,6 +148,7 @@ class EnecessApi:
         )
 
     async def get_plug_state(self, token: str, hardware_number: str) -> dict[str, Any]:
+        """Query the current ecoPlug relay configuration."""
         return await self._request_data(
             "post",
             "/api/v1/other/plug/control/",
@@ -124,11 +162,12 @@ class EnecessApi:
         )
 
     async def control_plug(
-            self,
-            token: str,
-            hardware_number: str,
-            is_on: bool,
+        self,
+        token: str,
+        hardware_number: str,
+        is_on: bool,
     ) -> dict[str, Any]:
+        """Set the relay state of one ecoPlug device."""
         return await self._request_data(
             "post",
             "/api/v1/other/plug/control/",

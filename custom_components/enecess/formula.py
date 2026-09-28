@@ -1,4 +1,5 @@
 """Bounded arithmetic formulas interpreted without executing Python code."""
+
 from __future__ import annotations
 
 import ast
@@ -7,15 +8,27 @@ from dataclasses import dataclass
 import math
 import operator
 
-
 FORMULA_RESULT_TYPES = (
-    "power", "energy", "reactive_energy", "apparent_power", "reactive_power",
-    "voltage", "current", "power_factor", "frequency", "number",
+    "power",
+    "energy",
+    "reactive_energy",
+    "apparent_power",
+    "reactive_power",
+    "voltage",
+    "current",
+    "power_factor",
+    "frequency",
+    "number",
 )
 MAX_EXPRESSION_LENGTH = 1024
 MAX_NODES = 256
 MAX_DEPTH = 32
-_BINARY = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul, ast.Div: operator.truediv}
+_BINARY = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+}
 _UNARY = {ast.UAdd: operator.pos, ast.USub: operator.neg}
 _ARITY = {"abs": (1, 1), "min": (2, MAX_NODES), "max": (2, MAX_NODES), "round": (1, 2)}
 
@@ -58,7 +71,11 @@ def _number(value: object) -> float:
 
 def validate_formula(expression: str, variables: Iterable[str]) -> ValidatedFormula:
     """Accept only small arithmetic expressions using known input names."""
-    if not isinstance(expression, str) or not expression.strip() or len(expression) > MAX_EXPRESSION_LENGTH:
+    if (
+        not isinstance(expression, str)
+        or not expression.strip()
+        or len(expression) > MAX_EXPRESSION_LENGTH
+    ):
         raise FormulaError("Formula is empty or too long")
     try:
         tree = ast.parse(expression.strip(), mode="eval")
@@ -84,7 +101,11 @@ def validate_formula(expression: str, variables: Iterable[str]) -> ValidatedForm
             check(node.right, depth + 1)
         elif isinstance(node, ast.UnaryOp) and type(node.op) in _UNARY:
             check(node.operand, depth + 1)
-        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in _ARITY:
+        elif (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in _ARITY
+        ):
             low, high = _ARITY[node.func.id]
             if node.keywords or not low <= len(node.args) <= high:
                 raise FormulaError("Invalid function arguments")
@@ -99,9 +120,15 @@ def validate_formula(expression: str, variables: Iterable[str]) -> ValidatedForm
     return ValidatedFormula(tree, frozenset(referenced))
 
 
-def evaluate_formula(expression: str | ValidatedFormula, values: Mapping[str, float]) -> float:
+def evaluate_formula(
+    expression: str | ValidatedFormula, values: Mapping[str, float]
+) -> float:
     """Interpret a validated tree with finite scalar inputs and results."""
-    formula = validate_formula(expression, values) if isinstance(expression, str) else expression
+    formula = (
+        validate_formula(expression, values)
+        if isinstance(expression, str)
+        else expression
+    )
     if not isinstance(formula, ValidatedFormula):
         raise FormulaError("Invalid formula")
 

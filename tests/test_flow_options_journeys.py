@@ -75,7 +75,7 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
         client = self.module.EnecessModbusClient("example.invalid", 502)
         client._client = transport
         flow = self.options_flow()
-        flow.hass = types.SimpleNamespace(data={"enecess": {"offline-options": {"modbus_client": client}}})
+        flow._entry.runtime_data = types.SimpleNamespace(modbus_client=client)
         result = await flow.async_step_init()
         result = await self.submit(flow, result, extra_action="channel_phases")
         result = await self.submit(flow, result, phase_device="0")
@@ -118,7 +118,7 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
         client = self.module.EnecessModbusClient("example.invalid", 502)
         client._client = transport
         flow = self.options_flow()
-        flow.hass = types.SimpleNamespace(data={"enecess": {"offline-options": {"modbus_client": client}}})
+        flow._entry.runtime_data = types.SimpleNamespace(modbus_client=client)
         result = await flow.async_step_init()
         result = await self.submit(flow, result, extra_action="channel_phases")
         result = await self.submit(flow, result, phase_device="0")

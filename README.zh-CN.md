@@ -4,6 +4,8 @@
 
 本仓库提供 **enecess** 品牌产品的 Home Assistant（简称 HA）自定义集成。
 
+> **Home Assistant 版本要求：2025.9.0 或更高版本。**
+
 ## 当前支持的设备
 
 - **ecoMain**

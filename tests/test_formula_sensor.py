@@ -78,10 +78,11 @@ class FormulaSensorTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.extra.extra_entity_device_index(descriptions, {**self.config, "sources": ["sub1_ch1_power_rt"]}), 0)
 
     async def test_setup_keeps_formula_with_currently_unselected_source(self):
-        from custom_components.enecess.const import CONST_ADD_MODE, CONST_DEVICE_TYPE, CONST_DEVICE_ECOMAIN, CONST_ECOMAIN_SERIAL, CONST_ENTRY_COORDINATOR, CONST_EXTRA_ENTITIES, DOMAIN
+        from custom_components.enecess.const import CONST_ADD_MODE, CONST_DEVICE_TYPE, CONST_DEVICE_ECOMAIN, CONST_ECOMAIN_SERIAL, CONST_EXTRA_ENTITIES
         entry = SimpleNamespace(entry_id="offline", data={CONST_ADD_MODE: "local", CONST_DEVICE_TYPE: CONST_DEVICE_ECOMAIN, CONST_ECOMAIN_SERIAL: "TEST_FORMULA_001"}, options={CONST_EXTRA_ENTITIES: [None, {**self.config, "sources": ["missing"], "variables": {"a": "missing"}, "expression": "a"}]})
         self.coordinator.specs = []
-        hass = SimpleNamespace(data={DOMAIN: {entry.entry_id: {CONST_ENTRY_COORDINATOR: self.coordinator}}})
+        entry.runtime_data = SimpleNamespace(coordinator=self.coordinator)
+        hass = SimpleNamespace()
         entities = []
         await self.runtime.async_setup_entry(hass, entry, entities.extend)
         self.assertEqual(len(entities), 1)

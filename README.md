@@ -4,6 +4,8 @@
 
 This repository provides a Home Assistant (HA) custom integration for **enecess** brand products.
 
+> **Home Assistant requirement:** Version **2025.9.0 or later**.
+
 ## Supported Devices
 
 - **ecoMain**

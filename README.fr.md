@@ -4,6 +4,8 @@
 
 Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** destinée aux produits de la marque **enecess**.
 
+> **Version requise de Home Assistant : 2025.9.0 ou ultérieure.**
+
 ## Appareils pris en charge
 
 - **ecoMain**

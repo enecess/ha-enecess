@@ -4,6 +4,8 @@
 
 Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration für **enecess**-Produkte bereit.
 
+> **Home-Assistant-Voraussetzung:** Version **2025.9.0 oder neuer**.
+
 ## Unterstützte Geräte
 
 - **ecoMain**

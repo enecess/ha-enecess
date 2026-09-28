@@ -1,7 +1,9 @@
+"""Normalize extra sensor definitions and derive their entity metadata."""
+
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
+from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass
 
@@ -9,11 +11,10 @@ from .const import (
     CONST_ADD_MODE,
     CONST_ADD_MODE_CLOUD,
     CONST_ADD_MODE_LOCAL,
-    CONST_ECOMAIN_SERIAL,
-    CONST_ECOMAIN_SELECTED_SLAVES,
-    CONST_EXTRA_ENTITIES,
-    CONST_MEASUREMENT_TYPES,
     CONST_ECOMAIN_FIRMWARE_VERSION,
+    CONST_ECOMAIN_SELECTED_SLAVES,
+    CONST_ECOMAIN_SERIAL,
+    CONST_EXTRA_ENTITIES,
     CONST_EXTRA_ENTITY_NAME,
     CONST_EXTRA_ENTITY_OPERATION,
     CONST_EXTRA_ENTITY_SOURCE,
@@ -23,58 +24,85 @@ from .const import (
     CONST_EXTRA_OPERATION_AVERAGE,
     CONST_EXTRA_OPERATION_INVERT,
     CONST_EXTRA_OPERATION_SUM,
+    CONST_MEASUREMENT_TYPES,
     DOMAIN,
 )
 from .ecomain.model import (
+    DEFAULT_CLOUD_MEASUREMENTS,
+    DEFAULT_LOCAL_MEASUREMENTS,
     EnecessSensorDescription,
     RegisterSpec,
+    available_local_measurements,
     build_sensor_descriptions,
     build_specs_cloud,
     build_specs_local,
-    available_local_measurements,
-    DEFAULT_LOCAL_MEASUREMENTS,
-    DEFAULT_CLOUD_MEASUREMENTS,
 )
 
-EXTRA_TRANSFORM_OPERATIONS = [CONST_EXTRA_OPERATION_INVERT, CONST_EXTRA_OPERATION_ABSOLUTE]
+EXTRA_TRANSFORM_OPERATIONS = [
+    CONST_EXTRA_OPERATION_INVERT,
+    CONST_EXTRA_OPERATION_ABSOLUTE,
+]
 EXTRA_AGGREGATE_OPERATIONS = [CONST_EXTRA_OPERATION_SUM, CONST_EXTRA_OPERATION_AVERAGE]
 EXTRA_SOURCE_KINDS = ["power", "energy"]
 
 
-def get_entry_slaves(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[int]:
+def get_entry_slaves(
+    entry_data: dict[str, Any], entry_options: dict[str, Any] | None = None
+) -> list[int]:
     """Return selected slaves, preferring mutable options."""
     entry_options = entry_options or {}
-    return entry_options.get(CONST_ECOMAIN_SELECTED_SLAVES, entry_data.get(CONST_ECOMAIN_SELECTED_SLAVES, []))
+    return entry_options.get(
+        CONST_ECOMAIN_SELECTED_SLAVES, entry_data.get(CONST_ECOMAIN_SELECTED_SLAVES, [])
+    )
 
 
-def get_entry_extra_entities(entry_options: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
+def get_entry_extra_entities(
+    entry_options: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     """Return configured extra entities from options."""
     entry_options = entry_options or {}
     extras = entry_options.get(CONST_EXTRA_ENTITIES, [])
-    return [extra for extra in extras if isinstance(extra, dict)] if isinstance(extras, list) else []
+    return (
+        [extra for extra in extras if isinstance(extra, dict)]
+        if isinstance(extras, list)
+        else []
+    )
 
 
-def get_entry_measurement_types(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None) -> list[str]:
+def get_entry_measurement_types(
+    entry_data: dict[str, Any], entry_options: dict[str, Any] | None = None
+) -> list[str]:
     """Keep pre-selection entries on their original set of measurements."""
-    defaults = DEFAULT_CLOUD_MEASUREMENTS if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD else DEFAULT_LOCAL_MEASUREMENTS
+    defaults = (
+        DEFAULT_CLOUD_MEASUREMENTS
+        if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD
+        else DEFAULT_LOCAL_MEASUREMENTS
+    )
     return list((entry_options or {}).get(CONST_MEASUREMENT_TYPES, defaults))
 
 
-def build_entry_specs(entry_data: dict[str, Any], entry_options: Optional[dict[str, Any]] = None, *, include_unsupported: bool = False) -> list[RegisterSpec]:
+def build_entry_specs(
+    entry_data: dict[str, Any],
+    entry_options: dict[str, Any] | None = None,
+    *,
+    include_unsupported: bool = False,
+) -> list[RegisterSpec]:
     """Build ecoMain specs using mutable options where applicable."""
     slaves = get_entry_slaves(entry_data, entry_options)
     measurements = get_entry_measurement_types(entry_data, entry_options)
     if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
         return build_specs_cloud(slaves, measurements)
     if not include_unsupported:
-        available = available_local_measurements(entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION))
+        available = available_local_measurements(
+            entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
+        )
         measurements = [item for item in measurements if item in available]
     return build_specs_local(slaves, measurements)
 
 
 def build_entry_descriptions(
     entry_data: dict[str, Any],
-    entry_options: Optional[dict[str, Any]] = None,
+    entry_options: dict[str, Any] | None = None,
 ) -> list[EnecessSensorDescription]:
     """Build ecoMain sensor descriptions using mutable options."""
     return build_sensor_descriptions(build_entry_specs(entry_data, entry_options))
@@ -82,21 +110,25 @@ def build_entry_descriptions(
 
 def sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
     """Build the unique id used by ecoMain sensor entities."""
-    mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    mode_key = (
+        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    )
     sub = f":sub_{idx}" if idx != 0 else ""
     return f"ecomain:{serial}{sub}:key_{key}:mode_{mode_key}"
 
 
 def device_identifier(serial: str, idx: int, mode: str) -> tuple[str, str]:
     """Build the device identifier used by ecoMain/ecoSub devices."""
-    mode_key = CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    mode_key = (
+        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
+    )
     sub = f":sub_{idx}" if idx != 0 else ""
     return DOMAIN, f"ecomain:{serial}{sub}:mode_{mode_key}"
 
 
 def build_entry_device_identifiers(
     entry_data: dict[str, Any],
-    entry_options: Optional[dict[str, Any]] = None,
+    entry_options: dict[str, Any] | None = None,
 ) -> set[tuple[str, str]]:
     """Build all device identifiers expected for an entry."""
     serial = str(entry_data.get(CONST_ECOMAIN_SERIAL))
@@ -110,7 +142,7 @@ def build_entry_device_identifiers(
 
 def build_entry_sensor_unique_ids(
     entry_data: dict[str, Any],
-    entry_options: Optional[dict[str, Any]] = None,
+    entry_options: dict[str, Any] | None = None,
 ) -> set[str]:
     """Build all sensor unique ids expected for an entry."""
     serial = str(entry_data.get(CONST_ECOMAIN_SERIAL))
@@ -121,7 +153,12 @@ def build_entry_sensor_unique_ids(
         for desc in descriptions
     }
     unique_ids.update(
-        sensor_unique_id(serial, extra_entity_device_index(descriptions, extra), str(extra.get("key")), mode)
+        sensor_unique_id(
+            serial,
+            extra_entity_device_index(descriptions, extra),
+            str(extra.get("key")),
+            mode,
+        )
         for extra in get_entry_extra_entities(entry_options)
         if extra.get("key")
     )
@@ -146,7 +183,7 @@ def extra_entity_device_index(
     return 0
 
 
-def _description_source_kind(desc: EnecessSensorDescription) -> Optional[str]:
+def _description_source_kind(desc: EnecessSensorDescription) -> str | None:
     if desc.device_class == SensorDeviceClass.POWER:
         return "power"
     if desc.device_class == SensorDeviceClass.ENERGY:
@@ -156,7 +193,7 @@ def _description_source_kind(desc: EnecessSensorDescription) -> Optional[str]:
 
 def build_source_options(
     entry_data: dict[str, Any],
-    entry_options: Optional[dict[str, Any]],
+    entry_options: dict[str, Any] | None,
     *,
     source_kind: str,
     power_only: bool = False,
@@ -178,12 +215,14 @@ def build_source_options(
 def find_source_description(
     descriptions: list[EnecessSensorDescription],
     source_key: str,
-) -> Optional[EnecessSensorDescription]:
+) -> EnecessSensorDescription | None:
     """Find a source sensor description by key."""
     return next((desc for desc in descriptions if desc.key == source_key), None)
 
 
-def make_extra_key(operation: str, sources: list[str], existing: list[dict[str, Any]]) -> str:
+def make_extra_key(
+    operation: str, sources: list[str], existing: list[dict[str, Any]]
+) -> str:
     """Create a stable extra-entity key."""
     raw = f"extra_{operation}_{'_'.join(sources)}"
     key = re.sub(r"[^a-zA-Z0-9_]+", "_", raw).strip("_").lower()
@@ -198,7 +237,9 @@ def make_extra_key(operation: str, sources: list[str], existing: list[dict[str, 
     return f"{base}_{idx}"
 
 
-def normalize_extra_entity(user_input: dict[str, Any], existing: list[dict[str, Any]]) -> dict[str, Any]:
+def normalize_extra_entity(
+    user_input: dict[str, Any], existing: list[dict[str, Any]]
+) -> dict[str, Any]:
     """Normalize form input into persisted extra-entity config."""
     operation = user_input[CONST_EXTRA_ENTITY_OPERATION]
     sources = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []

@@ -164,6 +164,14 @@
           "extra_formula_entity": "Formelentität",
           "flow_action": "Aktion"
         }
+      },
+      "reauth_confirm": {
+        "title": "Cloud-Konto erneut authentifizieren",
+        "description": "Melden Sie sich erneut mit demselben Cloud-Konto an, um den Zugriff wiederherzustellen.",
+        "data": {
+          "username": "Benutzername",
+          "password": "Passwort"
+        }
       }
     },
     "error": {
@@ -189,11 +197,13 @@
       "formula_name_required": "Gib einen Entitätsnamen ein.",
       "formula_result_type_locked": "Der Ergebnistyp kann nicht geändert werden. Erstelle eine neue Formelentität.",
       "no_formula_entities": "Es sind keine Formelentitäten konfiguriert.",
-      "slave_in_use": "Entferne zusätzliche Entitäten mit Messwerten dieses Untergeräts, bevor du es abwählst."
+      "slave_in_use": "Entferne zusätzliche Entitäten mit Messwerten dieses Untergeräts, bevor du es abwählst.",
+      "account_mismatch": "Verwenden Sie dasselbe Cloud-Konto wie für diese Integration."
     },
     "abort": {
       "already_configured": "Dieses Gerät wurde bereits konfiguriert.",
-      "user_cancelled": "Abgebrochen."
+      "user_cancelled": "Abgebrochen.",
+      "reauth_successful": "Erneute Authentifizierung erfolgreich."
     }
   },
   "options": {

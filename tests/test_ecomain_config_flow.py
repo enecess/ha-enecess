@@ -190,7 +190,7 @@ class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
         entry = types.SimpleNamespace(data={"device_type": "ecomain", "mode": "manual", "ecomain_serial": "test"},
                                       options={}, entry_id="test")
         self.flow = self.module.EnecessOptionsFlow(entry)
-        self.flow.hass = types.SimpleNamespace(data={"enecess": {"test": {"modbus_client": client}}})
+        entry.runtime_data = types.SimpleNamespace(modbus_client=client)
 
     async def test_old_firmware_blocks_phase_read_and_save(self):
         for version in (135, 136, 138):
@@ -275,41 +275,3 @@ class BrandMigrationTests(unittest.TestCase):
         self.assertEqual("My EcoMain", self.registry.normalize_entry_title(data, "My EcoMain"))
         data = {"device_type": "ecoplug", "username": "test@example.invalid"}
         self.assertEqual("ecoPlug (test@example.invalid)", self.registry.normalize_entry_title(data, "EcoPlug (test@example.invalid)"))
-
-
-class RuntimeFirmwareReloadTests(unittest.IsolatedAsyncioTestCase):
-    async def test_verified_firmware_change_reloads_without_options_change(self):
-        load_flow(self)
-        import importlib.util
-        import sys
-        from pathlib import Path
-        path = Path(__file__).resolve().parents[1] / "custom_components/enecess/__init__.py"
-        spec = importlib.util.spec_from_file_location("custom_components.enecess", path)
-        runtime = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(runtime)
-        class Coordinator:
-            def __init__(self, **kwargs):
-                self.firmware_version = 139
-            async def async_config_entry_first_refresh(self):
-                pass
-        fake_module = types.ModuleType("custom_components.enecess.ecomain.coordinator")
-        fake_module.EcoMainModbusCoordinator = Coordinator
-        entry = types.SimpleNamespace(data={"device_type": "ecomain", "mode": "manual", "ecomain_host": "offline",
-                                            "ecomain_serial": "test", "ecomain_firmware_version": 136},
-                                      options={"measurement_types": ["power", "voltage"]}, title="ecoMain test (Local)", entry_id="test")
-        listeners = []
-        entry.add_update_listener = lambda listener: listeners.append(listener)
-        entry.async_on_unload = lambda callback: None
-        def update(target, **kwargs):
-            for key, value in kwargs.items():
-                setattr(target, key, value)
-        manager = types.SimpleNamespace(async_update_entry=update, async_reload=AsyncMock(), async_forward_entry_setups=AsyncMock())
-        hass = types.SimpleNamespace(data={}, config_entries=manager)
-        with patch.dict(sys.modules, {fake_module.__name__: fake_module}), patch.object(runtime, "_async_remove_unconfigured_registry_entries"):
-            await runtime.async_setup_entry(hass, entry)
-        self.assertEqual(139, entry.data["ecomain_firmware_version"])
-        await listeners[0](hass, entry)
-        manager.async_reload.assert_not_awaited()
-        entry.data = {**entry.data, "ecomain_firmware_version": 138}
-        await listeners[0](hass, entry)
-        manager.async_reload.assert_awaited_once_with("test")

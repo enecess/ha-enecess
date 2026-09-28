@@ -164,6 +164,14 @@
           "extra_formula_entity": "Entité de formule",
           "flow_action": "Action"
         }
+      },
+      "reauth_confirm": {
+        "title": "Réauthentifier le compte cloud",
+        "description": "Reconnectez-vous avec le même compte cloud pour rétablir l'accès.",
+        "data": {
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe"
+        }
       }
     },
     "error": {
@@ -189,11 +197,13 @@
       "formula_name_required": "Saisissez un nom d'entité.",
       "formula_result_type_locked": "Le type de résultat ne peut pas changer. Créez une nouvelle entité de formule.",
       "no_formula_entities": "Aucune entité de formule configurée.",
-      "slave_in_use": "Supprimez les entités supplémentaires utilisant les mesures de cet appareil secondaire avant de le décocher."
+      "slave_in_use": "Supprimez les entités supplémentaires utilisant les mesures de cet appareil secondaire avant de le décocher.",
+      "account_mismatch": "Utilisez le même compte cloud que celui de cette intégration."
     },
     "abort": {
       "already_configured": "Cet appareil a déjà été configuré.",
-      "user_cancelled": "Annulé."
+      "user_cancelled": "Annulé.",
+      "reauth_successful": "Réauthentification réussie."
     }
   },
   "options": {
