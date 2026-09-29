@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "- Wybierz źródła; następna strona pokaże ich zmienne.\n- Podczas edycji nie można zmienić typu wyniku. Aby go zmienić, utwórz nową encję.",
+        "description": "Wybierz nazwę i typ wyniku. Następna strona pokaże źródła tego samego typu. Typu wyniku nie można zmienić podczas edycji.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
+          "flow_action": "Działanie"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Wybierz encje źródłowe",
+        "description": "Zaznacz jedno lub więcej źródeł za pomocą pól wyboru. Dostępne są tylko włączone pomiary zgodne z typem wyniku. Energia czynna i bierna używają wartości skumulowanych; przyrosty minutowe są wykluczone.",
+        "data": {
           "extra_entity_sources": "Encje źródłowe",
           "flow_action": "Działanie"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "- Wybierz źródła; następna strona pokaże ich zmienne.\n- Podczas edycji nie można zmienić typu wyniku. Aby go zmienić, utwórz nową encję.",
+        "description": "Wybierz nazwę i typ wyniku. Następna strona pokaże źródła tego samego typu. Typu wyniku nie można zmienić podczas edycji.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
+          "flow_action": "Działanie"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Wybierz encje źródłowe",
+        "description": "Zaznacz jedno lub więcej źródeł za pomocą pól wyboru. Dostępne są tylko włączone pomiary zgodne z typem wyniku. Energia czynna i bierna używają wartości skumulowanych; przyrosty minutowe są wykluczone.",
+        "data": {
           "extra_entity_sources": "Encje źródłowe",
           "flow_action": "Działanie"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "Moc",
-        "energy": "Energia"
+        "energy": "Energia czynna"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "Prąd",
         "power_factor": "Współczynnik mocy",
         "frequency": "Częstotliwość",
-        "energy": "Energia (skumulowana i przyrost 1-minutowy)"
+        "energy": "Energia czynna (skumulowana i przyrost minutowy)"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "Napięcie (V)",
         "current": "Prąd (A)",
         "power_factor": "Współczynnik mocy",
-        "frequency": "Częstotliwość (Hz)",
-        "number": "Liczba (bez jednostki)"
+        "frequency": "Częstotliwość (Hz)"
       }
     },
     "flow_action": {

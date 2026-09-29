@@ -67,7 +67,7 @@ class FormulaSensorTests(unittest.IsolatedAsyncioTestCase):
             ("reactive_power", "var", "reactive_power", "measurement"),
             ("voltage", "V", "voltage", "measurement"), ("current", "A", "current", "measurement"),
             ("power_factor", None, "power_factor", "measurement"),
-            ("frequency", "Hz", "frequency", "measurement"), ("number", None, None, "measurement"),
+            ("frequency", "Hz", "frequency", "measurement"),
         ]:
             with self.subTest(result_type=result_type):
                 description = self.entity(result_type=result_type).entity_description

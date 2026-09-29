@@ -332,8 +332,11 @@ Le entità aggregate mantengono `device_class`, `state_class` e unità delle ris
 Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due valori di potenza.
 
 1. Scegli **Aggiungi entità formula** durante l’aggiunta di ecoMain o in **Configura**.
-2. Inserisci un nome, scegli il tipo di risultato dal menu a tendina e una o più misurazioni abilitate dal menu a tendina delle sorgenti.
-3. La pagina successiva mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
+2. Inserisci un nome e scegli il tipo di risultato dal menu a tendina.
+3. Nella pagina successiva, seleziona insieme una o più sorgenti abilitate dello stesso tipo tramite le caselle di controllo.
+4. La pagina della formula mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
+
+L’energia attiva offre solo sorgenti di energia attiva cumulativa; l’energia reattiva solo sorgenti di energia reattiva cumulativa. Gli incrementi al minuto del cloud sono esclusi. Le formule energetiche usano `TOTAL`, consentendo aumenti e diminuzioni per calcolare l’energia netta. Non è disponibile un tipo numerico generico.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

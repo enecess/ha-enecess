@@ -18,7 +18,6 @@ FORMULA_RESULT_TYPES = (
     "current",
     "power_factor",
     "frequency",
-    "number",
 )
 MAX_EXPRESSION_LENGTH = 1024
 MAX_NODES = 256

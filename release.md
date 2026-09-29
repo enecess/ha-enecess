@@ -3,11 +3,14 @@
 ## Unreleased
 
 - Standardized user-visible names to enecess, ecoMain, ecoSub and ecoPlug; added Italian translations and documentation.
-- Local ecoMain retains its minimum firmware requirement of 136. Firmware 136–138 supports the original active power and forward/reverse active energy. Channel phase configuration is available from firmware 136; firmware 139 or later enables the eight additional local measurement types. Unsupported measurement choices are hidden on older firmware.
+- Local ecoMain retains its minimum firmware requirement of 136. Firmware 136–138 supports the original active power and forward/reverse active energy. Channel phase configuration and the eight additional local measurement types require firmware 139 or later. Unsupported measurement choices are hidden on older firmware.
 - Added measurement selection during ecoMain setup and in options. Local defaults remain active power and forward/reverse active energy; eight additional local categories are opt-in. Cloud offers power and energy, both selected by default.
 - Added local channel-phase configuration for ecoMain and configured online ecoSub devices, with changed-value writes and readback verification.
 - Measurement categories referenced by extra entities cannot be deselected until those entities are removed.
-- Added custom formula entities with selectable sources and result type/unit, restricted arithmetic and `abs`, `min`, `max`, `round`. Setup and options support adding formulas; options support editing with stable identity and fixed result type, and removing formulas. Invalid or unavailable calculations report unavailable. Formula energy uses `TOTAL`.
+- Formula result types, transform/aggregate actions and aggregate source types follow firmware capabilities, connection mode and enabled measurements, excluding choices without usable sources.
+- Local firmware read timeouts and connection failures report a connection error. The firmware-too-old error is reserved for a successfully read version below the minimum.
+- Older in-flight ecoPlug polls cannot overwrite a successful relay command. Invalid boolean telemetry is excluded from power and cumulative active energy statistics.
+- Added custom formula entities: choose a result type, then select sources of that type together using checkboxes. The generic number type is not offered. Active and reactive energy use their corresponding cumulative sources, excluding cloud per-minute increments. Supports restricted arithmetic and `abs`, `min`, `max`, `round`. Setup and options support adding formulas; options support editing with stable identity and fixed result type, and removing formulas. Invalid or unavailable calculations report unavailable. Active and reactive energy formulas use `TOTAL`, allowing increases and decreases for net energy calculations.
 
 
 ## v1.0.0

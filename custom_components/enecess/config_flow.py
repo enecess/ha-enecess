@@ -162,6 +162,25 @@ def _extra_entity_errors(
     return errors
 
 
+def _extra_source_counts(entry_data: dict, options: dict) -> dict[str, int]:
+    """Count usable sources for each supported transform/aggregate kind."""
+    return {
+        kind: len(build_source_options(entry_data, options, source_kind=kind))
+        for kind in EXTRA_SOURCE_KINDS
+    }
+
+
+def _extra_creation_actions(entry_data: dict, options: dict) -> list[str]:
+    """Offer creation actions only when their minimum inputs are available."""
+    counts = _extra_source_counts(entry_data, options)
+    actions = [CONST_EXTRA_ACTION_FINISH]
+    if counts["power"]:
+        actions.append(CONST_EXTRA_ACTION_ADD_TRANSFORM)
+    if any(count >= 2 for count in counts.values()):
+        actions.append(CONST_EXTRA_ACTION_ADD_AGGREGATE)
+    return actions
+
+
 class ConfigFlow(
     FlowNavigationMixin, FormulaFlowMixin, config_entries.ConfigFlow, domain=DOMAIN
 ):
@@ -1165,6 +1184,13 @@ class ConfigFlow(
         )
 
     def _show_extra_aggregate_kind_form(self) -> FlowResult:
+        kinds = [
+            kind
+            for kind, count in _extra_source_counts(
+                self._entry_data, self._options_data()
+            ).items()
+            if count >= 2
+        ]
         return self.async_show_form(
             step_id="extra_aggregate_kind",
             data_schema=vol.Schema(
@@ -1173,7 +1199,7 @@ class ConfigFlow(
                         CONST_EXTRA_ENTITY_SOURCE_KIND
                     ): selector.SelectSelector(
                         selector.SelectSelectorConfig(
-                            options=EXTRA_SOURCE_KINDS,
+                            options=kinds,
                             translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
                             mode=SelectSelectorMode.LIST,
                         )
@@ -1311,12 +1337,9 @@ class ConfigFlow(
         }
 
     def _show_extra_entities_menu(self, step_id: str) -> FlowResult:
-        actions = [
-            CONST_EXTRA_ACTION_FINISH,
-            CONST_EXTRA_ACTION_ADD_TRANSFORM,
-            CONST_EXTRA_ACTION_ADD_AGGREGATE,
-        ]
-        actions.append("add_formula")
+        actions = _extra_creation_actions(self._entry_data, self._options_data())
+        if self._formula_result_types():
+            actions.append("add_formula")
         if any(extra.get("operation") == "formula" for extra in self._extra_entities):
             actions.append("edit_formula")
         if self._extra_entities:
@@ -1767,6 +1790,13 @@ class EnecessOptionsFlow(
     ) -> FlowResult:
         """Choose the measurement kind for an aggregate entity."""
         if user_input is None:
+            kinds = [
+                kind
+                for kind, count in _extra_source_counts(
+                    self._measurement_entry_data, self._options
+                ).items()
+                if count >= 2
+            ]
             return self.async_show_form(
                 step_id="extra_aggregate_kind",
                 data_schema=vol.Schema(
@@ -1775,7 +1805,7 @@ class EnecessOptionsFlow(
                             CONST_EXTRA_ENTITY_SOURCE_KIND
                         ): selector.SelectSelector(
                             selector.SelectSelectorConfig(
-                                options=EXTRA_SOURCE_KINDS,
+                                options=kinds,
                                 translation_key=CONST_EXTRA_ENTITY_SOURCE_KIND,
                                 mode=SelectSelectorMode.LIST,
                             )
@@ -1877,12 +1907,9 @@ class EnecessOptionsFlow(
     async def _show_options_menu(
         self, errors: dict[str, str] | None = None
     ) -> FlowResult:
-        actions = [
-            CONST_EXTRA_ACTION_FINISH,
-            CONST_EXTRA_ACTION_ADD_TRANSFORM,
-            CONST_EXTRA_ACTION_ADD_AGGREGATE,
-        ]
-        actions.append("add_formula")
+        actions = _extra_creation_actions(self._measurement_entry_data, self._options)
+        if self._formula_result_types():
+            actions.append("add_formula")
         if any(extra.get("operation") == "formula" for extra in self._extra_entities):
             actions.append("edit_formula")
         actions.append("measurement_types")

@@ -22,6 +22,20 @@ def submit_values(result, values):
     return result['data_schema'](values)
 
 
+async def select_formula_sources(flow, values):
+    """Follow both displayed pages when a test needs an expression-ready draft."""
+    result = await flow.async_step_extra_formula()
+    result = await flow.async_step_extra_formula(submit_values(result, {
+        key: value for key, value in values.items() if key != 'extra_entity_sources'
+    }))
+    if result.get('errors'):
+        return result
+    assert result['step_id'] == 'extra_formula_sources'
+    return await flow.async_step_extra_formula_sources(submit_values(result, {
+        'extra_entity_sources': values['extra_entity_sources']
+    }))
+
+
 def load_flow(test):
     saved = patch.dict(sys.modules)
     saved.start()

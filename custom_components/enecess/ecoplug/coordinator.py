@@ -68,6 +68,7 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
             EcoPlugConfig(**item) for item in entry.data[CONST_ECOPLUG_DEVICES]
         )
         self._hardware_numbers = frozenset(plug.hardware_number for plug in self._plugs)
+        self._control_versions = dict.fromkeys(self._hardware_numbers, 0)
 
     async def _refresh_token(self, failed_token: str) -> None:
         """Refresh once when concurrent requests rejected the same token."""
@@ -183,9 +184,22 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         }
 
     async def _async_update_data(self) -> dict[str, EcoPlugSnapshot]:
+        control_versions = self._control_versions.copy()
         try:
             async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
-                return await self._request_with_auth_retry(self._fetch_attempt)
+                snapshots = await self._request_with_auth_retry(self._fetch_attempt)
+                # Preserve commands accepted while this poll was in flight, but
+                # still publish fresh readings and other devices' relay states.
+                current = self.data or {}
+                for serial, snapshot in snapshots.items():
+                    if self._control_versions[serial] != control_versions[serial]:
+                        commanded = current[serial]
+                        snapshots[serial] = replace(
+                            snapshot,
+                            is_on=commanded.is_on,
+                            state_error=commanded.state_error,
+                        )
+                return snapshots
         except EnecessAuthError as err:
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except _ORDINARY_REQUEST_ERRORS as err:
@@ -200,6 +214,7 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
             lambda token: self._api.control_plug(token, hardware_number, is_on)
         )
 
+        self._control_versions[hardware_number] += 1
         current = self.data or {}
         snapshot = current.get(hardware_number, EcoPlugSnapshot())
         updated = dict(current)

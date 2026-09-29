@@ -215,7 +215,8 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
     async def test_local_device_change_discards_completed_extra_and_drafts(self):
         f, r = await self.local('manual', ['1'])
         r = await self.submit(f, r, extra_action='add_formula')
-        r = await self.submit(f, r, extra_entity_name='Audited', extra_formula_result_type='power', extra_entity_sources=['main_l1_power_rt'])
+        r = await self.submit(f, r, extra_entity_name='Audited', extra_formula_result_type='power')
+        r = await self.submit(f, r, extra_entity_sources=['main_l1_power_rt'])
         r = await self.submit(f, r, extra_formula_expression='a')
         for unused in range(4):
             r = await self.submit(f, r, flow_action='back')

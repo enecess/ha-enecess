@@ -45,7 +45,7 @@ async def async_validate_local_device(
             if firmware_version < minimum_firmware:
                 return LocalValidationResult(error="firmware_too_old")
         except Exception:  # noqa: BLE001 -- Map client and malformed-response failures at the flow boundary.
-            return LocalValidationResult(error="firmware_too_old")
+            return LocalValidationResult(error="cannot_connect_local")
 
         try:
             response = await client.read_holding_registers(

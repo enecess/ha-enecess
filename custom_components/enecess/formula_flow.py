@@ -28,17 +28,26 @@ class FormulaFlowMixin:
         self._formula_edit_key = None
         self._formula_draft = None
 
-    def _formula_sources(self) -> dict[str, str]:
+    def _formula_sources(self, result_type: str) -> dict[str, str]:
         data, options = self._formula_context
         return {
             desc.key: f"{desc.name or desc.key} ({desc.native_unit_of_measurement or '—'})"
             for desc in build_entry_descriptions(data, options)
+            if desc.device_class == result_type
         }
+
+    def _formula_result_types(self) -> list[str]:
+        """Offer only result types backed by enabled, supported measurements."""
+        data, options = self._formula_context
+        available = {
+            desc.device_class for desc in build_entry_descriptions(data, options)
+        }
+        return [kind for kind in FORMULA_RESULT_TYPES if kind in available]
 
     def _formula_draft_error(self, draft: dict[str, Any]) -> str | None:
         if not draft.get("name", "").strip():
             return "formula_name_required"
-        if not draft.get("sources"):
+        if draft.get("result_type") not in self._formula_result_types():
             return "formula_sources_invalid"
         editing = getattr(self, "_formula_edit_key", None)
         if editing:
@@ -58,25 +67,72 @@ class FormulaFlowMixin:
 
     @navigable_step
     async def async_step_extra_formula(self, user_input=None):
-        """Collect the formula name, result type, and source bindings."""
+        """Choose the result type before offering compatible source entities."""
         draft = getattr(self, "_formula_draft", None) or {}
+        result_types = self._formula_result_types()
         errors = {}
-        available = self._formula_sources()
         if user_input is not None:
             proposed = {
                 **draft,
                 "name": user_input.get(CONST_EXTRA_ENTITY_NAME),
                 "result_type": user_input.get(RESULT_TYPE),
-                "sources": user_input.get(CONST_EXTRA_ENTITY_SOURCES),
             }
             error = self._formula_draft_error(proposed)
             if error:
                 errors["base"] = error
                 draft = proposed
             else:
-                sources = list(proposed["sources"])
-                # Reserve removed aliases until this operation ends, so an old
-                # expression cannot silently refer to a different source.
+                if proposed["result_type"] != draft.get("result_type"):
+                    proposed = {
+                        "name": proposed["name"],
+                        "result_type": proposed["result_type"],
+                    }
+                    self._discard_forward_drafts()
+                self._formula_draft = {
+                    **proposed,
+                    "name": proposed["name"].strip(),
+                }
+                return await self.async_step_extra_formula_sources()
+        return self.async_show_form(
+            step_id="extra_formula",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONST_EXTRA_ENTITY_NAME, default=draft.get("name") or ""
+                    ): str,
+                    vol.Required(
+                        RESULT_TYPE,
+                        default=draft["result_type"]
+                        if draft.get("result_type") in result_types
+                        else next(iter(result_types), vol.UNDEFINED),
+                    ): selector.SelectSelector(
+                        selector.SelectSelectorConfig(
+                            options=result_types,
+                            translation_key=RESULT_TYPE,
+                            mode=SelectSelectorMode.DROPDOWN,
+                        )
+                    ),
+                }
+            ),
+            errors=errors
+            or ({} if result_types else {"base": "formula_sources_invalid"}),
+        )
+
+    @navigable_step
+    async def async_step_extra_formula_sources(self, user_input=None):
+        """Select compatible sources together using a checkbox list."""
+        draft = getattr(self, "_formula_draft", None)
+        if not draft:
+            return await self.async_step_extra_formula()
+        available = self._formula_sources(draft["result_type"])
+        errors = {}
+        if user_input is not None:
+            sources = user_input.get(CONST_EXTRA_ENTITY_SOURCES) or []
+            if not sources or any(source not in available for source in sources):
+                errors["base"] = "formula_sources_invalid"
+            else:
+                # Reserve removed aliases so returning to the source page cannot
+                # silently give an existing expression a different meaning.
                 previous = draft.get("_variable_history", draft.get("variables", {}))
                 variables = {
                     alias: source
@@ -96,29 +152,16 @@ class FormulaFlowMixin:
                         alias = next(aliases)
                     variables[alias] = source
                 self._formula_draft = {
-                    **proposed,
-                    "name": proposed["name"].strip(),
-                    "sources": sources,
+                    **draft,
+                    "sources": list(sources),
                     "variables": variables,
                     "_variable_history": {**previous, **variables},
                 }
                 return await self.async_step_extra_formula_expression()
         return self.async_show_form(
-            step_id="extra_formula",
+            step_id="extra_formula_sources",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        CONST_EXTRA_ENTITY_NAME, default=draft.get("name") or ""
-                    ): str,
-                    vol.Required(
-                        RESULT_TYPE, default=draft.get("result_type") or "power"
-                    ): selector.SelectSelector(
-                        selector.SelectSelectorConfig(
-                            options=list(FORMULA_RESULT_TYPES),
-                            translation_key=RESULT_TYPE,
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
                     vol.Required(
                         CONST_EXTRA_ENTITY_SOURCES,
                         default=[
@@ -133,7 +176,7 @@ class FormulaFlowMixin:
                                 for key, label in available.items()
                             ],
                             multiple=True,
-                            mode=SelectSelectorMode.DROPDOWN,
+                            mode=SelectSelectorMode.LIST,
                         )
                     ),
                 }
@@ -183,7 +226,7 @@ class FormulaFlowMixin:
                     self._extra_entities.append(extra)
                 self._reset_formula()
                 return await self._async_formula_done()
-        available = self._formula_sources()
+        available = self._formula_sources(draft["result_type"])
         return self.async_show_form(
             step_id="extra_formula_expression",
             data_schema=vol.Schema(

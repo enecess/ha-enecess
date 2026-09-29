@@ -152,8 +152,8 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
                     result = await flow.async_step_init()
                     result = await self.submit(flow, result, extra_action=operation)
                     if operation == "add_formula":
-                        result = await self.submit(flow, result, extra_entity_name="Sub formula",
-                            extra_formula_result_type="power", extra_entity_sources=[source])
+                        result = await self.submit(flow, result, extra_entity_name="Sub formula", extra_formula_result_type="power")
+                        result = await self.submit(flow, result, extra_entity_sources=[source])
                         result = await self.submit(flow, result, extra_formula_expression="a")
                     elif operation == "add_transform":
                         result = await self.submit(flow, result, extra_entity_name="Sub absolute",
@@ -199,8 +199,8 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
         result = await self.submit(flow, result, extra_action="measurement_types")
         result = await self.submit(flow, result, measurement_types=["power", "voltage"])
         result = await self.submit(flow, result, extra_action="add_formula")
-        result = await self.submit(flow, result, extra_entity_name="Sub voltage",
-            extra_formula_result_type="voltage", extra_entity_sources=["sub1_ch1_voltage_rt"])
+        result = await self.submit(flow, result, extra_entity_name="Sub voltage", extra_formula_result_type="voltage")
+        result = await self.submit(flow, result, extra_entity_sources=["sub1_ch1_voltage_rt"])
         result = await self.submit(flow, result, extra_formula_expression="a")
         self.assertEqual("init", result["step_id"])
         result = await self.submit(flow, result, extra_action="finish", ecomain_selected_slaves=[])

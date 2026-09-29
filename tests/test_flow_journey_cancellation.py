@@ -129,13 +129,13 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
             while result['step_id'] != 'extra_entities':
                 result = await self.submit(flow, result, **self.inputs('zeroconf')[result['step_id']])
         result = await self.submit(flow, result, extra_action='add_formula')
-        result = await self.submit(flow, result, extra_entity_name='Old formula',
-            extra_formula_result_type='power', extra_entity_sources=['sub1_ch1_power_rt'])
+        result = await self.submit(flow, result, extra_entity_name='Old formula', extra_formula_result_type='power')
+        result = await self.submit(flow, result, extra_entity_sources=['sub1_ch1_power_rt'])
         result = await self.submit(flow, result, extra_formula_expression='a')
         original = deepcopy(flow._extra_entities)
         result = await self.submit(flow, result, extra_action='add_formula')
-        result = await self.submit(flow, result, extra_entity_name='Unsaved formula',
-            extra_formula_result_type='power', extra_entity_sources=['main_l1_power_rt'])
+        result = await self.submit(flow, result, extra_entity_name='Unsaved formula', extra_formula_result_type='power')
+        result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt'])
         result = await self.submit(flow, result, extra_formula_expression='a+', flow_action='cancel')
         self.assertEqual('extra_entities', result['step_id'])
         self.assertEqual(original, flow._extra_entities)
@@ -190,8 +190,8 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
                     flow._entry_data = data
                     result = await flow.async_step_extra_entities()
                 result = await self.submit(flow, result, extra_action='add_formula')
-                result = await self.submit(flow, result, extra_entity_name='Difference',
-                    extra_formula_result_type='power', extra_entity_sources=['main_l1_power_rt', 'main_l2_power_rt'])
+                result = await self.submit(flow, result, extra_entity_name='Difference', extra_formula_result_type='power')
+                result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt', 'main_l2_power_rt'])
                 result = await self.submit(flow, result, flow_action='back', extra_formula_expression='a-b')
                 result = await self.submit(flow, result, extra_entity_sources=['main_l2_power_rt', 'main_l3_power_rt'])
                 self.assertEqual({'b': 'main_l2_power_rt', 'c': 'main_l3_power_rt'}, flow._formula_draft['variables'])
@@ -211,8 +211,8 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
             while result['step_id'] != 'extra_entities':
                 result = await self.submit(flow, result, **self.inputs('manual')[result['step_id']])
             result = await self.submit(flow, result, extra_action='add_formula')
-            result = await self.submit(flow, result, extra_entity_name='Power',
-                extra_formula_result_type='power', extra_entity_sources=['main_l1_power_rt'])
+            result = await self.submit(flow, result, extra_entity_name='Power', extra_formula_result_type='power')
+            result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt'])
             result = await self.submit(flow, result, extra_formula_expression='a')
             original = deepcopy(flow._extra_entities)
             while result['step_id'] != 'ecomain_manual':

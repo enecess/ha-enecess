@@ -2,7 +2,7 @@
 import types
 import unittest
 
-from flow_test_support import load_flow
+from flow_test_support import select_formula_sources, load_flow
 
 
 class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
@@ -21,7 +21,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         return flow
 
     async def create(self, flow, expression="max(a - b, 0)"):
-        result = await flow.async_step_extra_formula({"extra_entity_name": "Net power",
+        result = await select_formula_sources(flow, {"extra_entity_name": "Net power",
             "extra_formula_result_type": "power", "extra_entity_sources": self.sources})
         self.assertEqual("extra_formula_expression", result["step_id"])
         self.assertIn("a", result["description_placeholders"]["variables"])
@@ -52,10 +52,9 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_invalid_inputs_do_not_create_entity(self):
         flow = self.flow()
-        result = await flow.async_step_extra_formula()
-        result = await flow.async_step_extra_formula(result["data_schema"]({
+        result = await select_formula_sources(flow, {
             "extra_entity_name": "Empty selection", "extra_formula_result_type": "power",
-            "extra_entity_sources": []}))
+            "extra_entity_sources": []})
         self.assertEqual("formula_sources_invalid", result["errors"]["base"])
         result = await self.create(flow, "__import__('os')")
         self.assertEqual("formula_invalid", result["errors"]["base"])
@@ -73,7 +72,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         key = flow._extra_entities[0]["key"]
         result = await flow.async_step_extra_formula_edit({"extra_formula_entity": key})
         self.assertEqual("extra_formula", result["step_id"])
-        result = await flow.async_step_extra_formula({"extra_entity_name": "Updated power", "extra_formula_result_type": "power",
+        result = await select_formula_sources(flow, {"extra_entity_name": "Updated power", "extra_formula_result_type": "power",
                                                     "extra_entity_sources": [self.sources[1]]})
         self.assertIn("b", result["description_placeholders"]["variables"])
         await flow.async_step_extra_formula_expression({"extra_formula_expression": "b / 2"})
@@ -86,7 +85,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         await self.create(flow)
         key = flow._extra_entities[0]["key"]
         await flow.async_step_extra_formula_edit({"extra_formula_entity": key})
-        result = await flow.async_step_extra_formula({"extra_entity_name": "Changed", "extra_formula_result_type": "energy",
+        result = await select_formula_sources(flow, {"extra_entity_name": "Changed", "extra_formula_result_type": "energy",
                                                     "extra_entity_sources": self.sources})
         self.assertEqual("formula_result_type_locked", result["errors"]["base"])
         self.assertEqual("power", flow._extra_entities[0]["result_type"])
@@ -102,7 +101,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         await self.create(flow, "a - b")
         original = dict(flow._extra_entities[0])
         await flow.async_step_extra_formula_edit({"extra_formula_entity": original["key"]})
-        await flow.async_step_extra_formula({"extra_entity_name": "Net power", "extra_formula_result_type": "power",
+        await select_formula_sources(flow, {"extra_entity_name": "Net power", "extra_formula_result_type": "power",
                                             "extra_entity_sources": list(reversed(self.sources))})
         await flow.async_step_extra_formula_expression({"extra_formula_expression": "a - b"})
         self.assertEqual(original["variables"], flow._extra_entities[0]["variables"])
@@ -123,7 +122,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         cloud = self.flow(True)
         cloud._entry.data["mode"] = "cloud"
         cloud._options["measurement_types"] = ["power", "energy"]
-        result = await cloud.async_step_extra_formula({"extra_entity_name": "Cloud net power", "extra_formula_result_type": "power",
+        result = await select_formula_sources(cloud, {"extra_entity_name": "Cloud net power", "extra_formula_result_type": "power",
             "extra_entity_sources": ["main_all_power_avg_1m", "main_ch1_power_avg_1m"]})
         self.assertEqual("extra_formula_expression", result["step_id"])
         await cloud.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
@@ -131,7 +130,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         self.data["mode"] = "manual"
         local = self.flow()
         local._measurement_types = ["voltage"]
-        result = await local.async_step_extra_formula({"extra_entity_name": "Mean voltage", "extra_formula_result_type": "voltage",
+        result = await select_formula_sources(local, {"extra_entity_name": "Mean voltage", "extra_formula_result_type": "voltage",
             "extra_entity_sources": ["main_l1_voltage_rt", "main_l2_voltage_rt"]})
         self.assertEqual("extra_formula_expression", result["step_id"])
         await local.async_step_extra_formula_expression({"extra_formula_expression": "(a+b)/2"})

@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "Aggiungi entità formula",
-        "description": "- Seleziona le sorgenti; la pagina successiva mostra le loro variabili.\n- Durante la modifica il tipo di risultato resta fisso. Per cambiarlo, crea una nuova entità.",
+        "description": "Scegli un nome e il tipo di risultato. La pagina successiva mostra le sorgenti dello stesso tipo. Il tipo non può essere cambiato durante la modifica.",
         "data": {
           "extra_entity_name": "Nome dell’entità",
           "extra_formula_result_type": "Tipo di risultato / unità",
+          "flow_action": "Azione"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Seleziona le entità sorgente",
+        "description": "Seleziona una o più sorgenti con le caselle di controllo. Sono mostrate solo le misurazioni abilitate dello stesso tipo del risultato. Energia attiva e reattiva usano valori cumulativi; gli incrementi al minuto sono esclusi.",
+        "data": {
           "extra_entity_sources": "Entità di origine",
           "flow_action": "Azione"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "Aggiungi entità formula",
-        "description": "- Seleziona le sorgenti; la pagina successiva mostra le loro variabili.\n- Durante la modifica il tipo di risultato resta fisso. Per cambiarlo, crea una nuova entità.",
+        "description": "Scegli un nome e il tipo di risultato. La pagina successiva mostra le sorgenti dello stesso tipo. Il tipo non può essere cambiato durante la modifica.",
         "data": {
           "extra_entity_name": "Nome dell’entità",
           "extra_formula_result_type": "Tipo di risultato / unità",
+          "flow_action": "Azione"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Seleziona le entità sorgente",
+        "description": "Seleziona una o più sorgenti con le caselle di controllo. Sono mostrate solo le misurazioni abilitate dello stesso tipo del risultato. Energia attiva e reattiva usano valori cumulativi; gli incrementi al minuto sono esclusi.",
+        "data": {
           "extra_entity_sources": "Entità di origine",
           "flow_action": "Azione"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "Potenza",
-        "energy": "Energia"
+        "energy": "Energia attiva"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "Corrente",
         "power_factor": "Fattore di potenza",
         "frequency": "Frequenza",
-        "energy": "Energia (accumulata e incremento di 1 minuto)"
+        "energy": "Energia attiva (cumulativa e incremento al minuto)"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "Tensione (V)",
         "current": "Corrente (A)",
         "power_factor": "Fattore di potenza",
-        "frequency": "Frequenza (Hz)",
-        "number": "Numero (senza unità)"
+        "frequency": "Frequenza (Hz)"
       }
     },
     "flow_action": {

@@ -439,8 +439,11 @@ Les valeurs disponibles dépendent des registres de l’appareil : toutes les ca
 Créez un capteur à partir de vos mesures, par exemple la différence ou la moyenne de deux puissances.
 
 1. Choisissez **Ajouter une entité de formule** pendant l’ajout d’ecoMain ou via **Configurer**.
-2. Saisissez un nom, choisissez le type de résultat dans la liste déroulante, puis une ou plusieurs mesures activées dans la liste déroulante des sources.
-3. La page suivante indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
+2. Saisissez un nom et choisissez le type de résultat dans la liste déroulante.
+3. Sur la page suivante, cochez ensemble une ou plusieurs sources activées du même type.
+4. La page de formule indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
+
+L’énergie active propose uniquement des sources d’énergie active cumulée, et l’énergie réactive des sources d’énergie réactive cumulée. Les incréments par minute du cloud sont exclus. Les formules d’énergie utilisent `TOTAL`, permettant des hausses et des baisses pour les calculs d’énergie nette. Aucun type numérique générique n’est proposé.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "- Wähle Quellen; die nächste Seite zeigt ihre Variablen.\n- Der Ergebnistyp bleibt beim Bearbeiten gleich. Für einen anderen Typ erstelle eine neue Entität.",
+        "description": "Namen und Ergebnistyp wählen. Die nächste Seite zeigt Quellen desselben Typs. Beim Bearbeiten kann der Ergebnistyp nicht geändert werden.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
+          "flow_action": "Aktion"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Quellentitäten auswählen",
+        "description": "Eine oder mehrere Quellen über die Kontrollkästchen auswählen. Es werden nur aktivierte Messwerte des Ergebnistyps angezeigt. Wirk- und Blindenergie verwenden kumulierte Werte; Minuteninkremente sind ausgeschlossen.",
+        "data": {
           "extra_entity_sources": "Quellentitäten",
           "flow_action": "Aktion"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "- Wähle Quellen; die nächste Seite zeigt ihre Variablen.\n- Der Ergebnistyp bleibt beim Bearbeiten gleich. Für einen anderen Typ erstelle eine neue Entität.",
+        "description": "Namen und Ergebnistyp wählen. Die nächste Seite zeigt Quellen desselben Typs. Beim Bearbeiten kann der Ergebnistyp nicht geändert werden.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
+          "flow_action": "Aktion"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Quellentitäten auswählen",
+        "description": "Eine oder mehrere Quellen über die Kontrollkästchen auswählen. Es werden nur aktivierte Messwerte des Ergebnistyps angezeigt. Wirk- und Blindenergie verwenden kumulierte Werte; Minuteninkremente sind ausgeschlossen.",
+        "data": {
           "extra_entity_sources": "Quellentitäten",
           "flow_action": "Aktion"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "Leistung",
-        "energy": "Energie"
+        "energy": "Wirkenergie"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "Strom",
         "power_factor": "Leistungsfaktor",
         "frequency": "Frequenz",
-        "energy": "Energie (kumuliert und 1-Minuten-Zuwachs)"
+        "energy": "Wirkenergie (kumuliert und Minuteninkrement)"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "Spannung (V)",
         "current": "Strom (A)",
         "power_factor": "Leistungsfaktor",
-        "frequency": "Frequenz (Hz)",
-        "number": "Zahl (ohne Einheit)"
+        "frequency": "Frequenz (Hz)"
       }
     },
     "flow_action": {

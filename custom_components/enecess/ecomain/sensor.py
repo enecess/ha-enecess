@@ -54,7 +54,6 @@ _FORMULA_UNITS = {
     "current": "A",
     "power_factor": None,
     "frequency": "Hz",
-    "number": None,
 }
 
 

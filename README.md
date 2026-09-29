@@ -431,8 +431,11 @@ Availability follows the device registers: not every category has a three-phase 
 Create a sensor from your measurements, such as the difference or average of two power readings.
 
 1. Choose **Add Formula Entity** during ecoMain setup or under **Configure**.
-2. Enter a name, choose a result type from the dropdown and select one or more enabled measurements from the sources dropdown.
-3. Use the next page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
+2. Enter a name and choose a result type from the dropdown.
+3. On the next page, use the checkboxes to select one or more enabled sources of the same type together.
+4. Use the expression page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
+
+Active energy offers only cumulative active energy sources; reactive energy offers only cumulative reactive energy sources. Cloud per-minute energy increments are excluded. Formula energy uses `TOTAL`, allowing increases and decreases for calculations such as forward minus reverse energy. There is no generic number result type.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

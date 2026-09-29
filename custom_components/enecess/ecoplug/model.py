@@ -86,6 +86,8 @@ def _parse_timestamp(value: Any) -> datetime | None:
 
 
 def _parse_non_negative_finite(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
     try:
         parsed = float(value)
     except (TypeError, ValueError, OverflowError):

@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "- Sélectionnez les sources ; la page suivante affiche leurs variables.\n- Le type de résultat reste fixe lors de la modification. Pour le changer, créez une nouvelle entité.",
+        "description": "Choisissez un nom et un type de résultat. La page suivante propose les sources du même type. Le type ne peut pas être modifié lors de la modification.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
+          "flow_action": "Action"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Sélectionner les entités sources",
+        "description": "Cochez une ou plusieurs sources. Seules les mesures activées du même type que le résultat sont proposées. Les énergies active et réactive utilisent des valeurs cumulées ; les incréments par minute sont exclus.",
+        "data": {
           "extra_entity_sources": "Entités sources",
           "flow_action": "Action"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "- Sélectionnez les sources ; la page suivante affiche leurs variables.\n- Le type de résultat reste fixe lors de la modification. Pour le changer, créez une nouvelle entité.",
+        "description": "Choisissez un nom et un type de résultat. La page suivante propose les sources du même type. Le type ne peut pas être modifié lors de la modification.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
+          "flow_action": "Action"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Sélectionner les entités sources",
+        "description": "Cochez une ou plusieurs sources. Seules les mesures activées du même type que le résultat sont proposées. Les énergies active et réactive utilisent des valeurs cumulées ; les incréments par minute sont exclus.",
+        "data": {
           "extra_entity_sources": "Entités sources",
           "flow_action": "Action"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "Puissance",
-        "energy": "Énergie"
+        "energy": "Énergie active"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "Courant",
         "power_factor": "Facteur de puissance",
         "frequency": "Fréquence",
-        "energy": "Énergie (cumulée et incrément de 1 minute)"
+        "energy": "Énergie active (cumul et incrément par minute)"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "Tension (V)",
         "current": "Courant (A)",
         "power_factor": "Facteur de puissance",
-        "frequency": "Fréquence (Hz)",
-        "number": "Nombre (sans unité)"
+        "frequency": "Fréquence (Hz)"
       }
     },
     "flow_action": {

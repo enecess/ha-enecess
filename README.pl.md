@@ -434,8 +434,11 @@ Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę t
 Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch wartości mocy.
 
 1. Wybierz **Dodaj encję formuły** podczas dodawania ecoMain lub w **Konfiguruj**.
-2. Podaj nazwę, wybierz typ wyniku z listy rozwijanej oraz jeden lub więcej włączonych pomiarów z listy rozwijanej źródeł.
-3. Następna strona pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
+2. Podaj nazwę i wybierz typ wyniku z listy rozwijanej.
+3. Na następnej stronie zaznacz za pomocą pól wyboru jedno lub więcej włączonych źródeł tego samego typu.
+4. Strona wzoru pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
+
+Energia czynna udostępnia tylko źródła skumulowanej energii czynnej, a energia bierna źródła skumulowanej energii biernej. Minutowe przyrosty z chmury są wykluczone. Formuły energii używają `TOTAL`, co pozwala na wzrosty i spadki przy obliczaniu energii netto. Ogólny typ liczbowy nie jest dostępny.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

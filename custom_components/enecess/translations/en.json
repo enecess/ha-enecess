@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "- Select sources; the next page shows their variables.\n- Editing cannot change the result type. Create a new entity to change it.",
+        "description": "Choose a name and result type. The next page offers sources of the same type. The result type cannot be changed when editing.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
+          "flow_action": "Action"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Select Source Entities",
+        "description": "Select one or more sources using the checkboxes. Only enabled measurements matching the result type are listed. Active and reactive energy use cumulative readings; per-minute increments are excluded.",
+        "data": {
           "extra_entity_sources": "Source Entities",
           "flow_action": "Action"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "- Select sources; the next page shows their variables.\n- Editing cannot change the result type. Create a new entity to change it.",
+        "description": "Choose a name and result type. The next page offers sources of the same type. The result type cannot be changed when editing.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
+          "flow_action": "Action"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "Select Source Entities",
+        "description": "Select one or more sources using the checkboxes. Only enabled measurements matching the result type are listed. Active and reactive energy use cumulative readings; per-minute increments are excluded.",
+        "data": {
           "extra_entity_sources": "Source Entities",
           "flow_action": "Action"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "Power",
-        "energy": "Energy"
+        "energy": "Active energy"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "Current",
         "power_factor": "Power factor",
         "frequency": "Frequency",
-        "energy": "Energy (accumulated and 1-minute increment)"
+        "energy": "Active energy (accumulated and 1-minute increment)"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "Voltage (V)",
         "current": "Current (A)",
         "power_factor": "Power factor",
-        "frequency": "Frequency (Hz)",
-        "number": "Number (no unit)"
+        "frequency": "Frequency (Hz)"
       }
     },
     "flow_action": {

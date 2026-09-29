@@ -142,10 +142,17 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "- 先选源实体，下一页显示对应变量。\n- 编辑时不能更改结果类型；如需更改，请新建实体。",
+        "description": "填写名称并选择结果类型，下一页仅显示相同类型的源实体。编辑时不能更改结果类型。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
+          "flow_action": "操作"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "选择源实体",
+        "description": "勾选一个或多个源实体，仅显示已启用且与结果类型相同的测量。有功电能、无功电能均使用累计量，不包含每分钟增量。",
+        "data": {
           "extra_entity_sources": "源实体",
           "flow_action": "操作"
         }
@@ -293,10 +300,17 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "- 先选源实体，下一页显示对应变量。\n- 编辑时不能更改结果类型；如需更改，请新建实体。",
+        "description": "填写名称并选择结果类型，下一页仅显示相同类型的源实体。编辑时不能更改结果类型。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
+          "flow_action": "操作"
+        }
+      },
+      "extra_formula_sources": {
+        "title": "选择源实体",
+        "description": "勾选一个或多个源实体，仅显示已启用且与结果类型相同的测量。有功电能、无功电能均使用累计量，不包含每分钟增量。",
+        "data": {
           "extra_entity_sources": "源实体",
           "flow_action": "操作"
         }
@@ -394,7 +408,7 @@
     "extra_entity_source_kind": {
       "options": {
         "power": "功率",
-        "energy": "能耗"
+        "energy": "有功电能"
       }
     },
     "measurement_types": {
@@ -410,7 +424,7 @@
         "current": "电流",
         "power_factor": "功率因数",
         "frequency": "频率",
-        "energy": "电能（累计及每分钟增量）"
+        "energy": "有功电能（累计及每分钟增量）"
       }
     },
     "phase_device": {
@@ -431,8 +445,7 @@
         "voltage": "电压 (V)",
         "current": "电流 (A)",
         "power_factor": "功率因数",
-        "frequency": "频率 (Hz)",
-        "number": "数值（无单位）"
+        "frequency": "频率 (Hz)"
       }
     },
     "flow_action": {

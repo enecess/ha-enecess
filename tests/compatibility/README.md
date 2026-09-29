@@ -72,7 +72,20 @@ deadlines. No physical devices or cloud accounts are contacted. See the
 [network recovery policy](network-recovery.zh-CN.md) for parameters
 and the distinction between reads and writes.
 
-As checked on 2026-09-28, the 134 offline tests and 52 real-HA runtime
+Formula flow tests verify that result selection precedes source selection,
+the source list supports checkbox multiselect, active energy sources match the
+chosen type, and cancelling the source page creates no formula. Capability
+coverage includes firmware 136/138/139, unknown firmware, cloud mode and selected
+measurement subsets. Every offered type must have usable sources; tests also
+follow detected firmware through measurement selection into the formula wizard.
+Transform/aggregate actions use the same availability constraints. Firmware read
+failures are distinguished from a successfully read unsupported version.
+
+Event-controlled ecoPlug tests exercise polls overlapping successful, failed and
+cancelled control commands, per-device isolation and authoritative later polls.
+Numeric payload regressions reject booleans while preserving real zero values.
+
+As checked on 2026-09-28, the 145 offline tests and 65 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 
