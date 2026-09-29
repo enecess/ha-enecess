@@ -432,10 +432,10 @@ Create a sensor from your measurements, such as the difference or average of two
 
 1. Choose **Add Formula Entity** during ecoMain setup or under **Configure**.
 2. Enter a name and choose a result type from the dropdown.
-3. On the next page, use the checkboxes to select one or more enabled sources of the same type together.
+3. On the next page, select sources from the multi-select dropdowns grouped by actual data type, independently of the result type. Each group is optional; select at least one source in total.
 4. Use the expression page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
 
-Active energy offers only cumulative active energy sources; reactive energy offers only cumulative reactive energy sources. Cloud per-minute energy increments are excluded. Formula energy uses `TOTAL`, allowing increases and decreases for calculations such as forward minus reverse energy. There is no generic number result type.
+Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active and reactive energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

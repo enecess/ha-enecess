@@ -216,7 +216,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
         f, r = await self.local('manual', ['1'])
         r = await self.submit(f, r, extra_action='add_formula')
         r = await self.submit(f, r, extra_entity_name='Audited', extra_formula_result_type='power')
-        r = await self.submit(f, r, extra_entity_sources=['main_l1_power_rt'])
+        r = await self.submit(f, r, extra_formula_sources_power=['main_l1_power_rt'])
         r = await self.submit(f, r, extra_formula_expression='a')
         for unused in range(4):
             r = await self.submit(f, r, flow_action='back')

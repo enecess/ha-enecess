@@ -31,9 +31,23 @@ async def select_formula_sources(flow, values):
     if result.get('errors'):
         return result
     assert result['step_id'] == 'extra_formula_sources'
-    return await flow.async_step_extra_formula_sources(submit_values(result, {
-        'extra_entity_sources': values['extra_entity_sources']
-    }))
+    return await flow.async_step_extra_formula_sources(submit_values(
+        result, formula_source_values(result, values['extra_entity_sources'])
+    ))
+
+
+def formula_source_values(result, sources):
+    """Map test source keys into groups offered by the displayed form."""
+    grouped = {}
+    found = set()
+    for key, control in result['data_schema'].schema.items():
+        if not str(key).startswith('extra_formula_sources_'):
+            continue
+        offered = {item['value'] for item in control.config['options']}
+        grouped[str(key)] = [source for source in sources if source in offered]
+        found.update(grouped[str(key)])
+    assert found == set(sources), f'Sources not offered by form: {set(sources) - found}'
+    return grouped
 
 
 def load_flow(test):

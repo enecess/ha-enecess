@@ -72,20 +72,27 @@ deadlines. No physical devices or cloud accounts are contacted. See the
 [network recovery policy](network-recovery.zh-CN.md) for parameters
 and the distinction between reads and writes.
 
-Formula flow tests verify that result selection precedes source selection,
-the source list supports checkbox multiselect, active energy sources match the
-chosen type, and cancelling the source page creates no formula. Capability
-coverage includes firmware 136/138/139, unknown firmware, cloud mode and selected
-measurement subsets. Every offered type must have usable sources; tests also
-follow detected firmware through measurement selection into the formula wizard.
-Transform/aggregate actions use the same availability constraints. Firmware read
-failures are distinguished from a successfully read unsupported version.
+Formula flow coverage checks that result selection precedes grouped source
+selection and expression entry. Source groups use dropdown multiselect and are
+independent of the result type, including unitless number results. At least one
+source is required across the optional groups. Cumulative active energy,
+cumulative reactive energy and cloud per-minute active energy increments are
+separate groups. Sources must be firmware-supported and already enabled;
+unsupported or empty groups are hidden and measurements are not enabled
+automatically. Every source-page submission regenerates variable bindings from
+`a` and clears the previous expression, including during editing or after going
+back. Cancelling the source page creates no formula. Capability coverage includes
+firmware 136/138/139, unknown firmware, cloud mode and selected measurement
+subsets, including detected firmware through measurement selection into the
+formula wizard. Transform/aggregate actions retain their availability
+constraints. Firmware read failures are distinguished from a successfully read
+unsupported version.
 
 Event-controlled ecoPlug tests exercise polls overlapping successful, failed and
 cancelled control commands, per-device isolation and authoritative later polls.
 Numeric payload regressions reject booleans while preserving real zero values.
 
-As checked on 2026-09-28, the 145 offline tests and 65 real-HA runtime
+As checked on 2026-09-29, the 152 offline tests and 69 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "填写名称并选择结果类型，下一页仅显示相同类型的源实体。编辑时不能更改结果类型。",
+        "description": "填写名称并选择结果类型，也可选择无单位的数值。下一页按数据类型分组选择来源，不受结果类型限制。编辑时不能更改结果类型。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
@@ -151,15 +151,24 @@
       },
       "extra_formula_sources": {
         "title": "选择源实体",
-        "description": "勾选一个或多个源实体，仅显示已启用且与结果类型相同的测量。有功电能、无功电能均使用累计量，不包含每分钟增量。",
+        "description": "通过各组多选下拉框合计选择至少一个来源。来源按实际数据类型分组，不受结果类型限制；仅列出固件支持且已启用的测量，隐藏空分组，不会自动启用测量。有功电能和无功电能分组包含累计量，云端每分钟有功电能增量单独分组。\n\n每次从本页继续都会从 a 开始重新分配变量并清空原表达式，编辑公式或返回修改来源后继续时也一样。",
         "data": {
-          "extra_entity_sources": "源实体",
+          "extra_formula_sources_power": "有功功率 (W)",
+          "extra_formula_sources_energy": "有功电能（累计量，Wh）",
+          "extra_formula_sources_reactive_energy": "无功电能（累计量，varh）",
+          "extra_formula_sources_apparent_power": "视在功率 (VA)",
+          "extra_formula_sources_reactive_power": "无功功率 (var)",
+          "extra_formula_sources_voltage": "电压 (V)",
+          "extra_formula_sources_current": "电流 (A)",
+          "extra_formula_sources_power_factor": "功率因数",
+          "extra_formula_sources_frequency": "频率 (Hz)",
+          "extra_formula_sources_energy_delta": "有功电能（每分钟增量，Wh）",
           "flow_action": "操作"
         }
       },
       "extra_formula_expression": {
         "title": "公式表达式",
-        "description": "变量：{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，请确认公式计算后的单位与其一致。",
+        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，数值类型无单位。来源可以跨类型，请自行确认公式的单位正确。",
         "data": {
           "extra_formula_expression": "公式表达式",
           "flow_action": "操作"
@@ -300,7 +309,7 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "填写名称并选择结果类型，下一页仅显示相同类型的源实体。编辑时不能更改结果类型。",
+        "description": "填写名称并选择结果类型，也可选择无单位的数值。下一页按数据类型分组选择来源，不受结果类型限制。编辑时不能更改结果类型。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
@@ -309,15 +318,24 @@
       },
       "extra_formula_sources": {
         "title": "选择源实体",
-        "description": "勾选一个或多个源实体，仅显示已启用且与结果类型相同的测量。有功电能、无功电能均使用累计量，不包含每分钟增量。",
+        "description": "通过各组多选下拉框合计选择至少一个来源。来源按实际数据类型分组，不受结果类型限制；仅列出固件支持且已启用的测量，隐藏空分组，不会自动启用测量。有功电能和无功电能分组包含累计量，云端每分钟有功电能增量单独分组。\n\n每次从本页继续都会从 a 开始重新分配变量并清空原表达式，编辑公式或返回修改来源后继续时也一样。",
         "data": {
-          "extra_entity_sources": "源实体",
+          "extra_formula_sources_power": "有功功率 (W)",
+          "extra_formula_sources_energy": "有功电能（累计量，Wh）",
+          "extra_formula_sources_reactive_energy": "无功电能（累计量，varh）",
+          "extra_formula_sources_apparent_power": "视在功率 (VA)",
+          "extra_formula_sources_reactive_power": "无功功率 (var)",
+          "extra_formula_sources_voltage": "电压 (V)",
+          "extra_formula_sources_current": "电流 (A)",
+          "extra_formula_sources_power_factor": "功率因数",
+          "extra_formula_sources_frequency": "频率 (Hz)",
+          "extra_formula_sources_energy_delta": "有功电能（每分钟增量，Wh）",
           "flow_action": "操作"
         }
       },
       "extra_formula_expression": {
         "title": "公式表达式",
-        "description": "变量：{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，请确认公式计算后的单位与其一致。",
+        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，数值类型无单位。来源可以跨类型，请自行确认公式的单位正确。",
         "data": {
           "extra_formula_expression": "公式表达式",
           "flow_action": "操作"
@@ -445,7 +463,8 @@
         "voltage": "电压 (V)",
         "current": "电流 (A)",
         "power_factor": "功率因数",
-        "frequency": "频率 (Hz)"
+        "frequency": "频率 (Hz)",
+        "number": "数值（无单位）"
       }
     },
     "flow_action": {

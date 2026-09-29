@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Aggiungi entità formula",
-        "description": "Scegli un nome e il tipo di risultato. La pagina successiva mostra le sorgenti dello stesso tipo. Il tipo non può essere cambiato durante la modifica.",
+        "description": "Inserisci un nome e scegli il tipo di risultato, anche un numero senza unità. Seleziona poi le sorgenti raggruppate per tipo di dati, indipendentemente dal risultato. Il tipo di risultato non può essere cambiato durante la modifica.",
         "data": {
           "extra_entity_name": "Nome dell’entità",
           "extra_formula_result_type": "Tipo di risultato / unità",
@@ -151,15 +151,24 @@
       },
       "extra_formula_sources": {
         "title": "Seleziona le entità sorgente",
-        "description": "Seleziona una o più sorgenti con le caselle di controllo. Sono mostrate solo le misurazioni abilitate dello stesso tipo del risultato. Energia attiva e reattiva usano valori cumulativi; gli incrementi al minuto sono esclusi.",
+        "description": "Seleziona almeno una sorgente in totale nei menu a selezione multipla. I gruppi seguono il tipo di dati, indipendentemente dal risultato. Sono mostrate solo le misurazioni abilitate e supportate dal firmware; i gruppi vuoti sono nascosti. Le misurazioni non vengono abilitate automaticamente. L’energia attiva e reattiva contiene valori cumulativi; gli incrementi al minuto di energia attiva dal cloud hanno un gruppo separato.\n\nOgni volta che prosegui da questa pagina, le variabili vengono riassegnate da a e l’espressione precedente viene cancellata, anche durante la modifica o dopo essere tornati alle sorgenti.",
         "data": {
-          "extra_entity_sources": "Entità di origine",
+          "extra_formula_sources_power": "Potenza attiva (W)",
+          "extra_formula_sources_energy": "Energia attiva (cumulativa, Wh)",
+          "extra_formula_sources_reactive_energy": "Energia reattiva (cumulativa, varh)",
+          "extra_formula_sources_apparent_power": "Potenza apparente (VA)",
+          "extra_formula_sources_reactive_power": "Potenza reattiva (var)",
+          "extra_formula_sources_voltage": "Tensione (V)",
+          "extra_formula_sources_current": "Corrente (A)",
+          "extra_formula_sources_power_factor": "Fattore di potenza",
+          "extra_formula_sources_frequency": "Frequenza (Hz)",
+          "extra_formula_sources_energy_delta": "Energia attiva (incremento al minuto, Wh)",
           "flow_action": "Azione"
         }
       },
       "extra_formula_expression": {
         "title": "Espressione",
-        "description": "Variabili: {variables}\n\n- Supporta +, -, *, /, parentesi, abs, min, max e round.\n- Esempi: `max(a-b,0)`, `(a+b)/2`.\n- Il tipo di risultato fissa l’unità. Verifica che l’unità ottenuta dalla formula corrisponda.",
+        "description": "Variabili:\n{variables}\n\n- Supporta +, -, *, /, parentesi, abs, min, max e round.\n- Esempi: `max(a-b,0)`, `(a+b)/2`.\n- Il tipo di risultato determina l’unità; Numero non ha unità. Le sorgenti possono avere tipi diversi. Verifica personalmente le unità della formula.",
         "data": {
           "extra_formula_expression": "Espressione",
           "flow_action": "Azione"
@@ -300,7 +309,7 @@
       },
       "extra_formula": {
         "title": "Aggiungi entità formula",
-        "description": "Scegli un nome e il tipo di risultato. La pagina successiva mostra le sorgenti dello stesso tipo. Il tipo non può essere cambiato durante la modifica.",
+        "description": "Inserisci un nome e scegli il tipo di risultato, anche un numero senza unità. Seleziona poi le sorgenti raggruppate per tipo di dati, indipendentemente dal risultato. Il tipo di risultato non può essere cambiato durante la modifica.",
         "data": {
           "extra_entity_name": "Nome dell’entità",
           "extra_formula_result_type": "Tipo di risultato / unità",
@@ -309,15 +318,24 @@
       },
       "extra_formula_sources": {
         "title": "Seleziona le entità sorgente",
-        "description": "Seleziona una o più sorgenti con le caselle di controllo. Sono mostrate solo le misurazioni abilitate dello stesso tipo del risultato. Energia attiva e reattiva usano valori cumulativi; gli incrementi al minuto sono esclusi.",
+        "description": "Seleziona almeno una sorgente in totale nei menu a selezione multipla. I gruppi seguono il tipo di dati, indipendentemente dal risultato. Sono mostrate solo le misurazioni abilitate e supportate dal firmware; i gruppi vuoti sono nascosti. Le misurazioni non vengono abilitate automaticamente. L’energia attiva e reattiva contiene valori cumulativi; gli incrementi al minuto di energia attiva dal cloud hanno un gruppo separato.\n\nOgni volta che prosegui da questa pagina, le variabili vengono riassegnate da a e l’espressione precedente viene cancellata, anche durante la modifica o dopo essere tornati alle sorgenti.",
         "data": {
-          "extra_entity_sources": "Entità di origine",
+          "extra_formula_sources_power": "Potenza attiva (W)",
+          "extra_formula_sources_energy": "Energia attiva (cumulativa, Wh)",
+          "extra_formula_sources_reactive_energy": "Energia reattiva (cumulativa, varh)",
+          "extra_formula_sources_apparent_power": "Potenza apparente (VA)",
+          "extra_formula_sources_reactive_power": "Potenza reattiva (var)",
+          "extra_formula_sources_voltage": "Tensione (V)",
+          "extra_formula_sources_current": "Corrente (A)",
+          "extra_formula_sources_power_factor": "Fattore di potenza",
+          "extra_formula_sources_frequency": "Frequenza (Hz)",
+          "extra_formula_sources_energy_delta": "Energia attiva (incremento al minuto, Wh)",
           "flow_action": "Azione"
         }
       },
       "extra_formula_expression": {
         "title": "Espressione",
-        "description": "Variabili: {variables}\n\n- Supporta +, -, *, /, parentesi, abs, min, max e round.\n- Esempi: `max(a-b,0)`, `(a+b)/2`.\n- Il tipo di risultato fissa l’unità. Verifica che l’unità ottenuta dalla formula corrisponda.",
+        "description": "Variabili:\n{variables}\n\n- Supporta +, -, *, /, parentesi, abs, min, max e round.\n- Esempi: `max(a-b,0)`, `(a+b)/2`.\n- Il tipo di risultato determina l’unità; Numero non ha unità. Le sorgenti possono avere tipi diversi. Verifica personalmente le unità della formula.",
         "data": {
           "extra_formula_expression": "Espressione",
           "flow_action": "Azione"
@@ -445,7 +463,8 @@
         "voltage": "Tensione (V)",
         "current": "Corrente (A)",
         "power_factor": "Fattore di potenza",
-        "frequency": "Frequenza (Hz)"
+        "frequency": "Frequenza (Hz)",
+        "number": "Numero (senza unità)"
       }
     },
     "flow_action": {

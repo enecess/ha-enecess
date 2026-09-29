@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Wybierz nazwę i typ wyniku. Następna strona pokaże źródła tego samego typu. Typu wyniku nie można zmienić podczas edycji.",
+        "description": "Podaj nazwę i wybierz typ wyniku, w tym liczbę bez jednostki. Następnie wybierz źródła pogrupowane według typu danych, niezależnie od wyniku. Typu wyniku nie można zmienić podczas edycji.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -151,15 +151,24 @@
       },
       "extra_formula_sources": {
         "title": "Wybierz encje źródłowe",
-        "description": "Zaznacz jedno lub więcej źródeł za pomocą pól wyboru. Dostępne są tylko włączone pomiary zgodne z typem wyniku. Energia czynna i bierna używają wartości skumulowanych; przyrosty minutowe są wykluczone.",
+        "description": "Wybierz łącznie co najmniej jedno źródło z list rozwijanych wielokrotnego wyboru. Grupy zależą od typu danych, niezależnie od wyniku. Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia; puste grupy są ukryte. Pomiary nie są włączane automatycznie. Energia czynna i bierna zawiera wartości skumulowane; minutowe przyrosty energii czynnej z chmury mają osobną grupę.\n\nZa każdym razem, gdy przechodzisz dalej z tej strony, zmienne są przypisywane ponownie od a, a poprzedni wzór jest usuwany, także podczas edycji lub po powrocie do wyboru źródeł.",
         "data": {
-          "extra_entity_sources": "Encje źródłowe",
+          "extra_formula_sources_power": "Moc czynna (W)",
+          "extra_formula_sources_energy": "Energia czynna (skumulowana, Wh)",
+          "extra_formula_sources_reactive_energy": "Energia bierna (skumulowana, varh)",
+          "extra_formula_sources_apparent_power": "Moc pozorna (VA)",
+          "extra_formula_sources_reactive_power": "Moc bierna (var)",
+          "extra_formula_sources_voltage": "Napięcie (V)",
+          "extra_formula_sources_current": "Prąd (A)",
+          "extra_formula_sources_power_factor": "Współczynnik mocy",
+          "extra_formula_sources_frequency": "Częstotliwość (Hz)",
+          "extra_formula_sources_energy_delta": "Energia czynna (przyrost minutowy, Wh)",
           "flow_action": "Działanie"
         }
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
+        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę; Liczba nie ma jednostki. Źródła mogą mieć różne typy. Samodzielnie sprawdź jednostki we wzorze.",
         "data": {
           "extra_formula_expression": "Wyrażenie",
           "flow_action": "Działanie"
@@ -300,7 +309,7 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Wybierz nazwę i typ wyniku. Następna strona pokaże źródła tego samego typu. Typu wyniku nie można zmienić podczas edycji.",
+        "description": "Podaj nazwę i wybierz typ wyniku, w tym liczbę bez jednostki. Następnie wybierz źródła pogrupowane według typu danych, niezależnie od wyniku. Typu wyniku nie można zmienić podczas edycji.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -309,15 +318,24 @@
       },
       "extra_formula_sources": {
         "title": "Wybierz encje źródłowe",
-        "description": "Zaznacz jedno lub więcej źródeł za pomocą pól wyboru. Dostępne są tylko włączone pomiary zgodne z typem wyniku. Energia czynna i bierna używają wartości skumulowanych; przyrosty minutowe są wykluczone.",
+        "description": "Wybierz łącznie co najmniej jedno źródło z list rozwijanych wielokrotnego wyboru. Grupy zależą od typu danych, niezależnie od wyniku. Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia; puste grupy są ukryte. Pomiary nie są włączane automatycznie. Energia czynna i bierna zawiera wartości skumulowane; minutowe przyrosty energii czynnej z chmury mają osobną grupę.\n\nZa każdym razem, gdy przechodzisz dalej z tej strony, zmienne są przypisywane ponownie od a, a poprzedni wzór jest usuwany, także podczas edycji lub po powrocie do wyboru źródeł.",
         "data": {
-          "extra_entity_sources": "Encje źródłowe",
+          "extra_formula_sources_power": "Moc czynna (W)",
+          "extra_formula_sources_energy": "Energia czynna (skumulowana, Wh)",
+          "extra_formula_sources_reactive_energy": "Energia bierna (skumulowana, varh)",
+          "extra_formula_sources_apparent_power": "Moc pozorna (VA)",
+          "extra_formula_sources_reactive_power": "Moc bierna (var)",
+          "extra_formula_sources_voltage": "Napięcie (V)",
+          "extra_formula_sources_current": "Prąd (A)",
+          "extra_formula_sources_power_factor": "Współczynnik mocy",
+          "extra_formula_sources_frequency": "Częstotliwość (Hz)",
+          "extra_formula_sources_energy_delta": "Energia czynna (przyrost minutowy, Wh)",
           "flow_action": "Działanie"
         }
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne: {variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę. Sprawdź, czy jednostka wyniku wzoru jest z nią zgodna.",
+        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę; Liczba nie ma jednostki. Źródła mogą mieć różne typy. Samodzielnie sprawdź jednostki we wzorze.",
         "data": {
           "extra_formula_expression": "Wyrażenie",
           "flow_action": "Działanie"
@@ -445,7 +463,8 @@
         "voltage": "Napięcie (V)",
         "current": "Prąd (A)",
         "power_factor": "Współczynnik mocy",
-        "frequency": "Częstotliwość (Hz)"
+        "frequency": "Częstotliwość (Hz)",
+        "number": "Liczba (bez jednostki)"
       }
     },
     "flow_action": {

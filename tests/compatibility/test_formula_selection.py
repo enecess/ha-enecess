@@ -3,6 +3,7 @@
 from types import SimpleNamespace
 
 from homeassistant.helpers.selector import SelectSelectorMode
+import voluptuous as vol
 
 from custom_components.enecess.config_flow import ConfigFlow
 from test_runtime import RealHARuntimeFixture
@@ -47,7 +48,8 @@ class FormulaSelectionTests(RealHARuntimeFixture):
             }
             expected = ["voltage"] if firmware >= 139 else ["power", "energy"]
             self.assertEqual(
-                fields["extra_formula_result_type"].config["options"], expected
+                fields["extra_formula_result_type"].config["options"],
+                [*expected, "number"],
             )
             result = await flow.async_step_extra_formula(
                 result["data_schema"]({"extra_entity_name": "Detected capabilities"})
@@ -141,7 +143,7 @@ class FormulaSelectionTests(RealHARuntimeFixture):
                     flow._entry_data = dict(entry.data)
                 flow.hass = self.hass
                 flow.context = {}
-                for result_type in ("power", "energy"):
+                for result_type in ("power", "energy", "number"):
                     result = await flow.async_step_extra_formula()
                     fields = {
                         str(key): value
@@ -149,7 +151,7 @@ class FormulaSelectionTests(RealHARuntimeFixture):
                     }
                     self.assertEqual(
                         fields["extra_formula_result_type"].config["options"],
-                        ["power", "energy"],
+                        ["power", "energy", "number"],
                     )
                     result = await flow.async_step_extra_formula(
                         result["data_schema"](
@@ -165,13 +167,13 @@ class FormulaSelectionTests(RealHARuntimeFixture):
                     }
                     sources = [
                         option["value"]
-                        for option in fields["extra_entity_sources"].config["options"][
-                            :2
-                        ]
+                        for option in fields["extra_formula_sources_power"].config[
+                            "options"
+                        ][:2]
                     ]
                     self.assertEqual(len(sources), 2)
                     result = await flow.async_step_extra_formula_sources(
-                        result["data_schema"]({"extra_entity_sources": sources})
+                        result["data_schema"]({"extra_formula_sources_power": sources})
                     )
                     result = await flow.async_step_extra_formula_expression(
                         result["data_schema"]({"extra_formula_expression": "a+b"})
@@ -196,7 +198,7 @@ class FormulaSelectionTests(RealHARuntimeFixture):
             fields = {
                 str(key): value for key, value in result["data_schema"].schema.items()
             }
-            self.assertNotIn(
+            self.assertIn(
                 "number", fields["extra_formula_result_type"].config["options"]
             )
             self.assertNotIn("extra_entity_sources", fields)
@@ -212,15 +214,20 @@ class FormulaSelectionTests(RealHARuntimeFixture):
             fields = {
                 str(key): value for key, value in result["data_schema"].schema.items()
             }
-            control = fields["extra_entity_sources"]
-            self.assertEqual(control.config["mode"], SelectSelectorMode.LIST)
+            control = fields["extra_formula_sources_energy"]
+            self.assertEqual(control.config["mode"], SelectSelectorMode.DROPDOWN)
             self.assertTrue(control.config["multiple"])
+            self.assertIn("extra_formula_sources_power", fields)
+            for key in result["data_schema"].schema:
+                if str(key).startswith("extra_formula_sources_"):
+                    self.assertIsInstance(key, vol.Optional)
+                    self.assertNotIsInstance(key, vol.Required)
             self.assertTrue(
                 all("_energy_" in item["value"] for item in control.config["options"])
             )
             sources = ["main_l1_energy_fwd_total", "main_l1_energy_rev_total"]
             result = await flow.async_step_extra_formula_sources(
-                result["data_schema"]({"extra_entity_sources": sources})
+                result["data_schema"]({"extra_formula_sources_energy": sources})
             )
             self.assertEqual(result["step_id"], "extra_formula_expression")
             result = await flow.async_step_extra_formula_expression(
@@ -249,3 +256,201 @@ class FormulaSelectionTests(RealHARuntimeFixture):
         )
         self.assertEqual(result["step_id"], "extra_entities")
         self.assertFalse(flow._extra_entities)
+
+    async def test_grouped_selectors_reject_wrong_group_and_empty_selection(self):
+        flow = ConfigFlow()
+        flow.hass = self.hass
+        flow.context = {}
+        flow._entry_data = dict(self.make_entry("local").data)
+        flow._measurement_types = ["power", "voltage"]
+        result = await flow.async_step_extra_formula()
+        result = await flow.async_step_extra_formula(
+            result["data_schema"](
+                {
+                    "extra_entity_name": "Fictional mixed measurements",
+                    "extra_formula_result_type": "number",
+                }
+            )
+        )
+        fields = {
+            str(key): value for key, value in result["data_schema"].schema.items()
+        }
+        self.assertEqual(
+            [name for name in fields if name.startswith("extra_formula_sources_")],
+            ["extra_formula_sources_power", "extra_formula_sources_voltage"],
+        )
+        voltage = fields["extra_formula_sources_voltage"].config["options"][0]["value"]
+        with self.assertRaises(vol.Invalid):
+            result["data_schema"]({"extra_formula_sources_power": [voltage]})
+        with self.assertRaises(vol.Invalid):
+            result["data_schema"]({"extra_formula_sources_voltage": voltage})
+        result = await flow.async_step_extra_formula_sources(result["data_schema"]({}))
+        self.assertEqual(result["errors"]["base"], "formula_sources_invalid")
+        self.assertFalse(flow._extra_entities)
+
+    async def test_no_supported_enabled_sources_do_not_offer_number(self):
+        for options in (False, True):
+            entry = self.make_entry("local")
+            self.hass.config_entries.async_update_entry(
+                entry,
+                data={**entry.data, "ecomain_firmware_version": 136},
+                options={"measurement_types": ["voltage"]},
+            )
+            if options:
+                flow = ConfigFlow.async_get_options_flow(entry)
+                flow.handler = entry.entry_id
+            else:
+                flow = ConfigFlow()
+                flow._entry_data = dict(entry.data)
+                flow._measurement_types = ["voltage"]
+            flow.hass = self.hass
+            flow.context = {}
+            result = await flow.async_step_extra_formula()
+            fields = {
+                str(key): value for key, value in result["data_schema"].schema.items()
+            }
+            self.assertEqual(fields["extra_formula_result_type"].config["options"], [])
+            self.assertEqual(result["errors"]["base"], "formula_sources_invalid")
+
+    async def test_cloud_accumulated_and_minute_energy_have_separate_dropdowns(self):
+        flow = ConfigFlow()
+        flow.hass = self.hass
+        flow.context = {}
+        flow._entry_data = dict(self.make_entry("main").data)
+        flow._measurement_types = ["energy"]
+        result = await flow.async_step_extra_formula()
+        result = await flow.async_step_extra_formula(
+            result["data_schema"](
+                {
+                    "extra_entity_name": "Fictional cloud energy",
+                    "extra_formula_result_type": "number",
+                }
+            )
+        )
+        fields = {
+            str(key): value for key, value in result["data_schema"].schema.items()
+        }
+        self.assertEqual(
+            [name for name in fields if name.startswith("extra_formula_sources_")],
+            ["extra_formula_sources_energy", "extra_formula_sources_energy_delta"],
+        )
+        selections = {}
+        for name in (
+            "extra_formula_sources_energy",
+            "extra_formula_sources_energy_delta",
+        ):
+            self.assertEqual(fields[name].config["mode"], SelectSelectorMode.DROPDOWN)
+            self.assertTrue(fields[name].config["multiple"])
+            selections[name] = [fields[name].config["options"][0]["value"]]
+        self.assertNotEqual(*selections.values())
+        result = await flow.async_step_extra_formula_sources(
+            result["data_schema"](selections)
+        )
+        self.assertEqual(result["step_id"], "extra_formula_expression")
+
+    async def test_mixed_number_edit_and_back_rebind_and_clear_expression(self):
+        for options in (False, True):
+            with self.subTest(options=options):
+                entry = self.make_entry("local")
+                self.hass.config_entries.async_update_entry(
+                    entry,
+                    data={**entry.data, "ecomain_firmware_version": 139},
+                    options={"measurement_types": ["power", "voltage"]},
+                )
+                if options:
+                    flow = ConfigFlow.async_get_options_flow(entry)
+                    flow.handler = entry.entry_id
+                else:
+                    flow = ConfigFlow()
+                    flow._entry_data = dict(entry.data)
+                    flow._measurement_types = ["power", "voltage"]
+                flow.hass = self.hass
+                flow.context = {}
+                result = (
+                    await flow._show_options_menu()
+                    if options
+                    else await flow.async_step_extra_entities()
+                )
+                menu_handler = (
+                    flow.async_step_init if options else flow.async_step_extra_entities
+                )
+                result = await menu_handler(
+                    result["data_schema"]({"extra_action": "add_formula"})
+                )
+                result = await flow.async_step_extra_formula(
+                    result["data_schema"](
+                        {
+                            "extra_entity_name": "Fictional mixed number",
+                            "extra_formula_result_type": "number",
+                        }
+                    )
+                )
+                fields = {
+                    str(key): value
+                    for key, value in result["data_schema"].schema.items()
+                }
+                powers = [
+                    item["value"]
+                    for item in fields["extra_formula_sources_power"].config["options"][
+                        :2
+                    ]
+                ][::-1]
+                voltage = fields["extra_formula_sources_voltage"].config["options"][0][
+                    "value"
+                ]
+                # Submit voltage first to verify that groups determine alias order.
+                result = await flow.async_step_extra_formula_sources(
+                    result["data_schema"](
+                        {
+                            "extra_formula_sources_voltage": [voltage],
+                            "extra_formula_sources_power": powers,
+                        }
+                    )
+                )
+                self.assertEqual(
+                    flow._formula_draft["variables"],
+                    {"a": powers[0], "b": powers[1], "c": voltage},
+                )
+                result = await flow.async_step_extra_formula_expression(
+                    result["data_schema"]({"extra_formula_expression": "b+c"})
+                )
+                original = dict(flow._extra_entities[0])
+                self.assertEqual(original["result_type"], "number")
+                result = await menu_handler(
+                    result["data_schema"]({"extra_action": "edit_formula"})
+                )
+                result = await flow.async_step_extra_formula_edit(
+                    result["data_schema"]({"extra_formula_entity": original["key"]})
+                )
+                result = await flow.async_step_extra_formula(result["data_schema"]({}))
+                result = await flow.async_step_extra_formula_sources(
+                    result["data_schema"]({})
+                )
+                self.assertEqual(
+                    flow._formula_draft["variables"], {"a": powers[1], "b": voltage}
+                )
+                self.assertEqual(
+                    result["data_schema"]({})["extra_formula_expression"], ""
+                )
+                result = await flow.async_step_extra_formula_expression(
+                    result["data_schema"](
+                        {"extra_formula_expression": "a/b", "flow_action": "back"}
+                    )
+                )
+                self.assertEqual(result["step_id"], "extra_formula_sources")
+                result = await flow.async_step_extra_formula_sources(
+                    result["data_schema"]({})
+                )
+                self.assertEqual(
+                    result["data_schema"]({})["extra_formula_expression"], ""
+                )
+                result = await flow.async_step_extra_formula_expression(
+                    result["data_schema"]({"extra_formula_expression": "a/b"})
+                )
+                self.assertFalse(result.get("errors"))
+                self.assertEqual(len(flow._extra_entities), 1)
+                self.assertEqual(flow._extra_entities[0]["key"], original["key"])
+                self.assertEqual(flow._extra_entities[0]["expression"], "a/b")
+                self.assertEqual(
+                    flow._extra_entities[0]["variables"], {"a": powers[1], "b": voltage}
+                )

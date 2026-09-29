@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Namen und Ergebnistyp wählen. Die nächste Seite zeigt Quellen desselben Typs. Beim Bearbeiten kann der Ergebnistyp nicht geändert werden.",
+        "description": "Gib einen Namen ein und wähle einen Ergebnistyp, einschließlich einer Zahl ohne Einheit. Wähle anschließend Quellen nach Datentyp gruppiert, unabhängig vom Ergebnistyp. Der Ergebnistyp kann beim Bearbeiten nicht geändert werden.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -151,15 +151,24 @@
       },
       "extra_formula_sources": {
         "title": "Quellentitäten auswählen",
-        "description": "Eine oder mehrere Quellen über die Kontrollkästchen auswählen. Es werden nur aktivierte Messwerte des Ergebnistyps angezeigt. Wirk- und Blindenergie verwenden kumulierte Werte; Minuteninkremente sind ausgeschlossen.",
+        "description": "Wähle insgesamt mindestens eine Quelle in den Dropdown-Menüs mit Mehrfachauswahl. Die Gruppen richten sich nach dem Datentyp, unabhängig vom Ergebnistyp. Nur von der Firmware unterstützte, aktivierte Messgrößen werden angezeigt; leere Gruppen sind ausgeblendet. Messgrößen werden nicht automatisch aktiviert. Wirk- und Blindenergie enthalten kumulierte Werte; Cloud-Minuteninkremente der Wirkenergie bilden eine eigene Gruppe.\n\nBei jedem Fortfahren von dieser Seite werden die Variablen ab a neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach der Rückkehr zur Quellenauswahl.",
         "data": {
-          "extra_entity_sources": "Quellentitäten",
+          "extra_formula_sources_power": "Wirkleistung (W)",
+          "extra_formula_sources_energy": "Wirkenergie (kumuliert, Wh)",
+          "extra_formula_sources_reactive_energy": "Blindenergie (kumuliert, varh)",
+          "extra_formula_sources_apparent_power": "Scheinleistung (VA)",
+          "extra_formula_sources_reactive_power": "Blindleistung (var)",
+          "extra_formula_sources_voltage": "Spannung (V)",
+          "extra_formula_sources_current": "Strom (A)",
+          "extra_formula_sources_power_factor": "Leistungsfaktor",
+          "extra_formula_sources_frequency": "Frequenz (Hz)",
+          "extra_formula_sources_energy_delta": "Wirkenergie (Minuteninkrement, Wh)",
           "flow_action": "Aktion"
         }
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
+        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest; Zahl hat keine Einheit. Quellen dürfen verschiedene Typen haben. Prüfe die Einheiten der Formel selbst.",
         "data": {
           "extra_formula_expression": "Formelausdruck",
           "flow_action": "Aktion"
@@ -300,7 +309,7 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Namen und Ergebnistyp wählen. Die nächste Seite zeigt Quellen desselben Typs. Beim Bearbeiten kann der Ergebnistyp nicht geändert werden.",
+        "description": "Gib einen Namen ein und wähle einen Ergebnistyp, einschließlich einer Zahl ohne Einheit. Wähle anschließend Quellen nach Datentyp gruppiert, unabhängig vom Ergebnistyp. Der Ergebnistyp kann beim Bearbeiten nicht geändert werden.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -309,15 +318,24 @@
       },
       "extra_formula_sources": {
         "title": "Quellentitäten auswählen",
-        "description": "Eine oder mehrere Quellen über die Kontrollkästchen auswählen. Es werden nur aktivierte Messwerte des Ergebnistyps angezeigt. Wirk- und Blindenergie verwenden kumulierte Werte; Minuteninkremente sind ausgeschlossen.",
+        "description": "Wähle insgesamt mindestens eine Quelle in den Dropdown-Menüs mit Mehrfachauswahl. Die Gruppen richten sich nach dem Datentyp, unabhängig vom Ergebnistyp. Nur von der Firmware unterstützte, aktivierte Messgrößen werden angezeigt; leere Gruppen sind ausgeblendet. Messgrößen werden nicht automatisch aktiviert. Wirk- und Blindenergie enthalten kumulierte Werte; Cloud-Minuteninkremente der Wirkenergie bilden eine eigene Gruppe.\n\nBei jedem Fortfahren von dieser Seite werden die Variablen ab a neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach der Rückkehr zur Quellenauswahl.",
         "data": {
-          "extra_entity_sources": "Quellentitäten",
+          "extra_formula_sources_power": "Wirkleistung (W)",
+          "extra_formula_sources_energy": "Wirkenergie (kumuliert, Wh)",
+          "extra_formula_sources_reactive_energy": "Blindenergie (kumuliert, varh)",
+          "extra_formula_sources_apparent_power": "Scheinleistung (VA)",
+          "extra_formula_sources_reactive_power": "Blindleistung (var)",
+          "extra_formula_sources_voltage": "Spannung (V)",
+          "extra_formula_sources_current": "Strom (A)",
+          "extra_formula_sources_power_factor": "Leistungsfaktor",
+          "extra_formula_sources_frequency": "Frequenz (Hz)",
+          "extra_formula_sources_energy_delta": "Wirkenergie (Minuteninkrement, Wh)",
           "flow_action": "Aktion"
         }
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen: {variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest. Prüfe, ob die Formel eine passende Einheit ergibt.",
+        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest; Zahl hat keine Einheit. Quellen dürfen verschiedene Typen haben. Prüfe die Einheiten der Formel selbst.",
         "data": {
           "extra_formula_expression": "Formelausdruck",
           "flow_action": "Aktion"
@@ -445,7 +463,8 @@
         "voltage": "Spannung (V)",
         "current": "Strom (A)",
         "power_factor": "Leistungsfaktor",
-        "frequency": "Frequenz (Hz)"
+        "frequency": "Frequenz (Hz)",
+        "number": "Zahl (ohne Einheit)"
       }
     },
     "flow_action": {

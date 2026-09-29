@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Choose a name and result type. The next page offers sources of the same type. The result type cannot be changed when editing.",
+        "description": "Choose a name and result type, including a unitless number. Next, select sources grouped by their data type, independently of the result type. The result type cannot be changed when editing.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -151,15 +151,24 @@
       },
       "extra_formula_sources": {
         "title": "Select Source Entities",
-        "description": "Select one or more sources using the checkboxes. Only enabled measurements matching the result type are listed. Active and reactive energy use cumulative readings; per-minute increments are excluded.",
+        "description": "Select at least one source across the multi-select dropdowns. Sources are grouped by data type, independently of the result type. Only firmware-supported, enabled measurements are listed; empty groups are hidden. Measurements are not enabled automatically. Active and reactive energy groups contain cumulative readings; cloud 1-minute active energy increments have a separate group.\n\nEach time you continue from this page, variables are reassigned from a and the previous expression is cleared, including when editing or returning to change sources.",
         "data": {
-          "extra_entity_sources": "Source Entities",
+          "extra_formula_sources_power": "Active power (W)",
+          "extra_formula_sources_energy": "Active energy (cumulative, Wh)",
+          "extra_formula_sources_reactive_energy": "Reactive energy (cumulative, varh)",
+          "extra_formula_sources_apparent_power": "Apparent power (VA)",
+          "extra_formula_sources_reactive_power": "Reactive power (var)",
+          "extra_formula_sources_voltage": "Voltage (V)",
+          "extra_formula_sources_current": "Current (A)",
+          "extra_formula_sources_power_factor": "Power factor",
+          "extra_formula_sources_frequency": "Frequency (Hz)",
+          "extra_formula_sources_energy_delta": "Active energy (1-minute increment, Wh)",
           "flow_action": "Action"
         }
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
+        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit; Number has no unit. Sources may have different types. Check the formula’s units yourself.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -300,7 +309,7 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Choose a name and result type. The next page offers sources of the same type. The result type cannot be changed when editing.",
+        "description": "Choose a name and result type, including a unitless number. Next, select sources grouped by their data type, independently of the result type. The result type cannot be changed when editing.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -309,15 +318,24 @@
       },
       "extra_formula_sources": {
         "title": "Select Source Entities",
-        "description": "Select one or more sources using the checkboxes. Only enabled measurements matching the result type are listed. Active and reactive energy use cumulative readings; per-minute increments are excluded.",
+        "description": "Select at least one source across the multi-select dropdowns. Sources are grouped by data type, independently of the result type. Only firmware-supported, enabled measurements are listed; empty groups are hidden. Measurements are not enabled automatically. Active and reactive energy groups contain cumulative readings; cloud 1-minute active energy increments have a separate group.\n\nEach time you continue from this page, variables are reassigned from a and the previous expression is cleared, including when editing or returning to change sources.",
         "data": {
-          "extra_entity_sources": "Source Entities",
+          "extra_formula_sources_power": "Active power (W)",
+          "extra_formula_sources_energy": "Active energy (cumulative, Wh)",
+          "extra_formula_sources_reactive_energy": "Reactive energy (cumulative, varh)",
+          "extra_formula_sources_apparent_power": "Apparent power (VA)",
+          "extra_formula_sources_reactive_power": "Reactive power (var)",
+          "extra_formula_sources_voltage": "Voltage (V)",
+          "extra_formula_sources_current": "Current (A)",
+          "extra_formula_sources_power_factor": "Power factor",
+          "extra_formula_sources_frequency": "Frequency (Hz)",
+          "extra_formula_sources_energy_delta": "Active energy (1-minute increment, Wh)",
           "flow_action": "Action"
         }
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables: {variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit. Check that the formula produces a matching unit.",
+        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit; Number has no unit. Sources may have different types. Check the formula’s units yourself.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -445,7 +463,8 @@
         "voltage": "Voltage (V)",
         "current": "Current (A)",
         "power_factor": "Power factor",
-        "frequency": "Frequency (Hz)"
+        "frequency": "Frequency (Hz)",
+        "number": "Number (no unit)"
       }
     },
     "flow_action": {

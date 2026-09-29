@@ -66,7 +66,7 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([self.sources[1]], flow._extra_entities[0]["sources"])
         self.assertEqual({"b": self.sources[1]}, flow._extra_entities[0]["variables"])
 
-    async def test_edit_preserves_identity_and_variable_names(self):
+    async def test_edit_preserves_identity_but_restarts_variable_names(self):
         flow = self.flow(True)
         await self.create(flow, "abs(b)")
         key = flow._extra_entities[0]["key"]
@@ -74,11 +74,12 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("extra_formula", result["step_id"])
         result = await select_formula_sources(flow, {"extra_entity_name": "Updated power", "extra_formula_result_type": "power",
                                                     "extra_entity_sources": [self.sources[1]]})
-        self.assertIn("b", result["description_placeholders"]["variables"])
-        await flow.async_step_extra_formula_expression({"extra_formula_expression": "b / 2"})
+        self.assertEqual({"a": self.sources[1]}, flow._formula_draft["variables"])
+        self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
+        await flow.async_step_extra_formula_expression({"extra_formula_expression": "a / 2"})
         self.assertEqual(1, len(flow._extra_entities))
         self.assertEqual(key, flow._extra_entities[0]["key"])
-        self.assertEqual("b / 2", flow._extra_entities[0]["expression"])
+        self.assertEqual("a / 2", flow._extra_entities[0]["expression"])
 
     async def test_edit_cannot_change_result_type(self):
         flow = self.flow(True)
@@ -96,15 +97,16 @@ class FormulaFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_measurement_types({"measurement_types": ["energy_forward"]})
         self.assertEqual("measurement_in_use", result["errors"]["base"])
 
-    async def test_reordering_edited_sources_does_not_rebind_variables(self):
+    async def test_reordering_edited_sources_rebinds_variables_and_clears_expression(self):
         flow = self.flow(True)
         await self.create(flow, "a - b")
         original = dict(flow._extra_entities[0])
         await flow.async_step_extra_formula_edit({"extra_formula_entity": original["key"]})
-        await select_formula_sources(flow, {"extra_entity_name": "Net power", "extra_formula_result_type": "power",
+        result = await select_formula_sources(flow, {"extra_entity_name": "Net power", "extra_formula_result_type": "power",
                                             "extra_entity_sources": list(reversed(self.sources))})
+        self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
         await flow.async_step_extra_formula_expression({"extra_formula_expression": "a - b"})
-        self.assertEqual(original["variables"], flow._extra_entities[0]["variables"])
+        self.assertEqual({"a": self.sources[1], "b": self.sources[0]}, flow._extra_entities[0]["variables"])
         self.assertEqual(original["key"], flow._extra_entities[0]["key"])
 
     async def test_formulas_sharing_sources_get_distinct_ids_and_remove_independently(self):

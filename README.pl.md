@@ -435,10 +435,10 @@ Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch warto
 
 1. Wybierz **Dodaj encję formuły** podczas dodawania ecoMain lub w **Konfiguruj**.
 2. Podaj nazwę i wybierz typ wyniku z listy rozwijanej.
-3. Na następnej stronie zaznacz za pomocą pól wyboru jedno lub więcej włączonych źródeł tego samego typu.
+3. Na następnej stronie wybierz źródła z list rozwijanych wielokrotnego wyboru, pogrupowane według typu danych, niezależnie od typu wyniku. Każda grupa jest opcjonalna; wybierz łącznie co najmniej jedno źródło.
 4. Strona wzoru pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
 
-Energia czynna udostępnia tylko źródła skumulowanej energii czynnej, a energia bierna źródła skumulowanej energii biernej. Minutowe przyrosty z chmury są wykluczone. Formuły energii używają `TOTAL`, co pozwala na wzrosty i spadki przy obliczaniu energii netto. Ogólny typ liczbowy nie jest dostępny.
+Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia. Puste grupy są ukryte; wybór źródeł nie włącza pomiarów automatycznie. Skumulowana energia czynna (Wh), skumulowana energia bierna (varh) i minutowe przyrosty energii czynnej z chmury (Wh) tworzą osobne grupy. Możesz łączyć różne typy źródeł i musisz samodzielnie sprawdzić jednostki we wzorze. Zmienne `a`, `b` itd. są wspólne dla grup. Za każdym przejściem dalej ze strony źródeł, także podczas edycji lub po cofnięciu, są przypisywane ponownie od `a`, a poprzedni wzór jest usuwany. Wyniki energii czynnej i biernej używają `TOTAL`, dopuszczając wzrosty i spadki dla energii netto. **Liczba** daje wynik czysto liczbowy bez jednostki ani klasy urządzenia (`device_class`), z `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

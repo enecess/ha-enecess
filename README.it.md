@@ -333,10 +333,10 @@ Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due va
 
 1. Scegli **Aggiungi entità formula** durante l’aggiunta di ecoMain o in **Configura**.
 2. Inserisci un nome e scegli il tipo di risultato dal menu a tendina.
-3. Nella pagina successiva, seleziona insieme una o più sorgenti abilitate dello stesso tipo tramite le caselle di controllo.
+3. Nella pagina successiva, seleziona le sorgenti nei menu a selezione multipla, raggruppate per tipo di dati e indipendenti dal tipo di risultato. Ogni gruppo è facoltativo; seleziona almeno una sorgente in totale.
 4. La pagina della formula mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
 
-L’energia attiva offre solo sorgenti di energia attiva cumulativa; l’energia reattiva solo sorgenti di energia reattiva cumulativa. Gli incrementi al minuto del cloud sono esclusi. Le formule energetiche usano `TOTAL`, consentendo aumenti e diminuzioni per calcolare l’energia netta. Non è disponibile un tipo numerico generico.
+Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I gruppi vuoti sono nascosti; la scelta delle sorgenti non abilita automaticamente le misurazioni. Energia attiva cumulativa (Wh), energia reattiva cumulativa (varh) e incrementi al minuto di energia attiva dal cloud (Wh) formano gruppi distinti. Puoi combinare tipi di sorgenti diversi e devi verificare personalmente le unità della formula. Le variabili `a`, `b`, ecc. sono condivise tra i gruppi. Ogni volta che prosegui dalla pagina delle sorgenti, anche durante la modifica o dopo essere tornati indietro, vengono riassegnate da `a` e l’espressione precedente viene cancellata. I risultati di energia attiva e reattiva usano `TOTAL`, consentendo aumenti e diminuzioni per l’energia netta. **Numero** produce un valore puramente numerico senza unità né classe del dispositivo (`device_class`), con `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

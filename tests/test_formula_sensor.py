@@ -73,6 +73,14 @@ class FormulaSensorTests(unittest.IsolatedAsyncioTestCase):
                 description = self.entity(result_type=result_type).entity_description
                 self.assertEqual((description.native_unit_of_measurement, description.device_class, description.state_class), (unit, device_class, state_class))
 
+    def test_number_formula_has_no_unit_or_device_class_and_keeps_numeric_state(self):
+        entity = self.entity(result_type="number", expression="a/b")
+        self.assertTrue(entity.available)
+        self.assertEqual(entity.native_value, 4)
+        self.assertIsNone(entity.entity_description.device_class)
+        self.assertIsNone(entity.entity_description.native_unit_of_measurement)
+        self.assertEqual(entity.entity_description.state_class, "measurement")
+
     def test_formula_device_identity_does_not_follow_edited_sources(self):
         descriptions = self.extra.build_entry_descriptions({"add_mode": "local", "ecomain_selected_slaves": [1]}, {})
         self.assertEqual(self.extra.extra_entity_device_index(descriptions, {**self.config, "sources": ["sub1_ch1_power_rt"]}), 0)

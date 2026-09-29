@@ -440,10 +440,10 @@ Créez un capteur à partir de vos mesures, par exemple la différence ou la moy
 
 1. Choisissez **Ajouter une entité de formule** pendant l’ajout d’ecoMain ou via **Configurer**.
 2. Saisissez un nom et choisissez le type de résultat dans la liste déroulante.
-3. Sur la page suivante, cochez ensemble une ou plusieurs sources activées du même type.
+3. Sur la page suivante, sélectionnez les sources dans les listes déroulantes à sélection multiple, regroupées par type de données, indépendamment du résultat. Chaque groupe est facultatif ; sélectionnez au moins une source au total.
 4. La page de formule indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
 
-L’énergie active propose uniquement des sources d’énergie active cumulée, et l’énergie réactive des sources d’énergie réactive cumulée. Les incréments par minute du cloud sont exclus. Les formules d’énergie utilisent `TOTAL`, permettant des hausses et des baisses pour les calculs d’énergie nette. Aucun type numérique générique n’est proposé.
+Seules les mesures activées et prises en charge par le micrologiciel sont proposées. Les groupes vides sont masqués ; le choix des sources n’active aucune mesure automatiquement. L’énergie active cumulée (Wh), l’énergie réactive cumulée (varh) et les incréments d’énergie active par minute du cloud (Wh) forment des groupes distincts. Vous pouvez combiner différents types de sources et devez vérifier vous-même les unités de la formule. Les variables `a`, `b`, etc. sont communes aux groupes. Chaque fois que vous continuez depuis la page des sources, y compris lors d’une modification ou après un retour, elles sont réattribuées à partir de `a` et l’expression précédente est effacée. Les résultats d’énergie active et réactive utilisent `TOTAL`, autorisant des hausses et des baisses pour l’énergie nette. **Nombre** produit une valeur purement numérique sans unité ni classe d’appareil (`device_class`), avec `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 

@@ -73,19 +73,25 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("measurement_types", result["step_id"])
         self.assertEqual(original, flow._extra_entities)
 
-    async def test_formula_selectors_offer_type_dropdown_then_source_checkboxes(self):
+    async def test_formula_selectors_offer_type_dropdown_then_grouped_source_dropdowns(self):
         for options in (False, True):
             flow = self.flow(options)
             result = await flow.async_step_extra_formula()
             fields = {str(key): value for key, value in result["data_schema"].schema.items()}
             self.assertEqual("dropdown", fields["extra_formula_result_type"].config["mode"])
             result = await flow.async_step_extra_formula(result["data_schema"]({
-                "extra_entity_name": "Checkboxes", "extra_formula_result_type": "power"}))
+                "extra_entity_name": "Grouped sources", "extra_formula_result_type": "power"}))
             fields = {str(key): value for key, value in result["data_schema"].schema.items()}
-            self.assertEqual("list", fields["extra_entity_sources"].config["mode"])
-            self.assertTrue(fields["extra_entity_sources"].config["multiple"])
+            self.assertNotIn("extra_entity_sources", fields)
+            source_fields = {key: value for key, value in fields.items()
+                             if key.startswith("extra_formula_sources_")}
+            self.assertIn("extra_formula_sources_power", source_fields)
+            self.assertTrue(source_fields)
+            for selector in source_fields.values():
+                self.assertEqual("dropdown", selector.config["mode"])
+                self.assertTrue(selector.config["multiple"])
 
-    async def test_back_from_expression_keeps_formula_and_unsaved_expression(self):
+    async def test_back_from_expression_keeps_sources_but_resubmit_clears_expression(self):
         for options in (False, True):
             with self.subTest(options=options):
                 flow = self.flow(options)
@@ -97,9 +103,11 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual("extra_formula_sources", result["step_id"])
                 values = result["data_schema"]({})
                 self.assertEqual("Difference", flow._formula_draft["name"])
-                self.assertEqual(self.formula["extra_entity_sources"], values["extra_entity_sources"])
+                self.assertEqual(self.formula["extra_entity_sources"], values["extra_formula_sources_power"])
                 result = await flow.async_step_extra_formula_sources(values)
-                self.assertEqual("a +", result["data_schema"]({})["extra_formula_expression"])
+                self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
+                result = await flow.async_step_extra_formula_expression(result["data_schema"]({}))
+                self.assertEqual("formula_invalid", result["errors"]["base"])
                 self.assertEqual([], flow._extra_entities)
                 result = await flow.async_step_extra_formula_expression(self.navigation_input(result, "cancel"))
                 self.assertEqual("init" if options else "extra_entities", result["step_id"])
@@ -117,6 +125,9 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
             await self.choose(flow, "edit_formula", options)
             await flow.async_step_extra_formula_edit({"extra_formula_entity": original[0]["key"]})
             result = await select_formula_sources(flow, {**self.formula, "extra_entity_name": "Changed"})
+            self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
+            self.assertEqual({"a": "main_l1_power_rt", "b": "main_l2_power_rt"},
+                             flow._formula_draft["variables"])
             result = await flow.async_step_extra_formula_expression(self.navigation_input(result, "cancel"))
             self.assertEqual("init" if options else "extra_entities", result["step_id"])
             self.assertEqual(original, flow._extra_entities)
@@ -138,7 +149,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual("extra_entities", result["step_id"])
         self.assertEqual(original, flow._extra_entities)
 
-    async def test_back_then_reorder_sources_keeps_variable_meaning(self):
+    async def test_back_then_reorder_sources_rebinds_variables_and_clears_expression(self):
         for options in (False, True):
             flow = self.flow(options)
             await self.menu(flow, options)
@@ -147,8 +158,11 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
             original = result["description_placeholders"]["variables"]
             await flow.async_step_extra_formula_expression(self.navigation_input(result, "back", extra_formula_expression="a-b"))
             result = await flow.async_step_extra_formula_sources({
-                "extra_entity_sources": list(reversed(self.formula["extra_entity_sources"]))})
-            self.assertEqual(original, result["description_placeholders"]["variables"])
+                "extra_formula_sources_power": list(reversed(self.formula["extra_entity_sources"]))})
+            self.assertNotEqual(original, result["description_placeholders"]["variables"])
+            self.assertEqual({"a": "main_l2_power_rt", "b": "main_l1_power_rt"},
+                             flow._formula_draft["variables"])
+            self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
 
     async def test_ecoplug_options_can_render_and_cancel_without_changes(self):
         devices = [{"hardware_number": "TEST-PLUG-01", "name": "Test plug"}]

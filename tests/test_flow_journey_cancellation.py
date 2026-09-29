@@ -130,12 +130,12 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
                 result = await self.submit(flow, result, **self.inputs('zeroconf')[result['step_id']])
         result = await self.submit(flow, result, extra_action='add_formula')
         result = await self.submit(flow, result, extra_entity_name='Old formula', extra_formula_result_type='power')
-        result = await self.submit(flow, result, extra_entity_sources=['sub1_ch1_power_rt'])
+        result = await self.submit(flow, result, extra_formula_sources_power=['sub1_ch1_power_rt'])
         result = await self.submit(flow, result, extra_formula_expression='a')
         original = deepcopy(flow._extra_entities)
         result = await self.submit(flow, result, extra_action='add_formula')
         result = await self.submit(flow, result, extra_entity_name='Unsaved formula', extra_formula_result_type='power')
-        result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt'])
+        result = await self.submit(flow, result, extra_formula_sources_power=['main_l1_power_rt'])
         result = await self.submit(flow, result, extra_formula_expression='a+', flow_action='cancel')
         self.assertEqual('extra_entities', result['step_id'])
         self.assertEqual(original, flow._extra_entities)
@@ -176,7 +176,7 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result.get('errors'))
         self.assertEqual(calls, transport.commands)
 
-    async def test_formula_source_replacement_never_reuses_removed_alias(self):
+    async def test_formula_source_replacement_rebinds_aliases_and_requires_new_expression(self):
         for options in (False, True):
             with self.subTest(options=options):
                 data = {'device_type': 'ecomain', 'mode': 'manual', 'ecomain_serial': 'TEST-JOURNEY-01',
@@ -191,17 +191,21 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
                     result = await flow.async_step_extra_entities()
                 result = await self.submit(flow, result, extra_action='add_formula')
                 result = await self.submit(flow, result, extra_entity_name='Difference', extra_formula_result_type='power')
-                result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt', 'main_l2_power_rt'])
+                result = await self.submit(flow, result, extra_formula_sources_power=['main_l1_power_rt', 'main_l2_power_rt'])
                 result = await self.submit(flow, result, flow_action='back', extra_formula_expression='a-b')
-                result = await self.submit(flow, result, extra_entity_sources=['main_l2_power_rt', 'main_l3_power_rt'])
-                self.assertEqual({'b': 'main_l2_power_rt', 'c': 'main_l3_power_rt'}, flow._formula_draft['variables'])
+                result = await self.submit(flow, result, extra_formula_sources_power=['main_l2_power_rt', 'main_l3_power_rt'])
+                self.assertEqual({'a': 'main_l2_power_rt', 'b': 'main_l3_power_rt'}, flow._formula_draft['variables'])
                 result = await self.submit(flow, result)
                 self.assertEqual('formula_invalid', result['errors']['base'])
                 self.assertEqual([], flow._extra_entities)
                 result = await self.submit(flow, result, flow_action='back')
-                result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt', 'main_l2_power_rt'])
+                result = await self.submit(flow, result, extra_formula_sources_power=['main_l1_power_rt', 'main_l2_power_rt'])
                 self.assertEqual({'a': 'main_l1_power_rt', 'b': 'main_l2_power_rt'}, flow._formula_draft['variables'])
+                self.assertEqual('', result['data_schema']({})['extra_formula_expression'])
                 result = await self.submit(flow, result)
+                self.assertEqual('formula_invalid', result['errors']['base'])
+                self.assertEqual([], flow._extra_entities)
+                result = await self.submit(flow, result, extra_formula_expression='a-b')
                 self.assertEqual('a-b', flow._extra_entities[0]['expression'])
 
     async def test_rejected_upstream_change_preserves_completed_entities(self):
@@ -212,7 +216,7 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
                 result = await self.submit(flow, result, **self.inputs('manual')[result['step_id']])
             result = await self.submit(flow, result, extra_action='add_formula')
             result = await self.submit(flow, result, extra_entity_name='Power', extra_formula_result_type='power')
-            result = await self.submit(flow, result, extra_entity_sources=['main_l1_power_rt'])
+            result = await self.submit(flow, result, extra_formula_sources_power=['main_l1_power_rt'])
             result = await self.submit(flow, result, extra_formula_expression='a')
             original = deepcopy(flow._extra_entities)
             while result['step_id'] != 'ecomain_manual':

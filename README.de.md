@@ -438,10 +438,10 @@ Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mi
 
 1. Wähle **Formelentität hinzufügen** bei der ecoMain-Einrichtung oder unter **Konfigurieren**.
 2. Gib einen Namen ein und wähle den Ergebnistyp im Dropdown-Menü.
-3. Wähle auf der nächsten Seite über Kontrollkästchen eine oder mehrere aktivierte Quellen desselben Typs gemeinsam aus.
+3. Wähle auf der nächsten Seite Quellen aus Dropdown-Menüs mit Mehrfachauswahl, gruppiert nach ihrem Datentyp und unabhängig vom Ergebnistyp. Jede Gruppe ist optional; wähle insgesamt mindestens eine Quelle.
 4. Die Formelseite zeigt, wofür `a`, `b` usw. stehen. Gib die Formel ein und prüfe, ob ihre Einheit zum Ergebnistyp passt.
 
-Wirkenergie bietet nur kumulierte Wirkenergiequellen, Blindenergie nur kumulierte Blindenergiequellen. Cloud-Minuteninkremente sind ausgeschlossen. Formelenergie verwendet `TOTAL` und darf für Nettoenergieberechnungen steigen oder fallen. Ein allgemeiner Zahlentyp wird nicht angeboten.
+Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk- und Blindenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
