@@ -228,7 +228,7 @@ class RealHARuntimeTests(RealHARuntimeFixture):
         self.assertFalse(result["errors"])
         result["data_schema"]({c.CONST_EXTRA_ACTION: c.CONST_EXTRA_ACTION_FINISH})
         measurement = await flow.async_step_measurement_types()
-        self.assertEqual(measurement["step_id"], "measurement_types")
+        self.assertEqual(measurement["step_id"], "measurement_types_local")
         self.assertTrue(measurement["data_schema"]({})[c.CONST_MEASUREMENT_TYPES])
 
     async def test_options_flow_plug_schema(self):

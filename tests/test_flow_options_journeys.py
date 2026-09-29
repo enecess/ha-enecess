@@ -181,6 +181,7 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
                 flow._available_slaves = available
                 result = await flow.async_step_init()
                 result = await self.submit(flow, result, extra_action="measurement_types")
+                self.assertEqual("measurement_types_local", result["step_id"])
                 result = await self.submit(flow, result, measurement_types=["power"])
                 result = await self.submit(flow, result, extra_action="finish")
                 self.assertEqual([1, 2], result["data"]["ecomain_selected_slaves"])
@@ -197,6 +198,8 @@ class OptionsJourneyTests(unittest.IsolatedAsyncioTestCase):
         flow._entry.data["ecomain_firmware_version"] = 138
         result = await flow.async_step_init()
         result = await self.submit(flow, result, extra_action="measurement_types")
+        self.assertEqual("measurement_types_local", result["step_id"])
+        self.assertEqual({"firmware_version": "139"}, result["description_placeholders"])
         result = await self.submit(flow, result, measurement_types=["power", "voltage"])
         result = await self.submit(flow, result, extra_action="add_formula")
         result = await self.submit(flow, result, extra_entity_name="Sub voltage", extra_formula_result_type="voltage")

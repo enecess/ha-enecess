@@ -70,7 +70,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
         original = deepcopy(flow._extra_entities)
         result = await flow.async_step_extra_entities(result["data_schema"]({"extra_action": "back"}))
-        self.assertEqual("measurement_types", result["step_id"])
+        self.assertEqual("measurement_types_local", result["step_id"])
         self.assertEqual(original, flow._extra_entities)
 
     async def test_formula_selectors_offer_type_dropdown_then_grouped_source_dropdowns(self):
@@ -141,7 +141,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
         result = await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
         original = deepcopy(flow._extra_entities)
         result = await flow.async_step_extra_entities(self.navigation_input(result, "back"))
-        self.assertEqual("measurement_types", result["step_id"])
+        self.assertEqual("measurement_types_local", result["step_id"])
         self.assertEqual(original, flow._extra_entities)
         result = await flow.async_step_measurement_types({"measurement_types": ["energy_forward"]})
         self.assertEqual("measurement_in_use", result["errors"]["base"])
@@ -278,7 +278,7 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_all_initial_intermediate_forms_offer_navigation(self):
         steps = ("ecomain_mode", "ecomain_auto_scan", "ecomain_manual", "ecomain_local_confirm",
                  "ecomain_local_setup", "ecomain_cloud_login", "ecoplug_cloud_login", "ecoplug_select",
-                 "ecomain_cloud_master", "ecomain_cloud_confirm", "measurement_types")
+                 "ecomain_cloud_master", "ecomain_cloud_confirm", "measurement_types_local")
         for step in steps:
             with self.subTest(step=step):
                 flow = self.flow()

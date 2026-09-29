@@ -19,6 +19,7 @@ from .client_api import EnecessApi, EnecessApiError, EnecessAuthError
 from .client_modbus import EnecessModbusClient, decode_int16
 from .const import (
     CONF_CLOUD_BASE_URL,
+    CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION,
     CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
     CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
     CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
@@ -130,6 +131,20 @@ def _measurement_schema(entry_data: dict, selected: list[str]) -> vol.Schema:
             )
         }
     )
+
+
+def _measurement_form_details(entry_data: dict) -> dict[str, Any]:
+    """Select translated firmware guidance without changing measurement choices."""
+    if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
+        return {"step_id": "measurement_types"}
+    firmware = entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
+    legacy = firmware is not None and firmware < CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION
+    return {
+        "step_id": "measurement_types_legacy" if legacy else "measurement_types_local",
+        "description_placeholders": {
+            "firmware_version": str(firmware) if firmware is not None else "—"
+        },
+    }
 
 
 def _selection_removes_extra_sources(
@@ -1069,10 +1084,20 @@ class ConfigFlow(
                 self._measurement_types = list(selected)
                 return await self.async_step_extra_entities()
         return self.async_show_form(
-            step_id="measurement_types",
+            **_measurement_form_details(self._entry_data),
             data_schema=_measurement_schema(self._entry_data, selected or []),
             errors=errors,
         )
+
+    @navigable_step
+    async def async_step_measurement_types_local(self, user_input=None):
+        """Handle the local measurement form with firmware details."""
+        return await self.async_step_measurement_types(user_input)
+
+    @navigable_step
+    async def async_step_measurement_types_legacy(self, user_input=None):
+        """Handle the local measurement form with an upgrade hint."""
+        return await self.async_step_measurement_types(user_input)
 
     @navigable_step
     async def async_step_extra_entities(
@@ -1530,12 +1555,22 @@ class EnecessOptionsFlow(
                 self._options[CONST_MEASUREMENT_TYPES] = list(selected)
                 return await self._show_options_menu()
         return self.async_show_form(
-            step_id="measurement_types",
+            **_measurement_form_details(self._measurement_entry_data),
             data_schema=_measurement_schema(
                 self._measurement_entry_data, selected or []
             ),
             errors=errors,
         )
+
+    @navigable_step
+    async def async_step_measurement_types_local(self, user_input=None):
+        """Handle the local measurement form with firmware details."""
+        return await self.async_step_measurement_types(user_input)
+
+    @navigable_step
+    async def async_step_measurement_types_legacy(self, user_input=None):
+        """Handle the local measurement form with an upgrade hint."""
+        return await self.async_step_measurement_types(user_input)
 
     @navigable_step
     async def async_step_phase_device(

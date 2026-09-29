@@ -25,14 +25,14 @@
       },
       "ecomain_local_confirm": {
         "title": "确认设备",
-        "description": "- 序列号：{ecomain_serial}\n- 地址：{ecomain_host}",
+        "description": "请确认以下设备信息。\n\n- 序列号：{ecomain_serial}\n- 地址：{ecomain_host}",
         "data": {
           "flow_action": "操作"
         }
       },
       "ecomain_local_setup": {
         "title": "设备设置",
-        "description": "- 序列号：{ecomain_serial}\n- 地址：{ecomain_host}",
+        "description": "序列号：{ecomain_serial}\n地址：{ecomain_host}\n\n选择要一并添加的 ecoSub，没有从机可直接继续。",
         "data": {
           "ecomain_selected_slaves": "选择要添加的从机",
           "flow_action": "操作"
@@ -64,7 +64,7 @@
       },
       "ecoplug_select": {
         "title": "选择 ecoPlug",
-        "description": "每个选中的插座会创建：\n\n- 通断开关\n- 实时功率传感器（W）\n- 累计电能传感器（kWh）",
+        "description": "选择要添加的插座。添加后可控制通断，并查看功率和累计有功电能。",
         "data": {
           "ecoplug_selected": "选择要添加的插座",
           "flow_action": "操作"
@@ -79,7 +79,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "确认设备",
-        "description": "序列号：{ecomain_serial}\n\n- `*_energy_total_1m`：云端返回的原始每分钟电能增量。\n- Home Assistant 能源面板请使用 `*_energy_accumulated`。\n- 云端接口未提供每个值的时间戳或样本 ID，累计电能可能有误差。",
+        "description": "序列号：{ecomain_serial}\n\n确认此 ecoMain，并选择要一并添加的 ecoSub。没有从机可直接继续。",
         "data": {
           "ecomain_selected_slaves": "选择要添加的从机",
           "flow_action": "操作"
@@ -134,7 +134,7 @@
       },
       "measurement_types": {
         "title": "测量类型",
-        "description": "- 至少选择一项要创建的测量类型。\n- 额外实体使用中的类型不能取消。\n- 本地固件 136–138：支持有功功率、正向/反向有功电能。\n- 本地固件 139 及以上：还支持其余八类测量和通道相位设置。\n- 旧固件不支持的选项会隐藏。",
+        "description": "选择需要查看的测量类型，至少选择一项。",
         "data": {
           "measurement_types": "测量类型",
           "flow_action": "操作"
@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "填写名称并选择结果类型，也可选择无单位的数值。下一页按数据类型分组选择来源，不受结果类型限制。编辑时不能更改结果类型。",
+        "description": "填写实体名称，并选择计算结果的类型和单位。无需单位时，选择“数值（无单位）”。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
@@ -151,7 +151,7 @@
       },
       "extra_formula_sources": {
         "title": "选择源实体",
-        "description": "通过各组多选下拉框合计选择至少一个来源。来源按实际数据类型分组，不受结果类型限制；仅列出固件支持且已启用的测量，隐藏空分组，不会自动启用测量。有功电能和无功电能分组包含累计量，云端每分钟有功电能增量单独分组。\n\n每次从本页继续都会从 a 开始重新分配变量并清空原表达式，编辑公式或返回修改来源后继续时也一样。",
+        "description": "选择参与公式计算的源实体，可多选，至少选择一个。",
         "data": {
           "extra_formula_sources_power": "有功功率 (W)",
           "extra_formula_sources_energy": "有功电能（累计量，Wh）",
@@ -168,7 +168,7 @@
       },
       "extra_formula_expression": {
         "title": "公式表达式",
-        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，数值类型无单位。来源可以跨类型，请自行确认公式的单位正确。",
+        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 请确认计算结果的单位与所选结果类型一致。",
         "data": {
           "extra_formula_expression": "公式表达式",
           "flow_action": "操作"
@@ -179,7 +179,8 @@
         "data": {
           "extra_formula_entity": "公式实体",
           "flow_action": "操作"
-        }
+        },
+        "description": "选择要编辑的公式实体。编辑时需要重新填写表达式；如需更改结果类型，请新建公式实体。"
       },
       "reauth_confirm": {
         "title": "重新验证云端账号",
@@ -187,6 +188,22 @@
         "data": {
           "username": "用户名",
           "password": "密码"
+        }
+      },
+      "measurement_types_local": {
+        "title": "测量类型",
+        "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。",
+        "data": {
+          "measurement_types": "测量类型",
+          "flow_action": "操作"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "测量类型",
+        "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。\n\n更多测量类型需升级至固件 139 或以上。",
+        "data": {
+          "measurement_types": "测量类型",
+          "flow_action": "操作"
         }
       }
     },
@@ -235,7 +252,7 @@
       },
       "ecoplug_select": {
         "title": "调整 ecoPlug",
-        "description": "每个选中的插座会创建：\n\n- 通断开关\n- 实时功率传感器（W）\n- 累计电能传感器（kWh）",
+        "description": "选择要保留在此集成中的插座。取消选择的插座将从此集成移除。",
         "data": {
           "ecoplug_selected": "选择要添加的插座",
           "flow_action": "操作"
@@ -276,7 +293,7 @@
       },
       "measurement_types": {
         "title": "测量类型",
-        "description": "- 至少选择一项要创建的测量类型。\n- 额外实体使用中的类型不能取消。\n- 本地固件 136–138：支持有功功率、正向/反向有功电能。\n- 本地固件 139 及以上：还支持其余八类测量和通道相位设置。\n- 旧固件不支持的选项会隐藏。",
+        "description": "选择需要查看的测量类型，至少选择一项。",
         "data": {
           "measurement_types": "测量类型",
           "flow_action": "操作"
@@ -288,11 +305,11 @@
           "phase_device": "设备",
           "flow_action": "操作"
         },
-        "description": "通道相位设置需要固件 139 及以上。"
+        "description": "选择需要修改通道相位的设备。"
       },
       "channel_phases": {
         "title": "通道相位",
-        "description": "- 为 {device} 各通道选择 L1、L2 或 L3。\n- 保存时只写入已修改的相位，再读取确认。",
+        "description": "为 {device} 的各通道选择 L1、L2 或 L3。保存后将更新设备的通道相位。",
         "data": {
           "channel_1": "通道 1",
           "channel_2": "通道 2",
@@ -309,7 +326,7 @@
       },
       "extra_formula": {
         "title": "添加公式实体",
-        "description": "填写名称并选择结果类型，也可选择无单位的数值。下一页按数据类型分组选择来源，不受结果类型限制。编辑时不能更改结果类型。",
+        "description": "填写实体名称，并选择计算结果的类型和单位。无需单位时，选择“数值（无单位）”。",
         "data": {
           "extra_entity_name": "实体名称",
           "extra_formula_result_type": "结果类型 / 单位",
@@ -318,7 +335,7 @@
       },
       "extra_formula_sources": {
         "title": "选择源实体",
-        "description": "通过各组多选下拉框合计选择至少一个来源。来源按实际数据类型分组，不受结果类型限制；仅列出固件支持且已启用的测量，隐藏空分组，不会自动启用测量。有功电能和无功电能分组包含累计量，云端每分钟有功电能增量单独分组。\n\n每次从本页继续都会从 a 开始重新分配变量并清空原表达式，编辑公式或返回修改来源后继续时也一样。",
+        "description": "选择参与公式计算的源实体，可多选，至少选择一个。",
         "data": {
           "extra_formula_sources_power": "有功功率 (W)",
           "extra_formula_sources_energy": "有功电能（累计量，Wh）",
@@ -335,7 +352,7 @@
       },
       "extra_formula_expression": {
         "title": "公式表达式",
-        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 结果类型决定单位，数值类型无单位。来源可以跨类型，请自行确认公式的单位正确。",
+        "description": "变量：\n{variables}\n\n- 支持 +、-、*、/、括号及 abs、min、max、round。\n- 示例：`max(a-b,0)`、`(a+b)/2`。\n- 请确认计算结果的单位与所选结果类型一致。",
         "data": {
           "extra_formula_expression": "公式表达式",
           "flow_action": "操作"
@@ -345,6 +362,23 @@
         "title": "编辑公式实体",
         "data": {
           "extra_formula_entity": "公式实体",
+          "flow_action": "操作"
+        },
+        "description": "选择要编辑的公式实体。编辑时需要重新填写表达式；如需更改结果类型，请新建公式实体。"
+      },
+      "measurement_types_local": {
+        "title": "测量类型",
+        "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。",
+        "data": {
+          "measurement_types": "测量类型",
+          "flow_action": "操作"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "测量类型",
+        "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。\n\n更多测量类型需升级至固件 139 或以上。",
+        "data": {
+          "measurement_types": "测量类型",
           "flow_action": "操作"
         }
       }
@@ -363,8 +397,8 @@
       "no_measurements_selected": "请至少选择一种测量类型。",
       "measurement_in_use": "请先移除使用此测量类型的额外实体，再取消选择。",
       "phase_read_failed": "无法读取设备的通道相位。",
-      "phase_write_failed": "无法写入此通道相位，请检查设备后重试。",
-      "phase_verify_failed": "回读相位与设置值不一致，请检查此通道后重试。",
+      "phase_write_failed": "无法保存通道相位，请检查设备连接后重试。",
+      "phase_verify_failed": "设备当前相位与所选值不一致，请检查该通道后重试。",
       "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",
       "phase_firmware_too_old": "通道相位设置需要固件 139 或更高版本。",
       "formula_invalid": "公式语法无效或包含不支持的表达式。",

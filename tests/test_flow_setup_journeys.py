@@ -41,7 +41,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
         if slaves:
             self.assertEqual('ecomain_local_setup', r['step_id'])
             r = await self.submit(f, r, ecomain_selected_slaves=list(slaves))
-        self.assertEqual('measurement_types', r['step_id'])
+        self.assertEqual('measurement_types_local', r['step_id'])
         r = await self.submit(f, r, measurement_types=['power'])
         return f, r
 
@@ -76,6 +76,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
         f, r = await self.cloud()
         r = await self.submit(f, r, ecomain_cloud_master_id='1')
         r = await self.submit(f, r, ecomain_selected_slaves=['1'])
+        self.assertEqual('measurement_types', r['step_id'])
         r = await self.submit(f, r, measurement_types=['power'])
         for unused in range(3):
             r = await self.submit(f, r, flow_action='back')
@@ -116,7 +117,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
             for slaves in ([], ['1']):
                 with self.subTest(mode=mode, slaves=slaves):
                     f, r = await self.local(mode, slaves)
-                    previous_pages = ['measurement_types']
+                    previous_pages = ['measurement_types_local']
                     if slaves:
                         previous_pages.append('ecomain_local_setup')
                     previous_pages.append('ecomain_local_confirm')
@@ -246,7 +247,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
             f._ecomain_local_config.update(ecomain_online_slaves=[], ecomain_firmware_version=139)
         f._async_validate_local_device = AsyncMock(side_effect=validate)
         r = await self.submit(f, r)
-        self.assertEqual('measurement_types', r['step_id'])
+        self.assertEqual('measurement_types_local', r['step_id'])
         r = await self.submit(f, r, measurement_types=['power'])
         r = await self.submit(f, r, extra_action='finish')
         self.assertEqual('create_entry', r['type'])
@@ -277,7 +278,7 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual('ecomain_auto_scan', r['step_id'])
         r = await self.submit(f, r, ecomain_serial='TEST-RETRY-AUTO-01')
         r = await self.submit(f, r)
-        self.assertEqual('measurement_types', r['step_id'])
+        self.assertEqual('measurement_types_local', r['step_id'])
         r = await self.submit(f, r, measurement_types=['power'])
         r = await self.submit(f, r, extra_action='finish')
         self.assertEqual('create_entry', r['type'])

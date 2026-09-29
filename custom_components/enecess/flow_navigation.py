@@ -17,6 +17,8 @@ SAVE_STEPS = {
     "extra_transform",
     "extra_aggregate",
     "measurement_types",
+    "measurement_types_local",
+    "measurement_types_legacy",
     "channel_phases",
     "ecoplug_select",
 }

@@ -62,14 +62,15 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
             'ecomain_cloud_master': {'ecomain_cloud_master_id': '1'},
             'ecomain_cloud_confirm': {'ecomain_selected_slaves': ['1']},
             'measurement_types': {'measurement_types': ['power']},
+            'measurement_types_local': {'measurement_types': ['power']},
         }
 
     async def test_cancel_at_every_setup_page_aborts_without_saving_or_more_io(self):
         routes = {
             'manual': ['ecomain_mode', 'ecomain_manual', 'ecomain_local_confirm',
-                       'ecomain_local_setup', 'measurement_types', 'extra_entities'],
+                       'ecomain_local_setup', 'measurement_types_local', 'extra_entities'],
             'auto': ['ecomain_mode', 'ecomain_auto_scan', 'ecomain_local_confirm',
-                     'ecomain_local_setup', 'measurement_types', 'extra_entities'],
+                     'ecomain_local_setup', 'measurement_types_local', 'extra_entities'],
             'cloud': ['ecomain_mode', 'ecomain_cloud_login', 'ecomain_cloud_master',
                       'ecomain_cloud_confirm', 'measurement_types', 'extra_entities'],
             'ecoplug': ['ecoplug_cloud_login', 'ecoplug_select'],
@@ -92,7 +93,7 @@ class JourneyCancellationTests(unittest.IsolatedAsyncioTestCase):
                     flow.hass.config_entries.async_update_entry.assert_not_called()
 
     async def test_discovery_main_page_cancel_resets_same_flow_without_more_io(self):
-        for target in ('ecomain_local_setup', 'measurement_types', 'extra_entities'):
+        for target in ('ecomain_local_setup', 'measurement_types_local', 'extra_entities'):
             with self.subTest(target=target):
                 flow, api, transport, client = self.make_flow()
                 flow.context = {'source': 'zeroconf', 'discovery_key': 'fake-discovery-key'}

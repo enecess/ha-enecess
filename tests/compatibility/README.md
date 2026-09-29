@@ -101,7 +101,7 @@ ecoPlug data, availability recovery and immediate control updates. Cloud energy
 continues counting identical successful deltas and excludes failed polls; pending
 storage checkpoints are not postponed by additional refreshes.
 
-As checked on 2026-09-29, the 155 offline tests and 85 real-HA runtime
+As checked on 2026-09-29, the 157 offline tests and 85 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

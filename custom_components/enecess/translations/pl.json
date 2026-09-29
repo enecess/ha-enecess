@@ -25,14 +25,14 @@
       },
       "ecomain_local_confirm": {
         "title": "Potwierdź urządzenie",
-        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
+        "description": "Sprawdź poniższe dane urządzenia.\n\n- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
         "data": {
           "flow_action": "Działanie"
         }
       },
       "ecomain_local_setup": {
         "title": "Konfiguracja urządzenia",
-        "description": "- Numer seryjny: {ecomain_serial}\n- Adres: {ecomain_host}",
+        "description": "Numer seryjny: {ecomain_serial}\nAdres: {ecomain_host}\n\nWybierz urządzenia ecoSub do dodania z tym ecoMain. Jeśli ich nie ma, przejdź dalej bez wybierania.",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
           "flow_action": "Działanie"
@@ -64,7 +64,7 @@
       },
       "ecoplug_select": {
         "title": "Wybierz ecoPlug",
-        "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
+        "description": "Wybierz gniazdka do dodania. Następnie będzie można je włączać i wyłączać oraz sprawdzać ich moc i skumulowaną energię czynną.",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania",
           "flow_action": "Działanie"
@@ -79,7 +79,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Potwierdź urządzenie",
-        "description": "Numer seryjny: {ecomain_serial}\n\n- `*_energy_total_1m`: surowy przyrost energii na minutę z API chmury.\n- W panelu Energia Home Assistant używaj `*_energy_accumulated`.\n- Łączna energia z chmury jest szacunkowa: API nie podaje czasu ani identyfikatora dla każdego pomiaru.",
+        "description": "Numer seryjny: {ecomain_serial}\n\nPotwierdź to urządzenie ecoMain i wybierz urządzenia ecoSub do dodania. Jeśli ich nie ma, przejdź dalej bez wybierania.",
         "data": {
           "ecomain_selected_slaves": "Wybierz urządzenia podrzędne do dodania",
           "flow_action": "Działanie"
@@ -134,7 +134,7 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
+        "description": "Wybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.",
         "data": {
           "measurement_types": "Rodzaje pomiarów",
           "flow_action": "Działanie"
@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Podaj nazwę i wybierz typ wyniku, w tym liczbę bez jednostki. Następnie wybierz źródła pogrupowane według typu danych, niezależnie od wyniku. Typu wyniku nie można zmienić podczas edycji.",
+        "description": "Podaj nazwę encji i wybierz typ wyniku oraz jednostkę. Jeśli jednostka nie jest potrzebna, wybierz liczbę bez jednostki.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -151,7 +151,7 @@
       },
       "extra_formula_sources": {
         "title": "Wybierz encje źródłowe",
-        "description": "Wybierz łącznie co najmniej jedno źródło z list rozwijanych wielokrotnego wyboru. Grupy zależą od typu danych, niezależnie od wyniku. Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia; puste grupy są ukryte. Pomiary nie są włączane automatycznie. Energia czynna i bierna zawiera wartości skumulowane; minutowe przyrosty energii czynnej z chmury mają osobną grupę.\n\nZa każdym razem, gdy przechodzisz dalej z tej strony, zmienne są przypisywane ponownie od a, a poprzedni wzór jest usuwany, także podczas edycji lub po powrocie do wyboru źródeł.",
+        "description": "Wybierz encje źródłowe używane w formule. Możesz wybrać kilka; wymagana jest co najmniej jedna.",
         "data": {
           "extra_formula_sources_power": "Moc czynna (W)",
           "extra_formula_sources_energy": "Energia czynna (skumulowana, Wh)",
@@ -168,7 +168,7 @@
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę; Liczba nie ma jednostki. Źródła mogą mieć różne typy. Samodzielnie sprawdź jednostki we wzorze.",
+        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Sprawdź, czy jednostka obliczonego wyniku odpowiada wybranemu typowi wyniku.",
         "data": {
           "extra_formula_expression": "Wyrażenie",
           "flow_action": "Działanie"
@@ -179,7 +179,8 @@
         "data": {
           "extra_formula_entity": "Encja formuły",
           "flow_action": "Działanie"
-        }
+        },
+        "description": "Wybierz encję formuły do edycji. Konieczne będzie ponowne wpisanie wzoru. Aby zmienić typ wyniku, utwórz nową encję formuły."
       },
       "reauth_confirm": {
         "title": "Ponowne uwierzytelnienie konta w chmurze",
@@ -187,6 +188,22 @@
         "data": {
           "username": "Nazwa użytkownika",
           "password": "Hasło"
+        }
+      },
+      "measurement_types_local": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wersja oprogramowania: {firmware_version}\n\nWybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów",
+          "flow_action": "Działanie"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wersja oprogramowania: {firmware_version}\n\nWybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.\n\nZaktualizuj oprogramowanie do wersji 139 lub nowszej, aby korzystać z dodatkowych typów pomiarów.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów",
+          "flow_action": "Działanie"
         }
       }
     },
@@ -235,7 +252,7 @@
       },
       "ecoplug_select": {
         "title": "Dostosuj ecoPlug",
-        "description": "Każde wybrane gniazdko tworzy:\n\n- Przełącznik włącz/wyłącz\n- Czujnik mocy chwilowej (W)\n- Czujnik energii całkowitej (kWh)",
+        "description": "Wybierz gniazdka, które mają pozostać w tej integracji. Odznaczone gniazdka zostaną z niej usunięte.",
         "data": {
           "ecoplug_selected": "Wybierz gniazdka do dodania",
           "flow_action": "Działanie"
@@ -276,7 +293,7 @@
       },
       "measurement_types": {
         "title": "Rodzaje pomiarów",
-        "description": "- Wybierz co najmniej jeden rodzaj pomiaru do utworzenia.\n- Nie można odznaczyć rodzajów używanych przez dodatkowe encje.\n- Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.\n- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.\n- Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.",
+        "description": "Wybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.",
         "data": {
           "measurement_types": "Rodzaje pomiarów",
           "flow_action": "Działanie"
@@ -288,11 +305,11 @@
           "phase_device": "Urządzenie",
           "flow_action": "Działanie"
         },
-        "description": "Ustawienia faz kanałów wymagają oprogramowania w wersji 139 lub nowszej."
+        "description": "Wybierz urządzenie, którego fazy kanałów chcesz zmienić."
       },
       "channel_phases": {
         "title": "Fazy kanałów",
-        "description": "- Wybierz L1, L2 lub L3 dla każdego kanału urządzenia {device}.\n- Zapis wysyła tylko zmienione fazy, a następnie odczytuje je ponownie, aby je sprawdzić.",
+        "description": "Wybierz L1, L2 lub L3 dla każdego kanału urządzenia {device}. Zapisanie zmieni fazy kanałów w urządzeniu.",
         "data": {
           "channel_1": "Kanał 1",
           "channel_2": "Kanał 2",
@@ -309,7 +326,7 @@
       },
       "extra_formula": {
         "title": "Dodaj encję formuły",
-        "description": "Podaj nazwę i wybierz typ wyniku, w tym liczbę bez jednostki. Następnie wybierz źródła pogrupowane według typu danych, niezależnie od wyniku. Typu wyniku nie można zmienić podczas edycji.",
+        "description": "Podaj nazwę encji i wybierz typ wyniku oraz jednostkę. Jeśli jednostka nie jest potrzebna, wybierz liczbę bez jednostki.",
         "data": {
           "extra_entity_name": "Nazwa encji",
           "extra_formula_result_type": "Typ wyniku / jednostka",
@@ -318,7 +335,7 @@
       },
       "extra_formula_sources": {
         "title": "Wybierz encje źródłowe",
-        "description": "Wybierz łącznie co najmniej jedno źródło z list rozwijanych wielokrotnego wyboru. Grupy zależą od typu danych, niezależnie od wyniku. Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia; puste grupy są ukryte. Pomiary nie są włączane automatycznie. Energia czynna i bierna zawiera wartości skumulowane; minutowe przyrosty energii czynnej z chmury mają osobną grupę.\n\nZa każdym razem, gdy przechodzisz dalej z tej strony, zmienne są przypisywane ponownie od a, a poprzedni wzór jest usuwany, także podczas edycji lub po powrocie do wyboru źródeł.",
+        "description": "Wybierz encje źródłowe używane w formule. Możesz wybrać kilka; wymagana jest co najmniej jedna.",
         "data": {
           "extra_formula_sources_power": "Moc czynna (W)",
           "extra_formula_sources_energy": "Energia czynna (skumulowana, Wh)",
@@ -335,7 +352,7 @@
       },
       "extra_formula_expression": {
         "title": "Wyrażenie",
-        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Typ wyniku określa jednostkę; Liczba nie ma jednostki. Źródła mogą mieć różne typy. Samodzielnie sprawdź jednostki we wzorze.",
+        "description": "Zmienne:\n{variables}\n\n- Obsługuje +, -, *, /, nawiasy, abs, min, max i round.\n- Przykłady: `max(a-b,0)`, `(a+b)/2`.\n- Sprawdź, czy jednostka obliczonego wyniku odpowiada wybranemu typowi wyniku.",
         "data": {
           "extra_formula_expression": "Wyrażenie",
           "flow_action": "Działanie"
@@ -345,6 +362,23 @@
         "title": "Edytuj encję formuły",
         "data": {
           "extra_formula_entity": "Encja formuły",
+          "flow_action": "Działanie"
+        },
+        "description": "Wybierz encję formuły do edycji. Konieczne będzie ponowne wpisanie wzoru. Aby zmienić typ wyniku, utwórz nową encję formuły."
+      },
+      "measurement_types_local": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wersja oprogramowania: {firmware_version}\n\nWybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów",
+          "flow_action": "Działanie"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Rodzaje pomiarów",
+        "description": "Wersja oprogramowania: {firmware_version}\n\nWybierz pomiary, które chcesz wyświetlać. Wymagany jest co najmniej jeden typ.\n\nZaktualizuj oprogramowanie do wersji 139 lub nowszej, aby korzystać z dodatkowych typów pomiarów.",
+        "data": {
+          "measurement_types": "Rodzaje pomiarów",
           "flow_action": "Działanie"
         }
       }
@@ -363,8 +397,8 @@
       "no_measurements_selected": "Wybierz co najmniej jeden rodzaj pomiaru.",
       "measurement_in_use": "Przed odznaczeniem usuń dodatkowe encje korzystające z tego pomiaru.",
       "phase_read_failed": "Nie można odczytać faz kanałów z urządzenia.",
-      "phase_write_failed": "Nie można zapisać fazy tego kanału. Sprawdź urządzenie i spróbuj ponownie.",
-      "phase_verify_failed": "Odczytana faza nie odpowiada żądanej wartości. Sprawdź ten kanał i spróbuj ponownie.",
+      "phase_write_failed": "Nie można zapisać fazy kanału. Sprawdź połączenie z urządzeniem i spróbuj ponownie.",
+      "phase_verify_failed": "Aktualna faza urządzenia nie odpowiada wybranej wartości. Sprawdź kanał i spróbuj ponownie.",
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",
       "phase_firmware_too_old": "Konfiguracja faz kanałów wymaga oprogramowania w wersji 139 lub nowszej.",
       "formula_invalid": "Nieprawidłowa składnia lub nieobsługiwane wyrażenie.",

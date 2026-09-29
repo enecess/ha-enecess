@@ -8,6 +8,7 @@ TRANSLATION_FILES = (
     ROOT / "custom_components/enecess/translations/en.json",
     ROOT / "custom_components/enecess/translations/de.json",
     ROOT / "custom_components/enecess/translations/fr.json",
+    ROOT / "custom_components/enecess/translations/it.json",
     ROOT / "custom_components/enecess/translations/pl.json",
     ROOT / "custom_components/enecess/translations/zh-Hans.json",
 )
@@ -21,15 +22,13 @@ class EcoPlugTranslationResourceTests(unittest.TestCase):
                 config_description = data["config"]["step"]["ecoplug_select"]["description"]
                 options_description = data["options"]["step"]["ecoplug_select"]["description"]
                 self.assertTrue(config_description.strip())
-                self.assertEqual(config_description, options_description)
+                self.assertTrue(options_description.strip())
 
-    def test_descriptions_are_customer_facing_and_include_units(self):
+    def test_descriptions_do_not_expose_internal_entity_identifiers(self):
         for path in TRANSLATION_FILES:
             with self.subTest(path=path.name):
                 data = json.loads(path.read_text(encoding="utf-8"))
                 description = data["config"]["step"]["ecoplug_select"]["description"]
-                self.assertIn("W", description)
-                self.assertIn("kWh", description)
                 self.assertNotIn("power_rt", description)
                 self.assertNotIn("energy_total", description)
                 self.assertNotIn("unique_id", description)

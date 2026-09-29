@@ -25,14 +25,14 @@
       },
       "ecomain_local_confirm": {
         "title": "Confirm Device",
-        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}",
+        "description": "Check the device details below.\n\n- Serial number: {ecomain_serial}\n- Address: {ecomain_host}",
         "data": {
           "flow_action": "Action"
         }
       },
       "ecomain_local_setup": {
         "title": "Setup Device",
-        "description": "- Serial Number: {ecomain_serial}\n- Address: {ecomain_host}",
+        "description": "Serial number: {ecomain_serial}\nAddress: {ecomain_host}\n\nSelect any ecoSub devices to add with this ecoMain. If there are none, continue without selecting any.",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add",
           "flow_action": "Action"
@@ -64,7 +64,7 @@
       },
       "ecoplug_select": {
         "title": "Select ecoPlug",
-        "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
+        "description": "Select the plugs to add. You can then switch them on or off and view their power and cumulative active energy.",
         "data": {
           "ecoplug_selected": "Select Plugs to Add",
           "flow_action": "Action"
@@ -79,7 +79,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Confirm Device",
-        "description": "Serial Number: {ecomain_serial}\n\n- `*_energy_total_1m`: raw 1-minute energy increment from the cloud API.\n- Use `*_energy_accumulated` for the Home Assistant Energy Dashboard.\n- Cloud accumulated energy is an estimate: the API provides no timestamp or sample ID for each value.",
+        "description": "Serial number: {ecomain_serial}\n\nConfirm this ecoMain and select any ecoSub devices to add with it. If there are none, continue without selecting any.",
         "data": {
           "ecomain_selected_slaves": "Select Slaves to Add",
           "flow_action": "Action"
@@ -134,7 +134,7 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
+        "description": "Select the measurements you want to view. Choose at least one type.",
         "data": {
           "measurement_types": "Measurement Types",
           "flow_action": "Action"
@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Choose a name and result type, including a unitless number. Next, select sources grouped by their data type, independently of the result type. The result type cannot be changed when editing.",
+        "description": "Enter an entity name and choose the result type and unit. Select “Number (no unit)” if no unit is needed.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -151,7 +151,7 @@
       },
       "extra_formula_sources": {
         "title": "Select Source Entities",
-        "description": "Select at least one source across the multi-select dropdowns. Sources are grouped by data type, independently of the result type. Only firmware-supported, enabled measurements are listed; empty groups are hidden. Measurements are not enabled automatically. Active and reactive energy groups contain cumulative readings; cloud 1-minute active energy increments have a separate group.\n\nEach time you continue from this page, variables are reassigned from a and the previous expression is cleared, including when editing or returning to change sources.",
+        "description": "Select the source entities to use in the formula. You can select multiple entities; at least one is required.",
         "data": {
           "extra_formula_sources_power": "Active power (W)",
           "extra_formula_sources_energy": "Active energy (cumulative, Wh)",
@@ -168,7 +168,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit; Number has no unit. Sources may have different types. Check the formula’s units yourself.",
+        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- Check that the calculated result uses the unit of the selected result type.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -179,7 +179,8 @@
         "data": {
           "extra_formula_entity": "Formula Entity",
           "flow_action": "Action"
-        }
+        },
+        "description": "Select the formula entity to edit. You will need to enter the expression again. To change the result type, create a new formula entity."
       },
       "reauth_confirm": {
         "title": "Reauthenticate cloud account",
@@ -187,6 +188,22 @@
         "data": {
           "username": "Username",
           "password": "Password"
+        }
+      },
+      "measurement_types_local": {
+        "title": "Measurement Types",
+        "description": "Firmware version: {firmware_version}\n\nSelect the measurements you want to view. Choose at least one type.",
+        "data": {
+          "measurement_types": "Measurement Types",
+          "flow_action": "Action"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Measurement Types",
+        "description": "Firmware version: {firmware_version}\n\nSelect the measurements you want to view. Choose at least one type.\n\nUpgrade to firmware 139 or later for more measurement types.",
+        "data": {
+          "measurement_types": "Measurement Types",
+          "flow_action": "Action"
         }
       }
     },
@@ -235,7 +252,7 @@
       },
       "ecoplug_select": {
         "title": "Adjust ecoPlug",
-        "description": "Each selected plug creates:\n\n- An on/off switch\n- A real-time power sensor (W)\n- A total energy sensor (kWh)",
+        "description": "Select the plugs to keep in this integration. Deselected plugs will be removed from the integration.",
         "data": {
           "ecoplug_selected": "Select Plugs to Add",
           "flow_action": "Action"
@@ -276,7 +293,7 @@
       },
       "measurement_types": {
         "title": "Measurement Types",
-        "description": "- Select at least one measurement type to create.\n- Types used by extra entities cannot be deselected.\n- Local firmware 136–138: active power and forward/reverse active energy.\n- Local firmware 139 or later: also supports the eight additional types and channel phase settings.\n- Unsupported types are hidden on older firmware.",
+        "description": "Select the measurements you want to view. Choose at least one type.",
         "data": {
           "measurement_types": "Measurement Types",
           "flow_action": "Action"
@@ -288,11 +305,11 @@
           "phase_device": "Device",
           "flow_action": "Action"
         },
-        "description": "Channel phase settings require firmware 139 or later."
+        "description": "Select the device whose channel phases you want to change."
       },
       "channel_phases": {
         "title": "Channel Phases",
-        "description": "- Select L1, L2 or L3 for each channel on {device}.\n- Saving writes only changed phases, then reads them back to check.",
+        "description": "Select L1, L2 or L3 for each channel on {device}. Saving updates the channel phases on the device.",
         "data": {
           "channel_1": "Channel 1",
           "channel_2": "Channel 2",
@@ -309,7 +326,7 @@
       },
       "extra_formula": {
         "title": "Add Formula Entity",
-        "description": "Choose a name and result type, including a unitless number. Next, select sources grouped by their data type, independently of the result type. The result type cannot be changed when editing.",
+        "description": "Enter an entity name and choose the result type and unit. Select “Number (no unit)” if no unit is needed.",
         "data": {
           "extra_entity_name": "Entity Name",
           "extra_formula_result_type": "Result Type / Unit",
@@ -318,7 +335,7 @@
       },
       "extra_formula_sources": {
         "title": "Select Source Entities",
-        "description": "Select at least one source across the multi-select dropdowns. Sources are grouped by data type, independently of the result type. Only firmware-supported, enabled measurements are listed; empty groups are hidden. Measurements are not enabled automatically. Active and reactive energy groups contain cumulative readings; cloud 1-minute active energy increments have a separate group.\n\nEach time you continue from this page, variables are reassigned from a and the previous expression is cleared, including when editing or returning to change sources.",
+        "description": "Select the source entities to use in the formula. You can select multiple entities; at least one is required.",
         "data": {
           "extra_formula_sources_power": "Active power (W)",
           "extra_formula_sources_energy": "Active energy (cumulative, Wh)",
@@ -335,7 +352,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- The result type sets the unit; Number has no unit. Sources may have different types. Check the formula’s units yourself.",
+        "description": "Variables:\n{variables}\n\n- Supports +, -, *, /, parentheses, abs, min, max and round.\n- Examples: `max(a-b,0)`, `(a+b)/2`.\n- Check that the calculated result uses the unit of the selected result type.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -345,6 +362,23 @@
         "title": "Edit Formula Entity",
         "data": {
           "extra_formula_entity": "Formula Entity",
+          "flow_action": "Action"
+        },
+        "description": "Select the formula entity to edit. You will need to enter the expression again. To change the result type, create a new formula entity."
+      },
+      "measurement_types_local": {
+        "title": "Measurement Types",
+        "description": "Firmware version: {firmware_version}\n\nSelect the measurements you want to view. Choose at least one type.",
+        "data": {
+          "measurement_types": "Measurement Types",
+          "flow_action": "Action"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Measurement Types",
+        "description": "Firmware version: {firmware_version}\n\nSelect the measurements you want to view. Choose at least one type.\n\nUpgrade to firmware 139 or later for more measurement types.",
+        "data": {
+          "measurement_types": "Measurement Types",
           "flow_action": "Action"
         }
       }
@@ -363,8 +397,8 @@
       "no_measurements_selected": "Select at least one measurement type.",
       "measurement_in_use": "Remove extra entities using this measurement before deselecting it.",
       "phase_read_failed": "Unable to read channel phases from the device.",
-      "phase_write_failed": "Unable to write this channel phase. Check the device and try again.",
-      "phase_verify_failed": "The phase read back does not match the requested value. Check this channel and try again.",
+      "phase_write_failed": "Unable to save the channel phase. Check the device connection and try again.",
+      "phase_verify_failed": "The device’s current phase does not match your selection. Check the channel and try again.",
       "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",
       "phase_firmware_too_old": "Channel phase configuration requires firmware 139 or later.",
       "formula_invalid": "Invalid syntax or unsupported expression.",

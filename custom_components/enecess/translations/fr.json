@@ -25,14 +25,14 @@
       },
       "ecomain_local_confirm": {
         "title": "Confirmer l'appareil",
-        "description": "- Numéro de série : {ecomain_serial}\n- Adresse : {ecomain_host}",
+        "description": "Vérifiez les informations de l’appareil ci-dessous.\n\n- Numéro de série : {ecomain_serial}\n- Adresse : {ecomain_host}",
         "data": {
           "flow_action": "Action"
         }
       },
       "ecomain_local_setup": {
         "title": "Configurer l'appareil",
-        "description": "- Numéro de série : {ecomain_serial}\n- Adresse : {ecomain_host}",
+        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}\n\nSélectionnez les appareils ecoSub à ajouter avec cet ecoMain. S’il n’y en a aucun, continuez sans sélection.",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "flow_action": "Action"
@@ -64,7 +64,7 @@
       },
       "ecoplug_select": {
         "title": "Sélectionner un ecoPlug",
-        "description": "Chaque prise sélectionnée crée :\n\n- Un interrupteur marche/arrêt\n- Un capteur de puissance en temps réel (W)\n- Un capteur d’énergie totale (kWh)",
+        "description": "Sélectionnez les prises à ajouter. Vous pourrez ensuite les allumer ou les éteindre et consulter leur puissance et leur énergie active cumulée.",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter",
           "flow_action": "Action"
@@ -79,7 +79,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Confirmer l'appareil",
-        "description": "Numéro de série : {ecomain_serial}\n\n- `*_energy_total_1m` : hausse brute d’énergie par minute fournie par l’API cloud.\n- Utilisez `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant.\n- L’énergie cloud cumulée dans Home Assistant reste une estimation : l’API ne donne ni date et heure ni identifiant pour chaque mesure.",
+        "description": "Numéro de série : {ecomain_serial}\n\nConfirmez cet ecoMain et sélectionnez les appareils ecoSub à ajouter. S’il n’y en a aucun, continuez sans sélection.",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "flow_action": "Action"
@@ -134,7 +134,7 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "- Sélectionnez au moins un type de mesure à créer.\n- Les types utilisés par des entités supplémentaires ne peuvent pas être décochés.\n- Firmware local 136–138 : puissance active et énergie active directe/inverse.\n- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.\n- Les types non pris en charge sont masqués avec un ancien firmware.",
+        "description": "Sélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
         "data": {
           "measurement_types": "Types de mesures",
           "flow_action": "Action"
@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "Saisissez un nom et choisissez un type de résultat, y compris un nombre sans unité. Sélectionnez ensuite les sources regroupées par type de données, indépendamment du résultat. Le type de résultat ne peut pas être modifié ensuite.",
+        "description": "Saisissez le nom de l’entité et choisissez le type de résultat et son unité. Choisissez un nombre sans unité si aucune unité n’est nécessaire.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
@@ -151,7 +151,7 @@
       },
       "extra_formula_sources": {
         "title": "Sélectionner les entités sources",
-        "description": "Sélectionnez au moins une source au total dans les listes déroulantes à sélection multiple. Les groupes suivent le type de données, indépendamment du résultat. Seules les mesures activées et prises en charge par le micrologiciel sont proposées ; les groupes vides sont masqués. Aucune mesure n’est activée automatiquement. Les énergies active et réactive contiennent les valeurs cumulées ; les incréments d’énergie active par minute du cloud ont un groupe séparé.\n\nChaque fois que vous continuez depuis cette page, les variables sont réattribuées à partir de a et l’expression précédente est effacée, y compris lors d’une modification ou après un retour aux sources.",
+        "description": "Sélectionnez les entités sources à utiliser dans la formule. Vous pouvez en sélectionner plusieurs ; au moins une est requise.",
         "data": {
           "extra_formula_sources_power": "Puissance active (W)",
           "extra_formula_sources_energy": "Énergie active (cumulée, Wh)",
@@ -168,7 +168,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables :\n{variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Le type de résultat définit l’unité ; Nombre n’a pas d’unité. Les sources peuvent avoir des types différents. Vérifiez vous-même les unités de la formule.",
+        "description": "Variables :\n{variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Vérifiez que l’unité du résultat calculé correspond au type de résultat sélectionné.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -179,7 +179,8 @@
         "data": {
           "extra_formula_entity": "Entité de formule",
           "flow_action": "Action"
-        }
+        },
+        "description": "Sélectionnez l’entité de formule à modifier. Vous devrez saisir à nouveau l’expression. Pour changer le type de résultat, créez une nouvelle entité de formule."
       },
       "reauth_confirm": {
         "title": "Réauthentifier le compte cloud",
@@ -187,6 +188,22 @@
         "data": {
           "username": "Nom d'utilisateur",
           "password": "Mot de passe"
+        }
+      },
+      "measurement_types_local": {
+        "title": "Types de mesures",
+        "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
+        "data": {
+          "measurement_types": "Types de mesures",
+          "flow_action": "Action"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Types de mesures",
+        "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.\n\nPassez au micrologiciel 139 ou ultérieur pour accéder à davantage de types de mesures.",
+        "data": {
+          "measurement_types": "Types de mesures",
+          "flow_action": "Action"
         }
       }
     },
@@ -235,7 +252,7 @@
       },
       "ecoplug_select": {
         "title": "Modifier ecoPlug",
-        "description": "Chaque prise sélectionnée crée :\n\n- Un interrupteur marche/arrêt\n- Un capteur de puissance en temps réel (W)\n- Un capteur d’énergie totale (kWh)",
+        "description": "Sélectionnez les prises à conserver dans cette intégration. Les prises désélectionnées seront retirées de l’intégration.",
         "data": {
           "ecoplug_selected": "Sélectionner les prises à ajouter",
           "flow_action": "Action"
@@ -276,7 +293,7 @@
       },
       "measurement_types": {
         "title": "Types de mesures",
-        "description": "- Sélectionnez au moins un type de mesure à créer.\n- Les types utilisés par des entités supplémentaires ne peuvent pas être décochés.\n- Firmware local 136–138 : puissance active et énergie active directe/inverse.\n- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.\n- Les types non pris en charge sont masqués avec un ancien firmware.",
+        "description": "Sélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
         "data": {
           "measurement_types": "Types de mesures",
           "flow_action": "Action"
@@ -288,11 +305,11 @@
           "phase_device": "Appareil",
           "flow_action": "Action"
         },
-        "description": "Le réglage des phases des canaux nécessite le firmware 139 ou plus récent."
+        "description": "Sélectionnez l’appareil dont vous souhaitez modifier les phases des canaux."
       },
       "channel_phases": {
         "title": "Phases des canaux",
-        "description": "- Choisissez L1, L2 ou L3 pour chaque canal de {device}.\n- À l’enregistrement, seules les phases modifiées sont écrites, puis relues pour vérification.",
+        "description": "Sélectionnez L1, L2 ou L3 pour chaque canal de {device}. L’enregistrement modifie les phases des canaux sur l’appareil.",
         "data": {
           "channel_1": "Canal 1",
           "channel_2": "Canal 2",
@@ -309,7 +326,7 @@
       },
       "extra_formula": {
         "title": "Ajouter une entité de formule",
-        "description": "Saisissez un nom et choisissez un type de résultat, y compris un nombre sans unité. Sélectionnez ensuite les sources regroupées par type de données, indépendamment du résultat. Le type de résultat ne peut pas être modifié ensuite.",
+        "description": "Saisissez le nom de l’entité et choisissez le type de résultat et son unité. Choisissez un nombre sans unité si aucune unité n’est nécessaire.",
         "data": {
           "extra_entity_name": "Nom de l'entité",
           "extra_formula_result_type": "Type de résultat / unité",
@@ -318,7 +335,7 @@
       },
       "extra_formula_sources": {
         "title": "Sélectionner les entités sources",
-        "description": "Sélectionnez au moins une source au total dans les listes déroulantes à sélection multiple. Les groupes suivent le type de données, indépendamment du résultat. Seules les mesures activées et prises en charge par le micrologiciel sont proposées ; les groupes vides sont masqués. Aucune mesure n’est activée automatiquement. Les énergies active et réactive contiennent les valeurs cumulées ; les incréments d’énergie active par minute du cloud ont un groupe séparé.\n\nChaque fois que vous continuez depuis cette page, les variables sont réattribuées à partir de a et l’expression précédente est effacée, y compris lors d’une modification ou après un retour aux sources.",
+        "description": "Sélectionnez les entités sources à utiliser dans la formule. Vous pouvez en sélectionner plusieurs ; au moins une est requise.",
         "data": {
           "extra_formula_sources_power": "Puissance active (W)",
           "extra_formula_sources_energy": "Énergie active (cumulée, Wh)",
@@ -335,7 +352,7 @@
       },
       "extra_formula_expression": {
         "title": "Expression",
-        "description": "Variables :\n{variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Le type de résultat définit l’unité ; Nombre n’a pas d’unité. Les sources peuvent avoir des types différents. Vérifiez vous-même les unités de la formule.",
+        "description": "Variables :\n{variables}\n\n- Accepte +, -, *, /, parenthèses, abs, min, max et round.\n- Exemples : `max(a-b,0)`, `(a+b)/2`.\n- Vérifiez que l’unité du résultat calculé correspond au type de résultat sélectionné.",
         "data": {
           "extra_formula_expression": "Expression",
           "flow_action": "Action"
@@ -345,6 +362,23 @@
         "title": "Modifier une entité de formule",
         "data": {
           "extra_formula_entity": "Entité de formule",
+          "flow_action": "Action"
+        },
+        "description": "Sélectionnez l’entité de formule à modifier. Vous devrez saisir à nouveau l’expression. Pour changer le type de résultat, créez une nouvelle entité de formule."
+      },
+      "measurement_types_local": {
+        "title": "Types de mesures",
+        "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
+        "data": {
+          "measurement_types": "Types de mesures",
+          "flow_action": "Action"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Types de mesures",
+        "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.\n\nPassez au micrologiciel 139 ou ultérieur pour accéder à davantage de types de mesures.",
+        "data": {
+          "measurement_types": "Types de mesures",
           "flow_action": "Action"
         }
       }
@@ -363,8 +397,8 @@
       "no_measurements_selected": "Sélectionnez au moins un type de mesure.",
       "measurement_in_use": "Supprimez les entités supplémentaires utilisant cette mesure avant de la désélectionner.",
       "phase_read_failed": "Impossible de lire les phases des canaux sur l’appareil.",
-      "phase_write_failed": "Impossible d’écrire la phase de ce canal. Vérifiez l’appareil et réessayez.",
-      "phase_verify_failed": "La phase relue ne correspond pas à la valeur demandée. Vérifiez ce canal et réessayez.",
+      "phase_write_failed": "Impossible d’enregistrer la phase du canal. Vérifiez la connexion de l’appareil et réessayez.",
+      "phase_verify_failed": "La phase actuelle de l’appareil ne correspond pas à votre sélection. Vérifiez le canal et réessayez.",
       "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local.",
       "phase_firmware_too_old": "La configuration des phases des canaux nécessite le firmware 139 ou ultérieur.",
       "formula_invalid": "Syntaxe incorrecte ou expression non prise en charge.",

@@ -30,14 +30,22 @@ class FormulaSelectionTests(RealHARuntimeFixture):
                 "ecomain_serial": "FICTIONAL-CAPABILITIES-001",
             }
             result = await flow.async_step_ecomain_local_setup()
-            self.assertEqual(result["step_id"], "measurement_types")
+            self.assertEqual(
+                result["step_id"],
+                "measurement_types_local"
+                if firmware >= 139
+                else "measurement_types_legacy",
+            )
+            self.assertEqual(
+                result["description_placeholders"], {"firmware_version": str(firmware)}
+            )
             fields = {
                 str(key): value for key, value in result["data_schema"].schema.items()
             }
             choices = fields["measurement_types"].config["options"]
             self.assertEqual("voltage" in choices, firmware >= 139)
             selected = ["voltage"] if firmware >= 139 else ["power", "energy_forward"]
-            result = await flow.async_step_measurement_types(
+            result = await getattr(flow, "async_step_" + result["step_id"])(
                 result["data_schema"]({"measurement_types": selected})
             )
             result = await flow.async_step_extra_entities(

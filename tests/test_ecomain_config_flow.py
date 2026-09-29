@@ -22,7 +22,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         flow._ecomain_local_config = {'ecomain_host': 'example.invalid',
                                      'ecomain_serial': 'test', 'ecomain_online_slaves': []}
         result = await flow.async_step_ecomain_local_setup({})
-        self.assertEqual('measurement_types', result['step_id'])
+        self.assertEqual('measurement_types_local', result['step_id'])
 
     async def test_new_flow_defaults_and_persists_selection(self):
         flow = self.module.ConfigFlow()
@@ -58,7 +58,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
                 async_close=AsyncMock())
             with patch.object(self.module, "EnecessModbusClient", return_value=client):
                 result = await flow.async_step_ecomain_local_setup()
-            self.assertEqual("measurement_types", result["step_id"])
+            self.assertEqual("measurement_types_local" if version >= 139 else "measurement_types_legacy", result["step_id"])
             choices = next(iter(result["data_schema"].schema.values())).config["options"]
             self.assertEqual(version == 139, "voltage" in choices)
             self.assertEqual(version, flow._entry_data["ecomain_firmware_version"])
@@ -144,7 +144,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
     async def test_options_dispatch_measurements_without_finishing(self):
         flow = self.module.EnecessOptionsFlow(self.entry())
         result = await flow.async_step_init({'extra_action': 'measurement_types'})
-        self.assertEqual('measurement_types', result['step_id'])
+        self.assertEqual('measurement_types_local', result['step_id'])
 
     async def test_cloud_does_not_offer_phase_writes(self):
         flow = self.module.EnecessOptionsFlow(self.entry('cloud'))

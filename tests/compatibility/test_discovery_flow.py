@@ -71,7 +71,7 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
         flow_id = result["flow_id"]
         manager = self.hass.config_entries.flow
         result = await manager.async_configure(flow_id, {})
-        self.assertEqual(result["step_id"], "measurement_types")
+        self.assertEqual(result["step_id"], "measurement_types_local")
         result = await manager.async_configure(
             flow_id, {"measurement_types": ["voltage"], "flow_action": "save"}
         )
@@ -92,7 +92,7 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
         duplicate = await self.discover("192.0.2.11")
         self.assertEqual(duplicate["reason"], "already_in_progress")
         restarted = await manager.async_configure(flow_id, {})
-        self.assertEqual(restarted["step_id"], "measurement_types")
+        self.assertEqual(restarted["step_id"], "measurement_types_local")
         defaults = restarted["data_schema"]({})["measurement_types"]
         self.assertNotEqual(defaults, ["voltage"])
 

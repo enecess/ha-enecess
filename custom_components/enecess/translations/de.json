@@ -25,14 +25,14 @@
       },
       "ecomain_local_confirm": {
         "title": "Gerät bestätigen",
-        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
+        "description": "Prüfe die folgenden Geräteangaben.\n\n- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
         "data": {
           "flow_action": "Aktion"
         }
       },
       "ecomain_local_setup": {
         "title": "Gerät konfigurieren",
-        "description": "- Seriennummer: {ecomain_serial}\n- Adresse: {ecomain_host}",
+        "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}\n\nWähle die ecoSub-Geräte, die du mit diesem ecoMain hinzufügen möchtest. Ohne ecoSub kannst du direkt fortfahren.",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
           "flow_action": "Aktion"
@@ -64,7 +64,7 @@
       },
       "ecoplug_select": {
         "title": "ecoPlug auswählen",
-        "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
+        "description": "Wähle die hinzuzufügenden Steckdosen. Danach kannst du sie ein- und ausschalten sowie Leistung und kumulierte Wirkenergie anzeigen.",
         "data": {
           "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen",
           "flow_action": "Aktion"
@@ -79,7 +79,7 @@
       },
       "ecomain_cloud_confirm": {
         "title": "Gerät bestätigen",
-        "description": "Seriennummer: {ecomain_serial}\n\n- `*_energy_total_1m`: roher Energiezuwachs pro Minute aus der Cloud-API.\n- Nutze `*_energy_accumulated` für das Home Assistant Energy Dashboard.\n- Die in Home Assistant summierte Cloud-Energie ist ein Schätzwert: Die API liefert pro Wert weder Zeitstempel noch Messwert-ID.",
+        "description": "Seriennummer: {ecomain_serial}\n\nBestätige dieses ecoMain und wähle die ecoSub-Geräte, die du hinzufügen möchtest. Ohne ecoSub kannst du direkt fortfahren.",
         "data": {
           "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
           "flow_action": "Aktion"
@@ -134,7 +134,7 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
+        "description": "Wähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.",
         "data": {
           "measurement_types": "Messgrößen",
           "flow_action": "Aktion"
@@ -142,7 +142,7 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Gib einen Namen ein und wähle einen Ergebnistyp, einschließlich einer Zahl ohne Einheit. Wähle anschließend Quellen nach Datentyp gruppiert, unabhängig vom Ergebnistyp. Der Ergebnistyp kann beim Bearbeiten nicht geändert werden.",
+        "description": "Gib einen Entitätsnamen ein und wähle Ergebnistyp und Einheit. Wähle eine Zahl ohne Einheit, wenn keine Einheit benötigt wird.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -151,7 +151,7 @@
       },
       "extra_formula_sources": {
         "title": "Quellentitäten auswählen",
-        "description": "Wähle insgesamt mindestens eine Quelle in den Dropdown-Menüs mit Mehrfachauswahl. Die Gruppen richten sich nach dem Datentyp, unabhängig vom Ergebnistyp. Nur von der Firmware unterstützte, aktivierte Messgrößen werden angezeigt; leere Gruppen sind ausgeblendet. Messgrößen werden nicht automatisch aktiviert. Wirk- und Blindenergie enthalten kumulierte Werte; Cloud-Minuteninkremente der Wirkenergie bilden eine eigene Gruppe.\n\nBei jedem Fortfahren von dieser Seite werden die Variablen ab a neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach der Rückkehr zur Quellenauswahl.",
+        "description": "Wähle die Quellentitäten für die Formel. Du kannst mehrere auswählen; mindestens eine ist erforderlich.",
         "data": {
           "extra_formula_sources_power": "Wirkleistung (W)",
           "extra_formula_sources_energy": "Wirkenergie (kumuliert, Wh)",
@@ -168,7 +168,7 @@
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest; Zahl hat keine Einheit. Quellen dürfen verschiedene Typen haben. Prüfe die Einheiten der Formel selbst.",
+        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Prüfe, ob das berechnete Ergebnis die Einheit des gewählten Ergebnistyps hat.",
         "data": {
           "extra_formula_expression": "Formelausdruck",
           "flow_action": "Aktion"
@@ -179,7 +179,8 @@
         "data": {
           "extra_formula_entity": "Formelentität",
           "flow_action": "Aktion"
-        }
+        },
+        "description": "Wähle die Formelentität zum Bearbeiten. Du musst den Ausdruck erneut eingeben. Erstelle eine neue Formelentität, um den Ergebnistyp zu ändern."
       },
       "reauth_confirm": {
         "title": "Cloud-Konto erneut authentifizieren",
@@ -187,6 +188,22 @@
         "data": {
           "username": "Benutzername",
           "password": "Passwort"
+        }
+      },
+      "measurement_types_local": {
+        "title": "Messgrößen",
+        "description": "Firmwareversion: {firmware_version}\n\nWähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.",
+        "data": {
+          "measurement_types": "Messgrößen",
+          "flow_action": "Aktion"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Messgrößen",
+        "description": "Firmwareversion: {firmware_version}\n\nWähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.\n\nAktualisiere auf Firmware 139 oder neuer, um weitere Messgrößen zu nutzen.",
+        "data": {
+          "measurement_types": "Messgrößen",
+          "flow_action": "Aktion"
         }
       }
     },
@@ -235,7 +252,7 @@
       },
       "ecoplug_select": {
         "title": "ecoPlug anpassen",
-        "description": "Jede ausgewählte Steckdose erstellt:\n\n- Einen Ein-/Aus-Schalter\n- Einen Sensor für die aktuelle Leistung (W)\n- Einen Sensor für die Gesamtenergie (kWh)",
+        "description": "Wähle die Steckdosen, die in dieser Integration bleiben sollen. Abgewählte Steckdosen werden aus der Integration entfernt.",
         "data": {
           "ecoplug_selected": "Hinzuzufügende Steckdosen auswählen",
           "flow_action": "Aktion"
@@ -276,7 +293,7 @@
       },
       "measurement_types": {
         "title": "Messgrößen",
-        "description": "- Wähle mindestens eine Messgröße zum Erstellen.\n- Messgrößen, die zusätzliche Entitäten nutzen, lassen sich nicht abwählen.\n- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.\n- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.\n- Ältere Firmware blendet nicht unterstützte Messgrößen aus.",
+        "description": "Wähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.",
         "data": {
           "measurement_types": "Messgrößen",
           "flow_action": "Aktion"
@@ -288,11 +305,11 @@
           "phase_device": "Gerät",
           "flow_action": "Aktion"
         },
-        "description": "Einstellungen der Kanalphasen erfordern Firmware ab 139."
+        "description": "Wähle das Gerät, dessen Kanalphasen du ändern möchtest."
       },
       "channel_phases": {
         "title": "Kanalphasen",
-        "description": "- Wähle L1, L2 oder L3 für jeden Kanal von {device}.\n- Beim Speichern werden nur geänderte Phasen geschrieben und danach zur Kontrolle gelesen.",
+        "description": "Wähle L1, L2 oder L3 für jeden Kanal von {device}. Beim Speichern werden die Kanalphasen am Gerät geändert.",
         "data": {
           "channel_1": "Kanal 1",
           "channel_2": "Kanal 2",
@@ -309,7 +326,7 @@
       },
       "extra_formula": {
         "title": "Formelentität hinzufügen",
-        "description": "Gib einen Namen ein und wähle einen Ergebnistyp, einschließlich einer Zahl ohne Einheit. Wähle anschließend Quellen nach Datentyp gruppiert, unabhängig vom Ergebnistyp. Der Ergebnistyp kann beim Bearbeiten nicht geändert werden.",
+        "description": "Gib einen Entitätsnamen ein und wähle Ergebnistyp und Einheit. Wähle eine Zahl ohne Einheit, wenn keine Einheit benötigt wird.",
         "data": {
           "extra_entity_name": "Entitätsname",
           "extra_formula_result_type": "Ergebnistyp / Einheit",
@@ -318,7 +335,7 @@
       },
       "extra_formula_sources": {
         "title": "Quellentitäten auswählen",
-        "description": "Wähle insgesamt mindestens eine Quelle in den Dropdown-Menüs mit Mehrfachauswahl. Die Gruppen richten sich nach dem Datentyp, unabhängig vom Ergebnistyp. Nur von der Firmware unterstützte, aktivierte Messgrößen werden angezeigt; leere Gruppen sind ausgeblendet. Messgrößen werden nicht automatisch aktiviert. Wirk- und Blindenergie enthalten kumulierte Werte; Cloud-Minuteninkremente der Wirkenergie bilden eine eigene Gruppe.\n\nBei jedem Fortfahren von dieser Seite werden die Variablen ab a neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach der Rückkehr zur Quellenauswahl.",
+        "description": "Wähle die Quellentitäten für die Formel. Du kannst mehrere auswählen; mindestens eine ist erforderlich.",
         "data": {
           "extra_formula_sources_power": "Wirkleistung (W)",
           "extra_formula_sources_energy": "Wirkenergie (kumuliert, Wh)",
@@ -335,7 +352,7 @@
       },
       "extra_formula_expression": {
         "title": "Formelausdruck",
-        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Der Ergebnistyp legt die Einheit fest; Zahl hat keine Einheit. Quellen dürfen verschiedene Typen haben. Prüfe die Einheiten der Formel selbst.",
+        "description": "Variablen:\n{variables}\n\n- Erlaubt: +, -, *, /, Klammern, abs, min, max und round.\n- Beispiele: `max(a-b,0)`, `(a+b)/2`.\n- Prüfe, ob das berechnete Ergebnis die Einheit des gewählten Ergebnistyps hat.",
         "data": {
           "extra_formula_expression": "Formelausdruck",
           "flow_action": "Aktion"
@@ -345,6 +362,23 @@
         "title": "Formelentität bearbeiten",
         "data": {
           "extra_formula_entity": "Formelentität",
+          "flow_action": "Aktion"
+        },
+        "description": "Wähle die Formelentität zum Bearbeiten. Du musst den Ausdruck erneut eingeben. Erstelle eine neue Formelentität, um den Ergebnistyp zu ändern."
+      },
+      "measurement_types_local": {
+        "title": "Messgrößen",
+        "description": "Firmwareversion: {firmware_version}\n\nWähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.",
+        "data": {
+          "measurement_types": "Messgrößen",
+          "flow_action": "Aktion"
+        }
+      },
+      "measurement_types_legacy": {
+        "title": "Messgrößen",
+        "description": "Firmwareversion: {firmware_version}\n\nWähle die Messgrößen, die du anzeigen möchtest. Wähle mindestens eine aus.\n\nAktualisiere auf Firmware 139 oder neuer, um weitere Messgrößen zu nutzen.",
+        "data": {
+          "measurement_types": "Messgrößen",
           "flow_action": "Aktion"
         }
       }
@@ -363,8 +397,8 @@
       "no_measurements_selected": "Wählen Sie mindestens eine Messgröße.",
       "measurement_in_use": "Entfernen Sie vor dem Abwählen zusätzliche Entitäten, die diese Messgröße verwenden.",
       "phase_read_failed": "Die Kanalphasen konnten nicht vom Gerät gelesen werden.",
-      "phase_write_failed": "Diese Kanalphase konnte nicht geschrieben werden. Prüfen Sie das Gerät und versuchen Sie es erneut.",
-      "phase_verify_failed": "Die zurückgelesene Phase stimmt nicht mit dem gewünschten Wert überein. Prüfen Sie diesen Kanal und versuchen Sie es erneut.",
+      "phase_write_failed": "Die Kanalphase konnte nicht gespeichert werden. Prüfe die Geräteverbindung und versuche es erneut.",
+      "phase_verify_failed": "Die aktuelle Phase des Geräts stimmt nicht mit deiner Auswahl überein. Prüfe den Kanal und versuche es erneut.",
       "phase_unavailable": "Kanalphasen sind nur für erreichbare Geräte im lokalen Modus verfügbar.",
       "phase_firmware_too_old": "Die Kanalphasenkonfiguration erfordert Firmware 139 oder neuer.",
       "formula_invalid": "Ungültige Syntax oder nicht unterstützter Ausdruck.",
