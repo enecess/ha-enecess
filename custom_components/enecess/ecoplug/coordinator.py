@@ -56,6 +56,7 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
             config_entry=entry,
             name="enecess ecoPlug Cloud Coordinator",
             update_interval=timedelta(seconds=CONF_CLOUD_UPDATE_INTERVAL),
+            always_update=False,
         )
         self._entry = entry
         self._api = api

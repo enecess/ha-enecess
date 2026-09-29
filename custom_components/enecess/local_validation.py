@@ -43,7 +43,9 @@ async def async_validate_local_device(
             )
             firmware_version = int(response.registers[0]) & 0xFFFF
             if firmware_version < minimum_firmware:
-                return LocalValidationResult(error="firmware_too_old")
+                return LocalValidationResult(
+                    error="firmware_too_old", firmware_version=firmware_version
+                )
         except Exception:  # noqa: BLE001 -- Map client and malformed-response failures at the flow boundary.
             return LocalValidationResult(error="cannot_connect_local")
 
@@ -61,6 +63,8 @@ async def async_validate_local_device(
                 online_slaves=online_slaves, firmware_version=firmware_version
             )
         except Exception:  # noqa: BLE001 -- Present connection and response failures as a form error.
-            return LocalValidationResult(error="cannot_connect_local")
+            return LocalValidationResult(
+                error="cannot_connect_local", firmware_version=firmware_version
+            )
     finally:
         await client.async_close()

@@ -350,7 +350,7 @@ Schritte:
 Jeder ausgewählte ecoPlug erstellt genau diese Entitäten:
 
 - Ein **Schalter**, der die Steckdose über die Cloud ein- oder ausschaltet.
-- `power_rt`: ein Echtzeit-Leistungssensor in **W**.
+- `power_rt`: ein Wirkleistungssensor in **W**.
 - `energy_total`: ein Gesamtenergiesensor in **kWh**.
 
 ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nach einer erfolgreichen Steuerungsanfrage wird der Schalterstatus sofort auf den von der Cloud akzeptierten Zielstatus gesetzt. Die späteren Cloud-Abfragen bleiben maßgeblich und können den Status korrigieren, wenn die Steckdose oder die Cloud einen anderen Wert meldet.
@@ -516,129 +516,63 @@ Beispiele:
 
 ## Entitätsbenennung & Bedeutung
 
-Die Integration erstellt Sensor-Entitäten mit vorhersagbaren Keys. Der Entitätsname entspricht dem Key.
+Die folgenden Namen sind **Messwertschlüssel**, keine vollständigen Home-Assistant-`entity_id`s. Die Sensoren verwenden diese Schlüssel als Namen; Home Assistant ergänzt den Gerätenamen und verwaltet die tatsächliche `sensor.…`-ID. Benutzerdefinierte Umbenennungen können davon abweichen. **Wirkleistung** bezeichnet die Messgröße; die bestehenden Schlüssel `power_rt` und `power_avg_1m` bleiben erhalten.
 
-### Allgemeines Namensschema
+### Lokaler Modus (Modbus): vollständiger Messwertkatalog
 
-- **Hauptgerät (ecoMain):** `main_...`
-- **Slave (ecoSub #):** `sub<slave_index>_...` (z. B. `sub1_...`, `sub2_...`, `sub3_...`)
-- **Kanalindex:** `ch1` bis `ch10`
+Ein Schlüssel besteht aus `<Präfix>_<Suffix>`. Die Bereiche in der Tabelle bedeuten:
 
-### Lokaler Modus (Modbus)
+- **A**: `main_l1`, `main_l2`, `main_l3`, `main_all` und alle Kanäle aus B.
+- **B**: `main_ch1`–`main_ch10` sowie `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` für ausgewählte ecoSub.
+- **C**: `main_l1`, `main_l2`, `main_l3` und B, ohne `main_all`.
 
-Im lokalen Modus werden u. a. folgende Entitäten erstellt:
+Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardmäßig ausgewählt sind. Ab Firmware 139 sind die acht weiteren Messgrößen optional auswählbar; sie werden nicht automatisch aktiviert. Es gibt keine ecoSub-Gesamtwerte oder ecoSub-Phasensensoren.
 
-- **Main L1/L2/L3 Echtzeit-Leistung**
-- **Main Gesamtleistung (L1+L2+L3) in Echtzeit**
-- **Main L1/L2/L3 Vorwärts/Rückwärts-Energie-Total**
-- **Main Gesamtenergie (L1+L2+L3) Vorwärts/Rückwärts**
-- **10 Haupt-Abzweigkanäle (ch1–ch10):**
-    - Echtzeit-Leistung
-    - Vorwärts-Energie-Total
-    - Rückwärts-Energie-Total
-- **Slaves (ecoSub) besitzen nur Abzweigkanäle (ch1–ch10):**
-    - Echtzeit-Leistung
-    - Vorwärts-Energie-Total
-    - Rückwärts-Energie-Total
+| Messgröße | Suffix | Einheit | Bereich |
+| --- | --- | --- | --- |
+| Wirkleistung | `power_rt` | W | A |
+| Wirkenergie vorwärts | `energy_fwd_total` | Wh | A |
+| Wirkenergie rückwärts | `energy_rev_total` | Wh | A |
+| Blindenergie vorwärts | `reactive_energy_fwd_total` | varh | A |
+| Blindenergie rückwärts | `reactive_energy_rev_total` | varh | A |
+| Scheinleistung | `apparent_power_rt` | VA | A |
+| Blindleistung | `reactive_power_rt` | var | A |
+| Spannung | `voltage_rt` | V | C |
+| Strom | `current_rt` | A | C |
+| Leistungsfaktor | `power_factor_rt` | — | C |
+| Frequenz | `frequency_rt` | Hz | `main` |
 
-#### Suffixe im lokalen Modus
+Die Frequenz hat ausschließlich den vollständigen Schlüssel `main_frequency_rt`, ohne Phase oder Kanal. Beispiele: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` bedeutet Momentanwert, `_total` einen kumulierten Zählerstand. Der Leistungsfaktor ist dimensionslos, kein Prozentwert. Die Richtung des Stromwandlers (CT) bestimmt vorwärts/rückwärts; ein umgekehrt montierter CT kann negative Wirkleistung und einen steigenden Rückwärtszähler verursachen.
 
-- `_rt` = **Echtzeitwert**
-- `fwd_total` = aufsummierte Energie in **Vorwärtsrichtung**
-- `rev_total` = aufsummierte Energie in **Rückwärtsrichtung**
+### Cloud-Modus
 
-#### Erklärung zur Stromwandler-Richtung (CT)
+Die beiden standardmäßig ausgewählten Messgrößen **Wirkleistung** (`power`) und **Energie** (`energy`) erzeugen drei Sensortypen:
 
-Jeder Abzweigkanal ist mit einem **Stromwandler (CT)** verbunden.
-Der CT trägt in der Regel einen **Pfeil**, der die Messrichtung angibt. Fließt der Strom in Pfeilrichtung, gilt dies als **Vorwärtsrichtung (positiv)**; fließt er
-entgegengesetzt, gilt dies als **Rückwärtsrichtung (negativ)**.
+| Auswahl | Suffix | Einheit | Bedeutung |
+| --- | --- | --- | --- |
+| Wirkleistung | `power_avg_1m` | W | Mittlere Wirkleistung über eine Minute |
+| Energie | `energy_total_1m` | Wh | Rohes Energieinkrement einer Minute, kein kumulierter Zähler |
+| Energie | `energy_accumulated` | Wh | Von Home Assistant aufsummierte Energie |
 
-Daher gilt:
+Diese Suffixe gelten nur für `main_all` und die Kanäle B. Es gibt keine L1/L2/L3-Sensoren, keine ecoSub-Gesamtwerte und keine der zusätzlichen lokalen Messgrößen im Cloud-Modus. Beispiele: `main_all_power_avg_1m`, `main_ch1_energy_total_1m`, `sub1_ch1_energy_accumulated`.
 
-- `*_energy_fwd_total` = Energie, die in **Vorwärtsrichtung** akkumuliert wird
-- `*_energy_rev_total` = Energie, die in **Rückwärtsrichtung** akkumuliert wird
+Für das Energie-Dashboard ist `*_energy_accumulated` vorgesehen (`TOTAL_INCREASING`), nicht `*_energy_total_1m` (ohne Energie-Geräteklasse oder Zustandsklasse). Der kumulierte Wert ist eine Schätzung aus gültigen Inkrementen erfolgreicher Abfragen. Ohne Zeitstempel oder eindeutige Messwert-ID können wiederholte Cloud-Werte mehrfach gezählt werden. Nach einem Neustart wird der gespeicherte Stand wiederhergestellt und das bereits geladene Inkrement zunächst nicht erneut addiert; dadurch können Werte fehlen. Dies ist kein exakter historischer Gerätezähler.
 
-#### Beispiele – Lokaler Modus
+### ecoPlug und zusätzliche Entitäten
 
-Main Echtzeit:
+Jede ausgewählte ecoPlug-Steckdose hat drei feste Entitäten:
 
-- `main_l1_power_rt`
-- `main_l2_power_rt`
-- `main_l3_power_rt`
-- `main_all_power_rt`
+| Entität | Name im Code | Daten |
+| --- | --- | --- |
+| Sensor | `power_rt` | Wirkleistung, W (`MEASUREMENT`) |
+| Sensor | `energy_total` | Kumulierte Energie, kWh (`TOTAL_INCREASING`) |
+| Schalter | Gerätename | Steckdose ein-/ausschalten |
 
-Main Energie-Totals:
+Die Sensornamen bleiben `power_rt` und `energy_total`; die übersetzten Beschreibungen hier sind keine zugesagten Anzeigenamen. Der Schalter übernimmt den Gerätenamen, ohne zusätzliches Namenssuffix.
 
-- `main_all_energy_fwd_total`
-- `main_all_energy_rev_total`
+ecoMain unterstützt fünf zusätzliche Operationen: Vorzeichen umkehren und Absolutwert für eine Wirkleistungsquelle, Summe und Durchschnitt für kompatible Leistungs- oder Energiequellen sowie eine benutzerdefinierte Formel. Diese Entitäten entstehen nur durch Konfiguration; ihr Name ist der gespeicherte Benutzername oder ersatzweise der erzeugte Schlüssel. Verfügbare Quellen hängen von Modus, Firmware und ausgewählten Messgrößen ab.
 
-Main Abzweig:
-
-- `main_ch1_power_rt`
-- `main_ch1_energy_fwd_total`
-- `main_ch1_energy_rev_total`
-
-Slave Abzweig:
-
-- `sub1_ch1_power_rt`
-- `sub1_ch1_energy_fwd_total`
-- `sub1_ch1_energy_rev_total`
-
----
-
-### Cloud-Modus-Entitäten
-
-Im Cloud-Modus werden u. a. folgende Entitäten erstellt:
-
-- **Gesamt (L1+L2+L3)**
-    - 1-Minuten-Durchschnittsleistung
-    - roher 1-Minuten-Energiezuwachs
-    - in Home Assistant kumulierte Energie
-- **10 Haupt-Abzweigkanäle (ch1–ch10)**
-    - 1-Minuten-Durchschnittsleistung
-    - roher 1-Minuten-Energiezuwachs
-    - in Home Assistant kumulierte Energie
-- **Slaves (ecoSub) mit Abzweigkanälen (ch1–ch10)**
-    - 1-Minuten-Durchschnittsleistung
-    - roher 1-Minuten-Energiezuwachs
-    - in Home Assistant kumulierte Energie
-
-> Die Cloud-Werte werden vom entfernten Dienst gemäß deiner Cloud-Konfiguration verarbeitet und bereitgestellt.
-
-#### Suffixe im Cloud-Modus
-
-- `avg_1m` = **1-Minuten-Durchschnitt**
-- `total_1m` = **roher 1-Minuten-Energiezuwachs aus dem Cloud-API**
-- `energy_accumulated` = **in Home Assistant kumulierter Energiezähler**
-
-- Verwende `*_energy_accumulated` im Home Assistant Energy Dashboard.
-- Nutze `*_power_avg_1m` zur Überwachung der aktuellen Leistung.
-- Die rohen Cloud-Entitäten `*_energy_total_1m` bleiben verfügbar, sind aber Minuten-Zuwächse und keine kumulativen Zähler.
-
-- Die summierte Cloud-Energie ist ein Schätzwert: Die API liefert pro 1-Minuten-Energiewert weder Zeitstempel noch Messwert-ID.
-- Sie kann ungenauer sein als lokale Modbus-Zähler für die gesamte Betriebszeit, besonders bei wiederholten Cloud-Messwerten oder Neustarts.
-
-#### Beispiele – Cloud-Modus
-
-Main Gesamt:
-
-- `main_all_power_avg_1m`
-- `main_all_energy_total_1m`
-- `main_all_energy_accumulated`
-
-Main Abzweig:
-
-- `main_ch1_power_avg_1m`
-- `main_ch1_energy_total_1m`
-- `main_ch1_energy_accumulated`
-
-Slave Abzweig:
-
-- `sub1_ch1_power_avg_1m`
-- `sub1_ch1_energy_total_1m`
-- `sub1_ch1_energy_accumulated`
-
----
+Formelergebnisse unterstützen Wirkleistung (W), Wirkenergie (Wh), Blindenergie (varh), Scheinleistung (VA), Blindleistung (var), Spannung (V), Strom (A), Leistungsfaktor, Frequenz (Hz) und eine dimensionslose Zahl. Energieformeln verwenden `TOTAL`, die übrigen Ergebnisse `MEASUREMENT`. Details zu Quellen, Einheiten und Bearbeitung stehen unter [Benutzerdefinierte Formelentitäten](#benutzerdefinierte-formelentitäten); die Auswahl steht unter [Messgrößen](#messgrößen).
 
 ## FAQ / Fehlerbehebung
 
@@ -837,19 +771,7 @@ Merke:
 
 ### F12: Warum sehe ich im Cloud-Modus keine L1/L2/L3-Entitäten?
 
-Das ist **so vorgesehen**:
-
-- **Lokaler Modus** (Modbus) stellt bereit:
-    - L1, L2, L3-Leistungen und Energien,
-    - sowie Gesamtwerte (L1+L2+L3).
-- **Cloud-Modus** stellt bereit:
-    - Gesamtwerte (L1+L2+L3),
-    - Kanalwerte (ch1–ch10),
-    - jeweils als verarbeitete Cloud-Daten:
-        - `*_avg_1m` (1-Minuten-Durchschnitt),
-        - `*_total_1m` (1-Minuten-Energie-Total).
-
-Phasen-aufgelöste Daten (L1/L2/L3) werden im aktuellen Cloud-API-Mapping nicht bereitgestellt.
+L1/L2/L3 werden nur lokal unterstützt; verfügbare Messgrößen und Gesamtwerte sind im [Messwertkatalog](#entitätsbenennung--bedeutung) beschrieben. Die Cloud stellt nur Wirkleistung und Energie für `main_all` und die Kanäle der ausgewählten Geräte bereit: `*_power_avg_1m`, `*_energy_total_1m` und den von Home Assistant berechneten Wert `*_energy_accumulated`. Es gibt keine Cloud-Phasenwerte, ecoSub-Gesamtwerte oder zusätzlichen lokalen Messgrößen.
 
 ---
 

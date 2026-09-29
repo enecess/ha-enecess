@@ -36,6 +36,7 @@ from ..const import (
     CONST_ECOMAIN_SERIAL,
 )
 from ..extra import build_entry_specs
+from .energy import CloudEnergyStore
 from .model import RegisterSpec, available_local_measurements
 
 _LOGGER = logging.getLogger(__name__)
@@ -80,6 +81,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
             config_entry=entry,
             name="enecess ecoMain Local Coordinator",
             update_interval=timedelta(seconds=CONF_LOCAL_UPDATE_INTERVAL),
+            always_update=False,
         )
         self._entry = entry
         self._client = client
@@ -186,6 +188,16 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         )
 
         self.specs = build_entry_specs(entry.data, entry.options)
+        self._energy = CloudEnergyStore(hass, entry)
+
+    async def _async_setup(self) -> None:
+        """Restore shared totals before the first cloud sample is processed."""
+        await self._energy.async_load(self.specs)
+
+    async def async_shutdown(self) -> None:
+        """Stop polling and persist totals independently of sensor unloading."""
+        await super().async_shutdown()
+        await self._energy.async_save()
 
     async def _refresh_token_and_store(self) -> None:
         token = await self._api.generate_token(self._username, self._password)
@@ -265,10 +277,12 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         try:
             async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
                 try:
-                    return await self._fetch_and_transform()
+                    values = await self._fetch_and_transform()
                 except EnecessAuthError:
                     await self._refresh_token_and_store()
-                    return await self._fetch_and_transform()
+                    values = await self._fetch_and_transform()
+                self._energy.async_accumulate(values, self.specs)
+                return values
         except EnecessAuthError as err:
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except (EnecessApiError, OSError, TimeoutError) as err:

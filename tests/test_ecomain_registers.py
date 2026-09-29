@@ -20,6 +20,8 @@ def load_runtime():
 
     module("register_test", __path__=[str(root)], CONF_ECOMAIN_PORT=502)
     module("register_test.ecomain", __path__=[str(root / "ecomain")])
+    # Storage is exercised with real HA objects by the compatibility suite.
+    module("register_test.ecomain.energy", CloudEnergyStore=object)
     classes = "POWER ENERGY REACTIVE_ENERGY APPARENT_POWER REACTIVE_POWER VOLTAGE CURRENT POWER_FACTOR FREQUENCY".split()
     description = make_dataclass("SensorEntityDescription", [(name, object, None) for name in (
         "key", "name", "native_unit_of_measurement", "device_class", "state_class", "suggested_display_precision"

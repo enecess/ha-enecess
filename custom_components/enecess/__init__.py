@@ -22,6 +22,7 @@ from .const import (
     CONST_ECOPLUG_DEVICES,
 )
 from .ecomain.coordinator import EcoMainCloudCoordinator, EcoMainModbusCoordinator
+from .ecomain.energy import CloudEnergyStore
 from .ecoplug.coordinator import EcoPlugCloudCoordinator
 from .extra import build_entry_specs
 from .registry import (
@@ -31,6 +32,15 @@ from .registry import (
 from .runtime import EnecessConfigEntry, EnecessRuntimeData
 
 PLATFORMS: tuple[Platform, ...] = (Platform.SENSOR, Platform.SWITCH)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> None:
+    """Delete entry-owned cumulative cloud energy when its entry is removed."""
+    if (
+        entry.data.get(CONST_DEVICE_TYPE) == CONST_DEVICE_ECOMAIN
+        and entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD
+    ):
+        await CloudEnergyStore(hass, entry).async_remove()
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> bool:

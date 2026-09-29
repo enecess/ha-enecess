@@ -71,7 +71,6 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual('create_entry', r['type'])
                     self.assertEqual([1] if slaves else [], r['data']['ecomain_selected_slaves'])
                     self.assertEqual(['power'], r['options']['measurement_types'])
-                    f.async_set_unique_id.assert_awaited_once()
 
     async def test_success_cloud_and_master_change(self):
         f, r = await self.cloud()
@@ -128,7 +127,6 @@ class SetupJourneyTests(unittest.IsolatedAsyncioTestCase):
                         self.assertEqual(expected, r['step_id'])
                     f._async_validate_local_device.assert_awaited_once()
                     self.assertEqual(1 if mode == 'auto' else 0, f._async_mdns_scan.await_count)
-                    f.async_set_unique_id.assert_not_awaited()
 
     async def test_ecoplug_credentials_change_then_finish(self):
         f, r = await self.cloud('ecoplug')

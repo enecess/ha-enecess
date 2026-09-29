@@ -352,7 +352,7 @@ ecoPlug est pris en charge **uniquement via le cloud enecess**. L’intégration
 Chaque ecoPlug sélectionné crée exactement les entités suivantes :
 
 - Un **interrupteur** qui commande la prise via le cloud.
-- `power_rt` : un capteur de puissance en temps réel en **W**.
+- `power_rt` : un capteur de puissance active en **W**.
 - `energy_total` : un capteur d’énergie totale en **kWh**.
 
 L’intégration récupère les données ecoPlug depuis le cloud environ toutes les **60 secondes**. Lorsqu’une commande réussit, l’état de l’interrupteur est immédiatement mis à jour avec l’état cible accepté par le cloud. Les actualisations ultérieures depuis le cloud font autorité et peuvent corriger l’état si la prise ou le cloud signale une valeur différente.
@@ -518,130 +518,63 @@ Exemples :
 
 ## Nom des entités & signification
 
-Les entités sont créées sous forme de capteurs, avec des clés prédictibles.
-Le nom de l’entité est égal à la clé du capteur.
+Les noms ci-dessous sont des **clés de mesure**, pas des `entity_id` Home Assistant complets. Les capteurs utilisent ces clés comme noms ; Home Assistant ajoute le nom de l’appareil et gère l’identifiant `sensor.…` réel, qui peut aussi être renommé par l’utilisateur. **Puissance active** décrit la mesure ; les clés existantes `power_rt` et `power_avg_1m` sont conservées.
 
-### Schéma de nommage
+### Mode local (Modbus) : catalogue complet
 
-- **Maître (ecoMain) :** `main_...`
-- **Esclave (ecoSub #) :** `sub<indice_esclave>_...` (ex : `sub1_...`, `sub2_...`, `sub3_...`)
-- **Canaux :** `ch1` à `ch10`
+Une clé suit le format `<préfixe>_<suffixe>`. Portées utilisées dans le tableau :
 
-### Entités en mode local (Modbus)
+- **A** : `main_l1`, `main_l2`, `main_l3`, `main_all` et tous les canaux B.
+- **B** : `main_ch1`–`main_ch10`, ainsi que `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` pour les ecoSub sélectionnés.
+- **C** : `main_l1`, `main_l2`, `main_l3` et B, sans `main_all`.
 
-En mode local, les entités incluent :
+Le firmware 136–138 propose seulement les trois premières mesures, sélectionnées par défaut. À partir du firmware 139, les huit autres mesures sont facultatives et ne sont pas activées automatiquement. Il n’existe aucun total ecoSub ni capteur de phase ecoSub.
 
-- **Puissance instantanée L1/L2/L3 du maître**
-- **Puissance instantanée totale (L1+L2+L3) du maître**
-- **Énergie totale L1/L2/L3 en sens avant/arrière**
-- **Énergie totale (L1+L2+L3) en sens avant/arrière**
-- **10 canaux de dérivation du maître (ch1–ch10) :**
-    - puissance instantanée
-    - énergie totale en sens avant
-    - énergie totale en sens inverse
-- **Esclaves (ecoSub) : uniquement canaux (ch1–ch10) :**
-    - puissance instantanée
-    - énergie totale en sens avant
-    - énergie totale en sens inverse
+| Mesure | Suffixe | Unité | Portée |
+| --- | --- | --- | --- |
+| Puissance active | `power_rt` | W | A |
+| Énergie active directe | `energy_fwd_total` | Wh | A |
+| Énergie active inverse | `energy_rev_total` | Wh | A |
+| Énergie réactive directe | `reactive_energy_fwd_total` | varh | A |
+| Énergie réactive inverse | `reactive_energy_rev_total` | varh | A |
+| Puissance apparente | `apparent_power_rt` | VA | A |
+| Puissance réactive | `reactive_power_rt` | var | A |
+| Tension | `voltage_rt` | V | C |
+| Courant | `current_rt` | A | C |
+| Facteur de puissance | `power_factor_rt` | — | C |
+| Fréquence | `frequency_rt` | Hz | `main` |
 
-#### Signification des suffixes (mode local)
+La fréquence possède uniquement la clé complète `main_frequency_rt`, sans phase ni canal. Exemples : `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` indique une valeur instantanée et `_total` un compteur cumulé. Le facteur de puissance est sans unité, pas en pourcentage. Le sens du transformateur de courant (CT) définit les directions directe/inverse ; un CT inversé peut entraîner une puissance active négative et l’augmentation du compteur inverse.
 
-- `_rt` = **valeur temps réel**
-- `fwd_total` = **énergie cumulée en sens avant (positif)**
-- `rev_total` = **énergie cumulée en sens inverse (négatif)**
+### Mode cloud
 
-#### Sens de la pince ampèremétrique (CT)
+Les deux mesures sélectionnées par défaut, **Puissance active** (`power`) et **Énergie** (`energy`), produisent trois types de capteurs :
 
-Chaque canal est associé à un **transformateur de courant (CT)**.
-La pince comporte généralement une **flèche** indiquant le sens de référence. Si le courant mesuré circule **dans le sens de la flèche**, il est considéré comme *
-*avant/positif** ; dans le sens opposé, il est **inverse/négatif**.
+| Sélection | Suffixe | Unité | Signification |
+| --- | --- | --- | --- |
+| Puissance active | `power_avg_1m` | W | Puissance active moyenne sur une minute |
+| Énergie | `energy_total_1m` | Wh | Incrément brut d’énergie sur une minute, pas un compteur cumulé |
+| Énergie | `energy_accumulated` | Wh | Énergie additionnée par Home Assistant |
 
-Donc :
+Ces suffixes s’appliquent uniquement à `main_all` et aux canaux B. Le cloud ne fournit ni capteurs L1/L2/L3, ni totaux ecoSub, ni mesures locales supplémentaires. Exemples : `main_all_power_avg_1m`, `main_ch1_energy_total_1m`, `sub1_ch1_energy_accumulated`.
 
-- `*_energy_fwd_total` = énergie cumulée lorsque le courant est dans le **sens de la flèche**.
-- `*_energy_rev_total` = énergie cumulée lorsque le courant est en **sens inverse**.
+Pour le tableau de bord Énergie, utilisez `*_energy_accumulated` (`TOTAL_INCREASING`), pas `*_energy_total_1m` (sans classe d’appareil énergie ni classe d’état). Le cumul est une estimation des incréments valides reçus lors des actualisations réussies. Sans horodatage ni identifiant unique de mesure, des valeurs cloud répétées peuvent être comptées plusieurs fois. Après un redémarrage, le total sauvegardé est restauré et l’incrément déjà chargé n’est pas immédiatement ajouté à nouveau ; des valeurs peuvent donc manquer. Ce n’est pas le compteur historique exact de l’appareil.
 
-#### Exemples (local)
+### ecoPlug et entités supplémentaires
 
-Temps réel maître :
+Chaque prise ecoPlug sélectionnée possède trois entités fixes :
 
-- `main_l1_power_rt`
-- `main_l2_power_rt`
-- `main_l3_power_rt`
-- `main_all_power_rt`
+| Entité | Nom dans le code | Données |
+| --- | --- | --- |
+| Capteur | `power_rt` | Puissance active, W (`MEASUREMENT`) |
+| Capteur | `energy_total` | Énergie cumulée, kWh (`TOTAL_INCREASING`) |
+| Interrupteur | Nom de l’appareil | Marche/arrêt de la prise |
 
-Énergie totale maître :
+Les capteurs conservent les noms `power_rt` et `energy_total` ; les descriptions traduites ici ne garantissent pas un nom d’affichage traduit. L’interrupteur utilise le nom de l’appareil sans suffixe supplémentaire.
 
-- `main_all_energy_fwd_total`
-- `main_all_energy_rev_total`
+ecoMain propose cinq opérations supplémentaires : inversion du signe et valeur absolue d’une source de puissance active, somme et moyenne de sources compatibles de puissance ou d’énergie, et formule personnalisée. Ces entités sont créées uniquement par configuration ; leur nom est celui enregistré par l’utilisateur ou, à défaut, la clé générée. Les sources disponibles dépendent du mode, du firmware et des mesures sélectionnées.
 
-Canaux maître :
-
-- `main_ch1_power_rt`
-- `main_ch1_energy_fwd_total`
-- `main_ch1_energy_rev_total`
-
-Canaux esclave :
-
-- `sub1_ch1_power_rt`
-- `sub1_ch1_energy_fwd_total`
-- `sub1_ch1_energy_rev_total`
-
----
-
-### Entités en mode cloud
-
-En mode cloud, les entités incluent :
-
-- **Somme maîtres (L1+L2+L3) uniquement :**
-    - puissance moyenne sur 1 minute
-    - incrément d'énergie brut sur 1 minute
-    - énergie cumulée côté Home Assistant
-- **10 canaux de dérivation du maître (ch1–ch10) :**
-    - puissance moyenne sur 1 minute
-    - incrément d'énergie brut sur 1 minute
-    - énergie cumulée côté Home Assistant
-- **Esclaves (ecoSub) : uniquement canaux (ch1–ch10) :**
-    - puissance moyenne sur 1 minute
-    - incrément d'énergie brut sur 1 minute
-    - énergie cumulée côté Home Assistant
-
-> Les valeurs cloud sont **traitées et renvoyées par le service distant**, en fonction de la configuration enregistrée dans votre compte.
-
-#### Signification des suffixes (mode cloud)
-
-- `avg_1m` = **moyenne sur 1 minute**
-- `total_1m` = **incrément d'énergie brut sur 1 minute provenant de l'API cloud**
-- `energy_accumulated` = **compteur d'énergie cumulée côté Home Assistant**
-
-- Utilisez les entités `*_energy_accumulated` dans le tableau de bord Énergie de Home Assistant.
-- Les entités `*_power_avg_1m` conviennent au suivi de puissance en temps réel.
-- Les entités cloud brutes `*_energy_total_1m` restent disponibles, mais ce sont des incréments par minute et non des compteurs cumulatifs.
-
-- L’énergie cloud cumulée reste une estimation : l’API ne donne ni date et heure ni identifiant pour chaque valeur d’énergie par minute.
-- Elle peut être moins précise que les totaux Modbus locaux sur toute la durée de vie, surtout avec des mesures cloud répétées ou des redémarrages.
-
-#### Exemples (cloud)
-
-Maître total :
-
-- `main_all_power_avg_1m`
-- `main_all_energy_total_1m`
-- `main_all_energy_accumulated`
-
-Canaux maître :
-
-- `main_ch1_power_avg_1m`
-- `main_ch1_energy_total_1m`
-- `main_ch1_energy_accumulated`
-
-Canaux esclave :
-
-- `sub1_ch1_power_avg_1m`
-- `sub1_ch1_energy_total_1m`
-- `sub1_ch1_energy_accumulated`
-
----
+Les résultats de formule peuvent être : puissance active (W), énergie active (Wh), énergie réactive (varh), puissance apparente (VA), puissance réactive (var), tension (V), courant (A), facteur de puissance, fréquence (Hz) et nombre sans unité. Les formules d’énergie utilisent `TOTAL` et les autres résultats `MEASUREMENT`. Voir [Entités de formule personnalisées](#entités-de-formule-personnalisées) pour les sources, unités et modifications, et [Types de mesures](#types-de-mesures) pour la sélection.
 
 ## FAQ / Dépannage
 
@@ -829,7 +762,7 @@ Plusieurs raisons possibles :
 - **Absence de charge** :
     - Si rien n’est branché ou si la charge est coupée, la puissance et l’énergie évolueront très peu.
 - **Cloud vs local** :
-    - En mode cloud, les données sont moyennées (`avg_1m`) et cumulées par minute (`total_1m`), elles évoluent donc plus lentement.
+    - En mode cloud, la puissance active est moyennée (`power_avg_1m`) et l’énergie est fournie sous forme d’incréments par minute (`energy_total_1m`), elles évoluent donc plus lentement.
 
 À retenir :
 
@@ -840,19 +773,7 @@ Plusieurs raisons possibles :
 
 ### Q12 : Pourquoi je n’ai pas d’entités L1/L2/L3 en mode cloud ?
 
-C’est **normal** :
-
-- En **mode local** (Modbus), l’intégration expose :
-    - Les puissances/énergies L1, L2, L3
-    - Les valeurs totales (L1+L2+L3)
-- En **mode cloud**, l’intégration expose :
-    - Les totaux (L1+L2+L3)
-    - Les canaux (ch1–ch10)
-    - Toutes ces valeurs sont des données traitées :
-        - `*_avg_1m` (puissance moyenne sur 1 minute)
-        - `*_total_1m` (énergie cumulée sur 1 minute)
-
-Les données par phase ne sont pas fournies par le mapping actuel de l’API cloud.
+Les phases L1/L2/L3 sont disponibles uniquement en local ; les mesures et totaux pris en charge figurent dans le [catalogue des entités](#nom-des-entités--signification). Le cloud fournit uniquement puissance active et énergie pour `main_all` et les canaux des appareils sélectionnés : `*_power_avg_1m`, `*_energy_total_1m` et le cumul calculé par Home Assistant `*_energy_accumulated`. Il ne fournit ni valeurs par phase, ni totaux ecoSub, ni mesures locales supplémentaires.
 
 ---
 

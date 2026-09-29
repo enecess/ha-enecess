@@ -2,11 +2,10 @@
 
 import logging
 from datetime import timedelta
-from unittest.mock import AsyncMock, Mock
 
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity_platform import EntityPlatform
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from custom_components.enecess.ecomain.model import (
     build_sensor_descriptions,
@@ -21,59 +20,6 @@ import test_runtime as runtime_fixture
 
 
 class RealHAEntityRegressionTests(runtime_fixture.RealHARuntimeFixture):
-    def make_energy_sensor(self, updates):
-        entry = self.make_entry("cloud")
-        coordinator = DataUpdateCoordinator(
-            self.hass,
-            logging.getLogger(__name__),
-            name="Fictional energy",
-            config_entry=entry,
-            update_method=AsyncMock(side_effect=updates),
-        )
-        description = next(
-            item
-            for item in build_sensor_descriptions(build_specs_cloud([]))
-            if item.key == "main_all_energy_accumulated"
-        )
-        sensor = EcoMainAccumulatedEnergySensor(
-            coordinator, "cloud", runtime_fixture.SERIAL, description
-        )
-        sensor._total = 100.0
-        sensor.async_write_ha_state = Mock()
-        unsubscribe = coordinator.async_add_listener(sensor._handle_coordinator_update)
-        self.addCleanup(unsubscribe)
-        return coordinator, sensor
-
-    async def test_failed_refresh_does_not_count_stale_delta(self):
-        coordinator, sensor = self.make_energy_sensor(
-            [
-                {"main_all_energy_total_1m": 5.0},
-                UpdateFailed("Fictional temporary failure"),
-                {"main_all_energy_total_1m": 5.0},
-            ]
-        )
-        totals = [sensor.native_value]
-        availability = []
-        with self.assertLogs(__name__, level="ERROR"):
-            for _ in range(3):
-                await coordinator.async_refresh()
-                totals.append(sensor.native_value)
-                availability.append(sensor.available)
-        self.assertEqual(totals, [100.0, 105.0, 105.0, 110.0])
-        self.assertEqual(availability, [True, False, True])
-
-    async def test_equal_successful_deltas_are_both_counted(self):
-        coordinator, sensor = self.make_energy_sensor(
-            [
-                {"main_all_energy_total_1m": 5.0},
-                {"main_all_energy_total_1m": 5.0},
-            ]
-        )
-        await coordinator.async_refresh()
-        self.assertEqual(sensor.native_value, 105.0)
-        await coordinator.async_refresh()
-        self.assertEqual(sensor.native_value, 110.0)
-
     async def test_existing_registry_identity_and_custom_names_survive(self):
         entry = self.make_entry("cloud")
         coordinator = DataUpdateCoordinator(

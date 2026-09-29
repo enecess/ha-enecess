@@ -92,6 +92,10 @@ def load_flow(test):
             self.context['unique_id'] = unique_id
             return None
 
+        def _abort_if_unique_id_configured(self, **kwargs):
+            # Discovery de-duplication is tested against the real HA flow manager.
+            pass
+
         def _set_confirm_only(self):
             self.context["confirm_only"] = True
 

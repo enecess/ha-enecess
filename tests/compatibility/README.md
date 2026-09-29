@@ -62,7 +62,9 @@ and rollback after partially completed platform setup. Other regressions cover
 failed/cancelled setup, HA stop, failed unload, cloud authentication and reauth,
 error classification, transition-only logging and energy accumulation during
 failed polling. Tests do not cover frontend flows, complete HA startup,
-recorder restore or real devices/cloud services.
+complete recorder startup or real devices/cloud services. Cloud energy checks
+exercise HA storage reload and migration of native RestoreSensor data, including
+disabled source entities, formula callback order and removal of entry-owned totals.
 
 Network recovery regressions use fictional HTTP responses and a loopback Modbus
 TCP peer with the real installed pymodbus client. They cover a lost reply,
@@ -92,7 +94,14 @@ Event-controlled ecoPlug tests exercise polls overlapping successful, failed and
 cancelled control commands, per-device isolation and authoritative later polls.
 Numeric payload regressions reject booleans while preserving real zero values.
 
-As checked on 2026-09-29, the 152 offline tests and 69 real-HA runtime
+Discovery regressions use the real HA flow manager to check pending-flow
+deduplication, ignored discoveries and cancellation that retains the original
+discovery card and identity. Notification regressions check unchanged local and
+ecoPlug data, availability recovery and immediate control updates. Cloud energy
+continues counting identical successful deltas and excludes failed polls; pending
+storage checkpoints are not postponed by additional refreshes.
+
+As checked on 2026-09-29, the 155 offline tests and 85 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

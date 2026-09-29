@@ -349,7 +349,7 @@ Kroki:
 Każdy wybrany ecoPlug tworzy dokładnie następujące encje:
 
 - **Przełącznik** sterujący gniazdkiem przez chmurę.
-- `power_rt`: czujnik mocy chwilowej w **W**.
+- `power_rt`: czujnik mocy czynnej w **W**.
 - `energy_total`: czujnik energii całkowitej w **kWh**.
 
 Integracja pobiera dane ecoPlug z chmury mniej więcej co **60 sekund**. Po pomyślnym wykonaniu polecenia stan przełącznika jest natychmiast aktualizowany do wartości docelowej zaakceptowanej przez chmurę. Późniejsze dane pobrane z chmury pozostają miarodajne i mogą skorygować stan, jeśli gniazdko lub chmura zgłosi inną wartość.
@@ -513,128 +513,63 @@ Przykład:
 
 ## Nazewnictwo i znaczenie encji
 
-Encje są tworzone jako sensory z przewidywalnymi kluczami. Nazwa encji jest równa kluczowi sensora.
+Poniższe nazwy to **klucze pomiarów**, a nie pełne identyfikatory `entity_id` Home Assistant. Czujniki używają tych kluczy jako nazw; Home Assistant dodaje nazwę urządzenia i zarządza właściwym identyfikatorem `sensor.…`, który użytkownik może zmienić. **Moc czynna** określa rodzaj pomiaru; dotychczasowe klucze `power_rt` i `power_avg_1m` pozostają bez zmian.
 
-### Wspólny wzorzec nazw
+### Tryb lokalny (Modbus): pełny katalog
 
-- **Główne urządzenie (ecoMain):** `main_...`
-- **Urządzenie podrzędne (ecoSub #):** `sub<slave_index>_...`, np. `sub1_...`, `sub2_...`, `sub3_...`
-- **Indeks kanału:** od `ch1` do `ch10`
+Klucz ma postać `<prefiks>_<sufiks>`. Zakresy w tabeli:
 
-### Encje w trybie lokalnym (Modbus)
+- **A**: `main_l1`, `main_l2`, `main_l3`, `main_all` oraz wszystkie kanały B.
+- **B**: `main_ch1`–`main_ch10` oraz `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` dla wybranych ecoSub.
+- **C**: `main_l1`, `main_l2`, `main_l3` i B, bez `main_all`.
 
-W trybie lokalnym encje obejmują:
+Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone domyślnie. Od wersji 139 osiem pozostałych rodzajów jest opcjonalnych i wymaga zaznaczenia. Nie ma sum ani czujników fazowych ecoSub.
 
-- **moc chwilową L1/L2/L3 ecoMain**,
-- **sumaryczną moc chwilową ecoMain (L1+L2+L3)**,
-- **całkowitą energię forward/reverse L1/L2/L3 ecoMain**,
-- **sumaryczną całkowitą energię forward/reverse ecoMain (L1+L2+L3)**,
-- **10 kanałów gałęzi ecoMain (ch1-ch10):**
-    - moc chwilowa,
-    - całkowita energia forward,
-    - całkowita energia reverse,
-- **urządzenia ecoSub mają tylko kanały gałęzi (ch1-ch10):**
-    - moc chwilowa,
-    - całkowita energia forward,
-    - całkowita energia reverse.
+| Pomiar | Sufiks | Jednostka | Zakres |
+| --- | --- | --- | --- |
+| Moc czynna | `power_rt` | W | A |
+| Energia czynna w kierunku zgodnym | `energy_fwd_total` | Wh | A |
+| Energia czynna w kierunku przeciwnym | `energy_rev_total` | Wh | A |
+| Energia bierna w kierunku zgodnym | `reactive_energy_fwd_total` | varh | A |
+| Energia bierna w kierunku przeciwnym | `reactive_energy_rev_total` | varh | A |
+| Moc pozorna | `apparent_power_rt` | VA | A |
+| Moc bierna | `reactive_power_rt` | var | A |
+| Napięcie | `voltage_rt` | V | C |
+| Prąd | `current_rt` | A | C |
+| Współczynnik mocy | `power_factor_rt` | — | C |
+| Częstotliwość | `frequency_rt` | Hz | `main` |
 
-#### Znaczenie sufiksów encji lokalnych
+Częstotliwość ma wyłącznie pełny klucz `main_frequency_rt`, bez fazy lub kanału. Przykłady: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` oznacza wartość chwilową, a `_total` licznik skumulowany. Współczynnik mocy jest bezwymiarowy, nie jest procentem. Kierunek przekładnika prądowego (CT) wyznacza kierunek zgodny i przeciwny; odwrotny montaż może powodować ujemną moc czynną i wzrost licznika energii w kierunku przeciwnym.
 
-- `_rt` = wartość **chwilowa**
-- `fwd_total` = **całkowita energia w kierunku dodatnim**
-- `rev_total` = **całkowita energia w kierunku przeciwnym**
+### Tryb chmury
 
-#### Wyjaśnienie kierunku przekładnika prądowego (CT)
+Dwa domyślnie wybrane pomiary, **Moc czynna** (`power`) i **Energia** (`energy`), tworzą trzy rodzaje czujników:
 
-Każdy kanał gałęzi jest powiązany z **przekładnikiem prądowym (CT)**.
-CT zwykle ma oznaczenie strzałki kierunku. Jeśli mierzony prąd płynie zgodnie ze strzałką, jest traktowany jako **forward (dodatni)**; jeśli przeciwnie, jako **reverse (ujemny)**.
+| Wybór | Sufiks | Jednostka | Znaczenie |
+| --- | --- | --- | --- |
+| Moc czynna | `power_avg_1m` | W | Średnia moc czynna z jednej minuty |
+| Energia | `energy_total_1m` | Wh | Surowy przyrost energii z jednej minuty, nie licznik skumulowany |
+| Energia | `energy_accumulated` | Wh | Energia sumowana przez Home Assistant |
 
-Dlatego:
+Sufiksy dotyczą wyłącznie `main_all` i kanałów B. W chmurze nie ma czujników L1/L2/L3, sum ecoSub ani dodatkowych pomiarów lokalnych. Przykłady: `main_all_power_avg_1m`, `main_ch1_energy_total_1m`, `sub1_ch1_energy_accumulated`.
 
-- `*_energy_fwd_total` = energia zgromadzona w kierunku **forward**,
-- `*_energy_rev_total` = energia zgromadzona w kierunku **reverse**.
+Do panelu Energia używaj `*_energy_accumulated` (`TOTAL_INCREASING`), a nie `*_energy_total_1m` (bez klasy urządzenia energia i bez klasy stanu). Suma jest szacunkiem opartym na prawidłowych przyrostach z udanych aktualizacji. Brak znacznika czasu lub unikatowego identyfikatora pomiaru może powodować wielokrotne zliczanie powtarzających się wartości chmurowych. Po restarcie zapisany stan zostaje przywrócony, a już pobrany przyrost nie jest od razu ponownie dodawany; może to powodować pominięcia. Nie jest to dokładny historyczny licznik urządzenia.
 
-#### Przykłady lokalne
+### ecoPlug i encje dodatkowe
 
-Moc chwilowa urządzenia głównego:
+Każde wybrane gniazdko ecoPlug ma trzy stałe encje:
 
-- `main_l1_power_rt`
-- `main_l2_power_rt`
-- `main_l3_power_rt`
-- `main_all_power_rt`
+| Encja | Nazwa w kodzie | Dane |
+| --- | --- | --- |
+| Czujnik | `power_rt` | Moc czynna, W (`MEASUREMENT`) |
+| Czujnik | `energy_total` | Energia skumulowana, kWh (`TOTAL_INCREASING`) |
+| Przełącznik | Nazwa urządzenia | Włączanie i wyłączanie gniazdka |
 
-Sumaryczna energia urządzenia głównego:
+Nazwy czujników pozostają `power_rt` i `energy_total`; przetłumaczone opisy nie oznaczają przetłumaczonych nazw wyświetlanych. Przełącznik używa nazwy urządzenia bez dodatkowego sufiksu.
 
-- `main_all_energy_fwd_total`
-- `main_all_energy_rev_total`
+ecoMain obsługuje pięć operacji dodatkowych: odwrócenie znaku i wartość bezwzględną pojedynczego źródła mocy czynnej, sumę i średnią zgodnych źródeł mocy lub energii oraz własną formułę. Te encje powstają tylko po skonfigurowaniu; nazwą jest zapisany tekst użytkownika lub wygenerowany klucz. Dostępność źródeł zależy od trybu, firmware i wybranych pomiarów.
 
-Gałąź urządzenia głównego:
-
-- `main_ch1_power_rt`
-- `main_ch1_energy_fwd_total`
-- `main_ch1_energy_rev_total`
-
-Gałąź urządzenia podrzędnego:
-
-- `sub1_ch1_power_rt`
-- `sub1_ch1_energy_fwd_total`
-- `sub1_ch1_energy_rev_total`
-
----
-
-### Encje w trybie chmury
-
-W trybie chmury encje obejmują:
-
-- **tylko sumę urządzenia głównego (L1+L2+L3)**
-    - 1-minutowa średnia moc,
-    - surowy 1-minutowy przyrost energii,
-    - energia skumulowana po stronie Home Assistant,
-- **10 kanałów gałęzi urządzenia głównego (ch1-ch10)**
-    - 1-minutowa średnia moc,
-    - surowy 1-minutowy przyrost energii,
-    - energia skumulowana po stronie Home Assistant,
-- **urządzenia ecoSub mają tylko kanały gałęzi (ch1-ch10)**
-    - 1-minutowa średnia moc,
-    - surowy 1-minutowy przyrost energii,
-    - energia skumulowana po stronie Home Assistant.
-
-> Wartości chmurowe są przetwarzane i zwracane przez usługę zdalną zgodnie z konfiguracją w chmurze.
-
-#### Znaczenie sufiksów encji chmurowych
-
-- `avg_1m` = **1-minutowa średnia**
-- `total_1m` = **surowy 1-minutowy przyrost energii z API chmury**
-- `energy_accumulated` = **licznik energii skumulowanej po stronie Home Assistant**
-
-- W Home Assistant Energy Dashboard używaj encji `*_energy_accumulated`.
-- Do monitorowania mocy w czasie rzeczywistym używaj encji `*_power_avg_1m`.
-- Surowe encje `*_energy_total_1m` pozostają dostępne, ale są przyrostami minutowymi, a nie licznikami skumulowanymi.
-
-- Łączna energia z chmury jest szacunkowa: API nie podaje czasu ani identyfikatora dla każdej minutowej wartości energii.
-- Może być mniej dokładna niż lokalne liczniki Modbus, zwłaszcza przy powtórzonych pomiarach lub restartach.
-
-#### Przykłady chmurowe
-
-Suma urządzenia głównego:
-
-- `main_all_power_avg_1m`
-- `main_all_energy_total_1m`
-- `main_all_energy_accumulated`
-
-Gałąź urządzenia głównego:
-
-- `main_ch1_power_avg_1m`
-- `main_ch1_energy_total_1m`
-- `main_ch1_energy_accumulated`
-
-Gałąź urządzenia podrzędnego:
-
-- `sub1_ch1_power_avg_1m`
-- `sub1_ch1_energy_total_1m`
-- `sub1_ch1_energy_accumulated`
-
----
+Wyniki formuł mogą mieć typ: moc czynna (W), energia czynna (Wh), energia bierna (varh), moc pozorna (VA), moc bierna (var), napięcie (V), prąd (A), współczynnik mocy, częstotliwość (Hz) i liczba bez jednostki. Formuły energii używają `TOTAL`, pozostałe wyniki `MEASUREMENT`. Szczegóły źródeł, jednostek i edycji opisano w [Własne encje formuł](#własne-encje-formuł), a wybór w [Rodzaje pomiarów](#rodzaje-pomiarów).
 
 ## FAQ / rozwiązywanie problemów
 
@@ -811,15 +746,7 @@ Dla chmury:
 
 ### Q12: Dlaczego w trybie chmury nie ma encji L1/L2/L3?
 
-Tryb lokalny odczytuje rejestry Modbus i może udostępniać wartości L1/L2/L3.
-
-Tryb chmury zależy od danych zwracanych przez usługę zdalną. Obecnie encje chmurowe obejmują:
-
-- sumę urządzenia głównego,
-- kanały gałęzi,
-- kanały urządzeń podrzędnych.
-
-Oddzielne encje L1/L2/L3 nie są obecnie udostępniane w trybie chmury.
+Pomiary L1/L2/L3 są dostępne tylko lokalnie; obsługiwane pomiary i sumy podano w [katalogu encji](#nazewnictwo-i-znaczenie-encji). Chmura udostępnia tylko moc czynną i energię dla `main_all` i kanałów wybranych urządzeń: `*_power_avg_1m`, `*_energy_total_1m` oraz sumę obliczaną przez Home Assistant `*_energy_accumulated`. Nie ma wartości fazowych, sum ecoSub ani dodatkowych pomiarów lokalnych.
 
 ---
 

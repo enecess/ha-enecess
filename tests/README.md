@@ -20,6 +20,11 @@ Coverage includes the firmware 136 baseline, firmware 139 channel-phase configur
 
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 
+Setup and options share the local validation path. Regression coverage includes
+bounded firmware reads, detected firmware on later read failures, online slave
+selection and connection cleanup on cancellation. Cloud accumulation and restore
+checks run in the real-HA compatibility suite instead of using sensor doubles.
+
 For isolated checks against installed Home Assistant releases from 2025.9.0 to
 2026.9.4, see [the compatibility matrix](compatibility/README.md). Its smoke
 suite uses real HA objects and runs separately from the framework doubles above.

@@ -344,7 +344,6 @@ class ConfigFlow(
     ) -> list[DiscoveredDevice]:
         zc_inst = await zeroconf.async_get_async_instance(self.hass)
         found_names: set[str] = set()
-        done = asyncio.Event()
 
         mdns_type = discovery_config.mdns_type
         mdns_prefix = discovery_config.mdns_prefix
@@ -369,17 +368,10 @@ class ConfigFlow(
             handlers=[_on_service_state_change],
         )
 
-        async def _wait() -> None:
-            try:
-                await asyncio.sleep(CONF_LOCAL_MDNS_SCAN_INTERVAL)
-            finally:
-                done.set()
-
-        waiter = asyncio.create_task(_wait())
-        await done.wait()
-
-        await browser.async_cancel()
-        waiter.cancel()
+        try:
+            await asyncio.sleep(CONF_LOCAL_MDNS_SCAN_INTERVAL)
+        finally:
+            await browser.async_cancel()
 
         results: list[DiscoveredDevice] = []
 
@@ -562,15 +554,13 @@ class ConfigFlow(
         }
 
         unique_id = f"ecomain:{selected.serial}:mode_local"
-        existing_entry = self._entry_by_unique_id(unique_id)
+        existing_entry = await self.async_set_unique_id(unique_id)
+        updates = None
         if existing_entry is not None:
             updates = {CONST_MDNS_IP: selected.ip}
             if existing_entry.data.get(CONST_ADD_MODE) == CONST_ADD_MODE_LOCAL_AUTO:
                 updates[CONST_ECOMAIN_HOST] = selected.ip
-            self.hass.config_entries.async_update_entry(
-                existing_entry, data={**existing_entry.data, **updates}
-            )
-            return self.async_abort(reason="already_configured")  # type: ignore[return-value]
+        self._abort_if_unique_id_configured(updates=updates, reload_on_update=False)
 
         self._navigation_discovery_state = self._navigation_snapshot()
         return await self.async_step_ecomain_local_confirm()  # type: ignore[return-value]
@@ -1978,33 +1968,18 @@ class EnecessOptionsFlow(
             return {"base": "cannot_connect_local"}
 
         client = EnecessModbusClient(host, port)
-        try:
-            rr = await client.read_holding_registers(
-                CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1
-            )
-            firmware_version = decode_int16(rr.registers, signed=False)
-            self._firmware_version = firmware_version
-            if firmware_version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
-                self._available_slaves = []
-                return {"base": "firmware_too_old"}
-
-            rr = await client.read_holding_registers(
-                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
-                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
-            )
-            allowed = set(self._ecomain_available_slaves)
-            self._available_slaves = [
-                str(idx)
-                for idx, reg in enumerate(rr.registers, start=1)
-                if decode_int16([reg], signed=False) == 1 and str(idx) in allowed
-            ]
-        except Exception:  # noqa: BLE001 - Convert driver and malformed-register failures into form errors.
-            self._available_slaves = []
-            return {"base": "cannot_connect_local"}
-        else:
-            return None
-        finally:
-            await client.async_close()
+        result = await async_validate_local_device(
+            client,
+            firmware_register=CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
+            minimum_firmware=CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
+            slave_register_start=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+            slave_register_count=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+            allowed_slaves=set(self._ecomain_available_slaves),
+            firmware_timeout=CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
+        )
+        self._firmware_version = result.firmware_version
+        self._available_slaves = result.online_slaves or []
+        return {"base": result.error} if result.error is not None else None
 
     async def _async_refresh_cloud_slaves(self) -> dict[str, str] | None:
         api = EnecessApi(

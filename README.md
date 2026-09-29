@@ -347,7 +347,7 @@ Steps:
 Each selected ecoPlug creates exactly these entities:
 
 - A **switch** that turns the plug on or off through the cloud.
-- `power_rt`: a real-time power sensor reporting current power in **W**.
+- `power_rt`: an active power sensor reporting in **W**.
 - `energy_total`: a total energy sensor reporting accumulated energy in **kWh**.
 
 ecoPlug data is polled from the cloud approximately every **60 seconds**. After a control request succeeds, the switch state is updated immediately to the accepted target state. Later cloud polling remains authoritative and can correct the state if the plug or cloud reports a different value.
@@ -510,127 +510,94 @@ Example:
 
 ## Entity Naming & Meaning
 
-Entities are created as sensors with predictable keys. The entity name equals the sensor key.
+The tables below cover the data items currently implemented. **Active power** is the measurement name; `power_rt` remains its technical key. The `_rt` suffix means an instantaneous reading, not a separate power type.
 
-### Common naming pattern
+Built-in sensors currently use their technical key as the entity name component. HA combines this with the device name to generate display names and entity IDs. These keys are not complete `sensor.xxx` IDs; use the actual ID shown on the HA entity page in automations. Extra entities use the name entered during configuration, and users can rename entities in HA.
 
-- **Main (ecoMain):** `main_...`
-- **Slave (ecoSub #):** `sub<slave_index>_...` (example: `sub1_...`, `sub2_...`, `sub3_...`)
-- **Channel index:** `ch1` to `ch10`
+### Measurement locations and keys
 
-### Local Mode (Modbus) Entities
+Ordinary ecoMain keys follow `<location>_<suffix>`:
 
-In local mode, entities include:
+| Location | Key prefix | Availability |
+| --- | --- | --- |
+| Main phases | `main_l1`, `main_l2`, `main_l3` | Local only |
+| Main three-phase total | `main_all` | Selected local measurements and cloud |
+| Main branches | `main_ch1` … `main_ch10` | Local and cloud |
+| Selected slave branches | `sub1_ch1` … `sub3_ch10` | Ten channels per selected ecoSub |
 
-- **Main L1/L2/L3 real-time power**
-- **Main total (L1+L2+L3) real-time power**
-- **Main L1/L2/L3 forward/reverse total energy**
-- **Main total (L1+L2+L3) forward/reverse total energy**
-- **Main 10 branch channels (ch1–ch10):**
-    - real-time power
-    - forward total energy
-    - reverse total energy
-- **Slaves (ecoSub) only have branch channels (ch1–ch10):**
-    - real-time power
-    - forward total energy
-    - reverse total energy
+Slaves have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected slave.
 
-#### Local entity suffix meaning
+### Complete local measurement catalog (Modbus)
 
-- `_rt` = **real-time** value
-- `fwd_total` = **positive direction accumulated total**
-- `rev_total` = **reverse direction accumulated total**
+Firmware **136–138** supports only the first three categories; firmware **139 or later** supports all eleven. Only the first three are selected by default. Enable the others under **Measurement Types**. These defaults refer to measurement selection; deselected measurements do not create sensors.
 
-#### Current transformer (CT) direction explanation
+| Measurement | Key suffix / full key | Native unit | Main phases | Main total | Branches | Selected by default |
+| --- | --- | --- | --- | --- | --- | --- |
+| Active power | `power_rt` | W | ✓ | ✓ | ✓ | Yes |
+| Forward active energy | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Yes |
+| Reverse active energy | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | Yes |
+| Forward reactive energy | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | No |
+| Reverse reactive energy | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | No |
+| Apparent power | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | No |
+| Reactive power | `reactive_power_rt` | var | ✓ | ✓ | ✓ | No |
+| Voltage | `voltage_rt` | V | ✓ | — | ✓ | No |
+| Current | `current_rt` | A | ✓ | — | ✓ | No |
+| Power factor | `power_factor_rt` | None | ✓ | — | ✓ | No |
+| Frequency | `main_frequency_rt` (full key) | Hz | — | — | — | No; one main sensor only |
 
-Each branch channel is bound to a **current transformer (CT)**.
-The CT usually has an **arrow** marking the direction. If the measured current direction matches the arrow direction, it is considered **forward (positive)**; if
-opposite, it is **reverse (negative)**.
+Power, voltage, current, power factor and frequency use the `MEASUREMENT` state class; the four cumulative energy categories use `TOTAL_INCREASING`. Units listed are native units; HA can convert their display according to user settings.
 
-Therefore:
+Examples: `main_l1_power_rt` is main L1 active power, `main_all_reactive_power_rt` is main total reactive power, `main_ch1_voltage_rt` is main channel 1 voltage, and `sub1_ch1_reactive_energy_fwd_total` is slave 1 channel 1 cumulative forward reactive energy.
 
-- `*_energy_fwd_total` = energy accumulated in the **forward** direction
-- `*_energy_rev_total` = energy accumulated in the **reverse** direction
+With `s` selected slaves, the three default categories create `42 + 30 × s` sensors. Selecting all eleven on firmware 139 or later creates `138 + 100 × s`, excluding extra entities.
 
-#### Local examples
+#### Current transformer (CT) direction
 
-Main real-time:
+The CT arrow marks the forward direction. `energy_fwd_total` accumulates active energy in that direction; `energy_rev_total` accumulates active energy in the opposite direction. `reactive_energy_fwd_total` and `reactive_energy_rev_total` are the device's cumulative forward and reverse reactive energy readings. `_rt` denotes an instantaneous measurement; `fwd_total` and `rev_total` denote directional cumulative values.
 
-- `main_l1_power_rt`
-- `main_l2_power_rt`
-- `main_l3_power_rt`
-- `main_all_power_rt`
+### Complete cloud measurement catalog
 
-Main energy totals:
+Cloud mode has two measurement selections, **Active power** and **Energy**, both selected by default. Each applies to `main_all`, `main_ch1` … `main_ch10` and selected `subN_ch1` … `subN_ch10`. Cloud mode has no per-phase readings or any of the eight additional local measurement categories.
 
-- `main_all_energy_fwd_total`
-- `main_all_energy_rev_total`
+| Selection | Data item | Key suffix | Native unit | HA state class |
+| --- | --- | --- | --- | --- |
+| Active power | 1-minute average active power | `power_avg_1m` | W | `MEASUREMENT` |
+| Energy | Raw 1-minute active energy increment | `energy_total_1m` | Wh | None |
+| Energy | Estimated active energy accumulated in HA | `energy_accumulated` | Wh | `TOTAL_INCREASING` |
 
-Main branch:
+For example, the main totals are `main_all_power_avg_1m`, `main_all_energy_total_1m` and `main_all_energy_accumulated`; replace the prefix with `main_ch1` or `sub1_ch1` for branch examples. With `s` selected slaves and both default selections, this creates `33 + 30 × s` sensors, excluding extra entities.
 
-- `main_ch1_power_rt`
-- `main_ch1_energy_fwd_total`
-- `main_ch1_energy_rev_total`
+- `power_avg_1m` is a backend-processed 1-minute average of active power, not a local instantaneous sample.
+- **Energy** creates both increment and cumulative entities. `energy_total_1m` is not a cumulative meter and has neither a device class nor a state class. Use `energy_accumulated` for the Energy Dashboard instead of the raw increment.
+- The integration maintains shared totals and saves and restores them through HA storage. Disabling a source cumulative entity does not stop enabled formulas or aggregates. However, cloud samples have no per-minute timestamp or ID, so duplicates and missed samples cannot be resolved reliably. Repeated samples, outages and restarts can introduce errors; local device lifetime totals may be more accurate.
 
-Slave branch:
+### ecoPlug entities
 
-- `sub1_ch1_power_rt`
-- `sub1_ch1_energy_fwd_total`
-- `sub1_ch1_energy_rev_total`
+Each selected ecoPlug creates three fixed cloud entities, without measurement selection or extra entity configuration:
 
----
+| Entity | Default name component / key | Native unit | HA state class |
+| --- | --- | --- | --- |
+| Plug switch | Uses the plug device name, without an extra name suffix | — | — |
+| Active power | `power_rt` | W | `MEASUREMENT` |
+| Cumulative active energy | `energy_total` | kWh | `TOTAL_INCREASING` |
 
-### Cloud Mode Entities
+Although ecoPlug and local ecoMain both use `power_rt`, ecoPlug readings are polled from the cloud roughly every 60 seconds. ecoPlug energy is natively in kWh; ecoMain energy is in Wh.
 
-In cloud mode, entities include:
+### ecoMain extra entities
 
-- **Main total (L1+L2+L3) only**
-    - 1-minute average power
-    - raw 1-minute energy increment
-    - Home Assistant-side accumulated energy
-- **Main 10 branch channels (ch1–ch10)**
-    - 1-minute average power
-    - raw 1-minute energy increment
-    - Home Assistant-side accumulated energy
-- **Slaves (ecoSub) only have branch channels (ch1–ch10)**
-    - 1-minute average power
-    - raw 1-minute energy increment
-    - Home Assistant-side accumulated energy
+Extra entities are configured explicitly and are available for local and cloud ecoMain:
 
-> Cloud values are **processed and returned by the remote service** according to your cloud configuration.
+| Operation | Sources and result |
+| --- | --- |
+| Invert | One active power source, producing `-a` |
+| Absolute value | One active power source, producing `abs(a)` |
+| Sum | Multiple matching active power or cumulative active energy sources, producing their sum |
+| Average | Multiple matching active power or cumulative active energy sources, producing their average |
+| Custom formula | Enabled, supported measurements; mixed source types are allowed, with units checked by the user |
 
-#### Cloud entity suffix meaning
+The first four operations retain the source device class, state class and native unit. Formula results support active power, active energy, reactive energy, apparent power, reactive power, voltage, current, power factor, frequency and number. Active/reactive energy results use `TOTAL`; the others use `MEASUREMENT`. See “Custom formula entities” above for configuration and expression rules.
 
-- `avg_1m` = **1-minute average**
-- `total_1m` = **raw 1-minute energy increment from the cloud API**
-- `energy_accumulated` = **Home Assistant-side accumulated energy meter**
-
-- Use `*_energy_accumulated` entities in the Home Assistant Energy Dashboard.
-- Use `*_power_avg_1m` entities for real-time power monitoring.
-- The raw cloud `*_energy_total_1m` entities remain available, but they are per-minute increments and are not cumulative meters.
-
-- Cloud accumulated energy is an estimate: the API provides no timestamp or sample ID for each 1-minute energy value.
-- It may be less accurate than local Modbus lifetime totals, especially with repeated cloud samples or restarts.
-
-#### Cloud examples
-
-Main total:
-
-- `main_all_power_avg_1m`
-- `main_all_energy_total_1m`
-- `main_all_energy_accumulated`
-
-Main branch:
-
-- `main_ch1_power_avg_1m`
-- `main_ch1_energy_total_1m`
-- `main_ch1_energy_accumulated`
-
-Slave branch:
-
-- `sub1_ch1_power_avg_1m`
-- `sub1_ch1_energy_total_1m`
-- `sub1_ch1_energy_accumulated`
+**Channel Phases** is an options page for local firmware 139 or later; it creates no additional `select` or sensor entities.
 
 ---
 
@@ -833,13 +800,14 @@ This is **by design**:
 
 - **Local mode** (Modbus) exposes:
     - L1, L2, L3 powers and energies
-    - Total (L1+L2+L3) values
+    - Three-phase totals for selected measurements; no total voltage, current or power factor entities
 - **Cloud mode** exposes:
     - Total (L1+L2+L3) values
     - Per-channel (ch1–ch10) values
     - All as processed data:
-        - `*_avg_1m` (1-minute average power)
-        - `*_total_1m` (1-minute accumulated energy)
+        - `*_power_avg_1m` (1-minute average active power)
+        - `*_energy_total_1m` (1-minute active energy increment)
+        - `*_energy_accumulated` (active energy estimate accumulated in HA)
 
 Per-phase data is not provided in the current cloud API mapping.
 

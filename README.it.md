@@ -243,7 +243,7 @@ Il cloud restituisce valori elaborati in base alla configurazione remota. L’ag
 Ogni presa crea esattamente tre entità:
 
 - Un interruttore per accensione e spegnimento tramite cloud.
-- `power_rt`: potenza in tempo reale, in **W**.
+- `power_rt`: potenza attiva, in **W**.
 - `energy_total`: energia totale accumulata, in **kWh**.
 
 Il polling avviene circa ogni **60 secondi**. Dopo un comando accettato, lo stato dell’interruttore viene aggiornato subito al valore richiesto. Le letture successive dal cloud restano la fonte autorevole e possono correggerlo. ecoPlug non supporta configurazione locale, selezione dei tipi di misurazione o entità aggiuntive.
@@ -400,37 +400,63 @@ Questa funzione modifica la configurazione sul dispositivo e richiede la conness
 
 I nomi delle voci ecoMain seguono i formati `ecoMain <serial> (Local)` e `ecoMain <serial> (Cloud)`. Gli identificatori univoci usano rispettivamente `ecomain:<serial>:mode_local` e `ecomain:<serial>:mode_cloud`.
 
-I nomi dei sensori corrispondono alle rispettive chiavi:
+I nomi seguenti sono **chiavi di misurazione**, non `entity_id` completi di Home Assistant. I sensori usano le chiavi come nomi; Home Assistant aggiunge il nome del dispositivo e gestisce l’effettivo identificatore `sensor.…`, che l’utente può rinominare. **Potenza attiva** descrive la misurazione; le chiavi esistenti `power_rt` e `power_avg_1m` rimangono invariate.
 
-- `main_...`: dispositivo principale ecoMain.
-- `sub1_...`, `sub2_...`, `sub3_...`: ecoSub selezionati.
-- `ch1`–`ch10`: canale.
-- `_rt`: lettura in tempo reale.
-- `fwd_total` e `rev_total`: totali accumulati nelle direzioni diretta e inversa.
+### Modalità locale (Modbus): catalogo completo
 
-La freccia sul trasformatore di corrente (CT) definisce la direzione diretta. Se la corrente scorre nel verso opposto, l’energia viene conteggiata nella direzione inversa. Un valore negativo o un contatore diretto fermo può dipendere dal verso di installazione del CT.
+Ogni chiave segue il formato `<prefisso>_<suffisso>`. Ambiti della tabella:
 
-Esempi delle categorie locali inizialmente selezionate:
+- **A**: `main_l1`, `main_l2`, `main_l3`, `main_all` e tutti i canali B.
+- **B**: `main_ch1`–`main_ch10` e `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` per gli ecoSub selezionati.
+- **C**: `main_l1`, `main_l2`, `main_l3` e B, senza `main_all`.
 
-| Posizione | Potenza | Energia diretta | Energia inversa |
+Il firmware 136–138 supporta solo le prime tre misurazioni, selezionate inizialmente. Dal firmware 139 le altre otto misurazioni sono facoltative e richiedono la selezione. Non sono presenti totali ecoSub né sensori delle fasi ecoSub.
+
+| Misurazione | Suffisso | Unità | Ambito |
 | --- | --- | --- | --- |
-| Fase L1 ecoMain | `main_l1_power_rt` | `main_l1_energy_fwd_total` | `main_l1_energy_rev_total` |
-| Totale ecoMain | `main_all_power_rt` | `main_all_energy_fwd_total` | `main_all_energy_rev_total` |
-| Canale 1 ecoMain | `main_ch1_power_rt` | `main_ch1_energy_fwd_total` | `main_ch1_energy_rev_total` |
-| Canale 1 ecoSub 1 | `sub1_ch1_power_rt` | `sub1_ch1_energy_fwd_total` | `sub1_ch1_energy_rev_total` |
+| Potenza attiva | `power_rt` | W | A |
+| Energia attiva diretta | `energy_fwd_total` | Wh | A |
+| Energia attiva inversa | `energy_rev_total` | Wh | A |
+| Energia reattiva diretta | `reactive_energy_fwd_total` | varh | A |
+| Energia reattiva inversa | `reactive_energy_rev_total` | varh | A |
+| Potenza apparente | `apparent_power_rt` | VA | A |
+| Potenza reattiva | `reactive_power_rt` | var | A |
+| Tensione | `voltage_rt` | V | C |
+| Corrente | `current_rt` | A | C |
+| Fattore di potenza | `power_factor_rt` | — | C |
+| Frequenza | `frequency_rt` | Hz | `main` |
 
-Nel cloud sono disponibili il totale di ecoMain e i dieci canali di ecoMain e degli ecoSub selezionati, senza entità separate per L1/L2/L3. Esempi per il totale:
+La frequenza ha solo la chiave completa `main_frequency_rt`, senza fase o canale. Esempi: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` indica un valore istantaneo e `_total` un contatore cumulativo. Il fattore di potenza è adimensionale, non una percentuale. Il verso del trasformatore di corrente (CT) determina la direzione diretta/inversa; un CT invertito può causare potenza attiva negativa e aumento del contatore inverso.
 
-- `main_all_power_avg_1m`: potenza media di un minuto.
-- `main_all_energy_total_1m`: incremento grezzo di energia di un minuto restituito dall’API.
-- `main_all_energy_accumulated`: energia accumulata da Home Assistant.
+### Modalità cloud
 
-- Lo stesso schema si applica a `main_ch1_...` e `sub1_ch1_...`.
-- Per la dashboard Energia usa **`*_energy_accumulated`**.
-- I sensori `*_energy_total_1m` sono incrementi, non contatori cumulativi.
+Le due misurazioni selezionate inizialmente, **Potenza attiva** (`power`) ed **Energia** (`energy`), generano tre tipi di sensori:
 
-- L’energia accumulata dal cloud è una stima: l’API non fornisce data e ora né un ID per ogni valore di energia.
-- Può essere meno precisa dei contatori locali, soprattutto con valori ripetuti o riavvii.
+| Selezione | Suffisso | Unità | Significato |
+| --- | --- | --- | --- |
+| Potenza attiva | `power_avg_1m` | W | Potenza attiva media di un minuto |
+| Energia | `energy_total_1m` | Wh | Incremento grezzo di energia di un minuto, non un contatore cumulativo |
+| Energia | `energy_accumulated` | Wh | Energia sommata da Home Assistant |
+
+Questi suffissi si applicano solo a `main_all` e ai canali B. Il cloud non offre sensori L1/L2/L3, totali ecoSub o le misurazioni locali aggiuntive. Esempi: `main_all_power_avg_1m`, `main_ch1_energy_total_1m`, `sub1_ch1_energy_accumulated`.
+
+Per la dashboard Energia usa `*_energy_accumulated` (`TOTAL_INCREASING`), non `*_energy_total_1m` (senza classe dispositivo energia né classe di stato). Il cumulativo è una stima basata sugli incrementi validi delle richieste riuscite. Senza timestamp o identificatore univoco del campione, valori cloud ripetuti possono essere conteggiati più volte. Dopo un riavvio viene ripristinato il totale salvato e l’incremento già caricato non viene subito aggiunto di nuovo; alcuni valori possono quindi essere omessi. Non è il contatore storico esatto del dispositivo.
+
+### ecoPlug ed entità aggiuntive
+
+Ogni presa ecoPlug selezionata ha tre entità fisse:
+
+| Entità | Nome nel codice | Dati |
+| --- | --- | --- |
+| Sensore | `power_rt` | Potenza attiva, W (`MEASUREMENT`) |
+| Sensore | `energy_total` | Energia cumulativa, kWh (`TOTAL_INCREASING`) |
+| Interruttore | Nome del dispositivo | Accensione/spegnimento della presa |
+
+I nomi dei sensori restano `power_rt` ed `energy_total`; le descrizioni tradotte non garantiscono nomi visualizzati tradotti. L’interruttore usa il nome del dispositivo senza suffisso aggiuntivo.
+
+ecoMain supporta cinque operazioni aggiuntive: inversione del segno e valore assoluto di una sorgente di potenza attiva, somma e media di sorgenti compatibili di potenza o energia, e formula personalizzata. Queste entità esistono solo dopo la configurazione; il nome è quello salvato dall’utente o, in alternativa, la chiave generata. Le sorgenti disponibili dipendono dalla modalità, dal firmware e dalle misurazioni selezionate.
+
+I risultati delle formule supportano potenza attiva (W), energia attiva (Wh), energia reattiva (varh), potenza apparente (VA), potenza reattiva (var), tensione (V), corrente (A), fattore di potenza, frequenza (Hz) e numero senza unità. Le formule energetiche usano `TOTAL`, gli altri risultati `MEASUREMENT`. Vedi [Entità formula personalizzate](#entità-formula-personalizzate) per sorgenti, unità e modifiche, [Entità aggiuntive](#entità-aggiuntive) per le operazioni e [Tipi di misurazione](#tipi-di-misurazione) per la selezione.
 
 ## Risoluzione dei problemi
 
