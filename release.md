@@ -2,15 +2,41 @@
 
 ## Unreleased
 
-- Standardized user-visible names to enecess, ecoMain, ecoSub and ecoPlug; added Italian translations and documentation.
-- Local ecoMain retains its minimum firmware requirement of 136. Firmware 136–138 supports the original active power and forward/reverse active energy. Channel phase configuration and the eight additional local measurement types require firmware 139 or later. Unsupported measurement choices are hidden on older firmware.
-- Added measurement selection during ecoMain setup and in options. Local defaults remain active power and forward/reverse active energy; eight additional local categories are opt-in. Cloud offers power and energy, both selected by default.
-- Added local channel-phase configuration for ecoMain and configured online ecoSub devices, with changed-value writes and readback verification.
-- Measurement categories referenced by extra entities cannot be deselected until those entities are removed.
-- Formula source groups, transform/aggregate actions and aggregate source types follow firmware capabilities, connection mode and enabled measurements, excluding choices without usable sources. Formula result types retain the available measurement types and also offer a unitless number.
-- Local firmware read timeouts and connection failures report a connection error. The firmware-too-old error is reserved for a successfully read version below the minimum.
-- Older in-flight ecoPlug polls cannot overwrite a successful relay command. Invalid boolean telemetry is excluded from power and cumulative active energy statistics.
-- Added custom formula entities: choose a name and result type, select sources in multi-select dropdowns grouped by actual data type, then enter an expression. Sources are independent of the result type and include only firmware-supported, enabled measurements; empty groups are hidden and measurements are never enabled automatically. Select at least one source across all groups. Cumulative active energy (Wh), cumulative reactive energy (varh) and cloud 1-minute active energy increments (Wh) are separate groups. Number results have no unit or device class and use `MEASUREMENT`; active and reactive energy results use `TOTAL` for net energy calculations. Supports restricted arithmetic and `abs`, `min`, `max`, `round`; users must check formula units. Variables are shared across groups. Each time the source page is submitted, including when editing or after going back, bindings are regenerated from `a` and the previous expression is cleared. Setup and options support adding formulas; options support editing with stable identity and fixed result type, and removing formulas. Invalid or unavailable calculations report unavailable.
+This update expands ecoMain measurements and custom calculations, adds local channel phase settings, and improves configuration and connection recovery.
+
+### Highlights
+
+- Added measurement selection during ecoMain setup and in **Configure** options, so users can choose the sensors they need.
+- Added nine optional local measurement types on firmware 139 or later: forward/reverse reactive energy, apparent energy, reactive power, apparent power, voltage, current, power factor, and frequency.
+- Added local channel phase settings for ecoMain and selected online ecoSub devices.
+- Added custom formula entities for calculations such as the difference between two power readings or net energy. Formulas can be added during setup and edited or removed later in **Configure**.
+- Added **Back** and **Cancel** actions to configuration pages and improved setup guidance.
+- Added Italian interface translations and documentation, and standardized product names to enecess, ecoMain, ecoSub, and ecoPlug.
+
+### Changes
+
+- Measurement and formula source choices now reflect the device firmware, connection mode, and enabled measurements.
+- Improved preservation of ecoMain settings and entity names when devices are temporarily unreachable or measurements become unavailable.
+- Improved local and cloud connection recovery, cloud sign-in handling, and cleanup when reloading or stopping the integration.
+- Improved cloud cumulative energy storage and recovery; calculations continue to work when the corresponding cumulative sensor is disabled.
+- Improved ecoSub online status handling so an offline slave does not prevent other devices from updating.
+- Improved ecoPlug switch feedback so an earlier poll does not overwrite a successful command, and improved handling of invalid readings.
+- Improved handling of invalid cloud channel data so other valid readings continue updating.
+- Updated sensor display units, precision, translations, and setup documentation.
+
+### Compatibility
+
+- Requires Home Assistant **2025.9.0 or later**.
+- Local ecoMain requires firmware **136 or later**. Firmware 136–138 supports active power and forward/reverse active energy; the additional measurements and channel phase settings require firmware **139 or later**.
+- ecoMain cloud mode continues to offer power and energy. ecoPlug remains cloud-only.
+
+### Upgrade Notes
+
+- Upgrade through HACS, then restart Home Assistant. Keep a current Home Assistant backup before upgrading.
+- Local ecoMain keeps active power and forward/reverse active energy enabled by default. Enable additional measurements in **Configure** as needed.
+- After updating ecoMain firmware, reload the integration to refresh the available measurements and settings.
+- Remove extra entities that use a measurement before deselecting it. When creating formulas, check that the calculation matches the chosen result unit.
+- Cloud cumulative energy remains an estimate and may differ from local meter totals during network interruptions or restarts.
 
 
 ## v1.0.0
