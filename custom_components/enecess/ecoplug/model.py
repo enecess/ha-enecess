@@ -1,6 +1,6 @@
 """Normalize ecoPlug cloud records, readings, and stable identifiers."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 import math
 from typing import Any
@@ -23,6 +23,8 @@ class EcoPlugSnapshot:
     is_on: bool | None = None
     data_error: str | None = None
     state_error: str | None = None
+    # Consuming a confirmation must not make an identical poll notify entities.
+    state_confirmed: bool = field(default=False, compare=False)
 
 
 def normalize_plug(plug: dict[str, Any]) -> dict[str, str] | None:

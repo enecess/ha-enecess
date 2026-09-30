@@ -16,11 +16,15 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
     - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
     - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
 
-> **Firmware-Anforderung (lokaler Modus):** Für die lokale Einrichtung von ecoMain über Modbus TCP ist Firmwareversion **136 oder neuer** erforderlich. Ist die Firmware älter oder stellt das Gerät kein kompatibles Firmwareversionsregister bereit, zeigt die Integration **Die Firmwareversion des Geräts ist zu alt** an. Diese lokale Firmwareprüfung gilt nicht für den Cloud-Modus.
+> Firmware unter **136** führt zu `firmware_too_old`; aktualisiere ecoMain mit offiziellen Werkzeugen. Bei einem Lesefehler des Firmware-Registers erscheint `cannot_connect_local`; prüfe Adresse, TCP-Port 502 und Netzwerk. Im Cloud-Modus entfällt diese Prüfung.
 
 - Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.
-- Lokale Firmware ab 139: auch die acht weiteren Messgrößen und Einstellungen der Kanalphasen.
+- Lokale Firmware ab 139: auch die neun weiteren Messgrößen und Einstellungen der Kanalphasen.
 - Ältere Firmware blendet nicht unterstützte Messgrößen aus.
+
+Protokoll 1.0.5 (Firmware ab 139) bietet optionale Scheinenergie (VAh) mit eigener Formel-Quellengruppe. Zähler verwenden `TOTAL_INCREASING`, Scheinenergieformeln `TOTAL`, ohne Geräteklasse.
+
+Offline-ecoSub-Sensoren sind nicht verfügbar; andere Geräte werden weiter aktualisiert. Lade die Integration nach einem Firmwareupdate bei gleicher IP-Adresse neu.
 
 ---
 
@@ -414,7 +418,7 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 >
 > ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
 
-Ab Firmware 139 stehen im lokalen Modus elf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
+Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
 
 | Kategorie | Bedeutung | Standard |
 | --- | --- | --- |
@@ -423,6 +427,7 @@ Ab Firmware 139 stehen im lokalen Modus elf Kategorien zur Verfügung; Firmware 
 | Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
 | Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
 | Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
+| Scheinenergie | Scheinenergie (VAh) | Aus |
 | Scheinleistung | Scheinleistung (VA) | Aus |
 | Blindleistung | Blindleistung (var) | Aus |
 | Spannung | Elektrische Spannung (V) | Aus |
@@ -441,7 +446,7 @@ Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mi
 3. Wähle auf der nächsten Seite Quellen aus Dropdown-Menüs mit Mehrfachauswahl, gruppiert nach ihrem Datentyp und unabhängig vom Ergebnistyp. Jede Gruppe ist optional; wähle insgesamt mindestens eine Quelle.
 4. Die Formelseite zeigt, wofür `a`, `b` usw. stehen. Gib die Formel ein und prüfe, ob ihre Einheit zum Ergebnistyp passt.
 
-Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk- und Blindenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
+Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh), kumulierte Scheinenergie (VAh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk-, Blind- und Scheinenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
@@ -526,7 +531,7 @@ Ein Schlüssel besteht aus `<Präfix>_<Suffix>`. Die Bereiche in der Tabelle bed
 - **B**: `main_ch1`–`main_ch10` sowie `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` für ausgewählte ecoSub.
 - **C**: `main_l1`, `main_l2`, `main_l3` und B, ohne `main_all`.
 
-Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardmäßig ausgewählt sind. Ab Firmware 139 sind die acht weiteren Messgrößen optional auswählbar; sie werden nicht automatisch aktiviert. Es gibt keine ecoSub-Gesamtwerte oder ecoSub-Phasensensoren.
+Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardmäßig ausgewählt sind. Ab Firmware 139 sind die neun weiteren Messgrößen optional auswählbar; sie werden nicht automatisch aktiviert. Es gibt keine ecoSub-Gesamtwerte oder ecoSub-Phasensensoren.
 
 | Messgröße | Suffix | Einheit | Bereich |
 | --- | --- | --- | --- |
@@ -535,6 +540,7 @@ Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardm�
 | Wirkenergie rückwärts | `energy_rev_total` | Wh | A |
 | Blindenergie vorwärts | `reactive_energy_fwd_total` | varh | A |
 | Blindenergie rückwärts | `reactive_energy_rev_total` | varh | A |
+| Scheinenergie | `apparent_energy_total` | VAh | A |
 | Scheinleistung | `apparent_power_rt` | VA | A |
 | Blindleistung | `reactive_power_rt` | var | A |
 | Spannung | `voltage_rt` | V | C |
@@ -572,7 +578,7 @@ Die Sensornamen bleiben `power_rt` und `energy_total`; die übersetzten Beschrei
 
 ecoMain unterstützt fünf zusätzliche Operationen: Vorzeichen umkehren und Absolutwert für eine Wirkleistungsquelle, Summe und Durchschnitt für kompatible Leistungs- oder Energiequellen sowie eine benutzerdefinierte Formel. Diese Entitäten entstehen nur durch Konfiguration; ihr Name ist der gespeicherte Benutzername oder ersatzweise der erzeugte Schlüssel. Verfügbare Quellen hängen von Modus, Firmware und ausgewählten Messgrößen ab.
 
-Formelergebnisse unterstützen Wirkleistung (W), Wirkenergie (Wh), Blindenergie (varh), Scheinleistung (VA), Blindleistung (var), Spannung (V), Strom (A), Leistungsfaktor, Frequenz (Hz) und eine dimensionslose Zahl. Energieformeln verwenden `TOTAL`, die übrigen Ergebnisse `MEASUREMENT`. Details zu Quellen, Einheiten und Bearbeitung stehen unter [Benutzerdefinierte Formelentitäten](#benutzerdefinierte-formelentitäten); die Auswahl steht unter [Messgrößen](#messgrößen).
+Formelergebnisse unterstützen Wirkleistung (W), Wirkenergie (Wh), Blindenergie (varh), Scheinenergie (VAh), Scheinleistung (VA), Blindleistung (var), Spannung (V), Strom (A), Leistungsfaktor, Frequenz (Hz) und eine dimensionslose Zahl. Energieformeln verwenden `TOTAL`, die übrigen Ergebnisse `MEASUREMENT`. Details zu Quellen, Einheiten und Bearbeitung stehen unter [Benutzerdefinierte Formelentitäten](#benutzerdefinierte-formelentitäten); die Auswahl steht unter [Messgrößen](#messgrößen).
 
 ## FAQ / Fehlerbehebung
 
@@ -611,7 +617,7 @@ Diese Meldung kann an mehreren Stellen auftreten:
 
 ### F3: Ich bekomme „Unable to connect to device“ (`cannot_connect_local`)
 
-Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät nach der Firmware-Prüfung nicht lesen kann.
+Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät einschließlich des Firmware-Registers nicht lesen kann.
 
 **Häufige Ursachen:**
 
@@ -631,27 +637,12 @@ Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät nach der Firmwa
 
 ### F4: Ich bekomme „Device firmware version is too old“ (`firmware_too_old`)
 
-Beim lokalen Setup liest die Integration zunächst ein **Firmware-Versionsregister** aus. Wenn:
-
-- Die Firmwareversion **unter der minimal unterstützten Version** liegt oder
-- die Version **nicht korrekt gelesen** werden kann,
-
-erscheint der Fehler **„Device firmware version is too old“** (`firmware_too_old`).
-
-**Bedeutung:**
-
-- Die aktuell installierte ecoMain-Firmware ist mit dieser Integration nicht kompatibel.
-- Eventuell läuft eine sehr alte oder nicht unterstützte Firmware.
-
-**Was du tun kannst:**
+Firmware unter **136** führt zu `firmware_too_old`; aktualisiere ecoMain mit offiziellen Werkzeugen. Bei einem Lesefehler des Firmware-Registers erscheint `cannot_connect_local`; prüfe Adresse, TCP-Port 502 und Netzwerk. Im Cloud-Modus entfällt diese Prüfung.
 
 1. ecoMain mit den offiziellen enecess-Tools / der App / dem vorgesehenen Verfahren auf die **neueste Firmware** aktualisieren.
 2. Anschließend das lokale Hinzufügen erneut versuchen.
 3. Falls du nicht weißt, wie die Firmware aktualisiert wird, den Installateur oder den enecess-Support kontaktieren und erwähnen, dass die Home-Assistant-Integration
    `firmware_too_old` meldet.
-
-> Hinweis: Wenn das Firmware-Register gar nicht gelesen werden kann, behandelt die Integration dies ebenfalls als `firmware_too_old`. Bist du sicher, dass die Firmware
-> aktuell ist, solltest du zusätzlich die Netzwerk-Erreichbarkeit (IP, Port, Verdrahtung) überprüfen.
 
 ---
 

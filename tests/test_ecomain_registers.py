@@ -58,8 +58,8 @@ class RegisterTests(unittest.TestCase):
         specs = self.model.build_specs_local([3], ["reactive_energy_forward", "reactive_energy_reverse", "apparent_power", "reactive_power", "voltage", "current", "power_factor", "frequency"])
         actual = {s.key: (s.address, s.regs, s.scale, s.signed) for s in specs}
         expected = {
-            "sub3_ch10_reactive_energy_fwd_total": (688, 4, .001, False),
-            "sub3_ch10_reactive_energy_rev_total": (848, 4, .001, False),
+            "sub3_ch10_reactive_energy_fwd_total": (540, 4, .001, False),
+            "sub3_ch10_reactive_energy_rev_total": (700, 4, .001, False),
             "sub3_ch10_apparent_power_rt": (986, 2, .01, True),
             "sub3_ch10_reactive_power_rt": (1186, 2, .01, True),
             "sub3_ch10_voltage_rt": (1326, 1, .01, False),
@@ -141,7 +141,7 @@ class PollingTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(count <= 125 for _, count in blocks))
         self.assertTrue(all(any(start <= s.address and s.address + s.regs <= start + count for start, count in blocks) for s in specs))
         covered = {i for start, count in blocks for i in range(start, start + count)}
-        self.assertEqual(covered, set(range(352)) | set(range(500, 852)))
+        self.assertEqual(covered, set(range(704)))
 
     async def test_firmware_capabilities_filter_reads_and_restore_after_target_change(self):
         model, coordinator = load_runtime()

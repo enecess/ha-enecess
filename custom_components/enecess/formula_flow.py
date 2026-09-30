@@ -51,7 +51,10 @@ class FormulaFlowMixin:
         """Offer available result types and preserve the locked type during edits."""
         data, options = self._formula_context
         available = {
-            desc.device_class for desc in build_entry_descriptions(data, options)
+            "apparent_energy"
+            if desc.spec.kind == "apparent_energy"
+            else desc.device_class
+            for desc in build_entry_descriptions(data, options)
         }
         if available:
             available.add("number")

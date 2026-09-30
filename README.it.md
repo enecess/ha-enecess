@@ -12,11 +12,15 @@ Questa integrazione personalizzata per Home Assistant supporta i prodotti **enec
 - **ecoSub**: fino a tre dispositivi secondari, selezionabili attraverso il relativo ecoMain. Ogni dispositivo dispone di dieci canali.
 - **ecoPlug**: connessione solo cloud. Un’unica voce dell’integrazione può contenere più prese dello stesso account; la selezione è modificabile nelle opzioni.
 
-> **Firmware richiesto in modalità locale:** ecoMain deve avere la versione **136 o successiva**. Se la versione è precedente o il registro della versione non è leggibile, viene visualizzato `firmware_too_old`. Questo controllo non si applica alla modalità cloud.
+> Un firmware inferiore a **136** genera `firmware_too_old`: aggiorna ecoMain con gli strumenti ufficiali. Se la lettura della versione fallisce, compare `cannot_connect_local`: verifica indirizzo, porta TCP 502 e connessione. Il controllo non riguarda la modalità cloud.
 
 - Firmware locale 136–138: potenza attiva ed energia attiva diretta/inversa.
-- Firmware locale 139 o successivo: anche gli altri otto tipi e le impostazioni delle fasi dei canali.
+- Firmware locale 139 o successivo: anche gli altri nove tipi e le impostazioni delle fasi dei canali.
 - I tipi non supportati sono nascosti con firmware precedenti.
+
+Il protocollo 1.0.5 (firmware 139 o successivo) aggiunge energia apparente facoltativa (VAh), con un gruppo di sorgenti dedicato. I contatori usano `TOTAL_INCREASING`, le formule `TOTAL`, senza classe del dispositivo.
+
+I sensori ecoSub offline diventano non disponibili; gli altri dispositivi continuano ad aggiornarsi. Ricarica l’integrazione dopo un aggiornamento firmware allo stesso indirizzo IP.
 
 ## Installazione con HACS
 
@@ -293,7 +297,7 @@ Tipo di dispositivo, metodo di connessione e dispositivo principale ecoMain non 
 >
 > ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
 
-Con il firmware 139 o successivo sono disponibili le seguenti undici categorie locali; con il firmware 136–138 sono disponibili soltanto le prime tre:
+Con il firmware 139 o successivo sono disponibili le seguenti dodici categorie locali; con il firmware 136–138 sono disponibili soltanto le prime tre:
 
 | Misurazione | Significato | Unità | Selezione iniziale |
 | --- | --- | --- | --- |
@@ -302,6 +306,7 @@ Con il firmware 139 o successivo sono disponibili le seguenti undici categorie l
 | Energia attiva inversa | Energia attiva accumulata nella direzione opposta | Wh | Sì |
 | Energia reattiva diretta | Energia reattiva accumulata nella direzione diretta | varh | No |
 | Energia reattiva inversa | Energia reattiva accumulata nella direzione inversa | varh | No |
+| Energia apparente | Energia apparente (VAh) | VAh | No |
 | Potenza apparente | Potenza apparente misurata | VA | No |
 | Potenza reattiva | Potenza reattiva misurata | var | No |
 | Tensione | Tensione elettrica | V | No |
@@ -336,7 +341,7 @@ Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due va
 3. Nella pagina successiva, seleziona le sorgenti nei menu a selezione multipla, raggruppate per tipo di dati e indipendenti dal tipo di risultato. Ogni gruppo è facoltativo; seleziona almeno una sorgente in totale.
 4. La pagina della formula mostra a cosa corrispondono `a`, `b`, ecc. Inserisci la formula e verifica che la sua unità corrisponda al tipo di risultato.
 
-Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I gruppi vuoti sono nascosti; la scelta delle sorgenti non abilita automaticamente le misurazioni. Energia attiva cumulativa (Wh), energia reattiva cumulativa (varh) e incrementi al minuto di energia attiva dal cloud (Wh) formano gruppi distinti. Puoi combinare tipi di sorgenti diversi e devi verificare personalmente le unità della formula. Le variabili `a`, `b`, ecc. sono condivise tra i gruppi. Ogni volta che prosegui dalla pagina delle sorgenti, anche durante la modifica o dopo essere tornati indietro, vengono riassegnate da `a` e l’espressione precedente viene cancellata. I risultati di energia attiva e reattiva usano `TOTAL`, consentendo aumenti e diminuzioni per l’energia netta. **Numero** produce un valore puramente numerico senza unità né classe del dispositivo (`device_class`), con `MEASUREMENT`.
+Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I gruppi vuoti sono nascosti; la scelta delle sorgenti non abilita automaticamente le misurazioni. Energia attiva cumulativa (Wh), energia reattiva cumulativa (varh), energia apparente cumulativa (VAh) e incrementi al minuto di energia attiva dal cloud (Wh) formano gruppi distinti. Puoi combinare tipi di sorgenti diversi e devi verificare personalmente le unità della formula. Le variabili `a`, `b`, ecc. sono condivise tra i gruppi. Ogni volta che prosegui dalla pagina delle sorgenti, anche durante la modifica o dopo essere tornati indietro, vengono riassegnate da `a` e l’espressione precedente viene cancellata. I risultati di energia attiva, reattiva e apparente usano `TOTAL`, consentendo aumenti e diminuzioni per l’energia netta. **Numero** produce un valore puramente numerico senza unità né classe del dispositivo (`device_class`), con `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
@@ -410,7 +415,7 @@ Ogni chiave segue il formato `<prefisso>_<suffisso>`. Ambiti della tabella:
 - **B**: `main_ch1`–`main_ch10` e `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` per gli ecoSub selezionati.
 - **C**: `main_l1`, `main_l2`, `main_l3` e B, senza `main_all`.
 
-Il firmware 136–138 supporta solo le prime tre misurazioni, selezionate inizialmente. Dal firmware 139 le altre otto misurazioni sono facoltative e richiedono la selezione. Non sono presenti totali ecoSub né sensori delle fasi ecoSub.
+Il firmware 136–138 supporta solo le prime tre misurazioni, selezionate inizialmente. Dal firmware 139 le altre nove misurazioni sono facoltative e richiedono la selezione. Non sono presenti totali ecoSub né sensori delle fasi ecoSub.
 
 | Misurazione | Suffisso | Unità | Ambito |
 | --- | --- | --- | --- |
@@ -419,6 +424,7 @@ Il firmware 136–138 supporta solo le prime tre misurazioni, selezionate inizia
 | Energia attiva inversa | `energy_rev_total` | Wh | A |
 | Energia reattiva diretta | `reactive_energy_fwd_total` | varh | A |
 | Energia reattiva inversa | `reactive_energy_rev_total` | varh | A |
+| Energia apparente | `apparent_energy_total` | VAh | A |
 | Potenza apparente | `apparent_power_rt` | VA | A |
 | Potenza reattiva | `reactive_power_rt` | var | A |
 | Tensione | `voltage_rt` | V | C |
@@ -456,7 +462,7 @@ I nomi dei sensori restano `power_rt` ed `energy_total`; le descrizioni tradotte
 
 ecoMain supporta cinque operazioni aggiuntive: inversione del segno e valore assoluto di una sorgente di potenza attiva, somma e media di sorgenti compatibili di potenza o energia, e formula personalizzata. Queste entità esistono solo dopo la configurazione; il nome è quello salvato dall’utente o, in alternativa, la chiave generata. Le sorgenti disponibili dipendono dalla modalità, dal firmware e dalle misurazioni selezionate.
 
-I risultati delle formule supportano potenza attiva (W), energia attiva (Wh), energia reattiva (varh), potenza apparente (VA), potenza reattiva (var), tensione (V), corrente (A), fattore di potenza, frequenza (Hz) e numero senza unità. Le formule energetiche usano `TOTAL`, gli altri risultati `MEASUREMENT`. Vedi [Entità formula personalizzate](#entità-formula-personalizzate) per sorgenti, unità e modifiche, [Entità aggiuntive](#entità-aggiuntive) per le operazioni e [Tipi di misurazione](#tipi-di-misurazione) per la selezione.
+I risultati delle formule supportano potenza attiva (W), energia attiva (Wh), energia reattiva (varh), energia apparente (VAh), potenza apparente (VA), potenza reattiva (var), tensione (V), corrente (A), fattore di potenza, frequenza (Hz) e numero senza unità. Le formule energetiche usano `TOTAL`, gli altri risultati `MEASUREMENT`. Vedi [Entità formula personalizzate](#entità-formula-personalizzate) per sorgenti, unità e modifiche, [Entità aggiuntive](#entità-aggiuntive) per le operazioni e [Tipi di misurazione](#tipi-di-misurazione) per la selezione.
 
 ## Risoluzione dei problemi
 
@@ -465,7 +471,7 @@ I risultati delle formule supportano potenza attiva (W), energia attiva (Wh), en
 | ecoMain non viene rilevato | Verifica sottorete/VLAN e multicast mDNS; prova la configurazione manuale. |
 | `no_devices_found` | Verifica alimentazione e rete locale oppure l’associazione di ecoMain all’account enecess. |
 | `cannot_connect_local` | Controlla IP/nome host, raggiungibilità e porta TCP 502; attendi se il dispositivo si sta riavviando. |
-| `firmware_too_old` | Aggiorna ecoMain alla versione 136 o successiva tramite gli strumenti ufficiali; verifica anche che il registro della versione sia leggibile. |
+| `firmware_too_old` | Aggiorna ecoMain alla versione 136 o successiva con gli strumenti ufficiali. |
 | `cannot_connect` | Controlla connessione Internet, DNS e disponibilità del servizio cloud `https://hems.enecess.com`. |
 | `auth_failed` | Prova le stesse credenziali nell’app enecess; se necessario, reimposta la password nell’app. |
 | `already_configured` | Esiste già una voce con lo stesso numero di serie e metodo di connessione. Apri le opzioni della voce esistente. |

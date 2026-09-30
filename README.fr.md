@@ -16,11 +16,15 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
     - Une entrée de compte peut sélectionner plusieurs prises par nom et numéro de série.
     - **Configurer / Options** permet de modifier ensuite la sélection.
 
-> **Prérequis du firmware (mode local) :** La configuration locale d’ecoMain via Modbus TCP nécessite la version **136 ou ultérieure** du firmware. Si le firmware est plus ancien ou si l’appareil n’expose pas de registre de version du firmware compatible, l’intégration affiche **La version du firmware de l’appareil est trop ancienne**. Ce contrôle local du firmware ne s’applique pas au mode cloud.
+> Un firmware inférieur à **136** provoque `firmware_too_old` ; mettez ecoMain à jour avec les outils officiels. Un échec de lecture de la version provoque `cannot_connect_local` ; vérifiez adresse, port TCP 502 et connexion. Le mode cloud ne réalise pas ce contrôle.
 
 - Firmware local 136–138 : puissance active et énergie active directe/inverse.
-- Firmware local 139 ou plus récent : aussi les huit autres types et le réglage des phases des canaux.
+- Firmware local 139 ou plus récent : aussi les neuf autres types et le réglage des phases des canaux.
 - Les types non pris en charge sont masqués avec un ancien firmware.
+
+Le protocole 1.0.5 (firmware 139 ou ultérieur) ajoute l’énergie apparente facultative (VAh), avec son groupe de sources de formule. Les compteurs utilisent `TOTAL_INCREASING`, les formules `TOTAL`, sans classe d’appareil.
+
+Les capteurs des ecoSub hors ligne deviennent indisponibles ; les autres appareils continuent de se mettre à jour. Rechargez l’intégration après une mise à jour du firmware à la même adresse IP.
 
 ---
 
@@ -416,7 +420,7 @@ Si vous devez modifier un réglage non modifiable :
 >
 > ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
 
-Le mode local propose onze catégories avec le firmware 139 ou ultérieur ; seules les trois premières sont disponibles avec le firmware 136–138 :
+Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; seules les trois premières sont disponibles avec le firmware 136–138 :
 
 | Catégorie | Signification | Par défaut |
 | --- | --- | --- |
@@ -425,6 +429,7 @@ Le mode local propose onze catégories avec le firmware 139 ou ultérieur ; seul
 | Énergie active inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
 | Énergie réactive directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
 | Énergie réactive inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
+| Énergie apparente | Énergie apparente (VAh) | Désactivée |
 | Puissance apparente | Puissance apparente (VA) | Désactivée |
 | Puissance réactive | Puissance réactive (var) | Désactivée |
 | Tension | Tension électrique (V) | Désactivée |
@@ -443,7 +448,7 @@ Créez un capteur à partir de vos mesures, par exemple la différence ou la moy
 3. Sur la page suivante, sélectionnez les sources dans les listes déroulantes à sélection multiple, regroupées par type de données, indépendamment du résultat. Chaque groupe est facultatif ; sélectionnez au moins une source au total.
 4. La page de formule indique à quoi correspondent `a`, `b`, etc. Saisissez la formule et vérifiez que son unité correspond au type de résultat.
 
-Seules les mesures activées et prises en charge par le micrologiciel sont proposées. Les groupes vides sont masqués ; le choix des sources n’active aucune mesure automatiquement. L’énergie active cumulée (Wh), l’énergie réactive cumulée (varh) et les incréments d’énergie active par minute du cloud (Wh) forment des groupes distincts. Vous pouvez combiner différents types de sources et devez vérifier vous-même les unités de la formule. Les variables `a`, `b`, etc. sont communes aux groupes. Chaque fois que vous continuez depuis la page des sources, y compris lors d’une modification ou après un retour, elles sont réattribuées à partir de `a` et l’expression précédente est effacée. Les résultats d’énergie active et réactive utilisent `TOTAL`, autorisant des hausses et des baisses pour l’énergie nette. **Nombre** produit une valeur purement numérique sans unité ni classe d’appareil (`device_class`), avec `MEASUREMENT`.
+Seules les mesures activées et prises en charge par le micrologiciel sont proposées. Les groupes vides sont masqués ; le choix des sources n’active aucune mesure automatiquement. L’énergie active cumulée (Wh), l’énergie réactive cumulée (varh), l’énergie apparente cumulée (VAh) et les incréments d’énergie active par minute du cloud (Wh) forment des groupes distincts. Vous pouvez combiner différents types de sources et devez vérifier vous-même les unités de la formule. Les variables `a`, `b`, etc. sont communes aux groupes. Chaque fois que vous continuez depuis la page des sources, y compris lors d’une modification ou après un retour, elles sont réattribuées à partir de `a` et l’expression précédente est effacée. Les résultats d’énergie active, réactive et apparente utilisent `TOTAL`, autorisant des hausses et des baisses pour l’énergie nette. **Nombre** produit une valeur purement numérique sans unité ni classe d’appareil (`device_class`), avec `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
@@ -528,7 +533,7 @@ Une clé suit le format `<préfixe>_<suffixe>`. Portées utilisées dans le tabl
 - **B** : `main_ch1`–`main_ch10`, ainsi que `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` pour les ecoSub sélectionnés.
 - **C** : `main_l1`, `main_l2`, `main_l3` et B, sans `main_all`.
 
-Le firmware 136–138 propose seulement les trois premières mesures, sélectionnées par défaut. À partir du firmware 139, les huit autres mesures sont facultatives et ne sont pas activées automatiquement. Il n’existe aucun total ecoSub ni capteur de phase ecoSub.
+Le firmware 136–138 propose seulement les trois premières mesures, sélectionnées par défaut. À partir du firmware 139, les neuf autres mesures sont facultatives et ne sont pas activées automatiquement. Il n’existe aucun total ecoSub ni capteur de phase ecoSub.
 
 | Mesure | Suffixe | Unité | Portée |
 | --- | --- | --- | --- |
@@ -537,6 +542,7 @@ Le firmware 136–138 propose seulement les trois premières mesures, sélection
 | Énergie active inverse | `energy_rev_total` | Wh | A |
 | Énergie réactive directe | `reactive_energy_fwd_total` | varh | A |
 | Énergie réactive inverse | `reactive_energy_rev_total` | varh | A |
+| Énergie apparente | `apparent_energy_total` | VAh | A |
 | Puissance apparente | `apparent_power_rt` | VA | A |
 | Puissance réactive | `reactive_power_rt` | var | A |
 | Tension | `voltage_rt` | V | C |
@@ -574,7 +580,7 @@ Les capteurs conservent les noms `power_rt` et `energy_total` ; les descriptions
 
 ecoMain propose cinq opérations supplémentaires : inversion du signe et valeur absolue d’une source de puissance active, somme et moyenne de sources compatibles de puissance ou d’énergie, et formule personnalisée. Ces entités sont créées uniquement par configuration ; leur nom est celui enregistré par l’utilisateur ou, à défaut, la clé générée. Les sources disponibles dépendent du mode, du firmware et des mesures sélectionnées.
 
-Les résultats de formule peuvent être : puissance active (W), énergie active (Wh), énergie réactive (varh), puissance apparente (VA), puissance réactive (var), tension (V), courant (A), facteur de puissance, fréquence (Hz) et nombre sans unité. Les formules d’énergie utilisent `TOTAL` et les autres résultats `MEASUREMENT`. Voir [Entités de formule personnalisées](#entités-de-formule-personnalisées) pour les sources, unités et modifications, et [Types de mesures](#types-de-mesures) pour la sélection.
+Les résultats de formule peuvent être : puissance active (W), énergie active (Wh), énergie réactive (varh), énergie apparente (VAh), puissance apparente (VA), puissance réactive (var), tension (V), courant (A), facteur de puissance, fréquence (Hz) et nombre sans unité. Les formules d’énergie utilisent `TOTAL` et les autres résultats `MEASUREMENT`. Voir [Entités de formule personnalisées](#entités-de-formule-personnalisées) pour les sources, unités et modifications, et [Types de mesures](#types-de-mesures) pour la sélection.
 
 ## FAQ / Dépannage
 
@@ -613,7 +619,7 @@ Cette erreur peut apparaître dans plusieurs cas :
 
 ### Q3 : J’obtiens « Unable to connect to device » (`cannot_connect_local`)
 
-Cette erreur survient lorsque le client Modbus local n’arrive pas à lire les registres de l’appareil (après la vérification de firmware).
+Cette erreur survient lorsque le client Modbus local n’arrive pas à lire les registres de l’appareil (y compris le registre du firmware).
 
 **Causes courantes :**
 
@@ -633,27 +639,12 @@ Cette erreur survient lorsque le client Modbus local n’arrive pas à lire les 
 
 ### Q4 : J’obtiens « Device firmware version is too old » (`firmware_too_old`)
 
-Lors de l’ajout en mode local, l’intégration lit d’abord un **registre de version firmware**. Si :
-
-- La version est **inférieure** au minimum requis, ou
-- L’intégration n’arrive pas à lire correctement la version,
-
-vous verrez l’erreur : **« Device firmware version is too old »** (`firmware_too_old`).
-
-**Ce que cela signifie :**
-
-- Le firmware d’ecoMain n’est pas compatible avec cette version de l’intégration.
-- L’appareil peut utiliser un firmware ancien ou non supporté.
-
-**Que faire :**
+Un firmware inférieur à **136** provoque `firmware_too_old` ; mettez ecoMain à jour avec les outils officiels. Un échec de lecture de la version provoque `cannot_connect_local` ; vérifiez adresse, port TCP 502 et connexion. Le mode cloud ne réalise pas ce contrôle.
 
 1. Mettez ecoMain à jour avec le **firmware le plus récent** via les outils/procédures officielles enecess (application, logiciel, etc.).
 2. Une fois la mise à jour effectuée, réessayez d’ajouter l’intégration en mode local.
 3. Si vous ne savez pas comment mettre à jour le firmware, contactez votre installateur ou le support enecess et mentionnez que l’intégration Home Assistant renvoie
    `firmware_too_old`.
-
-> Remarque : dans certains cas, si le registre de version ne peut pas être lu, l’intégration le traite également comme `firmware_too_old`. Si vous êtes certain que le
-> firmware est à jour, vérifiez aussi la connectivité (IP, port, câblage).
 
 ---
 

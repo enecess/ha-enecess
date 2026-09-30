@@ -71,7 +71,11 @@ from .const import (
     DiscoveryConfig,
     EcoMainDeviceTyp,
 )
-from .ecomain.model import CLOUD_MEASUREMENTS, available_local_measurements
+from .ecomain.model import (
+    CLOUD_MEASUREMENTS,
+    LOCAL_MEASUREMENTS,
+    available_local_measurements,
+)
 from .ecomain.phase import async_read_phases, async_write_phases
 from .ecoplug.model import build_plug_options, select_plugs
 from .extra import (
@@ -108,7 +112,9 @@ class DiscoveredDevice:
     ip: str | None
 
 
-def _measurement_schema(entry_data: dict, selected: list[str]) -> vol.Schema:
+def _measurement_schema(
+    entry_data: dict, selected: list[str], *, preserve_selected: bool = False
+) -> vol.Schema:
     choices = (
         CLOUD_MEASUREMENTS
         if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD
@@ -116,6 +122,13 @@ def _measurement_schema(entry_data: dict, selected: list[str]) -> vol.Schema:
             entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
         )
     )
+    if preserve_selected and entry_data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
+        # Keep existing choices visible so only an explicit deselection removes them.
+        choices = tuple(
+            dict.fromkeys(
+                (*choices, *(item for item in selected if item in LOCAL_MEASUREMENTS))
+            )
+        )
     return vol.Schema(
         {
             vol.Required(
@@ -1461,6 +1474,7 @@ class EnecessOptionsFlow(
             CONST_EXTRA_ENTITIES: get_entry_extra_entities(entry.options),
         }
         self._firmware_version = entry.data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
+        self._firmware_target = self._local_target
         self._available_slaves: list[str] = []
         self._phase_device: int | None = None
         self._phase_values: dict[str, str | None] = {}
@@ -1476,10 +1490,19 @@ class EnecessOptionsFlow(
         return await self._show_options_menu()
 
     @property
+    def _local_target(self) -> tuple[str | None, int]:
+        return (
+            self._entry.data.get(CONST_ECOMAIN_HOST),
+            self._entry.data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT),
+        )
+
+    @property
     def _measurement_entry_data(self) -> dict[str, Any]:
         return {
             **self._entry.data,
-            CONST_ECOMAIN_FIRMWARE_VERSION: self._firmware_version,
+            CONST_ECOMAIN_FIRMWARE_VERSION: self._firmware_version
+            if self._firmware_target == self._local_target
+            else None,
         }
 
     @property
@@ -1557,7 +1580,7 @@ class EnecessOptionsFlow(
         return self.async_show_form(
             **_measurement_form_details(self._measurement_entry_data),
             data_schema=_measurement_schema(
-                self._measurement_entry_data, selected or []
+                self._measurement_entry_data, selected or [], preserve_selected=True
             ),
             errors=errors,
         )
@@ -1995,10 +2018,13 @@ class EnecessOptionsFlow(
         return await self._async_refresh_local_slaves()
 
     async def _async_refresh_local_slaves(self) -> dict[str, str] | None:
-        self._firmware_version = None
-        host = self._entry.data.get(CONST_ECOMAIN_HOST)
-        port = self._entry.data.get(CONST_ECOMAIN_PORT, CONF_ECOMAIN_PORT)
+        target = self._local_target
+        if self._firmware_target != target:
+            self._firmware_version = None
+        self._firmware_target = target
+        host, port = target
         if not host:
+            self._firmware_version = None
             self._available_slaves = []
             return {"base": "cannot_connect_local"}
 
@@ -2012,7 +2038,8 @@ class EnecessOptionsFlow(
             allowed_slaves=set(self._ecomain_available_slaves),
             firmware_timeout=CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
         )
-        self._firmware_version = result.firmware_version
+        if result.firmware_version is not None:
+            self._firmware_version = result.firmware_version
         self._available_slaves = result.online_slaves or []
         return {"base": result.error} if result.error is not None else None
 
@@ -2057,7 +2084,10 @@ class EnecessOptionsFlow(
 
     def _update_entry_data(self) -> None:
         if self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
-            if self._firmware_version is not None:
+            if (
+                self._firmware_version is not None
+                and self._firmware_target == self._local_target
+            ):
                 self.hass.config_entries.async_update_entry(
                     self._entry, data=self._measurement_entry_data
                 )

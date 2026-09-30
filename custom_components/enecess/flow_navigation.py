@@ -49,6 +49,7 @@ STATE_FIELDS = (
     "_options",
     "_extra_entities",
     "_firmware_version",
+    "_firmware_target",
     "_available_slaves",
     "_phase_device",
     "_phase_values",

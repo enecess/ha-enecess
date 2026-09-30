@@ -16,11 +16,15 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
     - One account entry can select one or more plugs by name and serial number.
     - Open the entry's **Configure** options to change the selected plugs later.
 
-> **Firmware requirement (local mode):** Local ecoMain setup over Modbus TCP requires firmware version **136 or later**. If the firmware is older or the device does not expose a compatible firmware-version register, the integration displays **Device firmware version is too old**. This local firmware check does not apply to cloud mode.
+> Firmware below **136** produces `firmware_too_old`; update ecoMain with official tools. Failure to read the firmware register produces `cannot_connect_local`; check the address, TCP port 502 and connectivity. Cloud mode does not use this check.
 
 - Local firmware 136–138: active power and forward/reverse active energy.
-- Local firmware 139 or later: also supports the eight additional types and channel phase settings.
+- Local firmware 139 or later: also supports the nine additional types and channel phase settings.
 - Unsupported types are hidden on older firmware.
+
+Optional apparent energy (VAh) is supported by protocol 1.0.5 on firmware 139+, including separate formula sources. Counters use `TOTAL_INCREASING`; formulas use `TOTAL`, without a device class.
+
+Offline ecoSub sensors become unavailable while other devices continue updating. Reload the integration after updating firmware at the same IP address.
 
 ---
 
@@ -408,7 +412,7 @@ If you need to change immutable settings:
 >
 > ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
 
-Local mode offers eleven measurement categories on firmware 139 or later; only the first three are available on firmware 136–138:
+Local mode offers twelve measurement categories on firmware 139 or later; only the first three are available on firmware 136–138:
 
 | Category | Meaning | Default |
 | --- | --- | --- |
@@ -417,6 +421,7 @@ Local mode offers eleven measurement categories on firmware 139 or later; only t
 | Reverse active energy | Accumulated active energy in the reverse CT direction (Wh) | On |
 | Forward reactive energy | Accumulated reactive energy in the forward direction (varh) | Off |
 | Reverse reactive energy | Accumulated reactive energy in the reverse direction (varh) | Off |
+| Apparent energy | Apparent energy (VAh) | Off |
 | Apparent power | Apparent power (VA) | Off |
 | Reactive power | Reactive power (var) | Off |
 | Voltage | Voltage (V) | Off |
@@ -435,7 +440,7 @@ Create a sensor from your measurements, such as the difference or average of two
 3. On the next page, select sources from the multi-select dropdowns grouped by actual data type, independently of the result type. Each group is optional; select at least one source in total.
 4. Use the expression page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
 
-Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active and reactive energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
+Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), cumulative apparent energy (VAh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active, reactive and apparent energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
@@ -529,7 +534,7 @@ Slaves have no separate L1/L2/L3, three-phase total or frequency entities. “Br
 
 ### Complete local measurement catalog (Modbus)
 
-Firmware **136–138** supports only the first three categories; firmware **139 or later** supports all eleven. Only the first three are selected by default. Enable the others under **Measurement Types**. These defaults refer to measurement selection; deselected measurements do not create sensors.
+Firmware **136–138** supports only the first three categories; firmware **139 or later** supports all twelve. Only the first three are selected by default. Enable the others under **Measurement Types**. These defaults refer to measurement selection; deselected measurements do not create sensors.
 
 | Measurement | Key suffix / full key | Native unit | Main phases | Main total | Branches | Selected by default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -538,6 +543,7 @@ Firmware **136–138** supports only the first three categories; firmware **139 
 | Reverse active energy | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | Yes |
 | Forward reactive energy | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | No |
 | Reverse reactive energy | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | No |
+| Apparent energy | `apparent_energy_total` | VAh | ✓ | ✓ | ✓ | No |
 | Apparent power | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | No |
 | Reactive power | `reactive_power_rt` | var | ✓ | ✓ | ✓ | No |
 | Voltage | `voltage_rt` | V | ✓ | — | ✓ | No |
@@ -549,7 +555,7 @@ Power, voltage, current, power factor and frequency use the `MEASUREMENT` state 
 
 Examples: `main_l1_power_rt` is main L1 active power, `main_all_reactive_power_rt` is main total reactive power, `main_ch1_voltage_rt` is main channel 1 voltage, and `sub1_ch1_reactive_energy_fwd_total` is slave 1 channel 1 cumulative forward reactive energy.
 
-With `s` selected slaves, the three default categories create `42 + 30 × s` sensors. Selecting all eleven on firmware 139 or later creates `138 + 100 × s`, excluding extra entities.
+With `s` selected slaves, the three default categories create `42 + 30 × s` sensors. Selecting all twelve on firmware 139 or later creates `152 + 110 × s`, excluding extra entities.
 
 #### Current transformer (CT) direction
 
@@ -557,7 +563,7 @@ The CT arrow marks the forward direction. `energy_fwd_total` accumulates active 
 
 ### Complete cloud measurement catalog
 
-Cloud mode has two measurement selections, **Active power** and **Energy**, both selected by default. Each applies to `main_all`, `main_ch1` … `main_ch10` and selected `subN_ch1` … `subN_ch10`. Cloud mode has no per-phase readings or any of the eight additional local measurement categories.
+Cloud mode has two measurement selections, **Active power** and **Energy**, both selected by default. Each applies to `main_all`, `main_ch1` … `main_ch10` and selected `subN_ch1` … `subN_ch10`. Cloud mode has no per-phase readings or any of the nine additional local measurement categories.
 
 | Selection | Data item | Key suffix | Native unit | HA state class |
 | --- | --- | --- | --- | --- |
@@ -638,7 +644,7 @@ This can appear in several places:
 
 ### Q3: I get “Unable to connect to device” (`cannot_connect_local`)
 
-This error comes from the local Modbus client failing to read the device after the firmware check.
+This error comes from the local Modbus client failing to read the device including when the firmware register cannot be read.
 
 **Common reasons:**
 
@@ -658,26 +664,11 @@ This error comes from the local Modbus client failing to read the device after t
 
 ### Q4: I get “Device firmware version is too old” (`firmware_too_old`)
 
-During local setup, the integration first reads a **firmware version register** before doing anything else. If:
-
-- The firmware version is **lower than the minimum required** by the integration, or
-- The integration cannot read the firmware version correctly,
-
-you will see the error: **“Device firmware version is too old”** (`firmware_too_old`).
-
-**What this means:**
-
-- Your ecoMain firmware is not compatible with the current version of this integration.
-- The device may be running an early or unsupported firmware version.
-
-**What you can do:**
+Firmware below **136** produces `firmware_too_old`; update ecoMain with official tools. Failure to read the firmware register produces `cannot_connect_local`; check the address, TCP port 502 and connectivity. Cloud mode does not use this check.
 
 1. Update ecoMain to the **latest firmware** using the official enecess tools / app / procedure.
 2. After upgrading, try adding the integration again (local mode).
 3. If you are not sure how to update firmware, contact your installer or enecess support and mention that Home Assistant integration reports `firmware_too_old`.
-
-> Note: In some cases, if the firmware register cannot be read at all, the integration also treats it as `firmware_too_old`. If you are sure the firmware is already
-> up-to-date, also double-check basic connectivity (IP, port, wiring).
 
 ---
 

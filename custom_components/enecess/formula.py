@@ -12,6 +12,7 @@ FORMULA_RESULT_TYPES = (
     "power",
     "energy",
     "reactive_energy",
+    "apparent_energy",
     "apparent_power",
     "reactive_power",
     "voltage",

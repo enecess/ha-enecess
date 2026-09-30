@@ -78,7 +78,8 @@ Formula flow coverage checks that result selection precedes grouped source
 selection and expression entry. Source groups use dropdown multiselect and are
 independent of the result type, including unitless number results. At least one
 source is required across the optional groups. Cumulative active energy,
-cumulative reactive energy and cloud per-minute active energy increments are
+cumulative reactive energy, cumulative apparent energy and cloud per-minute
+active energy increments are
 separate groups. Sources must be firmware-supported and already enabled;
 unsupported or empty groups are hidden and measurements are not enabled
 automatically. Every source-page submission regenerates variable bindings from
@@ -93,6 +94,10 @@ unsupported version.
 Event-controlled ecoPlug tests exercise polls overlapping successful, failed and
 cancelled control commands, per-device isolation and authoritative later polls.
 Numeric payload regressions reject booleans while preserving real zero values.
+Control-health regressions keep relay acknowledgments independent from measurement
+polling: repeated commands preserve the poll deadline, only an acknowledged relay
+recovers after an account failure, later attempts expire old confirmations, and
+live cancellation publishes availability without shutdown callbacks.
 
 Discovery regressions use the real HA flow manager to check pending-flow
 deduplication, ignored discoveries and cancellation that retains the original
@@ -101,7 +106,12 @@ ecoPlug data, availability recovery and immediate control updates. Cloud energy
 continues counting identical successful deltas and excludes failed polls; pending
 storage checkpoints are not postponed by additional refreshes.
 
-As checked on 2026-09-29, the 157 offline tests and 85 real-HA runtime
+Protocol 1.0.5 regressions check apparent-energy metadata and UInt64 decoding,
+ecoSub online-status filtering and recovery, cross-device formula availability,
+and preservation of configured entity IDs, custom names and disabled choices
+when firmware capabilities change or the device is temporarily unreachable.
+
+As checked on 2026-09-30, the 165 offline tests and 103 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

@@ -62,7 +62,7 @@ class LocalFlowValidationTests(unittest.IsolatedAsyncioTestCase):
             except TimeoutError:
                 self.fail("Options validation ignored the configured firmware deadline")
         self.assertEqual(result, {"base": "cannot_connect_local"})
-        self.assertIsNone(flow._firmware_version)
+        self.assertEqual(flow._firmware_version, 136)
         self.assertEqual(flow._available_slaves, [])
         self.assertTrue(client.closed)
 

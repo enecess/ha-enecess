@@ -186,6 +186,8 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
 
     async def _async_update_data(self) -> dict[str, EcoPlugSnapshot]:
         control_versions = self._control_versions.copy()
+        poll_succeeded = False
+        poll_cancelled = False
         try:
             async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
                 snapshots = await self._request_with_auth_retry(self._fetch_attempt)
@@ -199,12 +201,47 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
                             snapshot,
                             is_on=commanded.is_on,
                             state_error=commanded.state_error,
+                            state_confirmed=commanded.state_confirmed,
                         )
+                poll_succeeded = True
                 return snapshots
         except EnecessAuthError as err:
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except _ORDINARY_REQUEST_ERRORS as err:
             raise UpdateFailed("Cloud request failed") from err
+        except asyncio.CancelledError:
+            poll_cancelled = True
+            raise
+        finally:
+            if not poll_succeeded:
+                changed = self._invalidate_prior_confirmations(control_versions)
+                if poll_cancelled:
+                    # Real task cancellation skips HA's availability callbacks.
+                    changed = changed or self.last_update_success
+                    self.last_update_success = False
+                if (
+                    changed
+                    and not self.last_update_success
+                    and not self._shutdown_requested
+                    and not self.hass.is_stopping
+                ):
+                    self.async_update_listeners()
+
+    def _invalidate_prior_confirmations(self, control_versions: dict[str, int]) -> bool:
+        """Expire relay acknowledgments superseded by a failed poll attempt."""
+        current = self.data or {}
+        updated = dict(current)
+        changed = False
+        for serial, snapshot in current.items():
+            if (
+                snapshot.state_confirmed
+                and self._control_versions[serial] == control_versions[serial]
+            ):
+                updated[serial] = replace(snapshot, state_confirmed=False)
+                changed = True
+        if changed:
+            self.data = updated
+        return changed
 
     async def async_control(self, hardware_number: str, is_on: bool) -> None:
         """Set one selected plug and publish the accepted state immediately."""
@@ -223,5 +260,11 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
             snapshot,
             is_on=is_on,
             state_error=None,
+            state_confirmed=True,
         )
-        self.async_set_updated_data(updated)
+        changed = updated != current or (
+            not self.last_update_success and not snapshot.state_confirmed
+        )
+        self.data = updated
+        if changed:
+            self.async_update_listeners()

@@ -88,7 +88,12 @@ class FormulaFilteringTests(unittest.IsolatedAsyncioTestCase):
                     }
                     self.assertTrue(
                         all(
-                            descriptions[key].device_class == result_type
+                            (
+                                descriptions[key].spec.kind == "apparent_energy"
+                                and descriptions[key].device_class is None
+                                if result_type == "apparent_energy"
+                                else descriptions[key].device_class == result_type
+                            )
                             for key in keys
                         )
                     )

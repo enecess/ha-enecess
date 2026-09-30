@@ -45,11 +45,10 @@ class EcoPlugSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Return whether the latest plug state can be controlled."""
-        if not self.coordinator.last_update_success:
-            return False
         snapshot = (self.coordinator.data or {}).get(self._hardware_number)
         return (
             snapshot is not None
+            and (self.coordinator.last_update_success or snapshot.state_confirmed)
             and snapshot.state_error is None
             and snapshot.is_on is not None
         )

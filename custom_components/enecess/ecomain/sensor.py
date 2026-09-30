@@ -45,6 +45,7 @@ _FORMULA_UNITS = {
     "power": "W",
     "energy": "Wh",
     "reactive_energy": "varh",
+    "apparent_energy": "VAh",
     "apparent_power": "VA",
     "reactive_power": "var",
     "voltage": "V",
@@ -111,6 +112,11 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
             self._attr_unique_id = _sensor_unique_id(
                 serial, spec.device_index, spec.key, mode_key
             )
+
+    @property
+    def available(self) -> bool:
+        """Require a value in the current successful device snapshot."""
+        return self.coordinator.last_update_success and self.native_value is not None
 
     @property
     def native_value(self):
@@ -192,7 +198,7 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
                 if valid_type
                 else None,
                 state_class=SensorStateClass.TOTAL
-                if result_type in ("energy", "reactive_energy")
+                if result_type in ("energy", "reactive_energy", "apparent_energy")
                 else SensorStateClass.MEASUREMENT,
             )
         self.entity_description = SensorEntityDescription(
@@ -304,6 +310,9 @@ async def async_setup_entry(
             entities.append(EcoMainSensor(coordinator, mode, serial, desc))
 
     source_descs = build_entry_descriptions(entry.data, entry.options)
+    configured_descs = build_entry_descriptions(
+        entry.data, entry.options, include_unsupported=True
+    )
     for extra in get_entry_extra_entities(entry.options):
         if not isinstance(extra.get("key"), str) or not extra["key"]:
             continue
@@ -318,7 +327,7 @@ async def async_setup_entry(
         source_desc = find_source_description(source_descs, sources[0])
         if source_desc is None:
             continue
-        device_index = extra_entity_device_index(source_descs, extra)
+        device_index = extra_entity_device_index(configured_descs, extra)
         entities.append(
             EcoMainExtraSensor(
                 coordinator, mode, serial, extra, source_desc, device_index

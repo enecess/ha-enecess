@@ -19,6 +19,7 @@ LOCAL_MEASUREMENTS = (
     *DEFAULT_LOCAL_MEASUREMENTS,
     "reactive_energy_forward",
     "reactive_energy_reverse",
+    "apparent_energy",
     "apparent_power",
     "reactive_power",
     "voltage",
@@ -69,8 +70,8 @@ _LOCAL_LAYOUT = {
     "energy_reverse": ("energy_rev_total", 16, 192, 4, 0.001, False, "energy"),
     "reactive_energy_forward": (
         "reactive_energy_fwd_total",
-        500,
-        532,
+        352,
+        384,
         4,
         0.001,
         False,
@@ -78,12 +79,21 @@ _LOCAL_LAYOUT = {
     ),
     "reactive_energy_reverse": (
         "reactive_energy_rev_total",
-        516,
-        692,
+        368,
+        544,
         4,
         0.001,
         False,
         "reactive_energy",
+    ),
+    "apparent_energy": (
+        "apparent_energy_total",
+        704,
+        720,
+        4,
+        0.001,
+        False,
+        "apparent_energy",
     ),
     "apparent_power": ("apparent_power_rt", 900, 908, 2, 0.01, True, "apparent_power"),
     "reactive_power": (
@@ -219,6 +229,7 @@ def build_sensor_descriptions(
         "energy_accumulated": ("Wh", SensorDeviceClass.ENERGY),
         "energy_delta": ("Wh", None),
         "reactive_energy": ("varh", SensorDeviceClass.REACTIVE_ENERGY),
+        "apparent_energy": ("VAh", None),
         "apparent_power": ("VA", SensorDeviceClass.APPARENT_POWER),
         "reactive_power": ("var", SensorDeviceClass.REACTIVE_POWER),
         "voltage": ("V", SensorDeviceClass.VOLTAGE),
@@ -230,7 +241,12 @@ def build_sensor_descriptions(
     for spec in specs:
         unit, device_class = metadata[spec.kind]
         state_class = SensorStateClass.MEASUREMENT
-        if spec.kind in ("energy", "energy_accumulated", "reactive_energy"):
+        if spec.kind in (
+            "energy",
+            "energy_accumulated",
+            "reactive_energy",
+            "apparent_energy",
+        ):
             state_class = SensorStateClass.TOTAL_INCREASING
         elif spec.kind == "energy_delta":
             state_class = None

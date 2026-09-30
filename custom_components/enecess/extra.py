@@ -103,9 +103,15 @@ def build_entry_specs(
 def build_entry_descriptions(
     entry_data: dict[str, Any],
     entry_options: dict[str, Any] | None = None,
+    *,
+    include_unsupported: bool = False,
 ) -> list[EnecessSensorDescription]:
     """Build ecoMain sensor descriptions using mutable options."""
-    return build_sensor_descriptions(build_entry_specs(entry_data, entry_options))
+    return build_sensor_descriptions(
+        build_entry_specs(
+            entry_data, entry_options, include_unsupported=include_unsupported
+        )
+    )
 
 
 def sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
@@ -144,10 +150,12 @@ def build_entry_sensor_unique_ids(
     entry_data: dict[str, Any],
     entry_options: dict[str, Any] | None = None,
 ) -> set[str]:
-    """Build all sensor unique ids expected for an entry."""
+    """Keep configured identities independent of temporary device capabilities."""
     serial = str(entry_data.get(CONST_ECOMAIN_SERIAL))
     mode = str(entry_data.get(CONST_ADD_MODE))
-    descriptions = build_entry_descriptions(entry_data, entry_options)
+    descriptions = build_entry_descriptions(
+        entry_data, entry_options, include_unsupported=True
+    )
     unique_ids = {
         sensor_unique_id(serial, desc.spec.device_index, desc.spec.key, mode)
         for desc in descriptions

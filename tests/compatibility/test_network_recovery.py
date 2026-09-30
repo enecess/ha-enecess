@@ -22,6 +22,7 @@ from custom_components.enecess.ecomain.coordinator import (
     EcoMainModbusCoordinator,
     EcoMainCloudCoordinator,
 )
+from custom_components.enecess.ecomain.model import RegisterSpec
 from custom_components.enecess.ecoplug.coordinator import EcoPlugCloudCoordinator
 from test_runtime import RealHARuntimeFixture, PLUG_SERIAL
 
@@ -368,12 +369,13 @@ class CoordinatorRecoveryTests(RealHARuntimeFixture):
         )
         # Firmware plus one read block must share the same time budget.
         coordinator._requested_specs = [
-            SimpleNamespace(
+            RegisterSpec(
                 address=10,
                 regs=1,
                 measurement_type=None,
                 kind="power",
                 key="fictional",
+                device_index=0,
                 signed=False,
                 scale=1,
             )

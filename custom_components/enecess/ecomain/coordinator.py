@@ -25,6 +25,8 @@ from ..const import (
     CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
     CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
     CONF_ECOMAIN_PORT,
+    CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+    CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
     CONF_LOCAL_UPDATE_INTERVAL,
     CONF_LOCAL_UPDATE_TIMEOUT,
     CONST_CLOUD_PASSWORD,
@@ -136,8 +138,30 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
             self.firmware_version = version
             self._validated_target = target
 
+        active_specs = self.specs
+        if any(spec.device_index for spec in active_specs):
+            status = await self._client.read_holding_registers(
+                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+            )
+            if len(status.registers) != CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT or any(
+                type(value) is not int or value not in (0, 1)
+                for value in status.registers
+            ):
+                raise UpdateFailed("Invalid ecoSub online status response")
+            online = {
+                index
+                for index, value in enumerate(status.registers, start=1)
+                if value == 1
+            }
+            active_specs = [
+                spec
+                for spec in active_specs
+                if spec.device_index == 0 or spec.device_index in online
+            ]
+
         reg_map: dict[int, int] = {}
-        for start, count in build_read_blocks(self.specs):
+        for start, count in build_read_blocks(active_specs):
             rr = await self._client.read_holding_registers(start, count)
             if len(rr.registers) != count:
                 raise UpdateFailed(
@@ -146,7 +170,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
             reg_map.update(((start + i), r) for i, r in enumerate(rr.registers))
 
         out: dict[str, float] = {}
-        for spec in self.specs:
+        for spec in active_specs:
             if spec.address is None or spec.regs is None:
                 continue
             regs = [reg_map[spec.address + i] for i in range(spec.regs)]

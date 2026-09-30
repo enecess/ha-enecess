@@ -16,11 +16,15 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
     - Jeden wpis konta może wybrać wiele gniazdek według nazwy i numeru seryjnego.
     - W **Konfiguruj / Opcje** można później zmienić wybór.
 
-> **Wymagania dotyczące oprogramowania układowego (tryb lokalny):** Lokalna konfiguracja ecoMain przez Modbus TCP wymaga wersji oprogramowania układowego **136 lub nowszej**. Jeśli wersja jest starsza albo urządzenie nie udostępnia zgodnego rejestru wersji oprogramowania, integracja wyświetli komunikat **Wersja oprogramowania urządzenia jest zbyt stara**. Ta lokalna kontrola wersji nie dotyczy trybu chmurowego.
+> Firmware starszy niż **136** powoduje `firmware_too_old`; zaktualizuj ecoMain oficjalnymi narzędziami. Błąd odczytu wersji powoduje `cannot_connect_local`; sprawdź adres, port TCP 502 i połączenie. Tryb chmurowy nie wykonuje tej kontroli.
 
 - Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.
-- Lokalne oprogramowanie od wersji 139: także osiem dodatkowych rodzajów i ustawienia faz kanałów.
+- Lokalne oprogramowanie od wersji 139: także dziewięć dodatkowych rodzajów i ustawienia faz kanałów.
 - Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.
+
+Protokół 1.0.5 (firmware od 139) dodaje opcjonalną energię pozorną (VAh) z osobną grupą źródeł formuł. Liczniki używają `TOTAL_INCREASING`, a formuły `TOTAL`, bez klasy urządzenia.
+
+Czujniki ecoSub offline stają się niedostępne; pozostałe urządzenia nadal się aktualizują. Po aktualizacji firmware pod tym samym adresem IP przeładuj integrację.
 
 ---
 
@@ -411,7 +415,7 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 >
 > ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
 
-Tryb lokalny oferuje jedenaście kategorii od wersji 139; wersje 136–138 obsługują tylko pierwsze trzy:
+Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsługują tylko pierwsze trzy:
 
 | Kategoria | Znaczenie | Domyślnie |
 | --- | --- | --- |
@@ -420,6 +424,7 @@ Tryb lokalny oferuje jedenaście kategorii od wersji 139; wersje 136–138 obsł
 | Energia czynna w kierunku przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
 | Energia bierna w kierunku zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
 | Energia bierna w kierunku przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
+| Energia pozorna | Energia pozorna (VAh) | Wyłączona |
 | Moc pozorna | Moc pozorna (VA) | Wyłączona |
 | Moc bierna | Moc bierna (var) | Wyłączona |
 | Napięcie | Napięcie elektryczne (V) | Wyłączona |
@@ -523,7 +528,7 @@ Klucz ma postać `<prefiks>_<sufiks>`. Zakresy w tabeli:
 - **B**: `main_ch1`–`main_ch10` oraz `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` dla wybranych ecoSub.
 - **C**: `main_l1`, `main_l2`, `main_l3` i B, bez `main_all`.
 
-Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone domyślnie. Od wersji 139 osiem pozostałych rodzajów jest opcjonalnych i wymaga zaznaczenia. Nie ma sum ani czujników fazowych ecoSub.
+Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone domyślnie. Od wersji 139 dziewięć pozostałych rodzajów jest opcjonalnych i wymaga zaznaczenia. Nie ma sum ani czujników fazowych ecoSub.
 
 | Pomiar | Sufiks | Jednostka | Zakres |
 | --- | --- | --- | --- |
@@ -532,6 +537,7 @@ Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone 
 | Energia czynna w kierunku przeciwnym | `energy_rev_total` | Wh | A |
 | Energia bierna w kierunku zgodnym | `reactive_energy_fwd_total` | varh | A |
 | Energia bierna w kierunku przeciwnym | `reactive_energy_rev_total` | varh | A |
+| Energia pozorna | `apparent_energy_total` | VAh | A |
 | Moc pozorna | `apparent_power_rt` | VA | A |
 | Moc bierna | `reactive_power_rt` | var | A |
 | Napięcie | `voltage_rt` | V | C |
@@ -569,7 +575,7 @@ Nazwy czujników pozostają `power_rt` i `energy_total`; przetłumaczone opisy n
 
 ecoMain obsługuje pięć operacji dodatkowych: odwrócenie znaku i wartość bezwzględną pojedynczego źródła mocy czynnej, sumę i średnią zgodnych źródeł mocy lub energii oraz własną formułę. Te encje powstają tylko po skonfigurowaniu; nazwą jest zapisany tekst użytkownika lub wygenerowany klucz. Dostępność źródeł zależy od trybu, firmware i wybranych pomiarów.
 
-Wyniki formuł mogą mieć typ: moc czynna (W), energia czynna (Wh), energia bierna (varh), moc pozorna (VA), moc bierna (var), napięcie (V), prąd (A), współczynnik mocy, częstotliwość (Hz) i liczba bez jednostki. Formuły energii używają `TOTAL`, pozostałe wyniki `MEASUREMENT`. Szczegóły źródeł, jednostek i edycji opisano w [Własne encje formuł](#własne-encje-formuł), a wybór w [Rodzaje pomiarów](#rodzaje-pomiarów).
+Wyniki formuł mogą mieć typ: moc czynna (W), energia czynna (Wh), energia bierna (varh), energia pozorna (VAh), moc pozorna (VA), moc bierna (var), napięcie (V), prąd (A), współczynnik mocy, częstotliwość (Hz) i liczba bez jednostki. Formuły energii używają `TOTAL`, pozostałe wyniki `MEASUREMENT`. Szczegóły źródeł, jednostek i edycji opisano w [Własne encje formuł](#własne-encje-formuł), a wybór w [Rodzaje pomiarów](#rodzaje-pomiarów).
 
 ## FAQ / rozwiązywanie problemów
 
@@ -631,15 +637,11 @@ Integracja nie może połączyć się z ecoMain przez Modbus TCP.
 
 ### Q4: Widzę „Device firmware version is too old” (`firmware_too_old`)
 
-Integracja odczytuje wersję firmware ecoMain przed kontynuowaniem konfiguracji lokalnej. Jeśli wersja jest niższa niż minimalna obsługiwana, konfiguracja zostanie zatrzymana.
-
-**Co możesz zrobić:**
+Firmware starszy niż **136** powoduje `firmware_too_old`; zaktualizuj ecoMain oficjalnymi narzędziami. Błąd odczytu wersji powoduje `cannot_connect_local`; sprawdź adres, port TCP 502 i połączenie. Tryb chmurowy nie wykonuje tej kontroli.
 
 1. Sprawdź wersję firmware ecoMain w oficjalnej aplikacji lub na urządzeniu.
 2. Zaktualizuj firmware, jeśli dostępna jest nowsza wersja.
 3. Spróbuj ponownie dodać integrację.
-
-> Minimalna obsługiwana wersja może zmieniać się w przyszłych wydaniach.
 
 ---
 
