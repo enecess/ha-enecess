@@ -45,18 +45,36 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
             self.hass.config_entries.flow.async_abort(flow["flow_id"])
         await super().asyncTearDown()
 
-    async def discover(self, host="192.0.2.10"):
+    async def discover(self, host="192.0.2.10", serial="FICTIONAL-DISCOVERY-001"):
         config = c.DEVICE_CONFIGS[c.CONST_DEVICE_ECOMAIN].discovery
         return await self.hass.config_entries.flow.async_init(
             c.DOMAIN,
             context={"source": "zeroconf"},
             data=SimpleNamespace(
                 type=config.mdns_type,
-                name=f"{config.mdns_prefix}FICTIONAL-DISCOVERY-001.{config.mdns_type}",
+                name=f"{config.mdns_prefix}{serial}.{config.mdns_type}",
                 hostname="fictional-discovery.local.",
                 host=host,
             ),
         )
+
+    async def test_discovery_titles_identify_devices_without_loaded_translations(self):
+        first = await self.discover()
+        second = await self.discover("192.0.2.11", "FICTIONAL-DISCOVERY-002")
+        progress = {
+            item["flow_id"]: item
+            for item in self.hass.config_entries.flow.async_progress()
+        }
+        for result, expected in (
+            (first, "ecoMain FICTIONAL-DISCOVERY-001"),
+            (second, "ecoMain FICTIONAL-DISCOVERY-002"),
+        ):
+            with self.subTest(title=expected):
+                # HA uses name when config.flow_title has not been loaded yet.
+                placeholders = progress[result["flow_id"]]["context"][
+                    "title_placeholders"
+                ]
+                self.assertEqual(placeholders.get("name"), expected)
 
     async def test_repeated_discovery_keeps_only_original_pending_card(self):
         first = await self.discover()
@@ -84,6 +102,10 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
         )
         progress = manager.async_progress()
         self.assertEqual(len(progress), 1)
+        self.assertEqual(
+            progress[0]["context"]["title_placeholders"].get("name"),
+            "ecoMain FICTIONAL-DISCOVERY-001",
+        )
         self.assertEqual(
             progress[0]["context"].get("unique_id"),
             "ecomain:FICTIONAL-DISCOVERY-001:mode_local",

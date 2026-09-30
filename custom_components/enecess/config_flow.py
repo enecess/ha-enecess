@@ -577,6 +577,7 @@ class ConfigFlow(
         }
 
         self.context["title_placeholders"] = {
+            "name": f"ecoMain {selected.serial}",
             CONST_ECOMAIN_SERIAL: selected.serial,
             CONST_ECOMAIN_HOST: selected.ip,
         }
