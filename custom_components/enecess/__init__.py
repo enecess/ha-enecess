@@ -126,6 +126,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> b
 
             async def _async_close_on_stop(event: Event) -> None:
                 """Release the socket when HA stops without unloading entries."""
+                await coordinator.async_shutdown()
                 await client.async_close()
 
             entry.async_on_unload(

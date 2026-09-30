@@ -34,7 +34,10 @@ def load_runtime():
 
     class Coordinator:
         def __init__(self, *args, **kwargs):
-            pass
+            self._shutdown_requested = False
+
+        async def async_shutdown(self):
+            self._shutdown_requested = True
 
         @classmethod
         def __class_getitem__(cls, item):

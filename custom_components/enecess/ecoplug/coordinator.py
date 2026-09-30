@@ -70,6 +70,9 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         )
         self._hardware_numbers = frozenset(plug.hardware_number for plug in self._plugs)
         self._control_versions = dict.fromkeys(self._hardware_numbers, 0)
+        self._control_locks = {
+            serial: asyncio.Lock() for serial in self._hardware_numbers
+        }
 
     async def _refresh_token(self, failed_token: str) -> None:
         """Refresh once when concurrent requests rejected the same token."""
@@ -248,23 +251,25 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         if hardware_number not in self._hardware_numbers:
             raise ValueError(f"ecoPlug is not selected: {hardware_number}")
 
-        await self._request_with_auth_retry(
-            lambda token: self._api.control_plug(token, hardware_number, is_on)
-        )
+        # Keep each device's commands and acknowledgments in submission order.
+        async with self._control_locks[hardware_number]:
+            await self._request_with_auth_retry(
+                lambda token: self._api.control_plug(token, hardware_number, is_on)
+            )
 
-        self._control_versions[hardware_number] += 1
-        current = self.data or {}
-        snapshot = current.get(hardware_number, EcoPlugSnapshot())
-        updated = dict(current)
-        updated[hardware_number] = replace(
-            snapshot,
-            is_on=is_on,
-            state_error=None,
-            state_confirmed=True,
-        )
-        changed = updated != current or (
-            not self.last_update_success and not snapshot.state_confirmed
-        )
-        self.data = updated
-        if changed:
-            self.async_update_listeners()
+            self._control_versions[hardware_number] += 1
+            current = self.data or {}
+            snapshot = current.get(hardware_number, EcoPlugSnapshot())
+            updated = dict(current)
+            updated[hardware_number] = replace(
+                snapshot,
+                is_on=is_on,
+                state_error=None,
+                state_confirmed=True,
+            )
+            changed = updated != current or (
+                not self.last_update_success and not snapshot.state_confirmed
+            )
+            self.data = updated
+            if changed:
+                self.async_update_listeners()

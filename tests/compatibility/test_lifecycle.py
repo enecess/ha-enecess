@@ -276,3 +276,69 @@ class LifecycleTests(RealHARuntimeFixture):
             )
             await self.hass.async_block_till_done()
             reload.assert_awaited_once_with(entry.entry_id)
+
+    async def test_unload_cancels_poll_waiting_for_modbus_lock(self):
+        entry = self.make_entry("local")
+        token = current_entry.set(entry)
+        self.addCleanup(current_entry.reset, token)
+        transport = Transport([139])
+        with (
+            self.transport_context(transport),
+            patch.object(ConfigEntries, "async_forward_entry_setups", new_callable=AsyncMock),
+            patch.object(ConfigEntries, "async_unload_platforms", new_callable=AsyncMock, return_value=True),
+        ):
+            await enecess.async_setup_entry(self.hass, entry)
+            runtime = entry.runtime_data
+            await runtime.modbus_client._lock.acquire()
+            poll = asyncio.create_task(runtime.coordinator.async_refresh())
+            try:
+                await asyncio.sleep(0)
+                self.assertFalse(poll.done())
+                await enecess.async_unload_entry(self.hass, entry)
+            finally:
+                runtime.modbus_client._lock.release()
+                await asyncio.gather(poll, return_exceptions=True)
+                connected_after_unload = transport.connected
+                await runtime.modbus_client.async_close()
+            self.assertTrue(poll.cancelled())
+            self.assertFalse(connected_after_unload)
+            self.assertIsNone(getattr(entry, "runtime_data", None))
+
+    async def test_ha_stop_cancels_blocked_modbus_read(self):
+        entry = self.make_entry("local")
+        token = current_entry.set(entry)
+        self.addCleanup(current_entry.reset, token)
+        transport = Transport([139])
+        with (
+            self.transport_context(transport),
+            patch.object(ConfigEntries, "async_forward_entry_setups", new_callable=AsyncMock),
+        ):
+            await enecess.async_setup_entry(self.hass, entry)
+            runtime = entry.runtime_data
+            transport.block_reads = True
+            poll = asyncio.create_task(runtime.coordinator.async_refresh())
+            await asyncio.wait_for(transport.read_started.wait(), 1)
+            try:
+                await self.hass.async_stop(force=True)
+                self.assertTrue(poll.done())
+                self.assertTrue(poll.cancelled())
+                self.assertFalse(transport.connected)
+            finally:
+                poll.cancel()
+                await asyncio.gather(poll, return_exceptions=True)
+
+    async def test_shutdown_coordinator_cannot_open_new_modbus_poll(self):
+        from custom_components.enecess.ecomain.coordinator import EcoMainModbusCoordinator
+
+        entry = self.make_entry("local")
+        transport = Transport([139])
+        with self.transport_context(transport):
+            client = EnecessModbusClient("192.0.2.1", 502)
+            coordinator = EcoMainModbusCoordinator(self.hass, entry, client, [])
+            await coordinator.async_shutdown()
+            try:
+                with self.assertRaises(asyncio.CancelledError):
+                    await coordinator._async_update_data()
+                self.assertFalse(transport.connected)
+            finally:
+                await client.async_close()

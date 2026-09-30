@@ -91,8 +91,24 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
         self.specs = list(specs)
         self.firmware_version: int | None = None
         self._validated_target: tuple[str, int] | None = None
+        self._poll_tasks: set[asyncio.Task[Any]] = set()
+
+    async def async_shutdown(self) -> None:
+        """Finish cancelled polls before the entry closes its Modbus connection."""
+        await super().async_shutdown()
+        current = asyncio.current_task()
+        polls = [task for task in self._poll_tasks if task is not current]
+        for task in polls:
+            task.cancel()
+        if polls:
+            await asyncio.gather(*polls, return_exceptions=True)
 
     async def _async_update_data(self) -> dict[str, float]:
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
+        task = asyncio.current_task()
+        assert task is not None
+        self._poll_tasks.add(task)
         try:
             async with asyncio.timeout(CONF_LOCAL_UPDATE_TIMEOUT):
                 return await self._async_read_data()
@@ -100,6 +116,8 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
             raise
         except (ModbusException, OSError, TimeoutError) as err:
             raise UpdateFailed(str(err)) from err
+        finally:
+            self._poll_tasks.discard(task)
 
     async def _async_read_data(self) -> dict[str, float]:
         """Validate firmware and decode all configured register blocks."""
@@ -269,7 +287,7 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
             if index == 0:
                 prefix = "main"
                 main_data = hw_data.get("household_electricity", {}) or {}
-                if main_data:
+                if isinstance(main_data, dict):
                     pwr = main_data.get("power")
                     eng = main_data.get("energy")
                     _store("main_all_power_avg_1m", pwr)
@@ -278,7 +296,11 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 prefix = f"sub{index}"
 
             channels = hw_data.get("ch_info", []) or []
+            if not isinstance(channels, list):
+                return
             for ch in channels:
+                if not isinstance(ch, dict):
+                    continue
                 raw_ch_no = ch.get("ch_number")
                 if raw_ch_no is None:
                     continue
