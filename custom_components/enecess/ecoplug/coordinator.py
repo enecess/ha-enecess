@@ -73,15 +73,30 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         self._control_locks = {
             serial: asyncio.Lock() for serial in self._hardware_numbers
         }
+        self._request_tasks: set[asyncio.Task[object]] = set()
+
+    async def async_shutdown(self) -> None:
+        """Stop scheduling and finish entry-owned polls and queued commands."""
+        await super().async_shutdown()
+        current = asyncio.current_task()
+        requests = [task for task in self._request_tasks if task is not current]
+        for task in requests:
+            task.cancel()
+        if requests:
+            await asyncio.gather(*requests, return_exceptions=True)
 
     async def _refresh_token(self, failed_token: str) -> None:
         """Refresh once when concurrent requests rejected the same token."""
         async with self._token_lock:
+            if self._shutdown_requested:
+                raise asyncio.CancelledError
             if self._token != failed_token:
                 return
 
             _LOGGER.warning("ecoPlug account token rejected; refreshing credentials")
             token = await self._api.generate_token(self._username, self._password)
+            if self._shutdown_requested:
+                raise asyncio.CancelledError
             if not token:
                 raise EnecessAuthError("Cloud auth succeeded but token missing")
 
@@ -97,12 +112,17 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         request: Callable[[str], Awaitable[_ResultT]],
     ) -> _ResultT:
         """Run an authenticated request, refreshing and retrying at most once."""
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
         failed_token = self._token
         try:
-            return await request(failed_token)
+            result = await request(failed_token)
         except EnecessAuthError:
             await self._refresh_token(failed_token)
-            return await request(self._token)
+            result = await request(self._token)
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
+        return result
 
     async def _fetch_data(self, plug: EcoPlugConfig, token: str) -> dict[str, object]:
         return await self._api.get_plug_data(token, plug.hardware_number)
@@ -188,6 +208,11 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
         }
 
     async def _async_update_data(self) -> dict[str, EcoPlugSnapshot]:
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
+        task = asyncio.current_task()
+        assert task is not None
+        self._request_tasks.add(task)
         control_versions = self._control_versions.copy()
         poll_succeeded = False
         poll_cancelled = False
@@ -216,6 +241,7 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
             poll_cancelled = True
             raise
         finally:
+            self._request_tasks.discard(task)
             if not poll_succeeded:
                 changed = self._invalidate_prior_confirmations(control_versions)
                 if poll_cancelled:
@@ -248,28 +274,36 @@ class EcoPlugCloudCoordinator(DataUpdateCoordinator[dict[str, EcoPlugSnapshot]])
 
     async def async_control(self, hardware_number: str, is_on: bool) -> None:
         """Set one selected plug and publish the accepted state immediately."""
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
         if hardware_number not in self._hardware_numbers:
             raise ValueError(f"ecoPlug is not selected: {hardware_number}")
 
-        # Keep each device's commands and acknowledgments in submission order.
-        async with self._control_locks[hardware_number]:
-            await self._request_with_auth_retry(
-                lambda token: self._api.control_plug(token, hardware_number, is_on)
-            )
+        task = asyncio.current_task()
+        assert task is not None
+        self._request_tasks.add(task)
+        try:
+            # Track commands while queued as well as while awaiting their ACK.
+            async with self._control_locks[hardware_number]:
+                await self._request_with_auth_retry(
+                    lambda token: self._api.control_plug(token, hardware_number, is_on)
+                )
 
-            self._control_versions[hardware_number] += 1
-            current = self.data or {}
-            snapshot = current.get(hardware_number, EcoPlugSnapshot())
-            updated = dict(current)
-            updated[hardware_number] = replace(
-                snapshot,
-                is_on=is_on,
-                state_error=None,
-                state_confirmed=True,
-            )
-            changed = updated != current or (
-                not self.last_update_success and not snapshot.state_confirmed
-            )
-            self.data = updated
-            if changed:
-                self.async_update_listeners()
+                self._control_versions[hardware_number] += 1
+                current = self.data or {}
+                snapshot = current.get(hardware_number, EcoPlugSnapshot())
+                updated = dict(current)
+                updated[hardware_number] = replace(
+                    snapshot,
+                    is_on=is_on,
+                    state_error=None,
+                    state_confirmed=True,
+                )
+                changed = updated != current or (
+                    not self.last_update_success and not snapshot.state_confirmed
+                )
+                self.data = updated
+                if changed:
+                    self.async_update_listeners()
+        finally:
+            self._request_tasks.discard(task)

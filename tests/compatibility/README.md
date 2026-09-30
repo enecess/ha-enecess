@@ -111,7 +111,12 @@ ecoSub online-status filtering and recovery, cross-device formula availability,
 and preservation of configured entity IDs, custom names and disabled choices
 when firmware capabilities change or the device is temporarily unreachable.
 
-As checked on 2026-09-30, the 170 offline tests and 114 real-HA runtime
+ecoPlug lifecycle regressions cancel in-flight polls, authentication refreshes,
+and queued controls during unload or shutdown, and reject new requests after
+shutdown. Cloud channel parsing rejects invalid identifiers while retaining valid
+readings and zero values.
+
+As checked on 2026-09-30, the 170 offline tests and 121 real-HA runtime
 tests pass on each matrix release. Passing these checks does not imply that
 uncovered behavior or all HA quality-scale requirements are correct.
 

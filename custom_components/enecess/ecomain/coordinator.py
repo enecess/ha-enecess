@@ -309,12 +309,19 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 if not isinstance(ch, dict):
                     continue
                 raw_ch_no = ch.get("ch_number")
-                if raw_ch_no is None:
+                if isinstance(raw_ch_no, bool) or not isinstance(
+                    raw_ch_no, (int, float, str)
+                ):
+                    continue
+                if isinstance(raw_ch_no, float) and not raw_ch_no.is_integer():
                     continue
                 try:
-                    ch_no = int(raw_ch_no) + 1
-                except (TypeError, ValueError):
+                    ch_no = int(raw_ch_no)
+                except (ValueError, OverflowError):
                     continue
+                if not 0 <= ch_no <= 9:
+                    continue
+                ch_no += 1
                 power = ch.get("power")
                 energy = ch.get("energy")
                 _store(f"{prefix}_ch{ch_no}_power_avg_1m", power)
