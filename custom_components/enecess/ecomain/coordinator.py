@@ -231,14 +231,21 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
         self.specs = build_entry_specs(entry.data, entry.options)
         self._energy = CloudEnergyStore(hass, entry)
+        self._poll_tasks: set[asyncio.Task[Any]] = set()
 
     async def _async_setup(self) -> None:
         """Restore shared totals before the first cloud sample is processed."""
         await self._energy.async_load(self.specs)
 
     async def async_shutdown(self) -> None:
-        """Stop polling and persist totals independently of sensor unloading."""
+        """Finish cancelled polls before persisting the entry's final totals."""
         await super().async_shutdown()
+        current = asyncio.current_task()
+        polls = [task for task in self._poll_tasks if task is not current]
+        for task in polls:
+            task.cancel()
+        if polls:
+            await asyncio.gather(*polls, return_exceptions=True)
         await self._energy.async_save()
 
     async def _refresh_token_and_store(self) -> None:
@@ -320,6 +327,11 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         return values
 
     async def _async_update_data(self) -> dict[str, float]:
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
+        task = asyncio.current_task()
+        assert task is not None
+        self._poll_tasks.add(task)
         try:
             async with asyncio.timeout(CONF_CLOUD_UPDATE_TIMEOUT):
                 try:
@@ -333,3 +345,5 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
             raise ConfigEntryAuthFailed("Cloud authentication failed") from err
         except (EnecessApiError, OSError, TimeoutError) as err:
             raise UpdateFailed("Cloud request failed") from err
+        finally:
+            self._poll_tasks.discard(task)

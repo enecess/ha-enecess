@@ -63,3 +63,30 @@ class FormulaTests(unittest.TestCase):
         self.assertEqual(actual["z"], "source_25")
         self.assertEqual(actual["aa"], "source_26")
         self.assertEqual(actual["ab"], "source_27")
+
+    def test_forty_fifth_source_has_a_usable_alias(self):
+        engine = self.engine()
+        sources = [f"source_{i}" for i in range(45)]
+        actual = engine.build_formula_variables(sources)
+        expected_names = [chr(letter) for letter in range(ord("a"), ord("z") + 1)]
+        expected_names += ["a" + chr(letter) for letter in range(ord("a"), ord("r") + 1)]
+        self.assertEqual(list(actual)[:44], expected_names)
+        alias = next(name for name, source in actual.items() if source == sources[44])
+        try:
+            validated = engine.validate_formula(alias, actual)
+        except engine.FormulaError as error:
+            self.fail(f"The generated alias {alias!r} cannot be used: {error}")
+        self.assertEqual(engine.evaluate_formula(validated, {alias: 45}), 45)
+
+    def test_all_generated_aliases_remain_usable_past_later_keywords(self):
+        engine = self.engine()
+        sources = [f"source_{i}" for i in range(500)]
+        actual = engine.build_formula_variables(sources)
+        self.assertEqual(list(actual.values()), sources)
+        for index, alias in enumerate(actual, 1):
+            with self.subTest(alias=alias):
+                try:
+                    validated = engine.validate_formula(alias, actual)
+                except engine.FormulaError as error:
+                    self.fail(f"The generated alias {alias!r} cannot be used: {error}")
+                self.assertEqual(engine.evaluate_formula(validated, {alias: index}), index)

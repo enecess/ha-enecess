@@ -472,7 +472,7 @@
         "energy_reverse": "Énergie active inverse",
         "reactive_energy_forward": "Énergie réactive directe",
         "reactive_energy_reverse": "Énergie réactive inverse",
-        "apparent_energy": "Énergie apparente (VAh)",
+        "apparent_energy": "Énergie apparente",
         "apparent_power": "Puissance apparente",
         "reactive_power": "Puissance réactive",
         "voltage": "Tension",

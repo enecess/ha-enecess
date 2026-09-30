@@ -412,18 +412,18 @@ If you need to change immutable settings:
 >
 > ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
 
-Local mode offers twelve measurement categories on firmware 139 or later; only the first three are available on firmware 136–138:
+Local mode offers twelve measurement categories on firmware 139 or later; firmware 136–138 supports only active power and forward/reverse active energy:
 
 | Category | Meaning | Default |
 | --- | --- | --- |
-| Active power | Instantaneous active power (W) | On |
 | Forward active energy | Accumulated active energy in the forward CT direction (Wh) | On |
 | Reverse active energy | Accumulated active energy in the reverse CT direction (Wh) | On |
 | Forward reactive energy | Accumulated reactive energy in the forward direction (varh) | Off |
 | Reverse reactive energy | Accumulated reactive energy in the reverse direction (varh) | Off |
 | Apparent energy | Apparent energy (VAh) | Off |
-| Apparent power | Apparent power (VA) | Off |
+| Active power | Instantaneous active power (W) | On |
 | Reactive power | Reactive power (var) | Off |
+| Apparent power | Apparent power (VA) | Off |
 | Voltage | Voltage (V) | Off |
 | Current | Current (A) | Off |
 | Power factor | Ratio of active to apparent power, without a unit | Off |
@@ -551,7 +551,7 @@ Firmware **136–138** supports only the first three categories; firmware **139 
 | Power factor | `power_factor_rt` | None | ✓ | — | ✓ | No |
 | Frequency | `main_frequency_rt` (full key) | Hz | — | — | — | No; one main sensor only |
 
-Power, voltage, current, power factor and frequency use the `MEASUREMENT` state class; the four cumulative energy categories use `TOTAL_INCREASING`. Units listed are native units; HA can convert their display according to user settings.
+Power, voltage, current, power factor and frequency use the `MEASUREMENT` state class; the five cumulative energy categories use `TOTAL_INCREASING`. Units listed are native units; HA can convert their display according to user settings.
 
 Examples: `main_l1_power_rt` is main L1 active power, `main_all_reactive_power_rt` is main total reactive power, `main_ch1_voltage_rt` is main channel 1 voltage, and `sub1_ch1_reactive_energy_fwd_total` is slave 1 channel 1 cumulative forward reactive energy.
 
@@ -601,7 +601,7 @@ Extra entities are configured explicitly and are available for local and cloud e
 | Average | Multiple matching active power or cumulative active energy sources, producing their average |
 | Custom formula | Enabled, supported measurements; mixed source types are allowed, with units checked by the user |
 
-The first four operations retain the source device class, state class and native unit. Formula results support active power, active energy, reactive energy, apparent power, reactive power, voltage, current, power factor, frequency and number. Active/reactive energy results use `TOTAL`; the others use `MEASUREMENT`. See “Custom formula entities” above for configuration and expression rules.
+The first four operations retain the source device class, state class and native unit. Formula results support active power, active energy, reactive energy, apparent energy, apparent power, reactive power, voltage, current, power factor, frequency and number. Active/reactive/apparent energy results use `TOTAL`; the others use `MEASUREMENT`. See “Custom formula entities” above for configuration and expression rules.
 
 **Channel Phases** is an options page for local firmware 139 or later; it creates no additional `select` or sensor entities.
 

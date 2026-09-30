@@ -420,18 +420,18 @@ Si vous devez modifier un réglage non modifiable :
 >
 > ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
 
-Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; seules les trois premières sont disponibles avec le firmware 136–138 :
+Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; le firmware 136–138 prend en charge uniquement la puissance active et les énergies actives directe et inverse :
 
 | Catégorie | Signification | Par défaut |
 | --- | --- | --- |
-| Puissance active | Puissance active instantanée (W) | Activée |
 | Énergie active directe | Énergie active cumulée dans le sens de la flèche du TC (Wh) | Activée |
 | Énergie active inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
 | Énergie réactive directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
 | Énergie réactive inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
 | Énergie apparente | Énergie apparente (VAh) | Désactivée |
-| Puissance apparente | Puissance apparente (VA) | Désactivée |
+| Puissance active | Puissance active instantanée (W) | Activée |
 | Puissance réactive | Puissance réactive (var) | Désactivée |
+| Puissance apparente | Puissance apparente (VA) | Désactivée |
 | Tension | Tension électrique (V) | Désactivée |
 | Courant | Intensité du courant (A) | Désactivée |
 | Facteur de puissance | Rapport entre puissances active et apparente, sans unité | Désactivée |

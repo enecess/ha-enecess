@@ -122,12 +122,12 @@ def _measurement_schema(
             entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
         )
     )
-    if preserve_selected and entry_data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
+    if entry_data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD:
         # Keep existing choices visible so only an explicit deselection removes them.
         choices = tuple(
-            dict.fromkeys(
-                (*choices, *(item for item in selected if item in LOCAL_MEASUREMENTS))
-            )
+            item
+            for item in LOCAL_MEASUREMENTS
+            if item in choices or (preserve_selected and item in selected)
         )
     return vol.Schema(
         {

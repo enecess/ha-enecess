@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
+import keyword
 import math
 import operator
 
@@ -49,11 +50,17 @@ class ValidatedFormula:
 def build_formula_variables(sources: list[str]) -> dict[str, str]:
     """Assign spreadsheet-style lower-case names in selected source order."""
     variables = {}
-    for index, source in enumerate(sources, 1):
-        name = ""
-        while index:
-            index, remainder = divmod(index - 1, 26)
-            name = chr(97 + remainder) + name
+    next_index = 1
+    for source in sources:
+        while True:
+            index = next_index
+            next_index += 1
+            name = ""
+            while index:
+                index, remainder = divmod(index - 1, 26)
+                name = chr(97 + remainder) + name
+            if not keyword.iskeyword(name):
+                break
         variables[name] = source
     return variables
 

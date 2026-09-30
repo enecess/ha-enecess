@@ -16,19 +16,21 @@ from ..const import (
 
 DEFAULT_LOCAL_MEASUREMENTS = ("power", "energy_forward", "energy_reverse")
 LOCAL_MEASUREMENTS = (
-    *DEFAULT_LOCAL_MEASUREMENTS,
+    "energy_forward",
+    "energy_reverse",
     "reactive_energy_forward",
     "reactive_energy_reverse",
     "apparent_energy",
-    "apparent_power",
+    "power",
     "reactive_power",
+    "apparent_power",
     "voltage",
     "current",
     "power_factor",
     "frequency",
 )
 DEFAULT_CLOUD_MEASUREMENTS = ("power", "energy")
-CLOUD_MEASUREMENTS = DEFAULT_CLOUD_MEASUREMENTS
+CLOUD_MEASUREMENTS = ("energy", "power")
 
 
 def available_local_measurements(firmware_version: int | None) -> tuple[str, ...]:

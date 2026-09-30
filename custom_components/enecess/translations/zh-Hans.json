@@ -472,7 +472,7 @@
         "energy_reverse": "反向有功电能",
         "reactive_energy_forward": "正向无功电能",
         "reactive_energy_reverse": "反向无功电能",
-        "apparent_energy": "视在电能 (VAh)",
+        "apparent_energy": "视在电能",
         "apparent_power": "视在功率",
         "reactive_power": "无功功率",
         "voltage": "电压",

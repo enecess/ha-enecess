@@ -472,7 +472,7 @@
         "energy_reverse": "Energia czynna w kierunku przeciwnym",
         "reactive_energy_forward": "Energia bierna w kierunku zgodnym",
         "reactive_energy_reverse": "Energia bierna w kierunku przeciwnym",
-        "apparent_energy": "Energia pozorna (VAh)",
+        "apparent_energy": "Energia pozorna",
         "apparent_power": "Moc pozorna",
         "reactive_power": "Moc bierna",
         "voltage": "Napięcie",

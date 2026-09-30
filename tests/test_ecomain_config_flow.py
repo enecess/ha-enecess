@@ -94,7 +94,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         flow = self.module.EnecessOptionsFlow(entry)
         result = await flow.async_step_measurement_types()
         choices = next(iter(result["data_schema"].schema.values())).config["options"]
-        self.assertEqual(["power", "energy_forward", "energy_reverse"], choices)
+        self.assertEqual(["energy_forward", "energy_reverse", "power"], choices)
         result = await flow._show_options_menu()
         actions = next(value.config["options"] for key, value in result["data_schema"].schema.items() if str(key) == "extra_action")
         self.assertNotIn("channel_phases", actions)

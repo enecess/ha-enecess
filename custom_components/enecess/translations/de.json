@@ -34,7 +34,7 @@
         "title": "Gerät konfigurieren",
         "description": "Seriennummer: {ecomain_serial}\nAdresse: {ecomain_host}\n\nWähle die ecoSub-Geräte, die du mit diesem ecoMain hinzufügen möchtest. Ohne ecoSub kannst du direkt fortfahren.",
         "data": {
-          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "ecomain_selected_slaves": "Hinzuzufügende Slaves auswählen",
           "flow_action": "Aktion"
         }
       },
@@ -81,7 +81,7 @@
         "title": "Gerät bestätigen",
         "description": "Seriennummer: {ecomain_serial}\n\nBestätige dieses ecoMain und wähle die ecoSub-Geräte, die du hinzufügen möchtest. Ohne ecoSub kannst du direkt fortfahren.",
         "data": {
-          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "ecomain_selected_slaves": "Hinzuzufügende Slaves auswählen",
           "flow_action": "Aktion"
         }
       },
@@ -246,7 +246,7 @@
         "title": "ecoMain anpassen",
         "description": "- Gerätetyp: {device_type}\n- Hinzufügungsmethode: {mode}\n- ecoMain-Seriennummer: {ecomain_serial}\n- Konfigurierte zusätzliche Entitäten: {extra_entities}",
         "data": {
-          "ecomain_selected_slaves": "Zu hinzuzufügende Slaves auswählen",
+          "ecomain_selected_slaves": "Hinzuzufügende Slaves auswählen",
           "extra_action": "Nächste Aktion",
           "flow_action": "Aktion"
         }
@@ -472,7 +472,7 @@
         "energy_reverse": "Wirkenergie rückwärts",
         "reactive_energy_forward": "Blindenergie vorwärts",
         "reactive_energy_reverse": "Blindenergie rückwärts",
-        "apparent_energy": "Scheinenergie (VAh)",
+        "apparent_energy": "Scheinenergie",
         "apparent_power": "Scheinleistung",
         "reactive_power": "Blindleistung",
         "voltage": "Spannung",

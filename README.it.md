@@ -297,18 +297,18 @@ Tipo di dispositivo, metodo di connessione e dispositivo principale ecoMain non 
 >
 > ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
 
-Con il firmware 139 o successivo sono disponibili le seguenti dodici categorie locali; con il firmware 136–138 sono disponibili soltanto le prime tre:
+Con il firmware 139 o successivo sono disponibili le seguenti dodici categorie locali; con il firmware 136–138 sono disponibili soltanto la potenza attiva e le energie attive diretta e inversa:
 
 | Misurazione | Significato | Unità | Selezione iniziale |
 | --- | --- | --- | --- |
-| Potenza attiva | Potenza elettrica attiva istantanea | W | Sì |
 | Energia attiva diretta | Energia attiva accumulata nella direzione diretta del trasformatore di corrente | Wh | Sì |
 | Energia attiva inversa | Energia attiva accumulata nella direzione opposta | Wh | Sì |
 | Energia reattiva diretta | Energia reattiva accumulata nella direzione diretta | varh | No |
 | Energia reattiva inversa | Energia reattiva accumulata nella direzione inversa | varh | No |
 | Energia apparente | Energia apparente (VAh) | VAh | No |
-| Potenza apparente | Potenza apparente misurata | VA | No |
+| Potenza attiva | Potenza elettrica attiva istantanea | W | Sì |
 | Potenza reattiva | Potenza reattiva misurata | var | No |
+| Potenza apparente | Potenza apparente misurata | VA | No |
 | Tensione | Tensione elettrica | V | No |
 | Corrente | Corrente elettrica | A | No |
 | Fattore di potenza | Rapporto tra potenza attiva e apparente | Senza unità | No |

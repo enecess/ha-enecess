@@ -31,6 +31,7 @@ def load_runtime():
     module("homeassistant.const", UnitOfPower=SimpleNamespace(WATT="W"), UnitOfEnergy=SimpleNamespace(WATT_HOUR="Wh"))
     module("homeassistant.config_entries", ConfigEntry=object)
     module("homeassistant.core", HomeAssistant=object)
+    module("homeassistant.exceptions", ConfigEntryAuthFailed=RuntimeError)
 
     class Coordinator:
         def __init__(self, *args, **kwargs):

@@ -418,18 +418,18 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 >
 > ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
 
-Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur die ersten drei:
+Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur Wirkleistung sowie Wirkenergie vorwärts und rückwärts:
 
 | Kategorie | Bedeutung | Standard |
 | --- | --- | --- |
-| Wirkleistung | Momentane Wirkleistung (W) | Ein |
 | Wirkenergie vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
 | Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
 | Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
 | Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
 | Scheinenergie | Scheinenergie (VAh) | Aus |
-| Scheinleistung | Scheinleistung (VA) | Aus |
+| Wirkleistung | Momentane Wirkleistung (W) | Ein |
 | Blindleistung | Blindleistung (var) | Aus |
+| Scheinleistung | Scheinleistung (VA) | Aus |
 | Spannung | Elektrische Spannung (V) | Aus |
 | Strom | Stromstärke (A) | Aus |
 | Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Aus |

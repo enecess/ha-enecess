@@ -415,18 +415,18 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 >
 > ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
 
-Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsługują tylko pierwsze trzy:
+Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsługują tylko moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym:
 
 | Kategoria | Znaczenie | Domyślnie |
 | --- | --- | --- |
-| Moc czynna | Chwilowa moc czynna (W) | Włączona |
 | Energia czynna w kierunku zgodnym | Energia czynna zgromadzona zgodnie ze strzałką przekładnika (Wh) | Włączona |
 | Energia czynna w kierunku przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
 | Energia bierna w kierunku zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
 | Energia bierna w kierunku przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
 | Energia pozorna | Energia pozorna (VAh) | Wyłączona |
-| Moc pozorna | Moc pozorna (VA) | Wyłączona |
+| Moc czynna | Chwilowa moc czynna (W) | Włączona |
 | Moc bierna | Moc bierna (var) | Wyłączona |
+| Moc pozorna | Moc pozorna (VA) | Wyłączona |
 | Napięcie | Napięcie elektryczne (V) | Wyłączona |
 | Prąd | Natężenie prądu (A) | Wyłączona |
 | Współczynnik mocy | Stosunek mocy czynnej do pozornej, bez jednostki | Wyłączona |
@@ -443,7 +443,7 @@ Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch warto
 3. Na następnej stronie wybierz źródła z list rozwijanych wielokrotnego wyboru, pogrupowane według typu danych, niezależnie od typu wyniku. Każda grupa jest opcjonalna; wybierz łącznie co najmniej jedno źródło.
 4. Strona wzoru pokaże, co oznaczają `a`, `b` itd. Wpisz wzór i sprawdź, czy jego jednostka pasuje do typu wyniku.
 
-Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia. Puste grupy są ukryte; wybór źródeł nie włącza pomiarów automatycznie. Skumulowana energia czynna (Wh), skumulowana energia bierna (varh) i minutowe przyrosty energii czynnej z chmury (Wh) tworzą osobne grupy. Możesz łączyć różne typy źródeł i musisz samodzielnie sprawdzić jednostki we wzorze. Zmienne `a`, `b` itd. są wspólne dla grup. Za każdym przejściem dalej ze strony źródeł, także podczas edycji lub po cofnięciu, są przypisywane ponownie od `a`, a poprzedni wzór jest usuwany. Wyniki energii czynnej i biernej używają `TOTAL`, dopuszczając wzrosty i spadki dla energii netto. **Liczba** daje wynik czysto liczbowy bez jednostki ani klasy urządzenia (`device_class`), z `MEASUREMENT`.
+Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia. Puste grupy są ukryte; wybór źródeł nie włącza pomiarów automatycznie. Skumulowana energia czynna (Wh), skumulowana energia bierna (varh), skumulowana energia pozorna (VAh) i minutowe przyrosty energii czynnej z chmury (Wh) tworzą osobne grupy. Możesz łączyć różne typy źródeł i musisz samodzielnie sprawdzić jednostki we wzorze. Zmienne `a`, `b` itd. są wspólne dla grup. Za każdym przejściem dalej ze strony źródeł, także podczas edycji lub po cofnięciu, są przypisywane ponownie od `a`, a poprzedni wzór jest usuwany. Wyniki energii czynnej, biernej i pozornej używają `TOTAL`, dopuszczając wzrosty i spadki dla energii netto. **Liczba** daje wynik czysto liczbowy bez jednostki ani klasy urządzenia (`device_class`), z `MEASUREMENT`.
 
 <!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
 
