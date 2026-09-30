@@ -76,12 +76,12 @@ class LocalFlowValidationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(flow._available_slaves, [])
         self.assertTrue(client.closed)
 
-    async def test_options_preserves_old_firmware_and_rejects_it(self):
+    async def test_options_rejects_old_firmware_with_local_connection_error(self):
         flow = self.options_flow()
         client = ValidationClient(firmware=135)
         with patch.object(self.module, "EnecessModbusClient", return_value=client):
             result = await flow._async_refresh_local_slaves()
-        self.assertEqual(result, {"base": "firmware_too_old"})
+        self.assertEqual(result, {"base": "cannot_connect_local"})
         self.assertEqual(flow._firmware_version, 135)
         self.assertTrue(client.closed)
 

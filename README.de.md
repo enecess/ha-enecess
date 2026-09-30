@@ -16,7 +16,7 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
     - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
     - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
 
-> Firmware unter **136** führt zu `firmware_too_old`; aktualisiere ecoMain mit offiziellen Werkzeugen. Bei einem Lesefehler des Firmware-Registers erscheint `cannot_connect_local`; prüfe Adresse, TCP-Port 502 und Netzwerk. Im Cloud-Modus entfällt diese Prüfung.
+> Die lokale Einrichtung erfordert Firmware **136 oder neuer**. Firmware unter 136 unterstützt kein Modbus und kann ebenso wie eine falsche Adresse oder ein Netzwerkfehler zu `cannot_connect_local` führen. Prüfe bei Fehlern Adresse, TCP-Port 502, Netzwerkverbindung und Firmwareversion; aktualisiere ecoMain bei Bedarf mit den offiziellen Werkzeugen. Im Cloud-Modus entfällt diese Prüfung.
 
 - Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.
 - Lokale Firmware ab 139: auch die neun weiteren Messgrößen und Einstellungen der Kanalphasen.
@@ -625,6 +625,7 @@ Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät einschließlich
 - Port 502 wird durch eine Firewall blockiert.
 - ecoMain ist aus dem Home-Assistant-Netzwerk nicht erreichbar.
 - ecoMain befindet sich in einem fehlerhaften Zustand oder startet gerade neu.
+- Firmware unter **136** unterstützt kein Modbus; aktualisiere ecoMain mit den offiziellen Werkzeugen.
 
 **Was du tun kannst:**
 
@@ -635,14 +636,14 @@ Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät einschließlich
 
 ---
 
-### F4: Ich bekomme „Device firmware version is too old“ (`firmware_too_old`)
+### F4: Welche Firmware benötigt die lokale ecoMain-Einrichtung?
 
-Firmware unter **136** führt zu `firmware_too_old`; aktualisiere ecoMain mit offiziellen Werkzeugen. Bei einem Lesefehler des Firmware-Registers erscheint `cannot_connect_local`; prüfe Adresse, TCP-Port 502 und Netzwerk. Im Cloud-Modus entfällt diese Prüfung.
+Die lokale Einrichtung erfordert Firmware **136 oder neuer**. Firmware unter 136 unterstützt kein Modbus und kann ebenso wie eine falsche Adresse oder ein Netzwerkfehler zu `cannot_connect_local` führen. Prüfe bei Fehlern Adresse, TCP-Port 502, Netzwerkverbindung und Firmwareversion; aktualisiere ecoMain bei Bedarf mit den offiziellen Werkzeugen. Im Cloud-Modus entfällt diese Prüfung.
 
 1. ecoMain mit den offiziellen enecess-Tools / der App / dem vorgesehenen Verfahren auf die **neueste Firmware** aktualisieren.
 2. Anschließend das lokale Hinzufügen erneut versuchen.
 3. Falls du nicht weißt, wie die Firmware aktualisiert wird, den Installateur oder den enecess-Support kontaktieren und erwähnen, dass die Home-Assistant-Integration
-   `firmware_too_old` meldet.
+   `cannot_connect_local` meldet.
 
 ---
 
@@ -806,4 +807,4 @@ Wenn Probleme auftreten:
 - Home-Assistant-Logs sammeln.
 - Die verwendete Hinzufügungsmethode angeben (Lokal Auto / Lokal Manuell / Cloud).
 - Gerätemodell und Netzwerktopologie kurz beschreiben.
-- Die konkrete Fehlermeldung nennen (z. B. `cannot_connect_local`, `firmware_too_old`, `auth_failed` usw.).
+- Die konkrete Fehlermeldung nennen (z. B. `cannot_connect_local`, `auth_failed` usw.).

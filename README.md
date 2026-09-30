@@ -16,7 +16,7 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
     - One account entry can select one or more plugs by name and serial number.
     - Open the entry's **Configure** options to change the selected plugs later.
 
-> Firmware below **136** produces `firmware_too_old`; update ecoMain with official tools. Failure to read the firmware register produces `cannot_connect_local`; check the address, TCP port 502 and connectivity. Cloud mode does not use this check.
+> Local configuration requires firmware **136 or later**. Firmware below 136 has no Modbus support and may cause `cannot_connect_local`, just like an incorrect address or a network failure. If configuration fails, check the address, TCP port 502, network connection and firmware version; update ecoMain with the official tools if needed. Cloud mode does not use this check.
 
 - Local firmware 136–138: active power and forward/reverse active energy.
 - Local firmware 139 or later: also supports the nine additional types and channel phase settings.
@@ -652,6 +652,7 @@ This error comes from the local Modbus client failing to read the device includi
 - Port 502 is blocked by firewall.
 - ecoMain is not reachable from Home Assistant network.
 - ecoMain is in an abnormal state or restarting.
+- Firmware below **136** has no Modbus support; update ecoMain with the official tools.
 
 **What you can do:**
 
@@ -662,13 +663,13 @@ This error comes from the local Modbus client failing to read the device includi
 
 ---
 
-### Q4: I get “Device firmware version is too old” (`firmware_too_old`)
+### Q4: What firmware does local ecoMain configuration require?
 
-Firmware below **136** produces `firmware_too_old`; update ecoMain with official tools. Failure to read the firmware register produces `cannot_connect_local`; check the address, TCP port 502 and connectivity. Cloud mode does not use this check.
+Local configuration requires firmware **136 or later**. Firmware below 136 has no Modbus support and may cause `cannot_connect_local`, just like an incorrect address or a network failure. If configuration fails, check the address, TCP port 502, network connection and firmware version; update ecoMain with the official tools if needed. Cloud mode does not use this check.
 
 1. Update ecoMain to the **latest firmware** using the official enecess tools / app / procedure.
 2. After upgrading, try adding the integration again (local mode).
-3. If you are not sure how to update firmware, contact your installer or enecess support and mention that Home Assistant integration reports `firmware_too_old`.
+3. If you are not sure how to update firmware, contact your installer or enecess support and mention that Home Assistant integration reports `cannot_connect_local`.
 
 ---
 
@@ -844,4 +845,4 @@ If you encounter issues:
 - Collect logs from Home Assistant.
 - Describe your add method (Local auto / Local manual / Cloud).
 - Provide your device model and network environment details.
-- Mention any specific error messages you see (e.g., `cannot_connect_local`, `firmware_too_old`, `auth_failed`, etc.).
+- Mention any specific error messages you see (e.g., `cannot_connect_local`, `auth_failed`, etc.).

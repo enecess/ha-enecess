@@ -16,7 +16,7 @@
     - 同一云端账号创建一个集成条目，可按名称和序列号多选一个或多个插座。
     - 添加后可通过该条目的**配置 / Options** 修改已选择的插座。
 
-> 固件低于 **136** 时提示 `firmware_too_old`，请使用官方工具更新 ecoMain。固件寄存器读取失败时提示 `cannot_connect_local`，请检查设备地址、TCP 502 端口和网络连接。云端模式不执行此检查。
+> 本地配置要求固件 **136 或以上**。低于 136 的固件没有 Modbus 能力，可能与地址错误或网络故障一样提示 `cannot_connect_local`。配置失败时，请检查设备地址、TCP 502 端口、网络连接和固件版本，必要时使用官方工具更新 ecoMain。云端模式不执行此检查。
 
 - 本地固件 136–138：支持有功功率、正向/反向有功电能。
 - 本地固件 139 及以上：还支持其余九类测量和通道相位设置。
@@ -654,6 +654,7 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 - 防火墙阻断了 502 端口。
 - ecoMain 与 Home Assistant 不在可达网络中。
 - ecoMain 正在重启或异常。
+- 固件低于 **136**，没有 Modbus 能力；请使用官方工具更新 ecoMain。
 
 **排查建议：**
 
@@ -664,13 +665,13 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 
 ---
 
-### Q4：提示 “设备固件版本过低”（`firmware_too_old`）
+### Q4：本地 ecoMain 配置需要什么固件版本？
 
-固件低于 **136** 时提示 `firmware_too_old`，请使用官方工具更新 ecoMain。固件寄存器读取失败时提示 `cannot_connect_local`，请检查设备地址、TCP 502 端口和网络连接。云端模式不执行此检查。
+本地配置要求固件 **136 或以上**。低于 136 的固件没有 Modbus 能力，可能与地址错误或网络故障一样提示 `cannot_connect_local`。配置失败时，请检查设备地址、TCP 502 端口、网络连接和固件版本，必要时使用官方工具更新 ecoMain。云端模式不执行此检查。
 
 1. 使用官方提供的 enecess 工具 / App / 升级方法，将 ecoMain 更新到 **最新固件版本**。
 2. 升级完成后，再次尝试通过本地模式添加集成。
-3. 如不清楚如何升级固件，可联系安装服务商或 enecess 官方支持，并说明 Home Assistant 集成提示 `firmware_too_old`。
+3. 如不清楚如何升级固件，可联系安装服务商或 enecess 官方支持，并说明 Home Assistant 集成提示 `cannot_connect_local`。
 
 ---
 
@@ -844,4 +845,4 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 - 尽量附上 Home Assistant 的相关日志。
 - 说明你的添加方式（本地自动 / 本地手动 / 云端）。
 - 描述你的 ecoMain / ecoSub 型号、安装方式及网络环境。
-- 说明看到的具体报错提示（如：`cannot_connect_local`、`firmware_too_old`、`auth_failed` 等）。
+- 说明看到的具体报错提示（如：`cannot_connect_local`、`auth_failed` 等）。

@@ -88,8 +88,8 @@ back. Cancelling the source page creates no formula. Capability coverage include
 firmware 136/138/139, unknown firmware, cloud mode and selected measurement
 subsets, including detected firmware through measurement selection into the
 formula wizard. Transform/aggregate actions retain their availability
-constraints. Firmware read failures are distinguished from a successfully read
-unsupported version.
+constraints. Firmware read failures and unsupported versions share the local
+connection error, which includes the minimum firmware requirement.
 
 Event-controlled ecoPlug tests exercise polls overlapping successful, failed and
 cancelled control commands, per-device isolation and authoritative later polls.

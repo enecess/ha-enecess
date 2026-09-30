@@ -12,7 +12,7 @@ Questa integrazione personalizzata per Home Assistant supporta i prodotti **enec
 - **ecoSub**: fino a tre dispositivi secondari, selezionabili attraverso il relativo ecoMain. Ogni dispositivo dispone di dieci canali.
 - **ecoPlug**: connessione solo cloud. Un’unica voce dell’integrazione può contenere più prese dello stesso account; la selezione è modificabile nelle opzioni.
 
-> Un firmware inferiore a **136** genera `firmware_too_old`: aggiorna ecoMain con gli strumenti ufficiali. Se la lettura della versione fallisce, compare `cannot_connect_local`: verifica indirizzo, porta TCP 502 e connessione. Il controllo non riguarda la modalità cloud.
+> La configurazione locale richiede il firmware **136 o successivo**. Il firmware precedente alla versione 136 non supporta Modbus e può causare `cannot_connect_local`, come un indirizzo errato o un problema di rete. Se la configurazione fallisce, verifica indirizzo, porta TCP 502, connessione di rete e versione del firmware; aggiorna ecoMain con gli strumenti ufficiali se necessario. Il controllo non riguarda la modalità cloud.
 
 - Firmware locale 136–138: potenza attiva ed energia attiva diretta/inversa.
 - Firmware locale 139 o successivo: anche gli altri nove tipi e le impostazioni delle fasi dei canali.
@@ -470,8 +470,7 @@ I risultati delle formule supportano potenza attiva (W), energia attiva (Wh), en
 | --- | --- |
 | ecoMain non viene rilevato | Verifica sottorete/VLAN e multicast mDNS; prova la configurazione manuale. |
 | `no_devices_found` | Verifica alimentazione e rete locale oppure l’associazione di ecoMain all’account enecess. |
-| `cannot_connect_local` | Controlla IP/nome host, raggiungibilità e porta TCP 502; attendi se il dispositivo si sta riavviando. |
-| `firmware_too_old` | Aggiorna ecoMain alla versione 136 o successiva con gli strumenti ufficiali. |
+| `cannot_connect_local` | Controlla indirizzo, rete, porta TCP 502 e firmware: le versioni precedenti alla 136 non supportano Modbus. Aggiorna ecoMain con gli strumenti ufficiali se necessario. |
 | `cannot_connect` | Controlla connessione Internet, DNS e disponibilità del servizio cloud `https://hems.enecess.com`. |
 | `auth_failed` | Prova le stesse credenziali nell’app enecess; se necessario, reimposta la password nell’app. |
 | `already_configured` | Esiste già una voce con lo stesso numero di serie e metodo di connessione. Apri le opzioni della voce esistente. |

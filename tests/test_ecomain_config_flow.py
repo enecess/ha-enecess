@@ -162,7 +162,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(["0", "2"], values)
 
 class FirmwareTests(unittest.IsolatedAsyncioTestCase):
-    async def test_failed_firmware_read_is_connection_error_not_old_firmware(self):
+    async def test_unreadable_firmware_uses_local_connection_error(self):
         module = load_flow(self)
         for response in (ConnectionRefusedError(), TimeoutError(), types.SimpleNamespace(registers=[]), types.SimpleNamespace(registers=[None])):
             with self.subTest(response=response):
@@ -178,7 +178,7 @@ class FirmwareTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_firmware_boundary_and_closed_connections(self):
         module = load_flow(self)
-        for version, expected in ((135, 'firmware_too_old'), (136, None), (138, None), (139, None), (140, None)):
+        for version, expected in ((135, 'cannot_connect_local'), (136, None), (138, None), (139, None), (140, None)):
             with self.subTest(version=version):
                 client = types.SimpleNamespace(
                     read_holding_registers=AsyncMock(side_effect=[types.SimpleNamespace(registers=[version]),

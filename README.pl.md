@@ -16,7 +16,7 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
     - Jeden wpis konta może wybrać wiele gniazdek według nazwy i numeru seryjnego.
     - W **Konfiguruj / Opcje** można później zmienić wybór.
 
-> Firmware starszy niż **136** powoduje `firmware_too_old`; zaktualizuj ecoMain oficjalnymi narzędziami. Błąd odczytu wersji powoduje `cannot_connect_local`; sprawdź adres, port TCP 502 i połączenie. Tryb chmurowy nie wykonuje tej kontroli.
+> Konfiguracja lokalna wymaga firmware **136 lub nowszego**. Firmware starszy niż 136 nie obsługuje Modbus i może powodować `cannot_connect_local`, tak jak błędny adres lub awaria sieci. Jeśli konfiguracja się nie powiedzie, sprawdź adres, port TCP 502, połączenie sieciowe i wersję firmware; w razie potrzeby zaktualizuj ecoMain oficjalnymi narzędziami. Tryb chmurowy nie wykonuje tej kontroli.
 
 - Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.
 - Lokalne oprogramowanie od wersji 139: także dziewięć dodatkowych rodzajów i ustawienia faz kanałów.
@@ -624,7 +624,7 @@ Integracja nie może połączyć się z ecoMain przez Modbus TCP.
 - ecoMain jest offline,
 - Home Assistant i ecoMain są w różnych sieciach bez routingu,
 - firewall blokuje port **502**,
-- urządzenie nie obsługuje wymaganej komunikacji lokalnej.
+- firmware starszy niż **136** nie obsługuje Modbus; zaktualizuj ecoMain oficjalnymi narzędziami.
 
 **Co możesz zrobić:**
 
@@ -635,9 +635,9 @@ Integracja nie może połączyć się z ecoMain przez Modbus TCP.
 
 ---
 
-### Q4: Widzę „Device firmware version is too old” (`firmware_too_old`)
+### Q4: Jakiego firmware wymaga lokalna konfiguracja ecoMain?
 
-Firmware starszy niż **136** powoduje `firmware_too_old`; zaktualizuj ecoMain oficjalnymi narzędziami. Błąd odczytu wersji powoduje `cannot_connect_local`; sprawdź adres, port TCP 502 i połączenie. Tryb chmurowy nie wykonuje tej kontroli.
+Konfiguracja lokalna wymaga firmware **136 lub nowszego**. Firmware starszy niż 136 nie obsługuje Modbus i może powodować `cannot_connect_local`, tak jak błędny adres lub awaria sieci. Jeśli konfiguracja się nie powiedzie, sprawdź adres, port TCP 502, połączenie sieciowe i wersję firmware; w razie potrzeby zaktualizuj ecoMain oficjalnymi narzędziami. Tryb chmurowy nie wykonuje tej kontroli.
 
 1. Sprawdź wersję firmware ecoMain w oficjalnej aplikacji lub na urządzeniu.
 2. Zaktualizuj firmware, jeśli dostępna jest nowsza wersja.
