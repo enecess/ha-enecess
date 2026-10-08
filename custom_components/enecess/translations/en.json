@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "Automatic Discovery",
-        "description": "Select ecoMain",
         "data": {
-          "ecomain_serial": "Master Serial Number",
+          "ecomain_serial": "Select ecoMain",
           "flow_action": "Action"
         }
       },

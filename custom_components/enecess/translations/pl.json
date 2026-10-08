@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "Automatyczne wykrywanie",
-        "description": "Wybierz ecoMain",
         "data": {
-          "ecomain_serial": "Numer seryjny urządzenia głównego",
+          "ecomain_serial": "Wybierz ecoMain",
           "flow_action": "Działanie"
         }
       },

@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "Automatische Erkennung",
-        "description": "ecoMain auswählen",
         "data": {
-          "ecomain_serial": "Master-Seriennummer",
+          "ecomain_serial": "ecoMain auswählen",
           "flow_action": "Aktion"
         }
       },

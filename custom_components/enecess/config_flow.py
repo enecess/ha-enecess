@@ -457,7 +457,17 @@ class ConfigFlow(
             return self.async_show_form(  # type: ignore[return-value]
                 step_id="ecomain_auto_scan",
                 data_schema=vol.Schema(
-                    {vol.Required(CONST_ECOMAIN_SERIAL): vol.In(options)}
+                    {
+                        vol.Required(CONST_ECOMAIN_SERIAL): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=[
+                                    {"value": serial, "label": label}
+                                    for serial, label in options.items()
+                                ],
+                                mode=SelectSelectorMode.DROPDOWN,
+                            )
+                        )
+                    }
                 ),
                 errors={},
             )

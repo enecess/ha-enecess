@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "自动发现",
-        "description": "选择 ecoMain",
         "data": {
-          "ecomain_serial": "主机序列号",
+          "ecomain_serial": "选择 ecoMain",
           "flow_action": "操作"
         }
       },

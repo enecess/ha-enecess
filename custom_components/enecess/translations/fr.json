@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "Découverte automatique",
-        "description": "Sélectionner ecoMain",
         "data": {
-          "ecomain_serial": "Numéro de série du maître",
+          "ecomain_serial": "Sélectionner ecoMain",
           "flow_action": "Action"
         }
       },

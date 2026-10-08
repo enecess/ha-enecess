@@ -17,9 +17,8 @@
       },
       "ecomain_auto_scan": {
         "title": "Rilevamento automatico",
-        "description": "Seleziona ecoMain",
         "data": {
-          "ecomain_serial": "Numero di serie del dispositivo principale",
+          "ecomain_serial": "Seleziona ecoMain",
           "flow_action": "Azione"
         }
       },
