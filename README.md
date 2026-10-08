@@ -64,7 +64,9 @@ Click the button below to add this repository to HACS as a custom integration:
 
 > **Process Screenshot:**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
+
 ---
+
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
 
 ### 3) Download / Install the integration from HACS
@@ -77,9 +79,13 @@ Click the button below to add this repository to HACS as a custom integration:
 
 > **Process Screenshot:**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+
 ---
+
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+
 ---
+
 > ![HA restart](docs/images/ha-restart.png)
 
 ---
@@ -107,9 +113,13 @@ When your ecoMain is powered on and in the same network as Home Assistant:
 
 > **Process Screenshot:**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+
 ---
+
 > ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
 
 ### Way 2: From “Add Integration” (manual start)
@@ -123,14 +133,23 @@ When your ecoMain is powered on and in the same network as Home Assistant:
 
 > **Process Screenshot:**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+
 ---
+
 > ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+
 ---
+
 > ![Select device type](docs/images/select-device-type.png)
+
 ---
+
 > ![Select add method](docs/images/select-add-method.png)
+
 ---
 
 ## ecoMain Add Methods & Step-by-step Flows
@@ -181,22 +200,29 @@ Troubleshooting tips:
 
 > **Process Screenshot:**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+
 ---
+
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Screenshot pending: Measurement types (local)**
->
-> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
+> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -238,22 +264,29 @@ Troubleshooting tips:
 
 > **Process Screenshot:**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+
 ---
+
 > ![Manual setup input 1](docs/images/ecomain-manual-input-2.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Screenshot pending: Measurement types (local)**
->
-> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
+> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -291,22 +324,29 @@ Notes:
 
 > **Process Screenshot:**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+
 ---
+
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+
 ---
+
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+
 ---
+
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **Screenshot pending: Measurement types (cloud)**
->
-> ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
+> ![Select cloud measurement types](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+
 ---
+
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
@@ -324,29 +364,23 @@ Steps:
 5. Finish to create one ecoPlug integration entry for that account and all selected plugs.
 6. To change the selection later, open **Settings → Devices & services → enecess → Configure**, then add or remove plugs and save the options.
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+> ![Select ecoPlug device type](docs/images/ecoplug-select-device-type.png)
 
-> **Screenshot pending: ecoPlug cloud login**
->
-> ![Screenshot pending: ecoPlug cloud login](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+> ![ecoPlug cloud login](docs/images/ecoplug-cloud-login.png)
 
-> **Screenshot pending: Select ecoPlug plugs**
->
-> ![Screenshot pending: Select ecoPlug plugs](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+> ![Select ecoPlug plugs](docs/images/ecoplug-select.png)
 
-> **Screenshot pending: ecoPlug setup complete**
->
-> ![Screenshot pending: ecoPlug setup complete](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+> ![ecoPlug setup complete](docs/images/ecoplug-complete.png)
 
-> **Screenshot pending: Change selected ecoPlug plugs**
->
-> ![Screenshot pending: Change selected ecoPlug plugs](docs/images/0_default.png)
+---
+
+> ![Open ecoPlug options](docs/images/ecoplug-options.png)
 
 Each selected ecoPlug creates exactly these entities:
 
@@ -400,18 +434,6 @@ If you need to change immutable settings:
 - Select at least one type.
 - Remove any extra entities that depend on a measurement before deselecting it.
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **Screenshot pending: Measurement types (local)**
->
-> ![Screenshot pending: Measurement types (local)](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **Screenshot pending: Measurement types (cloud)**
->
-> ![Screenshot pending: Measurement types (cloud)](docs/images/0_default.png)
-
 Local mode offers twelve measurement categories on firmware 139 or later; firmware 136–138 supports only active power and forward/reverse active energy:
 
 | Category | Meaning | Default |
@@ -442,17 +464,19 @@ Create a sensor from your measurements, such as the difference or average of two
 
 Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), cumulative apparent energy (VAh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active, reactive and apparent energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+> ![Add formula entity](docs/images/ecomain-formula-add.png)
 
-> **Screenshot pending: Formula name, result type and sources**
->
-> ![Screenshot pending: Formula name, result type and sources](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+> ![Set formula name and result type](docs/images/ecomain-formula-setup.png)
 
-> **Screenshot pending: Enter the formula**
->
-> ![Screenshot pending: Enter the formula](docs/images/0_default.png)
+---
+
+> ![Select formula source entities](docs/images/ecomain-formula-sources.png)
+
+---
+
+> ![Enter formula expression](docs/images/ecomain-formula-expression.png)
 
 | Formula | Result for two power readings |
 | --- | --- |
@@ -464,18 +488,6 @@ Only firmware-supported and enabled measurements are offered. Empty groups are h
 - Use **Remove Extra Entity** to delete a formula. Delete formulas using a measurement before deselecting it.
 - Missing data or a calculation that cannot be completed makes the result unavailable.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **Screenshot pending: Select a formula to edit**
->
-> ![Screenshot pending: Select a formula to edit](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **Screenshot pending: Select an extra entity to remove**
->
-> ![Screenshot pending: Select an extra entity to remove](docs/images/0_default.png)
-
 ### Channel Phases (Local Only)
 
 - For a local ecoMain entry, open **Configure**, choose **Channel Phases** as the next action, and select ecoMain or a configured online ecoSub.
@@ -485,19 +497,17 @@ Only firmware-supported and enabled measurements are offered. Empty groups are h
 - Check the displayed values before retrying.
 - This page changes settings on the device and is not available in cloud mode.
 
-Existing screenshots illustrate older versions and may not show the measurement-selection or channel-phase pages or current brand capitalization.
+The interface shown in the screenshots may vary with the Home Assistant or integration version.
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+> ![Open channel phase settings](docs/images/ecomain-phase-options.png)
 
-> **Screenshot pending: Select a device for phase settings**
->
-> ![Screenshot pending: Select a device for phase settings](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+> ![Select device for phase settings](docs/images/ecomain-phase-device.png)
 
-> **Screenshot pending: Set channel phases**
->
-> ![Screenshot pending: Set channel phases](docs/images/0_default.png)
+---
+
+> ![Set channel phases](docs/images/ecomain-channel-phases.png)
 
 ## Device Naming
 

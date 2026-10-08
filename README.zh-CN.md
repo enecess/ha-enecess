@@ -9,12 +9,12 @@
 ## 当前支持的设备
 
 - **ecoMain**
-    - 本地：Modbus TCP（支持 zeroconf / mDNS 自动发现）
-    - 云端：enecess Cloud（enecess 云服务）
+  - 本地：Modbus TCP（支持 zeroconf / mDNS 自动发现）
+  - 云端：enecess Cloud（enecess 云服务）
 - **ecoPlug**
-    - 仅支持云端（enecess Cloud）。
-    - 同一云端账号创建一个集成条目，可按名称和序列号多选一个或多个插座。
-    - 添加后可通过该条目的**配置 / Options** 修改已选择的插座。
+  - 仅支持云端（enecess Cloud）。
+  - 同一云端账号创建一个集成条目，可按名称和序列号多选一个或多个插座。
+  - 添加后可通过该条目的**配置 / Options** 修改已选择的插座。
 
 > 本地配置要求固件 **136 或以上**。低于 136 的固件没有 Modbus 能力，可能与地址错误或网络故障一样提示 `cannot_connect_local`。配置失败时，请检查设备地址、TCP 502 端口、网络连接和固件版本，必要时使用官方工具更新 ecoMain。云端模式不执行此检查。
 
@@ -64,7 +64,9 @@ ecoSub 离线时，其传感器显示不可用，其他设备继续更新。同�
 
 > **流程截图：**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
+
 ---
+
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
 
 ### 3）在 HACS 中下载 / 安装集成
@@ -73,13 +75,17 @@ ecoSub 离线时，其传感器显示不可用，其他设备继续更新。同�
 2. 搜索 **enecess**。
 3. 打开后点击 **Download** 下载。
 4. 下载完成后，**重启 Home Assistant**：
-    - 设置 → 系统 → 重启
+   - 设置 → 系统 → 重启
 
 > **流程截图：**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+
 ---
+
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+
 ---
+
 > ![HA restart](docs/images/ha-restart.png)
 
 ---
@@ -107,9 +113,13 @@ ecoMain 的配置流程有 **两种入口**：
 
 > **流程截图：**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+
 ---
+
 > ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
 
 ### 方式二：从“添加集成”入口（手动启动）
@@ -118,19 +128,28 @@ ecoMain 的配置流程有 **两种入口**：
 2. 点击 **添加集成（Add Integration）**。
 3. 搜索 **enecess**。
 4. 选择设备类型：
-    - **ecoMain**：继续选择**自动发现（本地）**、**手动设置（本地）**或**账号登录（云端）**。
-    - **ecoPlug**：直接进入云端账号登录。
+   - **ecoMain**：继续选择**自动发现（本地）**、**手动设置（本地）**或**账号登录（云端）**。
+   - **ecoPlug**：直接进入云端账号登录。
 
 > **流程截图：**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+
 ---
+
 > ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+
 ---
+
 > ![Select device type](docs/images/select-device-type.png)
+
 ---
+
 > ![Select add method](docs/images/select-add-method.png)
+
 ---
 
 ## ecoMain 支持的添加方式与详细流程
@@ -138,9 +157,9 @@ ecoMain 的配置流程有 **两种入口**：
 ecoMain 目前支持三种添加方式：
 
 1. **自动发现（本地）**
-    - 入口：
-        - “添加集成” → enecess → ecoMain → 选择：*自动发现（本地）*
-        - 或从设备与服务页面点击 **已发现的 ecoMain 卡片**
+   - 入口：
+     - “添加集成” → enecess → ecoMain → 选择：*自动发现（本地）*
+     - 或从设备与服务页面点击 **已发现的 ecoMain 卡片**
 2. **手动设置（本地）**
 3. **账号登录（云端）**
 
@@ -162,17 +181,17 @@ ecoMain 目前支持三种添加方式：
 通用步骤如下（两种入口后续流程相同）：
 
 1. 启动 ecoMain 配置：
-    - 从 **添加集成 → enecess → ecoMain → 自动发现（本地）**，
-    - 或点击 **已发现** 区域中的 ecoMain 卡片上的 **Add**。
+   - 从 **添加集成 → enecess → ecoMain → 自动发现（本地）**，
+   - 或点击 **已发现** 区域中的 ecoMain 卡片上的 **Add**。
 2. 集成会通过 **mDNS** 在网络中扫描匹配的服务。
 3. 如果找到设备，将显示一个列表，请根据序列号及 IP / 主机名选择你的 ecoMain。
 4. 确认设备信息（序列号和地址）。
 5. 集成会先读取设备的 **固件版本**，若版本过低会中止并提示；版本符合要求后，会通过 **Modbus TCP** 连接并探测 **在线从机（ecoSub）**。
 6. 如果探测到从机，可以勾选需要添加的从机（可选）。
 7. 选择**测量类型**，然后可选配置 **额外实体**：
-    - 基于功率源实体创建取反或绝对值实体。
-    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
-    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+   - 基于功率源实体创建取反或绝对值实体。
+   - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+   - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
 8. 完成后，会生成一个集成条目。
 
 排错提示：
@@ -183,22 +202,29 @@ ecoMain 目前支持三种添加方式：
 
 > **流程截图：**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+
 ---
+
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **截图待补：测量类型（本地）**
->
-> ![截图待补：测量类型（本地）](docs/images/0_default.png)
+> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -218,18 +244,18 @@ ecoMain 目前支持三种添加方式：
 步骤：
 
 1. 在添加集成流程中选择：
-    - 设备类型：**ecoMain**
-    - 添加方式：**手动设置（本地）**
+   - 设备类型：**ecoMain**
+   - 添加方式：**手动设置（本地）**
 2. 按提示输入：
-    - **主机序列号**
-    - **地址（IP 或主机名）**
+   - **主机序列号**
+   - **地址（IP 或主机名）**
 3. 确认设备信息（序列号和 IP）。
 4. 集成会先读取 **固件版本**，若版本过低会停止并提示更新固件；版本符合要求后，会通过 **Modbus TCP** 连接并获取 **在线从机（ecoSub）**。
 5. 如果探测到从机，可勾选需要添加的从机（可选）。
 6. 选择**测量类型**，然后可选配置 **额外实体**：
-    - 基于功率源实体创建取反或绝对值实体。
-    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
-    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+   - 基于功率源实体创建取反或绝对值实体。
+   - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+   - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
 7. 完成后，会生成一个集成条目。
 
 排错提示：
@@ -240,22 +266,29 @@ ecoMain 目前支持三种添加方式：
 
 > **流程截图：**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+
 ---
+
 > ![Manual setup input 2](docs/images/ecomain-manual-input-2.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **截图待补：测量类型（本地）**
->
-> ![截图待补：测量类型（本地）](docs/images/0_default.png)
+> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -274,18 +307,18 @@ ecoMain 目前支持三种添加方式：
 步骤：
 
 1. 在添加集成流程中选择：
-    - 设备类型：**ecoMain**
-    - 添加方式：**账号登录（云端）**
+   - 设备类型：**ecoMain**
+   - 添加方式：**账号登录（云端）**
 2. 输入你的云端账号（即 **enecess App** 的账号）：
-    - **用户名**
-    - **密码**
+   - **用户名**
+   - **密码**
 3. 集成会调用云端接口登录，并列出账号下所有可用的 ecoMain 主机。
 4. 在列表中选择你要添加的 ecoMain 主机。
 5. 如果账号下还存在 ecoSub 从机，集成会继续读取并列出，从中勾选需要添加的从机（可选）。
 6. 选择**测量类型**，然后可选配置 **额外实体**：
-    - 基于功率源实体创建取反或绝对值实体。
-    - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
-    - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
+   - 基于功率源实体创建取反或绝对值实体。
+   - 选择多个同类型功率 / 能耗源实体，创建总和或平均值实体。
+   - 聚合实体会保持源类型的 `device_class`、`state_class` 和原生单位。
 7. 完成后，会生成一个云端模式的集成条目。
 
 说明：
@@ -295,22 +328,29 @@ ecoMain 目前支持三种添加方式：
 
 > **流程截图：**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+
 ---
+
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+
 ---
+
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+
 ---
+
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **截图待补：测量类型（云端）**
->
-> ![截图待补：测量类型（云端）](docs/images/0_default.png)
+> ![Select cloud measurement types](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+
 ---
+
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
@@ -328,29 +368,23 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 5. 完成后，同一云端账号会创建一个 ecoPlug 集成条目，其中包含本次选择的全部插座。
 6. 后续如需更改选择，进入 **设置 → 设备与服务 → enecess → 配置**，增加或移除插座并保存选项。
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+> ![Select ecoPlug device type](docs/images/ecoplug-select-device-type.png)
 
-> **截图待补：ecoPlug 云端登录**
->
-> ![截图待补：ecoPlug 云端登录](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+> ![ecoPlug cloud login](docs/images/ecoplug-cloud-login.png)
 
-> **截图待补：选择 ecoPlug 插座**
->
-> ![截图待补：选择 ecoPlug 插座](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+> ![Select ecoPlug plugs](docs/images/ecoplug-select.png)
 
-> **截图待补：ecoPlug 添加完成**
->
-> ![截图待补：ecoPlug 添加完成](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+> ![ecoPlug setup complete](docs/images/ecoplug-complete.png)
 
-> **截图待补：修改已选的 ecoPlug 插座**
->
-> ![截图待补：修改已选的 ecoPlug 插座](docs/images/0_default.png)
+---
+
+> ![Open ecoPlug options](docs/images/ecoplug-options.png)
 
 每个已选择的 ecoPlug 只创建以下实体：
 
@@ -403,34 +437,22 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 - 之后可在条目的**配置**页面将下一步操作设为**测量类型**，再次调整。
 - 必须至少选择一项；若额外实体正在引用某类测量，需先移除相应额外实体，才能取消该测量类型。
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **截图待补：测量类型（本地）**
->
-> ![截图待补：测量类型（本地）](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **截图待补：测量类型（云端）**
->
-> ![截图待补：测量类型（云端）](docs/images/0_default.png)
-
 本地固件 139 及以上提供以下十二类测量；固件 136–138 仅支持有功功率、正向有功电能和反向有功电能：
 
-| 类别 | 含义 | 默认启用 |
-| --- | --- | --- |
-| 正向有功电能 | 沿 CT 箭头方向累计的有功电能（Wh） | 是 |
-| 反向有功电能 | 逆 CT 箭头方向累计的有功电能（Wh） | 是 |
-| 正向无功电能 | 正向累计无功电能（varh） | 否 |
-| 反向无功电能 | 反向累计无功电能（varh） | 否 |
-| 视在电能 | 视在电能 (VAh) | 否 |
-| 有功功率 | 实时有功功率（W） | 是 |
-| 无功功率 | 无功功率（var） | 否 |
-| 视在功率 | 视在功率（VA） | 否 |
-| 电压 | 电压（V） | 否 |
-| 电流 | 电流（A） | 否 |
-| 功率因数 | 有功功率与视在功率之比，无单位 | 否 |
-| 频率 | 电网频率（Hz），仅 ecoMain 提供 | 否 |
+| 类别     | 含义                    | 默认启用 |
+| ------ | --------------------- | ---- |
+| 正向有功电能 | 沿 CT 箭头方向累计的有功电能（Wh）  | 是    |
+| 反向有功电能 | 逆 CT 箭头方向累计的有功电能（Wh）  | 是    |
+| 正向无功电能 | 正向累计无功电能（varh）        | 否    |
+| 反向无功电能 | 反向累计无功电能（varh）        | 否    |
+| 视在电能   | 视在电能 (VAh)            | 否    |
+| 有功功率   | 实时有功功率（W）             | 是    |
+| 无功功率   | 无功功率（var）             | 否    |
+| 视在功率   | 视在功率（VA）              | 否    |
+| 电压     | 电压（V）                 | 否    |
+| 电流     | 电流（A）                 | 否    |
+| 功率因数   | 有功功率与视在功率之比，无单位       | 否    |
+| 频率     | 电网频率（Hz），仅 ecoMain 提供 | 否    |
 
 具体可用测量取决于设备寄存器，并非所有类别都具有三相总值或每通道值；ecoSub 提供通道测量。云端仅提供**有功功率**和**电能**，默认均启用；电能选项同时控制累计电能与每分钟原始增量。ecoPlug 仍使用固定的开关、功率、电能实体。
 
@@ -445,39 +467,29 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 
 仅提供固件支持且已启用的测量；空分组隐藏，选择公式来源不会自动启用测量。累计有功电能（Wh）、累计无功电能（varh）、累计视在电能（VAh）与云端每分钟有功电能增量（Wh）是不同来源分组。允许跨类型组合来源，请自行确认公式的单位正确。各组共用 `a`、`b` 等变量。每次从来源页继续，包括编辑或返回后继续，都会从 `a` 开始重新生成绑定关系，并清空原表达式。有功电能、无功电能和视在电能结果使用允许增减的累计量统计类型 `TOTAL`，支持净电能计算。**数值**类型生成纯数值结果，无单位、无设备类别（`device_class`），统计类型为 `MEASUREMENT`。
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+> ![Add formula entity](docs/images/ecomain-formula-add.png)
 
-> **截图待补：公式名称、结果类型和来源**
->
-> ![截图待补：公式名称、结果类型和来源](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+> ![Set formula name and result type](docs/images/ecomain-formula-setup.png)
 
-> **截图待补：填写公式**
->
-> ![截图待补：填写公式](docs/images/0_default.png)
+---
 
-| 公式 | 两路功率的计算结果 |
-| --- | --- |
+> ![Select formula source entities](docs/images/ecomain-formula-sources.png)
+
+---
+
+> ![Enter formula expression](docs/images/ecomain-formula-expression.png)
+
+| 公式           | 两路功率的计算结果       |
+| ------------ | --------------- |
 | `max(a-b,0)` | a 减 b，小于 0 时取 0 |
-| `(a+b)/2` | a 和 b 的平均功率 |
+| `(a+b)/2`    | a 和 b 的平均功率     |
 
 - 支持 `+`、`-`、`*`、`/`、括号及 `abs`、`min`、`max`、`round`。
 - 用**编辑公式实体**修改名称、来源或公式；更换结果类型或单位需新建实体。
 - 用**移除额外实体**删除公式。取消某类测量前，先删除使用它的公式。
 - 数据缺失或无法计算时，结果显示为不可用。
-
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **截图待补：选择要编辑的公式**
->
-> ![截图待补：选择要编辑的公式](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **截图待补：选择要移除的额外实体**
->
-> ![截图待补：选择要移除的额外实体](docs/images/0_default.png)
 
 ### 通道相位（仅本地）
 
@@ -487,19 +499,17 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 - 写入或校验失败会标记相应字段；已成功的修改不会自动回滚，重试前请核对页面值。
 - 该页面会修改设备上的相位配置，云端模式不提供此功能。
 
-现有截图来自较早版本，可能尚未展示测量类型或通道相位页面，产品名称大小写也可能与当前版本不同。
+截图中的界面可能随 Home Assistant 或集成版本有所变化。
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+> ![Open channel phase settings](docs/images/ecomain-phase-options.png)
 
-> **截图待补：选择要设置相位的设备**
->
-> ![截图待补：选择要设置相位的设备](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+> ![Select device for phase settings](docs/images/ecomain-phase-device.png)
 
-> **截图待补：设置各通道相位**
->
-> ![截图待补：设置各通道相位](docs/images/0_default.png)
+---
+
+> ![Set channel phases](docs/images/ecomain-channel-phases.png)
 
 ## 设备命名规则
 
@@ -525,12 +535,12 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 
 普通 ecoMain 测量键由 `<测点>_<后缀>` 组成：
 
-| 测点 | 键前缀 | 范围 |
-| --- | --- | --- |
-| 主机分相 | `main_l1`、`main_l2`、`main_l3` | 仅本地 |
-| 主机三相合计 | `main_all` | 本地部分测量及云端 |
-| 主机支路 | `main_ch1` … `main_ch10` | 本地及云端 |
-| 已选择的从机支路 | `sub1_ch1` … `sub3_ch10` | 每台 ecoSub 十路，仅创建所选从机 |
+| 测点       | 键前缀                           | 范围                   |
+| -------- | ----------------------------- | -------------------- |
+| 主机分相     | `main_l1`、`main_l2`、`main_l3` | 仅本地                  |
+| 主机三相合计   | `main_all`                    | 本地部分测量及云端            |
+| 主机支路     | `main_ch1` … `main_ch10`      | 本地及云端                |
+| 已选择的从机支路 | `sub1_ch1` … `sub3_ch10`      | 每台 ecoSub 十路，仅创建所选从机 |
 
 从机没有独立的 L1/L2/L3、三相合计或频率实体。下表的“支路”包含主机十路和每台已选择从机的十路。
 
@@ -538,20 +548,20 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 
 固件 **136–138** 仅支持前三类；固件 **139 及以上**支持全部十二类。默认只选择前三类，其余需在**测量类型**中启用。这里的默认值指测量选项；未选择的测量不会创建传感器。
 
-| 测量名称 | 键后缀 / 完整键 | 原生单位 | 主机分相 | 主机合计 | 支路 | 默认选择 |
-| --- | --- | --- | --- | --- | --- | --- |
-| 有功功率 | `power_rt` | W | ✓ | ✓ | ✓ | 是 |
-| 正向有功电能 | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | 是 |
-| 反向有功电能 | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | 是 |
-| 正向无功电能 | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | 否 |
-| 反向无功电能 | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | 否 |
-| 视在电能 | `apparent_energy_total` | VAh | ✓ | ✓ | ✓ | 否 |
-| 视在功率 | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | 否 |
-| 无功功率 | `reactive_power_rt` | var | ✓ | ✓ | ✓ | 否 |
-| 电压 | `voltage_rt` | V | ✓ | — | ✓ | 否 |
-| 电流 | `current_rt` | A | ✓ | — | ✓ | 否 |
-| 功率因数 | `power_factor_rt` | 无单位 | ✓ | — | ✓ | 否 |
-| 频率 | `main_frequency_rt`（完整键） | Hz | — | — | — | 否，仅主机一个 |
+| 测量名称   | 键后缀 / 完整键                   | 原生单位 | 主机分相 | 主机合计 | 支路  | 默认选择    |
+| ------ | --------------------------- | ---- | ---- | ---- | --- | ------- |
+| 有功功率   | `power_rt`                  | W    | ✓    | ✓    | ✓   | 是       |
+| 正向有功电能 | `energy_fwd_total`          | Wh   | ✓    | ✓    | ✓   | 是       |
+| 反向有功电能 | `energy_rev_total`          | Wh   | ✓    | ✓    | ✓   | 是       |
+| 正向无功电能 | `reactive_energy_fwd_total` | varh | ✓    | ✓    | ✓   | 否       |
+| 反向无功电能 | `reactive_energy_rev_total` | varh | ✓    | ✓    | ✓   | 否       |
+| 视在电能   | `apparent_energy_total`     | VAh  | ✓    | ✓    | ✓   | 否       |
+| 视在功率   | `apparent_power_rt`         | VA   | ✓    | ✓    | ✓   | 否       |
+| 无功功率   | `reactive_power_rt`         | var  | ✓    | ✓    | ✓   | 否       |
+| 电压     | `voltage_rt`                | V    | ✓    | —    | ✓   | 否       |
+| 电流     | `current_rt`                | A    | ✓    | —    | ✓   | 否       |
+| 功率因数   | `power_factor_rt`           | 无单位  | ✓    | —    | ✓   | 否       |
+| 频率     | `main_frequency_rt`（完整键）    | Hz   | —    | —    | —   | 否，仅主机一个 |
 
 功率、电压、电流、功率因数和频率使用 `MEASUREMENT` 统计类型；五类累计电能使用 `TOTAL_INCREASING`。单位为传感器原生单位，HA 可按用户设置转换显示。
 
@@ -567,11 +577,11 @@ CT 箭头标识正方向。`energy_fwd_total` 累计沿箭头方向的有功电�
 
 云端仅有**有功功率**和**电能**两个测量选项，默认均选择。每个选项适用于 `main_all`、`main_ch1` … `main_ch10` 和所选 `subN_ch1` … `subN_ch10`。云端没有分相测量，也不提供本地新增的九类测量。
 
-| 测量选项 | 数据项 | 键后缀 | 原生单位 | HA 统计类型 |
-| --- | --- | --- | --- | --- |
-| 有功功率 | 1 分钟平均有功功率 | `power_avg_1m` | W | `MEASUREMENT` |
-| 电能 | 云端原始 1 分钟有功电能增量 | `energy_total_1m` | Wh | 无 |
-| 电能 | HA 侧累加的有功电能估算值 | `energy_accumulated` | Wh | `TOTAL_INCREASING` |
+| 测量选项 | 数据项             | 键后缀                  | 原生单位 | HA 统计类型            |
+| ---- | --------------- | -------------------- | ---- | ------------------ |
+| 有功功率 | 1 分钟平均有功功率      | `power_avg_1m`       | W    | `MEASUREMENT`      |
+| 电能   | 云端原始 1 分钟有功电能增量 | `energy_total_1m`    | Wh   | 无                  |
+| 电能   | HA 侧累加的有功电能估算值  | `energy_accumulated` | Wh   | `TOTAL_INCREASING` |
 
 例如主机合计为 `main_all_power_avg_1m`、`main_all_energy_total_1m`、`main_all_energy_accumulated`；支路可替换前缀为 `main_ch1` 或 `sub1_ch1`。选择 `s` 台从机并保留两个默认选项时，共创建 `33 + 30 × s` 个传感器，不含额外实体。
 
@@ -583,11 +593,11 @@ CT 箭头标识正方向。`energy_fwd_total` 累计沿箭头方向的有功电�
 
 每个已选择的 ecoPlug 固定创建以下三个云端实体，不提供测量类型或额外实体配置：
 
-| 实体 | 默认名称部分 / 键 | 原生单位 | HA 统计类型 |
-| --- | --- | --- | --- |
-| 插座开关 | 使用插座设备名称，无额外名称后缀 | — | — |
-| 有功功率 | `power_rt` | W | `MEASUREMENT` |
-| 累计有功电能 | `energy_total` | kWh | `TOTAL_INCREASING` |
+| 实体     | 默认名称部分 / 键       | 原生单位 | HA 统计类型            |
+| ------ | ---------------- | ---- | ------------------ |
+| 插座开关   | 使用插座设备名称，无额外名称后缀 | —    | —                  |
+| 有功功率   | `power_rt`       | W    | `MEASUREMENT`      |
+| 累计有功电能 | `energy_total`   | kWh  | `TOTAL_INCREASING` |
 
 ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 秒从云端轮询；其电能原生单位是 kWh，ecoMain 为 Wh。
 
@@ -595,12 +605,12 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 
 额外实体需要手动配置，可用于本地或云端 ecoMain：
 
-| 操作 | 来源与结果 |
-| --- | --- |
-| 取反 | 单个有功功率来源，结果为 `-a` |
-| 绝对值 | 单个有功功率来源，结果为 `abs(a)` |
-| 总和 | 多个同类型有功功率或累计有功电能来源，结果为总和 |
-| 平均值 | 多个同类型有功功率或累计有功电能来源，结果为平均值 |
+| 操作    | 来源与结果                        |
+| ----- | ---------------------------- |
+| 取反    | 单个有功功率来源，结果为 `-a`            |
+| 绝对值   | 单个有功功率来源，结果为 `abs(a)`        |
+| 总和    | 多个同类型有功功率或累计有功电能来源，结果为总和     |
+| 平均值   | 多个同类型有功功率或累计有功电能来源，结果为平均值    |
 | 自定义公式 | 已启用且受支持的测量来源；允许跨类型组合，需自行确认单位 |
 
 前四类保留源测量的设备类别、统计类型和原生单位。公式提供有功功率、有功电能、无功电能、视在电能、视在功率、无功功率、电压、电流、功率因数、频率、数值十一种结果类型；有功/无功/视在电能结果使用 `TOTAL`，其余使用 `MEASUREMENT`。配置与表达式规则见上文“自定义公式实体”。
@@ -637,10 +647,10 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 **排查建议：**
 
 - 对于 **本地模式**：
-    - 确认 ecoMain 已上电并接入局域网。
-    - 尝试使用 **手动设置（本地）**，直接填写已知 IP。
+  - 确认 ecoMain 已上电并接入局域网。
+  - 尝试使用 **手动设置（本地）**，直接填写已知 IP。
 - 对于 **云端模式**：
-    - 登录 enecess App 或 Web 云平台，确认 ecoMain 已经绑定在当前 **enecess App 账号** 下。
+  - 登录 enecess App 或 Web 云平台，确认 ecoMain 已经绑定在当前 **enecess App 账号** 下。
 
 ---
 
@@ -749,10 +759,10 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 
 1. **配置支持的从机列表**：只支持配置中声明的从机编号（当前为 `1`、`2`、`3`）。
 2. **本地模式下的在线从机**：
-    - 通过寄存器读取“从机在线状态”。
-    - 仅对状态为在线的从机提供选择。
+   - 通过寄存器读取“从机在线状态”。
+   - 仅对状态为在线的从机提供选择。
 3. **用户选择的从机**：
-    - 只为你在流程中勾选的从机创建实体。
+   - 只为你在流程中勾选的从机创建实体。
 
 最终你能看到的实体是：
 
@@ -772,12 +782,12 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 可能原因包括：
 
 - **CT 方向反了：**
-    - 如果 CT 箭头安装方向与实际电流方向相反，那么“正向”测点可能始终接近 0，而“反向”测点会不断累加。
-    - 请检查互感器安装方向，使箭头与实际电流方向一致。
+  - 如果 CT 箭头安装方向与实际电流方向相反，那么“正向”测点可能始终接近 0，而“反向”测点会不断累加。
+  - 请检查互感器安装方向，使箭头与实际电流方向一致。
 - **没有负载：**
-    - 如果支路上没有接入负载，或当前负载处于关闭状态，则功率和能量的变化都接近于 0。
+  - 如果支路上没有接入负载，或当前负载处于关闭状态，则功率和能量的变化都接近于 0。
 - **云端与本地模式的差异：**
-    - 云端模式返回的是 `avg_1m`（平均值）和 `total_1m`（每分钟累计），数值变化节奏会比本地实时值慢很多。
+  - 云端模式返回的是 `avg_1m`（平均值）和 `total_1m`（每分钟累计），数值变化节奏会比本地实时值慢很多。
 
 记住：
 
@@ -791,15 +801,15 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 这是 **设计如此**：
 
 - **本地模式（Modbus）**：
-    - 暴露 L1、L2、L3 各相功率 / 电能；
-    - 部分测量提供三相合计；电压、电流和功率因数没有合计实体。
+  - 暴露 L1、L2、L3 各相功率 / 电能；
+  - 部分测量提供三相合计；电压、电流和功率因数没有合计实体。
 - **云端模式**：
-    - 暴露合计（L1+L2+L3）；
-    - 暴露各支路通道（ch1–ch10）的数据；
-    - 均为处理后的统计值：
-        - `*_power_avg_1m`：一分钟平均有功功率；
-        - `*_energy_total_1m`：一分钟有功电能增量；
-        - `*_energy_accumulated`：HA 侧累加的有功电能估算值。
+  - 暴露合计（L1+L2+L3）；
+  - 暴露各支路通道（ch1–ch10）的数据；
+  - 均为处理后的统计值：
+    - `*_power_avg_1m`：一分钟平均有功功率；
+    - `*_energy_total_1m`：一分钟有功电能增量；
+    - `*_energy_accumulated`：HA 侧累加的有功电能估算值。
 
 当前云端接口映射中，并未提供按相（L1/L2/L3）的分相数据。
 
@@ -808,11 +818,11 @@ ecoPlug 与 ecoMain 本地虽都使用 `power_rt`，ecoPlug 数据仍约每 60 �
 ### Q13：数据多久更新一次？
 
 - **本地模式**：
-    - 集成会以大约 **5 秒** 的间隔轮询 Modbus 寄存器。
-    - 带 `_rt` 后缀的实体会近似实时更新。
+  - 集成会以大约 **5 秒** 的间隔轮询 Modbus 寄存器。
+  - 带 `_rt` 后缀的实体会近似实时更新。
 - **云端模式**：
-    - 集成会以大约 **60 秒** 的间隔轮询云端数据。
-    - `avg_1m` 和 `total_1m` 是按分钟统计的数据，变化频率相对较慢。
+  - 集成会以大约 **60 秒** 的间隔轮询云端数据。
+  - `avg_1m` 和 `total_1m` 是按分钟统计的数据，变化频率相对较慢。
 
 > 实际间隔在后续版本中可能会根据需求进行调整。
 

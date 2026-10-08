@@ -64,7 +64,9 @@ Kliknij poniższy przycisk, aby dodać to repozytorium do HACS jako niestandardo
 
 > **Zrzut ekranu procesu:**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
+
 ---
+
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
 
 ### 3) Pobierz / zainstaluj integrację z HACS
@@ -77,9 +79,13 @@ Kliknij poniższy przycisk, aby dodać to repozytorium do HACS jako niestandardo
 
 > **Zrzut ekranu procesu:**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+
 ---
+
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+
 ---
+
 > ![HA restart](docs/images/ha-restart.png)
 
 ---
@@ -107,9 +113,13 @@ Gdy ecoMain jest włączony i znajduje się w tej samej sieci co Home Assistant:
 
 > **Zrzut ekranu procesu:**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+
 ---
+
 > ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
 
 ### Sposób 2: Z „Add Integration” (uruchomienie ręczne)
@@ -125,14 +135,23 @@ Gdy ecoMain jest włączony i znajduje się w tej samej sieci co Home Assistant:
 
 > **Zrzut ekranu procesu:**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+
 ---
+
 > ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+
 ---
+
 > ![Select device type](docs/images/select-device-type.png)
+
 ---
+
 > ![Select add method](docs/images/select-add-method.png)
+
 ---
 
 ## Metody dodawania ecoMain i przebieg konfiguracji
@@ -183,22 +202,29 @@ Wskazówki diagnostyczne:
 
 > **Zrzut ekranu procesu:**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+
 ---
+
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
->
-> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
+> ![Wybierz lokalne rodzaje pomiarów](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -240,22 +266,29 @@ Wskazówki diagnostyczne:
 
 > **Zrzut ekranu procesu:**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+
 ---
+
 > ![Manual setup input 1](docs/images/ecomain-manual-input-2.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
->
-> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
+> ![Wybierz lokalne rodzaje pomiarów](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -293,22 +326,29 @@ Uwagi:
 
 > **Zrzut ekranu procesu:**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+
 ---
+
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+
 ---
+
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+
 ---
+
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)**
->
-> ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
+> ![Wybierz rodzaje pomiarów w chmurze](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+
 ---
+
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
@@ -326,29 +366,23 @@ Kroki:
 5. Zakończ konfigurację, aby utworzyć jeden wpis integracji ecoPlug dla tego konta i wszystkich wybranych gniazdek.
 6. Aby później zmienić wybór, otwórz **Ustawienia → Urządzenia i usługi → enecess → Konfiguruj**, dodaj lub usuń gniazdka i zapisz opcje.
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+> ![Wybierz typ urządzenia ecoPlug](docs/images/ecoplug-select-device-type.png)
 
-> **Zrzut ekranu do dodania: Logowanie do chmury ecoPlug**
->
-> ![Zrzut ekranu do dodania: Logowanie do chmury ecoPlug](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+> ![Zaloguj się do chmury ecoPlug](docs/images/ecoplug-cloud-login.png)
 
-> **Zrzut ekranu do dodania: Wybór gniazdek ecoPlug**
->
-> ![Zrzut ekranu do dodania: Wybór gniazdek ecoPlug](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+> ![Wybierz gniazdka ecoPlug](docs/images/ecoplug-select.png)
 
-> **Zrzut ekranu do dodania: Dodawanie ecoPlug zakończone**
->
-> ![Zrzut ekranu do dodania: Dodawanie ecoPlug zakończone](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+> ![Zakończ konfigurację ecoPlug](docs/images/ecoplug-complete.png)
 
-> **Zrzut ekranu do dodania: Zmiana wybranych gniazdek ecoPlug**
->
-> ![Zrzut ekranu do dodania: Zmiana wybranych gniazdek ecoPlug](docs/images/0_default.png)
+---
+
+> ![Otwórz opcje ecoPlug](docs/images/ecoplug-options.png)
 
 Każdy wybrany ecoPlug tworzy dokładnie następujące encje:
 
@@ -403,18 +437,6 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 - Wymagany jest co najmniej jeden rodzaj.
 - Przed odznaczeniem pomiaru usuń dodatkowe encje, które z niego korzystają.
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)**
->
-> ![Zrzut ekranu do dodania: Rodzaje pomiarów (lokalnie)](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)**
->
-> ![Zrzut ekranu do dodania: Rodzaje pomiarów (chmura)](docs/images/0_default.png)
-
 Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsługują tylko moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym:
 
 | Kategoria | Znaczenie | Domyślnie |
@@ -445,17 +467,19 @@ Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch warto
 
 Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia. Puste grupy są ukryte; wybór źródeł nie włącza pomiarów automatycznie. Skumulowana energia czynna (Wh), skumulowana energia bierna (varh), skumulowana energia pozorna (VAh) i minutowe przyrosty energii czynnej z chmury (Wh) tworzą osobne grupy. Możesz łączyć różne typy źródeł i musisz samodzielnie sprawdzić jednostki we wzorze. Zmienne `a`, `b` itd. są wspólne dla grup. Za każdym przejściem dalej ze strony źródeł, także podczas edycji lub po cofnięciu, są przypisywane ponownie od `a`, a poprzedni wzór jest usuwany. Wyniki energii czynnej, biernej i pozornej używają `TOTAL`, dopuszczając wzrosty i spadki dla energii netto. **Liczba** daje wynik czysto liczbowy bez jednostki ani klasy urządzenia (`device_class`), z `MEASUREMENT`.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+> ![Dodaj encję formuły](docs/images/ecomain-formula-add.png)
 
-> **Zrzut ekranu do dodania: Nazwa formuły, typ wyniku i źródła**
->
-> ![Zrzut ekranu do dodania: Nazwa formuły, typ wyniku i źródła](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+> ![Ustaw nazwę formuły i typ wyniku](docs/images/ecomain-formula-setup.png)
 
-> **Zrzut ekranu do dodania: Wpisanie wzoru**
->
-> ![Zrzut ekranu do dodania: Wpisanie wzoru](docs/images/0_default.png)
+---
+
+> ![Wybierz encje źródłowe formuły](docs/images/ecomain-formula-sources.png)
+
+---
+
+> ![Wpisz wzór](docs/images/ecomain-formula-expression.png)
 
 | Wzór | Wynik dla dwóch wartości mocy |
 | --- | --- |
@@ -467,18 +491,6 @@ Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządz
 - Usuń wzór przez **Usuń dodatkową encję**. Przed odznaczeniem pomiaru usuń wzory, które go używają.
 - Brak danych lub niemożliwe obliczenie oznacza niedostępny wynik.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **Zrzut ekranu do dodania: Wybór formuły do edycji**
->
-> ![Zrzut ekranu do dodania: Wybór formuły do edycji](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **Zrzut ekranu do dodania: Wybór dodatkowej encji do usunięcia**
->
-> ![Zrzut ekranu do dodania: Wybór dodatkowej encji do usunięcia](docs/images/0_default.png)
-
 ### Fazy kanałów (tylko lokalnie)
 
 - Dla lokalnego wpisu ecoMain otwórz **Konfiguruj**, wybierz akcję **Fazy kanałów**, a następnie ecoMain lub skonfigurowany ecoSub online.
@@ -488,19 +500,17 @@ Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządz
 - Sprawdź wyświetlane wartości przed ponowieniem próby.
 - Strona zmienia konfigurację urządzenia i nie jest dostępna w trybie chmurowym.
 
-Istniejące zrzuty ekranu przedstawiają starsze wersje i mogą nie zawierać nowych stron ani aktualnej pisowni nazw produktów.
+Interfejs widoczny na zrzutach ekranu może się różnić w zależności od wersji Home Assistant lub integracji.
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+> ![Otwórz ustawienia faz kanałów](docs/images/ecomain-phase-options.png)
 
-> **Zrzut ekranu do dodania: Wybór urządzenia do ustawienia faz**
->
-> ![Zrzut ekranu do dodania: Wybór urządzenia do ustawienia faz](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+> ![Wybierz urządzenie do ustawienia faz](docs/images/ecomain-phase-device.png)
 
-> **Zrzut ekranu do dodania: Ustawienie faz kanałów**
->
-> ![Zrzut ekranu do dodania: Ustawienie faz kanałów](docs/images/0_default.png)
+---
+
+> ![Ustaw fazy kanałów](docs/images/ecomain-channel-phases.png)
 
 ## Nazewnictwo urządzeń
 

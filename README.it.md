@@ -114,12 +114,13 @@ Se il rilevamento non trova ecoMain, verifica la configurazione multicast del ro
 >
 > ![Selezionare gli ecoSub online](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Schermata da aggiungere: Tipi di misurazione (locale)**
+> **Selezionare i tipi di misurazione locali**
 >
-> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
+> ![Selezionare i tipi di misurazione locali](docs/images/ecomain-measurement-types-local.png)
 
+---
 
 > **Scegliere le entità aggiuntive**
 >
@@ -155,12 +156,13 @@ La porta Modbus TCP è **502** e non è modificabile nell’interfaccia. Home As
 >
 > ![Selezionare gli ecoSub online](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Schermata da aggiungere: Tipi di misurazione (locale)**
+> **Selezionare i tipi di misurazione locali**
 >
-> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
+> ![Selezionare i tipi di misurazione locali](docs/images/ecomain-measurement-types-local.png)
 
+---
 
 > **Scegliere le entità aggiuntive**
 >
@@ -197,12 +199,13 @@ Il cloud restituisce valori elaborati in base alla configurazione remota. L’ag
 >
 > ![Selezionare gli ecoSub](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **Schermata da aggiungere: Tipi di misurazione (cloud)**
+> **Selezionare i tipi di misurazione cloud**
 >
-> ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
+> ![Selezionare i tipi di misurazione cloud](docs/images/ecomain-measurement-types-cloud.png)
 
+---
 
 > **Scegliere le entità aggiuntive**
 >
@@ -220,29 +223,33 @@ Il cloud restituisce valori elaborati in base alla configurazione remota. L’ag
 4. Termina per creare una voce dell’integrazione per quell’account e tutte le prese selezionate.
 5. Per aggiungere o rimuovere prese in seguito, apri **Configura** sulla voce dell’integrazione.
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
-
-> **Schermata da aggiungere: Accesso cloud ecoPlug**
+> **Selezionare il tipo di dispositivo ecoPlug**
 >
-> ![Schermata da aggiungere: Accesso cloud ecoPlug](docs/images/0_default.png)
+> ![Selezionare il tipo di dispositivo ecoPlug](docs/images/ecoplug-select-device-type.png)
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+---
 
-> **Schermata da aggiungere: Selezionare le prese ecoPlug**
+> **Accedere al cloud per ecoPlug**
 >
-> ![Schermata da aggiungere: Selezionare le prese ecoPlug](docs/images/0_default.png)
+> ![Accedere al cloud per ecoPlug](docs/images/ecoplug-cloud-login.png)
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+---
 
-> **Schermata da aggiungere: Aggiunta ecoPlug completata**
+> **Selezionare le prese ecoPlug**
 >
-> ![Schermata da aggiungere: Aggiunta ecoPlug completata](docs/images/0_default.png)
+> ![Selezionare le prese ecoPlug](docs/images/ecoplug-select.png)
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+---
 
-> **Schermata da aggiungere: Modificare le prese ecoPlug selezionate**
+> **Completare la configurazione di ecoPlug**
 >
-> ![Schermata da aggiungere: Modificare le prese ecoPlug selezionate](docs/images/0_default.png)
+> ![Completare la configurazione di ecoPlug](docs/images/ecoplug-complete.png)
+
+---
+
+> **Aprire le opzioni di ecoPlug**
+>
+> ![Aprire le opzioni di ecoPlug](docs/images/ecoplug-options.png)
 
 Ogni presa crea esattamente tre entità:
 
@@ -284,18 +291,6 @@ Tipo di dispositivo, metodo di connessione e dispositivo principale ecoMain non 
 - Per modificarla in seguito, apri **Configura** sulla voce dell’integrazione e scegli **Tipi di misurazione** come azione successiva.
 - Devi mantenere almeno un tipo selezionato.
 - Prima di deselezionare un tipo utilizzato da un’entità aggiuntiva, rimuovi l’entità che lo utilizza.
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **Schermata da aggiungere: Tipi di misurazione (locale)**
->
-> ![Schermata da aggiungere: Tipi di misurazione (locale)](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **Schermata da aggiungere: Tipi di misurazione (cloud)**
->
-> ![Schermata da aggiungere: Tipi di misurazione (cloud)](docs/images/0_default.png)
 
 Con il firmware 139 o successivo sono disponibili le seguenti dodici categorie locali; con il firmware 136–138 sono disponibili soltanto la potenza attiva e le energie attive diretta e inversa:
 
@@ -343,17 +338,27 @@ Crea un sensore dalle misurazioni, ad esempio la differenza o la media di due va
 
 Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I gruppi vuoti sono nascosti; la scelta delle sorgenti non abilita automaticamente le misurazioni. Energia attiva cumulativa (Wh), energia reattiva cumulativa (varh), energia apparente cumulativa (VAh) e incrementi al minuto di energia attiva dal cloud (Wh) formano gruppi distinti. Puoi combinare tipi di sorgenti diversi e devi verificare personalmente le unità della formula. Le variabili `a`, `b`, ecc. sono condivise tra i gruppi. Ogni volta che prosegui dalla pagina delle sorgenti, anche durante la modifica o dopo essere tornati indietro, vengono riassegnate da `a` e l’espressione precedente viene cancellata. I risultati di energia attiva, reattiva e apparente usano `TOTAL`, consentendo aumenti e diminuzioni per l’energia netta. **Numero** produce un valore puramente numerico senza unità né classe del dispositivo (`device_class`), con `MEASUREMENT`.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
-
-> **Schermata da aggiungere: Nome, tipo di risultato e sorgenti della formula**
+> **Aggiungere un’entità formula**
 >
-> ![Schermata da aggiungere: Nome, tipo di risultato e sorgenti della formula](docs/images/0_default.png)
+> ![Aggiungere un’entità formula](docs/images/ecomain-formula-add.png)
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+---
 
-> **Schermata da aggiungere: Inserire la formula**
+> **Impostare nome e tipo di risultato della formula**
 >
-> ![Schermata da aggiungere: Inserire la formula](docs/images/0_default.png)
+> ![Impostare nome e tipo di risultato della formula](docs/images/ecomain-formula-setup.png)
+
+---
+
+> **Selezionare le sorgenti della formula**
+>
+> ![Selezionare le sorgenti della formula](docs/images/ecomain-formula-sources.png)
+
+---
+
+> **Inserire la formula**
+>
+> ![Inserire la formula](docs/images/ecomain-formula-expression.png)
 
 | Formula | Risultato per due valori di potenza |
 | --- | --- |
@@ -365,18 +370,6 @@ Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I grup
 - Elimina una formula con **Rimuovi entità aggiuntiva**. Prima di deselezionare una misurazione, elimina le formule che la usano.
 - Se mancano dati o il calcolo non è possibile, il risultato non è disponibile.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **Schermata da aggiungere: Scegliere una formula da modificare**
->
-> ![Schermata da aggiungere: Scegliere una formula da modificare](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **Schermata da aggiungere: Scegliere un’entità aggiuntiva da rimuovere**
->
-> ![Schermata da aggiungere: Scegliere un’entità aggiuntiva da rimuovere](docs/images/0_default.png)
-
 ### Fasi dei canali in modalità locale
 
 - Apri **Impostazioni → Dispositivi e servizi → enecess → Configura**, scegli **Fasi dei canali** e seleziona ecoMain oppure un ecoSub configurato e online.
@@ -387,19 +380,23 @@ Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I grup
 - Gli errori di scrittura o verifica vengono indicati sui canali interessati; un errore non annulla automaticamente le modifiche già riuscite.
 - Controlla i valori visualizzati prima di riprovare.
 
-Questa funzione modifica la configurazione sul dispositivo e richiede la connessione locale. Non è disponibile per ecoMain cloud o ecoPlug. Le immagini nelle altre versioni del README possono mostrare etichette e pagine di versioni precedenti.
+Questa funzione modifica la configurazione sul dispositivo e richiede la connessione locale. Non è disponibile per ecoMain cloud o ecoPlug. L’interfaccia mostrata nelle schermate può variare in base alla versione di Home Assistant o dell’integrazione.
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
-
-> **Schermata da aggiungere: Scegliere il dispositivo per le fasi**
+> **Aprire le opzioni delle fasi dei canali**
 >
-> ![Schermata da aggiungere: Scegliere il dispositivo per le fasi](docs/images/0_default.png)
+> ![Aprire le opzioni delle fasi dei canali](docs/images/ecomain-phase-options.png)
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+---
 
-> **Schermata da aggiungere: Impostare le fasi dei canali**
+> **Selezionare il dispositivo per le fasi**
 >
-> ![Schermata da aggiungere: Impostare le fasi dei canali](docs/images/0_default.png)
+> ![Selezionare il dispositivo per le fasi](docs/images/ecomain-phase-device.png)
+
+---
+
+> **Impostare le fasi dei canali**
+>
+> ![Impostare le fasi dei canali](docs/images/ecomain-channel-phases.png)
 
 ## Nomi delle entità e letture
 

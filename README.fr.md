@@ -192,13 +192,12 @@ Conseils en cas de problème :
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Capture à ajouter: Types de mesures (local)**
->
-> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
+> ![Choisir les types de mesures locales](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
@@ -249,13 +248,12 @@ Conseils en cas de problème :
 ---
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Capture à ajouter: Types de mesures (local)**
->
-> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
+> ![Choisir les types de mesures locales](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 ---
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
@@ -303,13 +301,12 @@ Remarques :
 ---
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **Capture à ajouter: Types de mesures (cloud)**
->
-> ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
+> ![Choisir les types de mesures cloud](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 ---
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
@@ -329,29 +326,23 @@ ecoPlug est pris en charge **uniquement via le cloud enecess**. L’intégration
 5. Terminez la configuration pour créer une entrée d’intégration ecoPlug pour ce compte et toutes les prises sélectionnées.
 6. Pour modifier la sélection ultérieurement, ouvrez **Paramètres → Appareils et services → enecess → Configurer**, ajoutez ou retirez des prises, puis enregistrez les options.
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+> ![Choisir le type d’appareil ecoPlug](docs/images/ecoplug-select-device-type.png)
 
-> **Capture à ajouter: Connexion cloud ecoPlug**
->
-> ![Capture à ajouter: Connexion cloud ecoPlug](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+> ![Se connecter au cloud pour ecoPlug](docs/images/ecoplug-cloud-login.png)
 
-> **Capture à ajouter: Choisir les prises ecoPlug**
->
-> ![Capture à ajouter: Choisir les prises ecoPlug](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+> ![Choisir les prises ecoPlug](docs/images/ecoplug-select.png)
 
-> **Capture à ajouter: Ajout ecoPlug terminé**
->
-> ![Capture à ajouter: Ajout ecoPlug terminé](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+> ![Terminer la configuration ecoPlug](docs/images/ecoplug-complete.png)
 
-> **Capture à ajouter: Modifier les prises ecoPlug sélectionnées**
->
-> ![Capture à ajouter: Modifier les prises ecoPlug sélectionnées](docs/images/0_default.png)
+---
+
+> ![Ouvrir les options ecoPlug](docs/images/ecoplug-options.png)
 
 Chaque ecoPlug sélectionné crée exactement les entités suivantes :
 
@@ -399,26 +390,12 @@ Si vous devez modifier un réglage non modifiable :
 3. Supprimez l’entrée d’intégration.
 4. Ajoutez-la à nouveau avec les bons paramètres.
 
-> Une gestion d’options est prévue pour une version ultérieure.
-
 ### Types de mesures
 
 - Pendant l’ajout d’ecoMain, sélectionnez les **Types de mesures** après les appareils ecoSub et avant les entités supplémentaires.
 - Pour les modifier ensuite, ouvrez **Configurer → Types de mesures**.
 - Au moins un type est requis.
 - Supprimez les entités supplémentaires qui utilisent une mesure avant de la désélectionner.
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **Capture à ajouter: Types de mesures (local)**
->
-> ![Capture à ajouter: Types de mesures (local)](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **Capture à ajouter: Types de mesures (cloud)**
->
-> ![Capture à ajouter: Types de mesures (cloud)](docs/images/0_default.png)
 
 Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; le firmware 136–138 prend en charge uniquement la puissance active et les énergies actives directe et inverse :
 
@@ -450,17 +427,19 @@ Créez un capteur à partir de vos mesures, par exemple la différence ou la moy
 
 Seules les mesures activées et prises en charge par le micrologiciel sont proposées. Les groupes vides sont masqués ; le choix des sources n’active aucune mesure automatiquement. L’énergie active cumulée (Wh), l’énergie réactive cumulée (varh), l’énergie apparente cumulée (VAh) et les incréments d’énergie active par minute du cloud (Wh) forment des groupes distincts. Vous pouvez combiner différents types de sources et devez vérifier vous-même les unités de la formule. Les variables `a`, `b`, etc. sont communes aux groupes. Chaque fois que vous continuez depuis la page des sources, y compris lors d’une modification ou après un retour, elles sont réattribuées à partir de `a` et l’expression précédente est effacée. Les résultats d’énergie active, réactive et apparente utilisent `TOTAL`, autorisant des hausses et des baisses pour l’énergie nette. **Nombre** produit une valeur purement numérique sans unité ni classe d’appareil (`device_class`), avec `MEASUREMENT`.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+> ![Ajouter une entité de formule](docs/images/ecomain-formula-add.png)
 
-> **Capture à ajouter: Nom, type de résultat et sources de la formule**
->
-> ![Capture à ajouter: Nom, type de résultat et sources de la formule](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+> ![Définir le nom et le type de résultat de la formule](docs/images/ecomain-formula-setup.png)
 
-> **Capture à ajouter: Saisir la formule**
->
-> ![Capture à ajouter: Saisir la formule](docs/images/0_default.png)
+---
+
+> ![Choisir les sources de la formule](docs/images/ecomain-formula-sources.png)
+
+---
+
+> ![Saisir la formule](docs/images/ecomain-formula-expression.png)
 
 | Formule | Résultat pour deux puissances |
 | --- | --- |
@@ -472,18 +451,6 @@ Seules les mesures activées et prises en charge par le micrologiciel sont propo
 - Supprimez une formule via **Supprimer une entité supplémentaire**. Avant de décocher une mesure, supprimez les formules qui l’utilisent.
 - Si des données manquent ou si le calcul est impossible, le résultat est indisponible.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **Capture à ajouter: Choisir une formule à modifier**
->
-> ![Capture à ajouter: Choisir une formule à modifier](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **Capture à ajouter: Choisir une entité supplémentaire à supprimer**
->
-> ![Capture à ajouter: Choisir une entité supplémentaire à supprimer](docs/images/0_default.png)
-
 ### Phases des canaux (mode local uniquement)
 
 - Pour une entrée ecoMain locale, ouvrez **Configurer**, choisissez l’action **Phases des canaux**, puis ecoMain ou un ecoSub configuré et en ligne.
@@ -493,19 +460,17 @@ Seules les mesures activées et prises en charge par le micrologiciel sont propo
 - Vérifiez les valeurs affichées avant de réessayer.
 - Cette page modifie la configuration de l’appareil et n’est pas disponible en mode cloud.
 
-Les captures existantes montrent des versions antérieures et peuvent ne pas inclure les nouvelles pages ou la casse actuelle des noms de produits.
+L’interface présentée dans les captures peut varier selon la version de Home Assistant ou de l’intégration.
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+> ![Ouvrir les options des phases des canaux](docs/images/ecomain-phase-options.png)
 
-> **Capture à ajouter: Choisir l’appareil pour régler les phases**
->
-> ![Capture à ajouter: Choisir l’appareil pour régler les phases](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+> ![Choisir l’appareil pour régler les phases](docs/images/ecomain-phase-device.png)
 
-> **Capture à ajouter: Régler les phases des canaux**
->
-> ![Capture à ajouter: Régler les phases des canaux](docs/images/0_default.png)
+---
+
+> ![Régler les phases des canaux](docs/images/ecomain-channel-phases.png)
 
 ## Nom des appareils
 

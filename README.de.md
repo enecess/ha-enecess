@@ -64,7 +64,9 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 
 > **Ablauf-Screenshot:**
 > ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
+
 ---
+
 > ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
 
 ### 3) Integration über HACS installieren
@@ -77,9 +79,13 @@ Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HA
 
 > **Ablauf-Screenshot:**
 > ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+
 ---
+
 > ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+
 ---
+
 > ![HA restart](docs/images/ha-restart.png)
 
 ---
@@ -108,9 +114,13 @@ Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 
 > **Ablauf-Screenshot:**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+
 ---
+
 > ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
 
 ### Weg 2: Über „Integration hinzufügen“ (manuell)
@@ -126,14 +136,23 @@ Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 
 > **Ablauf-Screenshot:**
 > ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+
 ---
+
 > ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+
 ---
+
 > ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+
 ---
+
 > ![Select device type](docs/images/select-device-type.png)
+
 ---
+
 > ![Select add method](docs/images/select-add-method.png)
+
 ---
 
 ## ecoMain – Hinzufügungsmethoden & Schritt-für-Schritt-Abläufe
@@ -184,22 +203,29 @@ Tipps bei Problemen:
 
 > **Ablauf-Screenshot:**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+
 ---
+
 > ![Select discovered device](docs/images/ecomain-select-discovered.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Screenshot folgt: Messgrößen (lokal)**
->
-> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
+> ![Lokale Messgrößen auswählen](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -241,22 +267,29 @@ Tipps bei Problemen:
 
 > **Ablauf-Screenshot:**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+
 ---
+
 > ![Manual setup input 2](docs/images/ecomain-manual-input-2.png)
+
 ---
+
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
+
 ---
+
 > ![Select online slaves](docs/images/ecomain-select-slaves.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
+---
 
-> **Screenshot folgt: Messgrößen (lokal)**
->
-> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
+> ![Lokale Messgrößen auswählen](docs/images/ecomain-measurement-types-local.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+
 ---
+
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
 ---
@@ -294,22 +327,29 @@ Hinweise:
 
 > **Ablauf-Screenshot:**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+
 ---
+
 > ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+
 ---
+
 > ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+
 ---
+
 > ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
 
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
+---
 
-> **Screenshot folgt: Messgrößen (Cloud)**
->
-> ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
+> ![Cloud-Messgrößen auswählen](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
+
 > ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+
 ---
+
 > ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
 
 ---
@@ -327,29 +367,23 @@ Schritte:
 5. Schließe die Einrichtung ab, um für dieses Konto einen ecoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
 6. Um die Auswahl später anzupassen, öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, füge Steckdosen hinzu oder entferne sie und speichere die Optionen.
 
-<!-- Screenshot pending: docs/images/ecoplug-cloud-login.png -->
+> ![Gerätetyp ecoPlug auswählen](docs/images/ecoplug-select-device-type.png)
 
-> **Screenshot folgt: ecoPlug-Cloud-Anmeldung**
->
-> ![Screenshot folgt: ecoPlug-Cloud-Anmeldung](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-select.png -->
+> ![Bei ecoPlug Cloud anmelden](docs/images/ecoplug-cloud-login.png)
 
-> **Screenshot folgt: ecoPlug-Steckdosen auswählen**
->
-> ![Screenshot folgt: ecoPlug-Steckdosen auswählen](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-complete.png -->
+> ![ecoPlug-Steckdosen auswählen](docs/images/ecoplug-select.png)
 
-> **Screenshot folgt: ecoPlug-Einrichtung abgeschlossen**
->
-> ![Screenshot folgt: ecoPlug-Einrichtung abgeschlossen](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecoplug-options.png -->
+> ![ecoPlug-Einrichtung abschließen](docs/images/ecoplug-complete.png)
 
-> **Screenshot folgt: Ausgewählte ecoPlug-Steckdosen ändern**
->
-> ![Screenshot folgt: Ausgewählte ecoPlug-Steckdosen ändern](docs/images/0_default.png)
+---
+
+> ![ecoPlug-Optionen öffnen](docs/images/ecoplug-options.png)
 
 Jeder ausgewählte ecoPlug erstellt genau diese Entitäten:
 
@@ -397,26 +431,12 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 3. Den Integrationseintrag löschen/entfernen.
 4. Die Integration mit den neuen Einstellungen erneut hinzufügen.
 
-> Eine Bearbeiten-Funktion ist für zukünftige Versionen geplant.
-
 ### Messgrößen
 
 - Wähle bei der Einrichtung von ecoMain nach den ecoSub-Geräten und vor den zusätzlichen Entitäten die **Messgrößen** aus.
 - Später lässt sich die Auswahl über **Konfigurieren → Messgrößen** ändern.
 - Mindestens eine Messgröße ist erforderlich.
 - Entferne zusätzliche Entitäten, die eine Messgröße verwenden, bevor du diese abwählst.
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-local.png -->
-
-> **Screenshot folgt: Messgrößen (lokal)**
->
-> ![Screenshot folgt: Messgrößen (lokal)](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-measurement-types-cloud.png -->
-
-> **Screenshot folgt: Messgrößen (Cloud)**
->
-> ![Screenshot folgt: Messgrößen (Cloud)](docs/images/0_default.png)
 
 Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur Wirkleistung sowie Wirkenergie vorwärts und rückwärts:
 
@@ -448,17 +468,19 @@ Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mi
 
 Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh), kumulierte Scheinenergie (VAh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk-, Blind- und Scheinenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-setup.png -->
+> ![Formelentität hinzufügen](docs/images/ecomain-formula-add.png)
 
-> **Screenshot folgt: Formelname, Ergebnistyp und Quellen**
->
-> ![Screenshot folgt: Formelname, Ergebnistyp und Quellen](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-formula-expression.png -->
+> ![Formelname und Ergebnistyp festlegen](docs/images/ecomain-formula-setup.png)
 
-> **Screenshot folgt: Formel eingeben**
->
-> ![Screenshot folgt: Formel eingeben](docs/images/0_default.png)
+---
+
+> ![Quellentitäten für die Formel auswählen](docs/images/ecomain-formula-sources.png)
+
+---
+
+> ![Formelausdruck eingeben](docs/images/ecomain-formula-expression.png)
 
 | Formel | Ergebnis für zwei Leistungswerte |
 | --- | --- |
@@ -470,18 +492,6 @@ Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angebot
 - Lösche Formeln über **Zusätzliche Entität entfernen**. Lösche Formeln, die eine Messgröße nutzen, bevor du diese abwählst.
 - Fehlen Daten oder lässt sich die Formel nicht berechnen, ist das Ergebnis nicht verfügbar.
 
-<!-- Screenshot pending: docs/images/ecomain-formula-edit.png -->
-
-> **Screenshot folgt: Formel zum Bearbeiten auswählen**
->
-> ![Screenshot folgt: Formel zum Bearbeiten auswählen](docs/images/0_default.png)
-
-<!-- Screenshot pending: docs/images/ecomain-extra-remove.png -->
-
-> **Screenshot folgt: Zusätzliche Entität zum Entfernen auswählen**
->
-> ![Screenshot folgt: Zusätzliche Entität zum Entfernen auswählen](docs/images/0_default.png)
-
 ### Kanalphasen (nur lokal)
 
 - Wähle bei einem lokalen ecoMain-Eintrag unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub.
@@ -491,19 +501,17 @@ Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angebot
 - Prüfe die angezeigten Werte vor einem erneuten Versuch.
 - Diese Seite verändert die Gerätekonfiguration und ist im Cloud-Modus nicht verfügbar.
 
-Vorhandene Screenshots zeigen ältere Versionen und enthalten möglicherweise noch nicht die neuen Seiten oder die aktuelle Schreibweise der Produktnamen.
+Die in den Screenshots gezeigte Oberfläche kann je nach Home Assistant- oder Integrationsversion variieren.
 
-<!-- Screenshot pending: docs/images/ecomain-phase-device.png -->
+> ![Kanalphaseneinstellungen öffnen](docs/images/ecomain-phase-options.png)
 
-> **Screenshot folgt: Gerät für die Phaseneinstellungen auswählen**
->
-> ![Screenshot folgt: Gerät für die Phaseneinstellungen auswählen](docs/images/0_default.png)
+---
 
-<!-- Screenshot pending: docs/images/ecomain-channel-phases.png -->
+> ![Gerät für die Phaseneinstellungen auswählen](docs/images/ecomain-phase-device.png)
 
-> **Screenshot folgt: Kanalphasen einstellen**
->
-> ![Screenshot folgt: Kanalphasen einstellen](docs/images/0_default.png)
+---
+
+> ![Kanalphasen einstellen](docs/images/ecomain-channel-phases.png)
 
 ## Gerätenamen
 
