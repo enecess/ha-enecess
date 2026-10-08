@@ -1,8 +1,10 @@
 # enecess Home Assistant Integration Release Notes
 
-## Unreleased
+## v1.1.0
 
-This update expands ecoMain measurements and custom calculations, adds local channel phase settings, and improves configuration and connection recovery.
+Release date: 2026-10-08
+
+v1.1.0 expands ecoMain measurements and custom calculations, adds local channel phase settings, and improves configuration and connection recovery.
 
 ### Highlights
 
@@ -15,6 +17,7 @@ This update expands ecoMain measurements and custom calculations, adds local cha
 
 ### Changes
 
+- Improved local discovery titles and device selection; **Automatic Discovery** now uses a **Select ecoMain** dropdown showing serial numbers and IP addresses.
 - Measurement and formula source choices now reflect the device firmware, connection mode, and enabled measurements.
 - Improved preservation of ecoMain settings and entity names when devices are temporarily unreachable or measurements become unavailable.
 - Improved local and cloud connection recovery, cloud sign-in handling, and cleanup when reloading or stopping the integration.
@@ -22,7 +25,7 @@ This update expands ecoMain measurements and custom calculations, adds local cha
 - Improved ecoSub online status handling so an offline slave does not prevent other devices from updating.
 - Improved ecoPlug switch feedback so an earlier poll does not overwrite a successful command, and improved handling of invalid readings.
 - Improved handling of invalid cloud channel data so other valid readings continue updating.
-- Updated sensor display units, precision, translations, and setup documentation.
+- Updated sensor display units, precision, and translations, and refreshed setup documentation and screenshots across all six languages.
 
 ### Compatibility
 
@@ -38,6 +41,7 @@ This update expands ecoMain measurements and custom calculations, adds local cha
 - Remove extra entities that use a measurement before deselecting it. When creating formulas, check that the calculation matches the chosen result unit.
 - Cloud cumulative energy remains an estimate and may differ from local meter totals during network interruptions or restarts.
 
+---
 
 ## v1.0.0
 
