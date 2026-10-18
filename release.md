@@ -1,5 +1,21 @@
 # enecess Home Assistant Integration Release Notes
 
+## v1.1.1
+
+Release date: 2026-10-18
+
+v1.1.1 updates the enecess integration icons in Home Assistant.
+
+### Changes
+
+- Added enecess icons and logos for standard and high-resolution displays.
+
+### Upgrade Notes
+
+- Upgrade through HACS, then restart Home Assistant.
+
+---
+
 ## v1.1.0
 
 Release date: 2026-10-08

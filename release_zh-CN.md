@@ -1,5 +1,21 @@
 # enecess Home Assistant 集成发布说明
 
+## v1.1.1
+
+发布日期：2026-10-18
+
+v1.1.1 更新 Home Assistant 中的 enecess 集成图标。
+
+### 变更
+
+- 补充 enecess 图标与标志，适配标准及高分辨率显示。
+
+### 升级说明
+
+- 通过 HACS 升级，然后重启 Home Assistant。
+
+---
+
 ## v1.1.0
 
 发布日期：2026-10-08
