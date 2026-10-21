@@ -30,7 +30,7 @@ Les capteurs des ecoSub hors ligne deviennent indisponibles ; les autres apparei
 
 ## Installation avec HACS
 
-Cette intégration peut être installée via **HACS**. Après son ajout à la liste des dépôts par défaut de HACS, recherchez directement **enecess** dans **Integrations**. Pendant l’examen de son ajout, ajoutez d’abord ce dépôt à HACS avec l’une des méthodes ci-dessous.
+Cette intégration figure dans la **liste des dépôts par défaut de HACS**. Recherchez directement **enecess** dans HACS pour l’installer.
 
 ### 1) Installer HACS (si ce n’est pas déjà fait)
 
@@ -39,39 +39,11 @@ Suivez le guide officiel d’utilisation de HACS :
 - **Commencer avec HACS**
   [👉 Cliquer pour continuer](https://hacs.xyz/docs/use/)
 
-### 2) Ajouter le dépôt pendant l’examen HACS
+### 2) Télécharger / installer l’intégration depuis HACS
 
-#### Option A : Ajout en un clic (recommandé)
-
-Cliquez sur le bouton ci-dessous pour ajouter ce dépôt à HACS en tant qu’intégration personnalisée :
-
-- **Ajouter à HACS (redirection My Home Assistant) :**
-  [👉 Cliquer pour continuer](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
-
-> Après avoir cliqué sur le lien, renseignez l’adresse de **votre instance Home Assistant** sur la nouvelle page.
-
-> **Capture d’écran du processus :**
-> ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
-
-#### Option B : Ajout manuel dans HACS
-
-1. Ouvrez Home Assistant.
-2. Allez dans **HACS**.
-3. Ouvrez le menu (en haut à droite) → **Custom repositories**.
-4. Collez l’URL du dépôt (par ex. `https://github.com/enecess/ha-enecess`).
-5. Catégorie : **Integration**
-6. Cliquez sur **Add**.
-
-> **Capture d’écran du processus :**
-> ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
----
-> ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
-
-### 3) Télécharger / installer l’intégration depuis HACS
-
-1. Dans HACS, allez dans **Integrations**.
-2. Recherchez **enecess**.
-3. Ouvrez la fiche → cliquez sur **Download**.
+1. Ouvrez **HACS** dans Home Assistant.
+2. Recherchez **enecess** et ouvrez les détails de l’intégration.
+3. Cliquez sur **Download**.
 4. Une fois le téléchargement terminé, **redémarrez Home Assistant** :
     - Paramètres → Système → Redémarrer
 

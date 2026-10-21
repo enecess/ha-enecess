@@ -30,7 +30,7 @@ Offline ecoSub sensors become unavailable while other devices continue updating.
 
 ## Installation with HACS
 
-This integration can be installed through **HACS**. After it is included in the HACS default repository list, search for **enecess** directly under **Integrations**. Until then, add this repository to HACS using one of the methods below.
+This integration is included in the **HACS default repository list**. Search for **enecess** directly in HACS to install it.
 
 ### 1) Install HACS (if you haven’t yet)
 
@@ -39,41 +39,11 @@ Follow the official HACS usage guide:
 - **Start using HACS**
   [👉Click to continue](https://hacs.xyz/docs/use/)
 
-### 2) Add this repository during the HACS review period
+### 2) Download / Install the integration from HACS
 
-#### Option A: One-click “Add Repository” (recommended)
-
-Click the button below to add this repository to HACS as a custom integration:
-
-- **Add to HACS (My Home Assistant redirect):**
-  [👉Click to continue](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
-
-> After clicking the link, fill in your **Home Assistant address** on the new page.
-
-> **Process Screenshot:**
-> ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
-
-#### Option B: Add manually in HACS
-
-1. Open Home Assistant.
-2. Go to **HACS**.
-3. Open the menu (top-right) → **Custom repositories**.
-4. Paste the repository URL (e.g. `https://github.com/enecess/ha-enecess`).
-5. Category: **Integration**
-6. Click **Add**.
-
-> **Process Screenshot:**
-> ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
-
----
-
-> ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
-
-### 3) Download / Install the integration from HACS
-
-1. In HACS, go to **Integrations**.
-2. Search for **enecess**.
-3. Open it → click **Download**.
+1. Open **HACS** in Home Assistant.
+2. Search for **enecess** and open the integration details.
+3. Click **Download**.
 4. When finished, **restart Home Assistant**:
     - Settings → System → Restart
 

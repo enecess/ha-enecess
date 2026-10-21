@@ -30,7 +30,7 @@ ecoSub 离线时，其传感器显示不可用，其他设备继续更新。同�
 
 ## 通过 HACS 安装
 
-本集成可通过 **HACS** 安装。正式加入 HACS 默认仓库列表后，可直接在 **Integrations** 中搜索 **enecess**。在审核收录期间，请先使用以下任一方式将本仓库添加到 HACS。
+本集成已收录到 **HACS 默认仓库列表**，可直接在 HACS 中搜索 **enecess** 安装。
 
 ### 1）安装 HACS（如果你还没有安装）
 
@@ -39,41 +39,11 @@ ecoSub 离线时，其传感器显示不可用，其他设备继续更新。同�
 - **开始使用 HACS**
   [👉点击前往](https://hacs.xyz/docs/use/)
 
-### 2）在 HACS 审核收录期间添加本仓库
+### 2）在 HACS 中下载 / 安装集成
 
-#### 方式 A：一键添加仓库（推荐）
-
-点击下面的按钮，将本仓库添加为 HACS 自定义集成：
-
-- **添加到 HACS（通过 My Home Assistant 重定向）：**
-  [👉点击前往](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
-
-> 打开链接后，在新页面中填入你的 **Home Assistant 地址**，按提示完成添加。
-
-> **流程截图：**
-> ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
-
-#### 方式 B：在 HACS 手动添加
-
-1. 打开 Home Assistant。
-2. 进入 **HACS**。
-3. 右上角菜单 → 选择 **Custom repositories（自定义仓库）**。
-4. 在对话框中填入仓库地址（例如：`https://github.com/enecess/ha-enecess`）。
-5. Category（类别）选择：**Integration**。
-6. 点击 **Add**。
-
-> **流程截图：**
-> ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
-
----
-
-> ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
-
-### 3）在 HACS 中下载 / 安装集成
-
-1. 在 HACS 中切换到 **Integrations**。
-2. 搜索 **enecess**。
-3. 打开后点击 **Download** 下载。
+1. 在 Home Assistant 中打开 **HACS**。
+2. 搜索 **enecess**，并打开集成详情。
+3. 点击 **Download** 下载。
 4. 下载完成后，**重启 Home Assistant**：
    - 设置 → 系统 → 重启
 

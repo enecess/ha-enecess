@@ -24,25 +24,12 @@ I sensori ecoSub offline diventano non disponibili; gli altri dispositivi contin
 
 ## Installazione con HACS
 
+L’integrazione è inclusa nel **catalogo predefinito di HACS**. Cerca direttamente **enecess** in HACS per installarla.
+
 1. Installa HACS seguendo la [guida ufficiale](https://hacs.xyz/docs/use/).
-2. Durante la revisione per l’inclusione nell’elenco predefinito di HACS, aggiungi questo repository tramite [Aggiungi a HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration). Inserisci l’indirizzo della tua istanza Home Assistant quando richiesto.
-3. In alternativa, apri **HACS → menu → Repository personalizzati**, inserisci `https://github.com/enecess/ha-enecess`, scegli la categoria **Integrazione** e aggiungi il repository.
-4. Cerca **enecess** nelle integrazioni HACS e seleziona **Scarica**.
-5. Riavvia Home Assistant da **Impostazioni → Sistema → Riavvia**.
-
-Dopo l’inclusione nel catalogo predefinito di HACS sarà possibile cercare direttamente enecess senza aggiungere un repository personalizzato.
-
-> **Aggiungere il repository a HACS**
->
-> ![Aggiungere il repository a HACS](docs/images/hacs-add-repo-redirect.png)
-
-> **Aprire i repository personalizzati**
->
-> ![Aprire i repository personalizzati](docs/images/hacs-custom-repositories-1.png)
-
-> **Aggiungere il repository manualmente**
->
-> ![Aggiungere il repository manualmente](docs/images/hacs-custom-repositories-2.png)
+2. Apri **HACS** in Home Assistant e cerca **enecess**.
+3. Apri i dettagli dell’integrazione e seleziona **Scarica**.
+4. Riavvia Home Assistant da **Impostazioni → Sistema → Riavvia**.
 
 > **Trovare enecess in HACS**
 >

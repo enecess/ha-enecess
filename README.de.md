@@ -30,7 +30,7 @@ Offline-ecoSub-Sensoren sind nicht verfügbar; andere Geräte werden weiter aktu
 
 ## Installation mit HACS
 
-Diese Integration kann über **HACS** installiert werden. Nach der Aufnahme in die HACS-Standardliste kannst du unter **Integrations** direkt nach **enecess** suchen. Füge dieses Repository während der Aufnahmeprüfung zunächst mit einer der folgenden Methoden zu HACS hinzu.
+Diese Integration ist in der **HACS-Standardliste** enthalten. Suche direkt in HACS nach **enecess**, um sie zu installieren.
 
 ### 1) HACS installieren (falls noch nicht geschehen)
 
@@ -39,41 +39,11 @@ Folge der offiziellen HACS-Anleitung:
 - **HACS verwenden**
   [👉Hier klicken](https://hacs.xyz/docs/use/)
 
-### 2) Repository während der HACS-Aufnahmeprüfung hinzufügen
+### 2) Integration über HACS installieren
 
-#### Variante A: One-Click „Add Repository“ (empfohlen)
-
-Klicke auf den folgenden Link, um dieses Repository direkt als Integration in HACS hinzuzufügen:
-
-- **Zu HACS hinzufügen (My Home Assistant Redirect):**
-  [👉Hier klicken](https://my.home-assistant.io/redirect/hacs_repository/?owner=enecess&repository=ha-enecess&category=integration)
-
-> Nach dem Klick trage auf der neuen Seite die Adresse deiner **Home Assistant-Instanz** ein.
-
-> **Ablauf-Screenshot:**
-> ![Add repository redirect](docs/images/hacs-add-repo-redirect.png)
-
-#### Variante B: Manuell in HACS hinzufügen
-
-1. Home Assistant öffnen.
-2. Zu **HACS** wechseln.
-3. Menü (oben rechts) → **Custom repositories**.
-4. Repository-URL einfügen (z. B. `https://github.com/enecess/ha-enecess`).
-5. Kategorie: **Integration**
-6. Auf **Add** klicken.
-
-> **Ablauf-Screenshot:**
-> ![HACS custom repositories 1](docs/images/hacs-custom-repositories-1.png)
-
----
-
-> ![HACS custom repositories 2](docs/images/hacs-custom-repositories-2.png)
-
-### 3) Integration über HACS installieren
-
-1. In HACS zu **Integrations** wechseln.
-2. Nach **enecess** suchen.
-3. Öffnen → auf **Download** klicken.
+1. **HACS** in Home Assistant öffnen.
+2. Nach **enecess** suchen und die Integrationsdetails öffnen.
+3. Auf **Download** klicken.
 4. Anschließend **Home Assistant neu starten**:
     - Einstellungen → System → Neustart
 
