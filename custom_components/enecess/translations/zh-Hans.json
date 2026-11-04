@@ -1,4 +1,32 @@
 {
+  "entity": {
+    "sensor": {
+      "solar_irradiance": {
+        "name": "辐照度"
+      },
+      "solar_tilt_angle": {
+        "name": "倾角"
+      },
+      "solar_module_temperature": {
+        "name": "组件温度"
+      },
+      "solar_actual_power": {
+        "name": "实际功率"
+      },
+      "solar_estimated_power": {
+        "name": "理论功率"
+      },
+      "solar_performance_ratio": {
+        "name": "性能比"
+      },
+      "solar_actual_energy": {
+        "name": "累计实际电量"
+      },
+      "solar_estimated_energy": {
+        "name": "累计理论电量"
+      }
+    }
+  },
   "config": {
     "flow_title": "ecoMain {ecomain_serial}",
     "step": {

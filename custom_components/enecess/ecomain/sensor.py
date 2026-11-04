@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from ..const import (
+    CONF_ECOMAIN_SOLAR_DEVICE_INDEX,
     CONF_SENSOR_DISPLAY_PRECISION,
     CONST_ADD_MODE,
     CONST_ADD_MODE_CLOUD,
@@ -105,8 +106,12 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
             self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
-                model="ecoSub",
-                name=f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
+                model="ecoSolarMonitor"
+                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else "ecoSub",
+                name=f"ecoSolarMonitor {serial} ({mode_key.title()})"
+                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
             self._attr_unique_id = _sensor_unique_id(
@@ -226,8 +231,12 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
             self._attr_device_info = DeviceInfo(
                 identifiers={_device_identifier(serial, device_index, mode_key)},
                 manufacturer="enecess",
-                model="ecoSub",
-                name=f"ecoSub {serial} #{device_index} ({mode_key.title()})",
+                model="ecoSolarMonitor"
+                if device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else "ecoSub",
+                name=f"ecoSolarMonitor {serial} ({mode_key.title()})"
+                if device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else f"ecoSub {serial} #{device_index} ({mode_key.title()})",
                 via_device=_device_identifier(serial, 0, mode_key),
             )
         self._attr_unique_id = _sensor_unique_id(

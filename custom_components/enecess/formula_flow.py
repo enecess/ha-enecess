@@ -23,6 +23,10 @@ SOURCE_PREFIX = "extra_formula_sources_"
 SOURCE_KINDS = (
     *[kind for kind in FORMULA_RESULT_TYPES if kind != "number"],
     "energy_delta",
+    "irradiance",
+    "temperature",
+    "tilt_angle",
+    "performance_ratio",
 )
 
 

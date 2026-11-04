@@ -1,4 +1,32 @@
 {
+  "entity": {
+    "sensor": {
+      "solar_irradiance": {
+        "name": "Irradiance"
+      },
+      "solar_tilt_angle": {
+        "name": "Angle d’inclinaison"
+      },
+      "solar_module_temperature": {
+        "name": "Température du module"
+      },
+      "solar_actual_power": {
+        "name": "Puissance réelle"
+      },
+      "solar_estimated_power": {
+        "name": "Puissance estimée"
+      },
+      "solar_performance_ratio": {
+        "name": "Ratio de performance"
+      },
+      "solar_actual_energy": {
+        "name": "Énergie réelle cumulée"
+      },
+      "solar_estimated_energy": {
+        "name": "Énergie estimée cumulée"
+      }
+    }
+  },
   "config": {
     "flow_title": "ecoMain {ecomain_serial}",
     "step": {

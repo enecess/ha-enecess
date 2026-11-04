@@ -27,6 +27,8 @@ from ..const import (
     CONF_ECOMAIN_PORT,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+    CONF_ECOMAIN_SOLAR_DEVICE_INDEX,
+    CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION,
     CONF_LOCAL_UPDATE_INTERVAL,
     CONF_LOCAL_UPDATE_TIMEOUT,
     CONST_CLOUD_PASSWORD,
@@ -158,11 +160,17 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
 
         active_specs = self.specs
         if any(spec.device_index for spec in active_specs):
+            status_count = (
+                CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                if self.firmware_version is not None
+                and self.firmware_version >= CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION
+                else CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT
+            )
             status = await self._client.read_holding_registers(
                 CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
-                CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
+                status_count,
             )
-            if len(status.registers) != CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT or any(
+            if len(status.registers) != status_count or any(
                 type(value) is not int or value not in (0, 1)
                 for value in status.registers
             ):

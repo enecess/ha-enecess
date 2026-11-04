@@ -142,10 +142,11 @@ def load_flow(test):
         device_class: str | None = None
         state_class: str | None = None
         suggested_display_precision: int | None = None
+        translation_key: str | None = None
 
     classes = types.SimpleNamespace(**{n: n.lower() for n in (
         'POWER', 'ENERGY', 'REACTIVE_ENERGY', 'APPARENT_POWER', 'REACTIVE_POWER',
-        'VOLTAGE', 'CURRENT', 'POWER_FACTOR', 'FREQUENCY')})
+        'VOLTAGE', 'CURRENT', 'POWER_FACTOR', 'FREQUENCY', 'IRRADIANCE', 'TEMPERATURE')})
     module('homeassistant.components.sensor', SensorDeviceClass=classes,
            SensorEntityDescription=Description,
            SensorStateClass=types.SimpleNamespace(MEASUREMENT='measurement', TOTAL_INCREASING='total_increasing', TOTAL='total'))

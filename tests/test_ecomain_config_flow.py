@@ -182,7 +182,7 @@ class FirmwareTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(version=version):
                 client = types.SimpleNamespace(
                     read_holding_registers=AsyncMock(side_effect=[types.SimpleNamespace(registers=[version]),
-                                                                 types.SimpleNamespace(registers=[1, 0, 0])]),
+                                                                 types.SimpleNamespace(registers=[1, 0, 0, 0] if version >= 140 else [1, 0, 0])]),
                     async_close=AsyncMock())
                 result = await module.async_validate_local_device(
                     client, firmware_register=3009, minimum_firmware=module.CONF_ECOMAIN_MIN_FIRMWARE_VERSION,

@@ -11,6 +11,8 @@ from homeassistant.components.sensor import (
 from ..const import (
     CONF_ECOMAIN_AVAILABLE_SLAVES,
     CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION,
+    CONF_ECOMAIN_SOLAR_DEVICE_INDEX,
+    CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION,
     CONF_SENSOR_DISPLAY_PRECISION,
 )
 
@@ -31,10 +33,26 @@ LOCAL_MEASUREMENTS = (
 )
 DEFAULT_CLOUD_MEASUREMENTS = ("power", "energy")
 CLOUD_MEASUREMENTS = ("energy", "power")
+SOLAR_MEASUREMENTS = (
+    "solar_irradiance",
+    "solar_tilt_angle",
+    "solar_module_temperature",
+    "solar_actual_power",
+    "solar_estimated_power",
+    "solar_performance_ratio",
+    "solar_actual_energy",
+    "solar_estimated_energy",
+)
+DEFAULT_SOLAR_MEASUREMENTS = SOLAR_MEASUREMENTS[:5]
 
 
 def available_local_measurements(firmware_version: int | None) -> tuple[str, ...]:
     """Expose extended registers only after confirming compatible firmware."""
+    if (
+        firmware_version is not None
+        and firmware_version >= CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION
+    ):
+        return (*LOCAL_MEASUREMENTS, *SOLAR_MEASUREMENTS)
     if (
         firmware_version is not None
         and firmware_version >= CONF_ECOMAIN_EXTENDED_FIRMWARE_VERSION
@@ -112,6 +130,18 @@ _LOCAL_LAYOUT = {
     "power_factor": ("power_factor_rt", 1202, 1211, 1, 0.01, True, "power_factor"),
 }
 
+# Measurement: address, width, scale, signed, kind.
+_SOLAR_LAYOUT = {
+    "solar_irradiance": (4000, 1, 0.1, True, "irradiance"),
+    "solar_tilt_angle": (4004, 1, 0.1, True, "tilt_angle"),
+    "solar_module_temperature": (4002, 1, 0.1, True, "temperature"),
+    "solar_actual_power": (4010, 4, 0.001, True, "power"),
+    "solar_estimated_power": (4006, 4, 0.001, True, "power"),
+    "solar_performance_ratio": (4005, 1, 0.01, True, "performance_ratio"),
+    "solar_actual_energy": (4018, 4, 0.001, False, "energy"),
+    "solar_estimated_energy": (4014, 4, 0.001, False, "energy"),
+}
+
 
 def _slave_list(slaves: list | None) -> list[int]:
     return sorted(
@@ -119,11 +149,14 @@ def _slave_list(slaves: list | None) -> list[int]:
     )
 
 
-def build_specs_local(slaves=None, measurement_types=None) -> list[RegisterSpec]:
-    """Build requested ecoMain and ecoSub registers before capability filtering."""
+def build_specs_local(
+    slaves=None, measurement_types=None, solar_measurement_types=None
+) -> list[RegisterSpec]:
+    """Build requested meter and solar registers before capability filtering."""
     selected = set(
         DEFAULT_LOCAL_MEASUREMENTS if measurement_types is None else measurement_types
     )
+    devices = _slave_list(slaves)
     specs = []
     for measurement, (
         suffix,
@@ -156,7 +189,7 @@ def build_specs_local(slaves=None, measurement_types=None) -> list[RegisterSpec]
         phases = ("l1", "l2", "l3") if width == 1 else ("l1", "l2", "l3", "all")
         for index, phase in enumerate(phases):
             add(f"main_{phase}", main + index * step, 0)
-        for device in [0, *_slave_list(slaves)]:
+        for device in [0, *(device for device in devices if 1 <= device <= 3)]:
             prefix = "main" if device == 0 else f"sub{device}"
             for channel in range(1, 11):
                 add(
@@ -175,6 +208,32 @@ def build_specs_local(slaves=None, measurement_types=None) -> list[RegisterSpec]
                 scale=0.01,
                 measurement_type="frequency",
             )
+        )
+    if CONF_ECOMAIN_SOLAR_DEVICE_INDEX in devices:
+        solar_selected = set(
+            DEFAULT_SOLAR_MEASUREMENTS
+            if solar_measurement_types is None
+            else solar_measurement_types
+        )
+        specs.extend(
+            RegisterSpec(
+                key=measurement,
+                kind=kind,
+                device_index=CONF_ECOMAIN_SOLAR_DEVICE_INDEX,
+                address=address,
+                regs=width,
+                scale=scale,
+                measurement_type=measurement,
+                signed=signed,
+            )
+            for measurement, (
+                address,
+                width,
+                scale,
+                signed,
+                kind,
+            ) in _SOLAR_LAYOUT.items()
+            if measurement in solar_selected
         )
     return specs
 
@@ -238,6 +297,10 @@ def build_sensor_descriptions(
         "current": ("A", SensorDeviceClass.CURRENT),
         "power_factor": (None, SensorDeviceClass.POWER_FACTOR),
         "frequency": ("Hz", SensorDeviceClass.FREQUENCY),
+        "irradiance": ("W/m²", SensorDeviceClass.IRRADIANCE),
+        "temperature": ("°C", SensorDeviceClass.TEMPERATURE),
+        "tilt_angle": ("°", None),
+        "performance_ratio": ("%", None),
     }
     descriptions = []
     for spec in specs:
@@ -255,7 +318,12 @@ def build_sensor_descriptions(
         descriptions.append(
             EnecessSensorDescription(
                 key=spec.key,
-                name=spec.key,
+                name=None
+                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else spec.key,
+                translation_key=spec.key
+                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
+                else None,
                 native_unit_of_measurement=unit,
                 device_class=device_class,
                 state_class=state_class,

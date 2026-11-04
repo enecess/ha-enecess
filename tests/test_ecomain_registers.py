@@ -22,9 +22,9 @@ def load_runtime():
     module("register_test.ecomain", __path__=[str(root / "ecomain")])
     # Storage is exercised with real HA objects by the compatibility suite.
     module("register_test.ecomain.energy", CloudEnergyStore=object)
-    classes = "POWER ENERGY REACTIVE_ENERGY APPARENT_POWER REACTIVE_POWER VOLTAGE CURRENT POWER_FACTOR FREQUENCY".split()
+    classes = "POWER ENERGY REACTIVE_ENERGY APPARENT_POWER REACTIVE_POWER VOLTAGE CURRENT POWER_FACTOR FREQUENCY IRRADIANCE TEMPERATURE".split()
     description = make_dataclass("SensorEntityDescription", [(name, object, None) for name in (
-        "key", "name", "native_unit_of_measurement", "device_class", "state_class", "suggested_display_precision"
+        "key", "name", "native_unit_of_measurement", "device_class", "state_class", "suggested_display_precision", "translation_key"
     )], frozen=True, kw_only=True)
     module("homeassistant.components.sensor", SensorDeviceClass=SimpleNamespace(**{k: k.lower() for k in classes}),
            SensorEntityDescription=description, SensorStateClass=SimpleNamespace(MEASUREMENT="measurement", TOTAL_INCREASING="total_increasing"))

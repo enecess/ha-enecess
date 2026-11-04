@@ -25,11 +25,13 @@ from .const import (
     CONST_EXTRA_OPERATION_INVERT,
     CONST_EXTRA_OPERATION_SUM,
     CONST_MEASUREMENT_TYPES,
+    CONST_SOLAR_MEASUREMENT_TYPES,
     DOMAIN,
 )
 from .ecomain.model import (
     DEFAULT_CLOUD_MEASUREMENTS,
     DEFAULT_LOCAL_MEASUREMENTS,
+    DEFAULT_SOLAR_MEASUREMENTS,
     EnecessSensorDescription,
     RegisterSpec,
     available_local_measurements,
@@ -81,6 +83,17 @@ def get_entry_measurement_types(
     return list((entry_options or {}).get(CONST_MEASUREMENT_TYPES, defaults))
 
 
+def get_entry_solar_measurement_types(
+    entry_options: dict[str, Any] | None = None,
+) -> list[str]:
+    """Use solar defaults only when no explicit selection has been saved."""
+    return list(
+        (entry_options or {}).get(
+            CONST_SOLAR_MEASUREMENT_TYPES, DEFAULT_SOLAR_MEASUREMENTS
+        )
+    )
+
+
 def build_entry_specs(
     entry_data: dict[str, Any],
     entry_options: dict[str, Any] | None = None,
@@ -92,12 +105,14 @@ def build_entry_specs(
     measurements = get_entry_measurement_types(entry_data, entry_options)
     if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD:
         return build_specs_cloud(slaves, measurements)
+    solar_measurements = get_entry_solar_measurement_types(entry_options)
     if not include_unsupported:
         available = available_local_measurements(
             entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION)
         )
         measurements = [item for item in measurements if item in available]
-    return build_specs_local(slaves, measurements)
+        solar_measurements = [item for item in solar_measurements if item in available]
+    return build_specs_local(slaves, measurements, solar_measurements)
 
 
 def build_entry_descriptions(
