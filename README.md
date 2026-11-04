@@ -767,7 +767,7 @@ The integration uses multiple filters:
 3. **Selected sub-devices and measurements**:
     - Only selected sub-devices with enabled measurements create sensors. Offline configured sensors remain registered but become unavailable.
 
-So you will see entities for:
+For new sub-device selections, entities are created for:
 
 - Supported slave indices
 - That are detected as online (local)
