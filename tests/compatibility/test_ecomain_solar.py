@@ -96,6 +96,8 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
         platform.config_entry = entry
         self.addAsyncCleanup(platform.async_reset)
         await platform.async_add_entities(entities)
+        self.assertEqual(entities[0].name, "solar_actual_power")
+        self.assertIsNone(entities[0].entity_description.translation_key)
         registry = device_registry.async_get(self.hass)
         registered = device_registry.async_entries_for_config_entry(
             registry, entry.entry_id
@@ -193,10 +195,8 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
         self.assertEqual(
             descriptions["solar_tilt_angle"].state_class, SensorStateClass.MEASUREMENT
         )
-        self.assertEqual(
-            descriptions["solar_actual_power"].translation_key, "solar_actual_power"
-        )
-        self.assertIsNone(descriptions["solar_actual_power"].name)
+        self.assertIsNone(descriptions["solar_actual_power"].translation_key)
+        self.assertEqual(descriptions["solar_actual_power"].name, "solar_actual_power")
         client = SolarClient()
         coordinator = EcoMainModbusCoordinator(
             self.hass, entry, client, build_entry_specs(data, options)

@@ -318,12 +318,7 @@ def build_sensor_descriptions(
         descriptions.append(
             EnecessSensorDescription(
                 key=spec.key,
-                name=None
-                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
-                else spec.key,
-                translation_key=spec.key
-                if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
-                else None,
+                name=spec.key,
                 native_unit_of_measurement=unit,
                 device_class=device_class,
                 state_class=state_class,

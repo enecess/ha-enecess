@@ -35,7 +35,7 @@ class SolarModelTests(unittest.TestCase):
         self.extra = import_module("custom_components.enecess.extra")
         self.model = import_module("custom_components.enecess.ecomain.model")
 
-    def test_solar_only_selection_maps_all_eight_registers_and_translated_metadata(self):
+    def test_solar_only_selection_keeps_key_names_and_human_measurement_labels(self):
         descriptions = self.extra.build_entry_descriptions(local_data(), {
             "measurement_types": [], "solar_measurement_types": list(SOLAR)})
         self.assertEqual([desc.key for desc in descriptions], list(SOLAR))
@@ -50,8 +50,9 @@ class SolarModelTests(unittest.TestCase):
                                  (address, width, scale, signed, kind, 4, desc.key))
                 self.assertEqual((desc.native_unit_of_measurement, desc.device_class), (unit, device_class))
                 self.assertEqual(desc.state_class, "total_increasing" if kind == "energy" else "measurement")
-                self.assertIsNone(desc.name)
-                self.assertEqual(strings["entity"]["sensor"][desc.translation_key]["name"], name)
+                self.assertEqual(desc.name, desc.key)
+                self.assertIsNone(desc.translation_key)
+                self.assertEqual(strings["selector"]["solar_measurement_types"]["options"][desc.key], name)
 
     def test_index_four_never_expands_into_meter_channels(self):
         specs = self.model.build_specs_local([1, 4], ["power"])
