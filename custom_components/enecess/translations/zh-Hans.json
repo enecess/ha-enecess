@@ -163,6 +163,10 @@
           "extra_formula_sources_power_factor": "功率因数",
           "extra_formula_sources_frequency": "频率 (Hz)",
           "extra_formula_sources_energy_delta": "有功电能（每分钟增量，Wh）",
+          "extra_formula_sources_irradiance": "辐照度 (W/m²)",
+          "extra_formula_sources_temperature": "组件温度 (°C)",
+          "extra_formula_sources_tilt_angle": "倾角 (°)",
+          "extra_formula_sources_performance_ratio": "性能比 (%)",
           "flow_action": "操作"
         }
       },
@@ -349,6 +353,10 @@
           "extra_formula_sources_power_factor": "功率因数",
           "extra_formula_sources_frequency": "频率 (Hz)",
           "extra_formula_sources_energy_delta": "有功电能（每分钟增量，Wh）",
+          "extra_formula_sources_irradiance": "辐照度 (W/m²)",
+          "extra_formula_sources_temperature": "组件温度 (°C)",
+          "extra_formula_sources_tilt_angle": "倾角 (°)",
+          "extra_formula_sources_performance_ratio": "性能比 (%)",
           "flow_action": "操作"
         }
       },

@@ -163,6 +163,10 @@
           "extra_formula_sources_power_factor": "Fattore di potenza",
           "extra_formula_sources_frequency": "Frequenza (Hz)",
           "extra_formula_sources_energy_delta": "Energia attiva (incremento al minuto, Wh)",
+          "extra_formula_sources_irradiance": "Irradianza (W/m²)",
+          "extra_formula_sources_temperature": "Temperatura del modulo (°C)",
+          "extra_formula_sources_tilt_angle": "Angolo di inclinazione (°)",
+          "extra_formula_sources_performance_ratio": "Rapporto di prestazione (%)",
           "flow_action": "Azione"
         }
       },
@@ -349,6 +353,10 @@
           "extra_formula_sources_power_factor": "Fattore di potenza",
           "extra_formula_sources_frequency": "Frequenza (Hz)",
           "extra_formula_sources_energy_delta": "Energia attiva (incremento al minuto, Wh)",
+          "extra_formula_sources_irradiance": "Irradianza (W/m²)",
+          "extra_formula_sources_temperature": "Temperatura del modulo (°C)",
+          "extra_formula_sources_tilt_angle": "Angolo di inclinazione (°)",
+          "extra_formula_sources_performance_ratio": "Rapporto di prestazione (%)",
           "flow_action": "Azione"
         }
       },
