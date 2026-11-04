@@ -373,20 +373,20 @@ Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; le 
 
 | Catégorie | Signification | Par défaut |
 | --- | --- | --- |
-| Énergie active directe | Énergie active cumulée dans le sens de la flèche du TC (Wh) | Activée |
-| Énergie active inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
-| Énergie réactive directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
-| Énergie réactive inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
-| Énergie apparente | Énergie apparente (VAh) | Désactivée |
-| Puissance active | Puissance active instantanée (W) | Activée |
-| Puissance réactive | Puissance réactive (var) | Désactivée |
-| Puissance apparente | Puissance apparente (VA) | Désactivée |
+| Énergie Active Directe | Énergie active cumulée dans le sens de la flèche du TC (Wh) | Activée |
+| Énergie Active Inverse | Énergie active cumulée dans le sens opposé (Wh) | Activée |
+| Énergie Réactive Directe | Énergie réactive cumulée dans le sens direct (varh) | Désactivée |
+| Énergie Réactive Inverse | Énergie réactive cumulée dans le sens inverse (varh) | Désactivée |
+| Énergie Apparente | Énergie apparente (VAh) | Désactivée |
+| Puissance Active | Puissance active instantanée (W) | Activée |
+| Puissance Réactive | Puissance réactive (var) | Désactivée |
+| Puissance Apparente | Puissance apparente (VA) | Désactivée |
 | Tension | Tension électrique (V) | Désactivée |
 | Courant | Intensité du courant (A) | Désactivée |
-| Facteur de puissance | Rapport entre puissances active et apparente, sans unité | Désactivée |
+| Facteur De Puissance | Rapport entre puissances active et apparente, sans unité | Désactivée |
 | Fréquence | Fréquence du réseau (Hz), ecoMain uniquement | Désactivée |
 
-Les valeurs disponibles dépendent des registres de l’appareil : toutes les catégories ne possèdent pas de total triphasé ou de valeur pour chaque canal. ecoSub fournit les mesures des canaux. Le cloud propose uniquement **Puissance active** et **Énergie**, sélectionnées par défaut. Énergie comprend le compteur cumulé et les incréments bruts d’une minute. Les entités fixes d’ecoPlug restent inchangées.
+Les valeurs disponibles dépendent des registres de l’appareil : toutes les catégories ne possèdent pas de total triphasé ou de valeur pour chaque canal. ecoSub fournit les mesures des canaux. Le cloud propose uniquement **Puissance Active** et **Énergie**, sélectionnées par défaut. Énergie comprend le compteur cumulé et les incréments bruts d’une minute. Les entités fixes d’ecoPlug restent inchangées.
 
 ### Entités de formule personnalisées
 
@@ -460,7 +460,7 @@ Exemples :
 
 ## Nom des entités & signification
 
-Les noms ci-dessous sont des **clés de mesure**, pas des `entity_id` Home Assistant complets. Les capteurs utilisent ces clés comme noms ; Home Assistant ajoute le nom de l’appareil et gère l’identifiant `sensor.…` réel, qui peut aussi être renommé par l’utilisateur. **Puissance active** décrit la mesure ; les clés existantes `power_rt` et `power_avg_1m` sont conservées.
+Les noms ci-dessous sont des **clés de mesure**, pas des `entity_id` Home Assistant complets. Les capteurs utilisent ces clés comme noms ; Home Assistant ajoute le nom de l’appareil et gère l’identifiant `sensor.…` réel, qui peut aussi être renommé par l’utilisateur. **Puissance Active** décrit la mesure ; les clés existantes `power_rt` et `power_avg_1m` sont conservées.
 
 ### Mode local (Modbus) : catalogue complet
 
@@ -474,28 +474,28 @@ Le firmware 136–138 propose seulement les trois premières mesures, sélection
 
 | Mesure | Suffixe | Unité | Portée |
 | --- | --- | --- | --- |
-| Puissance active | `power_rt` | W | A |
-| Énergie active directe | `energy_fwd_total` | Wh | A |
-| Énergie active inverse | `energy_rev_total` | Wh | A |
-| Énergie réactive directe | `reactive_energy_fwd_total` | varh | A |
-| Énergie réactive inverse | `reactive_energy_rev_total` | varh | A |
-| Énergie apparente | `apparent_energy_total` | VAh | A |
-| Puissance apparente | `apparent_power_rt` | VA | A |
-| Puissance réactive | `reactive_power_rt` | var | A |
+| Puissance Active | `power_rt` | W | A |
+| Énergie Active Directe | `energy_fwd_total` | Wh | A |
+| Énergie Active Inverse | `energy_rev_total` | Wh | A |
+| Énergie Réactive Directe | `reactive_energy_fwd_total` | varh | A |
+| Énergie Réactive Inverse | `reactive_energy_rev_total` | varh | A |
+| Énergie Apparente | `apparent_energy_total` | VAh | A |
+| Puissance Apparente | `apparent_power_rt` | VA | A |
+| Puissance Réactive | `reactive_power_rt` | var | A |
 | Tension | `voltage_rt` | V | C |
 | Courant | `current_rt` | A | C |
-| Facteur de puissance | `power_factor_rt` | — | C |
+| Facteur De Puissance | `power_factor_rt` | — | C |
 | Fréquence | `frequency_rt` | Hz | `main` |
 
 La fréquence possède uniquement la clé complète `main_frequency_rt`, sans phase ni canal. Exemples : `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` indique une valeur instantanée et `_total` un compteur cumulé. Le facteur de puissance est sans unité, pas en pourcentage. Le sens du transformateur de courant (CT) définit les directions directe/inverse ; un CT inversé peut entraîner une puissance active négative et l’augmentation du compteur inverse.
 
 ### Mode cloud
 
-Les deux mesures sélectionnées par défaut, **Puissance active** (`power`) et **Énergie** (`energy`), produisent trois types de capteurs :
+Les deux mesures sélectionnées par défaut, **Puissance Active** (`power`) et **Énergie** (`energy`), produisent trois types de capteurs :
 
 | Sélection | Suffixe | Unité | Signification |
 | --- | --- | --- | --- |
-| Puissance active | `power_avg_1m` | W | Puissance active moyenne sur une minute |
+| Puissance Active | `power_avg_1m` | W | Puissance active moyenne sur une minute |
 | Énergie | `energy_total_1m` | Wh | Incrément brut d’énergie sur une minute, pas un compteur cumulé |
 | Énergie | `energy_accumulated` | Wh | Énergie additionnée par Home Assistant |
 
@@ -509,8 +509,8 @@ Chaque prise ecoPlug sélectionnée possède trois entités fixes :
 
 | Entité | Nom dans le code | Données |
 | --- | --- | --- |
-| Capteur | `power_rt` | Puissance active, W (`MEASUREMENT`) |
-| Capteur | `energy_total` | Énergie cumulée, kWh (`TOTAL_INCREASING`) |
+| Capteur | `power_rt` | Puissance Active, W (`MEASUREMENT`) |
+| Capteur | `energy_total` | Énergie Cumulée, kWh (`TOTAL_INCREASING`) |
 | Interrupteur | Nom de l’appareil | Marche/arrêt de la prise |
 
 Les capteurs conservent les noms `power_rt` et `energy_total` ; les descriptions traduites ici ne garantissent pas un nom d’affichage traduit. L’interrupteur utilise le nom de l’appareil sans suffixe supplémentaire.

@@ -111,14 +111,24 @@ ecoSub online-status filtering and recovery, cross-device formula availability,
 and preservation of configured entity IDs, custom names and disabled choices
 when firmware capabilities change or the device is temporarily unreachable.
 
+Protocol 1.0.6 checks exercise firmware-140 ecoSolarMonitor measurements with
+real HA sensor metadata and key-based names. Real EntityPlatform registration
+checks solar-only parent/child linkage and preserves custom names. Native HA
+section and numeric-selector schemas are serialized and submitted for channel/CT
+and centralized PV commissioning, including incomplete Back/Cancel inputs,
+unknown stored choices and visible error locations. Formula checks include the
+four new solar input groups. Modbus settings and readback tests use simulated
+responses; this is schema/runtime coverage, not a browser or hardware test.
+
 ecoPlug lifecycle regressions cancel in-flight polls, authentication refreshes,
 and queued controls during unload or shutdown, and reject new requests after
 shutdown. Cloud channel parsing rejects invalid identifiers while retaining valid
 readings and zero values.
 
-As checked on 2026-09-30, the 170 offline tests and 121 real-HA runtime
-tests pass on each matrix release. Passing these checks does not imply that
-uncovered behavior or all HA quality-scale requirements are correct.
+The existing five-release matrix is retained for protocol 1.0.6. Its logs and
+`results/summary.json` report the test counts and outcomes for each run. Passing
+these checks does not imply that uncovered behavior or all HA quality-scale
+requirements are correct.
 
 ## Code style
 

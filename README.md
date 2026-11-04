@@ -20,11 +20,12 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
 
 - Local firmware 136–138: active power and forward/reverse active energy.
 - Local firmware 139 or later: also supports the nine additional types and channel phase settings.
+- Confirmed local firmware 140 or later: protocol 1.0.6 adds ecoSolarMonitor measurements and channel/PV installation settings.
 - Unsupported types are hidden on older firmware.
 
 Optional apparent energy (VAh) is supported by protocol 1.0.5 on firmware 139+, including separate formula sources. Counters use `TOTAL_INCREASING`; formulas use `TOTAL`, without a device class.
 
-Offline ecoSub sensors become unavailable while other devices continue updating. Reload the integration after updating firmware at the same IP address.
+Offline ecoSub and ecoSolarMonitor sensors become unavailable while other devices continue updating. Reload the integration after updating firmware at the same IP address: runtime setup re-probes the firmware rather than relying on the saved version. Opening **Configure** also refreshes the detected firmware and devices. New solar measurements and installation settings require a successful firmware-140-or-later probe; unknown or older firmware does not enable them.
 
 ---
 
@@ -66,7 +67,7 @@ Follow the official HACS usage guide:
 - **Back** keeps your inputs and appears only when a previous page exists.
 - From a discovery card: the first page has no action choices. **Cancel** on later setup pages clears this attempt and returns to the first page, keeping the discovery card.
 - From **Add integration**: **Cancel** ends setup. Cancelling an operation opened from a menu returns to that menu.
-- Cancelling from the options home page exits without saving pending changes.
+- Cancelling from the options home page exits without saving pending HA option changes. Hardware settings already saved on an installation page remain applied.
 
 There are **two ways** to start the configuration flow for ecoMain:
 
@@ -154,8 +155,8 @@ Steps (applies to both starts):
 2. The integration will scan your network via **mDNS** for matching services.
 3. If devices are found, select the correct ecoMain by **serial number** (and IP/hostname shown).
 4. Confirm the device information (serial and address).
-5. The integration will first check the **firmware version** of the device, then try to connect via **Modbus TCP** and detect **online slaves** (ecoSub).
-6. If slaves are detected, select which slaves to add (optional).
+5. The integration will first check the **firmware version** of the device, then connect via **Modbus TCP** and detect **online sub-devices**: ecoSub, plus ecoSolarMonitor on firmware 140 or later.
+6. If sub-devices are detected, select which to add (optional).
 7. Select **Measurement Types**, then optionally configure **Extra Entities**:
     - Create inverted or absolute-value entities from power sources.
     - Create sum or average entities from multiple power or energy sources of the same type.
@@ -218,8 +219,8 @@ Steps:
     - **Master Serial Number**
     - **Address (IP or Hostname)**
 3. Confirm the device information.
-4. The integration will first check the **firmware version**, then connect via **Modbus TCP** and detect **online slaves** (ecoSub).
-5. If slaves are detected, select which slaves to add (optional).
+4. The integration will first check the **firmware version**, then connect via **Modbus TCP** and detect **online sub-devices**: ecoSub, plus ecoSolarMonitor on firmware 140 or later.
+5. If sub-devices are detected, select which to add (optional).
 6. Select **Measurement Types**, then optionally configure **Extra Entities**:
     - Create inverted or absolute-value entities from power sources.
     - Create sum or average entities from multiple power or energy sources of the same type.
@@ -368,7 +369,7 @@ ecoPlug data is polled from the cloud approximately every **60 seconds**. After 
 - **Back** keeps your inputs and appears only when a previous page exists.
 - From a discovery card: the first page has no action choices. **Cancel** on later setup pages clears this attempt and returns to the first page, keeping the discovery card.
 - From **Add integration**: **Cancel** ends setup. Cancelling an operation opened from a menu returns to that menu.
-- Cancelling from the options home page exits without saving pending changes.
+- Cancelling from the options home page exits without saving pending HA option changes. Hardware settings already saved on an installation page remain applied.
 
 ### Editing an existing entry
 
@@ -376,7 +377,7 @@ Open **Settings → Devices & services → enecess → Configure** to adjust mut
 
 You can change:
 
-- For ecoMain entries: selected ecoSub slave devices, measurement types, extra entity configuration and local channel phases.
+- For ecoMain entries: selected ecoSub/ecoSolarMonitor devices, measurement types, extra entity configuration and local channel phases; firmware 140 or later also offers CT and PV installation settings.
 - For an ecoPlug account entry: the selected plugs.
 
 You cannot change:
@@ -399,7 +400,7 @@ If you need to change immutable settings:
 
 ### Measurement Types
 
-- During ecoMain setup, select **Measurement Types** after choosing ecoSub devices and before configuring extra entities.
+- During ecoMain setup, select **Measurement Types** after choosing sub-devices and before configuring extra entities.
 - Open **Configure → Measurement Types** to change them later.
 - Select at least one type.
 - Remove any extra entities that depend on a measurement before deselecting it.
@@ -408,20 +409,39 @@ Local mode offers twelve measurement categories on firmware 139 or later; firmwa
 
 | Category | Meaning | Default |
 | --- | --- | --- |
-| Forward active energy | Accumulated active energy in the forward CT direction (Wh) | On |
-| Reverse active energy | Accumulated active energy in the reverse CT direction (Wh) | On |
-| Forward reactive energy | Accumulated reactive energy in the forward direction (varh) | Off |
-| Reverse reactive energy | Accumulated reactive energy in the reverse direction (varh) | Off |
-| Apparent energy | Apparent energy (VAh) | Off |
-| Active power | Instantaneous active power (W) | On |
-| Reactive power | Reactive power (var) | Off |
-| Apparent power | Apparent power (VA) | Off |
+| Forward Active Energy | Accumulated active energy in the forward CT direction (Wh) | On |
+| Reverse Active Energy | Accumulated active energy in the reverse CT direction (Wh) | On |
+| Forward Reactive Energy | Accumulated reactive energy in the forward direction (varh) | Off |
+| Reverse Reactive Energy | Accumulated reactive energy in the reverse direction (varh) | Off |
+| Apparent Energy | Apparent energy (VAh) | Off |
+| Active Power | Instantaneous active power (W) | On |
+| Reactive Power | Reactive power (var) | Off |
+| Apparent Power | Apparent power (VA) | Off |
 | Voltage | Voltage (V) | Off |
 | Current | Current (A) | Off |
-| Power factor | Ratio of active to apparent power, without a unit | Off |
+| Power Factor | Ratio of active to apparent power, without a unit | Off |
 | Frequency | Grid frequency (Hz), ecoMain only | Off |
 
-Availability follows the device registers: not every category has a three-phase total or a value for every channel. ecoSub exposes channel measurements. Cloud mode offers only **Active power** and **Energy**, both on by default. Energy controls both accumulated energy and raw one-minute increments. ecoPlug retains its fixed switch, power and energy entities.
+Availability follows the device registers: not every category has a three-phase total or a value for every channel. ecoSub exposes channel measurements. Cloud mode offers only **Active Power** and **Energy**, both on by default. Energy controls both accumulated energy and raw one-minute increments. ecoPlug retains its fixed switch, power and energy entities.
+
+### ecoSolarMonitor Measurements (Local Firmware 140 or Later)
+
+Select the detected **ecoSolarMonitor** sub-device, then choose its measurements in the separate **ecoSolarMonitor** group under **Measurement Types**. Each ecoMain owns exactly one ecoSolarMonitor device (child index `4`), alongside ecoSub indices `1`–`3`. It has eight measurements and no ten-channel meter layout. It belongs to the current ecoMain even when inverter channels come from an ecoSub.
+
+| Measurement Label | Full Measurement Key | Native Unit | Selected by Default |
+| --- | --- | --- | --- |
+| Irradiance | `solar_irradiance` | W/m² | Yes |
+| Tilt Angle | `solar_tilt_angle` | ° | Yes |
+| Module Temperature | `solar_module_temperature` | °C | Yes |
+| Actual Power | `solar_actual_power` | W | Yes |
+| Estimated Power | `solar_estimated_power` | W | Yes |
+| Performance Ratio | `solar_performance_ratio` | % | No |
+| Cumulative Actual Energy | `solar_actual_energy` | Wh | No |
+| Cumulative Estimated Energy | `solar_estimated_energy` | Wh | No |
+
+The first six use `MEASUREMENT`; both cumulative energy measurements use `TOTAL_INCREASING`. These Title Case labels describe measurement configuration and documentation. Physical sensor names use the full keys above, following the existing ecoMain naming convention; there are no translated entity-name labels.
+
+Configured selections survive temporary device outages, failed firmware probes and firmware downgrades. Existing entity IDs, custom names and disabled choices are retained; unavailable capabilities make their sensors unavailable. Only explicit deselection removes configured identities. Remove dependent extra entities before deselecting their devices or measurements. Solar-only measurement selection is supported when ecoSolarMonitor is selected.
 
 ### Custom formula entities
 
@@ -433,6 +453,8 @@ Create a sensor from your measurements, such as the difference or average of two
 4. Use the expression page’s `a`, `b`, etc. mapping to enter your formula. Check that its unit matches the result type.
 
 Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), cumulative apparent energy (VAh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active, reactive and apparent energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
+
+On confirmed local firmware 140 or later, enabled ecoSolarMonitor measurements are also formula inputs. Actual Power and Estimated Power join power sources; Cumulative Actual Energy and Cumulative Estimated Energy join cumulative active energy sources. Irradiance (W/m²), Module Temperature (°C), Tilt Angle (°) and Performance Ratio (%) have their own source groups. These inputs do not add formula result types: use an existing result type, including **Number** where appropriate, and check the resulting units.
 
 > ![Add formula entity](docs/images/ecomain-formula-add.png)
 
@@ -460,7 +482,7 @@ Only firmware-supported and enabled measurements are offered. Empty groups are h
 
 ### Channel Phases (Local Only)
 
-- For a local ecoMain entry, open **Configure**, choose **Channel Phases** as the next action, and select ecoMain or a configured online ecoSub.
+- On firmware 139, open **Configure**, choose **Channel Phases** as the next action, and select ecoMain or a configured online ecoSub. Firmware 140 or later uses **Channel Configuration**, described below.
 - Assign **L1**, **L2** or **L3** to each of its ten channels.
 - The integration reads current phases, writes only changed values and reads them back to verify.
 - Failed writes or verification are reported on the affected fields; successful changes are not automatically rolled back.
@@ -479,6 +501,17 @@ The interface shown in the screenshots may vary with the Home Assistant or integ
 
 > ![Set channel phases](docs/images/ecomain-channel-phases.png)
 
+### Installation Settings (Local Firmware 140 or Later)
+
+Open **Configure** after commissioning the entry. These options require confirmed local firmware 140 or later and re-check firmware before accessing hardware settings. They are unavailable in cloud mode and do not create control entities.
+
+- **Channel Configuration**: select ecoMain or a selected, currently online ecoSub. Each of its ten channel sections offers **Phase** (`L1`, `L2`, `L3`) and a **Current Transformer** dropdown limited to **30 A** or **100 A**. ecoMain also has a separate **Main Circuit Current Transformers** section for L1/L2/L3, each limited to **100 A**. Unsupported stored values have no invented default; choose a supported value before saving. ecoSolarMonitor is excluded from this meter picker.
+- **ecoSolarMonitor Configuration**: available when ecoSolarMonitor is selected. Configure the current ecoMain's **Installed PV Capacity** (integer `0`–`2147483647` W) and **Power Temperature Coefficient** (`-32.768`–`32.767` %/°C, at most three decimal places). The same page groups inverter-channel selections under ecoMain and each detected online ecoSub, including ecoSubs whose HA measurements were not selected. Each group selects any of channels `1`–`10`; an empty selection clears that displayed group's inverter channels. Hidden/offline devices keep their existing hardware values. PV settings and inverter groups remain owned by the current ecoMain, with no extra ecoSub-selection step.
+
+**Save** on either installation page immediately reads current hardware, writes only changed values and reads them back to verify. Successful writes are not rolled back if another field fails. Errors identify the affected field or channel section; check those values before retrying. **Back**, **Cancel**, or cancelling the options home page cannot undo hardware settings already saved. Pending HA selections and extra-entity changes are committed separately when finishing the options flow.
+
+The existing screenshots illustrate earlier flows; they do not show or validate these firmware-140 installation pages.
+
 ## Device Naming
 
 When the integration entry is created, the title follows this format:
@@ -495,7 +528,7 @@ Example:
 
 ## Entity Naming & Meaning
 
-The tables below cover the data items currently implemented. **Active power** is the measurement name; `power_rt` remains its technical key. The `_rt` suffix means an instantaneous reading, not a separate power type.
+The tables below cover the data items currently implemented. **Active Power** is the measurement name; `power_rt` remains its technical key. The `_rt` suffix means an instantaneous reading, not a separate power type.
 
 Built-in sensors currently use their technical key as the entity name component. HA combines this with the device name to generate display names and entity IDs. These keys are not complete `sensor.xxx` IDs; use the actual ID shown on the HA entity page in automations. Extra entities use the name entered during configuration, and users can rename entities in HA.
 
@@ -510,7 +543,7 @@ Ordinary ecoMain keys follow `<location>_<suffix>`:
 | Main branches | `main_ch1` … `main_ch10` | Local and cloud |
 | Selected slave branches | `sub1_ch1` … `sub3_ch10` | Ten channels per selected ecoSub |
 
-Slaves have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected slave.
+ecoSub devices have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected ecoSub. ecoSolarMonitor uses the eight full keys in [its measurement table](#ecosolarmonitor-measurements-local-firmware-140-or-later), without a location prefix or channel suffix.
 
 ### Complete local measurement catalog (Modbus)
 
@@ -518,17 +551,17 @@ Firmware **136–138** supports only the first three categories; firmware **139 
 
 | Measurement | Key suffix / full key | Native unit | Main phases | Main total | Branches | Selected by default |
 | --- | --- | --- | --- | --- | --- | --- |
-| Active power | `power_rt` | W | ✓ | ✓ | ✓ | Yes |
-| Forward active energy | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Yes |
-| Reverse active energy | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | Yes |
-| Forward reactive energy | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | No |
-| Reverse reactive energy | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | No |
-| Apparent energy | `apparent_energy_total` | VAh | ✓ | ✓ | ✓ | No |
-| Apparent power | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | No |
-| Reactive power | `reactive_power_rt` | var | ✓ | ✓ | ✓ | No |
+| Active Power | `power_rt` | W | ✓ | ✓ | ✓ | Yes |
+| Forward Active Energy | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Yes |
+| Reverse Active Energy | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | Yes |
+| Forward Reactive Energy | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | No |
+| Reverse Reactive Energy | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | No |
+| Apparent Energy | `apparent_energy_total` | VAh | ✓ | ✓ | ✓ | No |
+| Apparent Power | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | No |
+| Reactive Power | `reactive_power_rt` | var | ✓ | ✓ | ✓ | No |
 | Voltage | `voltage_rt` | V | ✓ | — | ✓ | No |
 | Current | `current_rt` | A | ✓ | — | ✓ | No |
-| Power factor | `power_factor_rt` | None | ✓ | — | ✓ | No |
+| Power Factor | `power_factor_rt` | None | ✓ | — | ✓ | No |
 | Frequency | `main_frequency_rt` (full key) | Hz | — | — | — | No; one main sensor only |
 
 Power, voltage, current, power factor and frequency use the `MEASUREMENT` state class; the five cumulative energy categories use `TOTAL_INCREASING`. Units listed are native units; HA can convert their display according to user settings.
@@ -543,11 +576,11 @@ The CT arrow marks the forward direction. `energy_fwd_total` accumulates active 
 
 ### Complete cloud measurement catalog
 
-Cloud mode has two measurement selections, **Active power** and **Energy**, both selected by default. Each applies to `main_all`, `main_ch1` … `main_ch10` and selected `subN_ch1` … `subN_ch10`. Cloud mode has no per-phase readings or any of the nine additional local measurement categories.
+Cloud mode has two measurement selections, **Active Power** and **Energy**, both selected by default. Each applies to `main_all`, `main_ch1` … `main_ch10` and selected `subN_ch1` … `subN_ch10`. Cloud mode has no per-phase readings or any of the nine additional local measurement categories.
 
 | Selection | Data item | Key suffix | Native unit | HA state class |
 | --- | --- | --- | --- | --- |
-| Active power | 1-minute average active power | `power_avg_1m` | W | `MEASUREMENT` |
+| Active Power | 1-minute average active power | `power_avg_1m` | W | `MEASUREMENT` |
 | Energy | Raw 1-minute active energy increment | `energy_total_1m` | Wh | None |
 | Energy | Estimated active energy accumulated in HA | `energy_accumulated` | Wh | `TOTAL_INCREASING` |
 
@@ -564,8 +597,8 @@ Each selected ecoPlug creates three fixed cloud entities, without measurement se
 | Entity | Default name component / key | Native unit | HA state class |
 | --- | --- | --- | --- |
 | Plug switch | Uses the plug device name, without an extra name suffix | — | — |
-| Active power | `power_rt` | W | `MEASUREMENT` |
-| Cumulative active energy | `energy_total` | kWh | `TOTAL_INCREASING` |
+| Active Power | `power_rt` | W | `MEASUREMENT` |
+| Cumulative Active Energy | `energy_total` | kWh | `TOTAL_INCREASING` |
 
 Although ecoPlug and local ecoMain both use `power_rt`, ecoPlug readings are polled from the cloud roughly every 60 seconds. ecoPlug energy is natively in kWh; ecoMain energy is in Wh.
 
@@ -583,7 +616,7 @@ Extra entities are configured explicitly and are available for local and cloud e
 
 The first four operations retain the source device class, state class and native unit. Formula results support active power, active energy, reactive energy, apparent energy, apparent power, reactive power, voltage, current, power factor, frequency and number. Active/reactive/apparent energy results use `TOTAL`; the others use `MEASUREMENT`. See “Custom formula entities” above for configuration and expression rules.
 
-**Channel Phases** is an options page for local firmware 139 or later; it creates no additional `select` or sensor entities.
+**Channel Phases** (firmware 139), **Channel Configuration** and **ecoSolarMonitor Configuration** (firmware 140 or later) are local options pages; they create no additional control entities.
 
 ---
 
@@ -706,7 +739,7 @@ If an entry with the same ID already exists, you cannot add it again.
 
 Open the entry’s **Configure** / **Options** flow from Home Assistant.
 
-For ecoMain entries, you can change selected ecoSub slaves, measurement types, extra entity configuration and local channel phases. For an ecoPlug account entry, you can change which plugs are selected. Device type, add method, and the selected ecoMain master device cannot be changed in place.
+For ecoMain entries, you can change selected ecoSub/ecoSolarMonitor devices, measurement types, extra entity configuration and local channel phases. Confirmed local firmware 140 or later also offers CT and PV installation settings, as described in [Installation Settings](#installation-settings-local-firmware-140-or-later). For an ecoPlug account entry, you can change which plugs are selected. Device type, add method, and the selected ecoMain master device cannot be changed in place.
 
 To change immutable settings, remove the existing entry and add it again with the new parameters.
 
@@ -727,12 +760,12 @@ Check the release notes for upgrade instructions before installing a new version
 
 The integration uses multiple filters:
 
-1. **Available slaves**: Only slave indices listed in the configuration are supported (currently `1`, `2`, `3`).
+1. **Available sub-devices**: ecoSub uses indices `1`, `2`, `3`; local firmware 140 or later also supports one ecoSolarMonitor at index `4`.
 2. **Online slaves** (local mode):
     - The integration reads a set of “slave online” registers.
-    - Only slaves marked as online are offered for selection.
-3. **Selected slaves**:
-    - Only slaves you selected during the setup are actually created as entities.
+    - New selections are offered only for online sub-devices. Options retain already selected devices while they are offline.
+3. **Selected sub-devices and measurements**:
+    - Only selected sub-devices with enabled measurements create sensors. Offline configured sensors remain registered but become unavailable.
 
 So you will see entities for:
 
@@ -743,7 +776,7 @@ So you will see entities for:
 If some expected sub-devices are missing:
 
 - Check that the slaves are powered and correctly wired.
-- Re-add the integration and include the missing slave(s) in the selection.
+- Open **Configure** to select detected sub-devices and their measurements. Reload after updating firmware.
 
 ---
 

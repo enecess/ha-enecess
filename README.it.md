@@ -165,7 +165,7 @@ La porta Modbus TCP è **502** e non è modificabile nell’interfaccia. Home As
 2. Scegli **Accesso all’account (cloud)** e inserisci lo stesso nome utente e la stessa password dell’app enecess. Non viene creato un nuovo account.
 3. Seleziona ecoMain dall’elenco dei dispositivi principali.
 4. Seleziona gli ecoSub da includere, se disponibili.
-5. Scegli **Potenza attiva**, **Energia** o entrambe. L’energia comprende il contatore accumulato e l’incremento grezzo di un minuto.
+5. Scegli **Potenza Attiva**, **Energia** o entrambe. L’energia comprende il contatore accumulato e l’incremento grezzo di un minuto.
 6. Configura eventuali entità aggiuntive e termina.
 
 Il cloud restituisce valori elaborati in base alla configurazione remota. L’aggiornamento avviene circa ogni **60 secondi**, rispetto ai circa **5 secondi** della modalità locale.
@@ -283,22 +283,22 @@ Con il firmware 139 o successivo sono disponibili le seguenti dodici categorie l
 
 | Misurazione | Significato | Unità | Selezione iniziale |
 | --- | --- | --- | --- |
-| Energia attiva diretta | Energia attiva accumulata nella direzione diretta del trasformatore di corrente | Wh | Sì |
-| Energia attiva inversa | Energia attiva accumulata nella direzione opposta | Wh | Sì |
-| Energia reattiva diretta | Energia reattiva accumulata nella direzione diretta | varh | No |
-| Energia reattiva inversa | Energia reattiva accumulata nella direzione inversa | varh | No |
-| Energia apparente | Energia apparente (VAh) | VAh | No |
-| Potenza attiva | Potenza elettrica attiva istantanea | W | Sì |
-| Potenza reattiva | Potenza reattiva misurata | var | No |
-| Potenza apparente | Potenza apparente misurata | VA | No |
+| Energia Attiva Diretta | Energia attiva accumulata nella direzione diretta del trasformatore di corrente | Wh | Sì |
+| Energia Attiva Inversa | Energia attiva accumulata nella direzione opposta | Wh | Sì |
+| Energia Reattiva Diretta | Energia reattiva accumulata nella direzione diretta | varh | No |
+| Energia Reattiva Inversa | Energia reattiva accumulata nella direzione inversa | varh | No |
+| Energia Apparente | Energia apparente (VAh) | VAh | No |
+| Potenza Attiva | Potenza elettrica attiva istantanea | W | Sì |
+| Potenza Reattiva | Potenza reattiva misurata | var | No |
+| Potenza Apparente | Potenza apparente misurata | VA | No |
 | Tensione | Tensione elettrica | V | No |
 | Corrente | Corrente elettrica | A | No |
-| Fattore di potenza | Rapporto tra potenza attiva e apparente | Senza unità | No |
+| Fattore Di Potenza | Rapporto tra potenza attiva e apparente | Senza unità | No |
 | Frequenza | Frequenza della rete, disponibile solo su ecoMain | Hz | No |
 
 Le categorie si applicano alle misurazioni effettivamente disponibili sul dispositivo; non tutte hanno un totale trifase o un valore per ogni canale. Gli ecoSub forniscono misurazioni dei canali. La frequenza è disponibile solo sul dispositivo principale.
 
-Nel cloud sono disponibili soltanto **Potenza attiva** ed **Energia**, entrambe selezionate inizialmente. L’opzione Energia controlla sia `*_energy_accumulated` sia `*_energy_total_1m`. Le nuove categorie locali non sono disponibili nel cloud. Gli account ecoPlug mantengono il proprio insieme fisso di entità.
+Nel cloud sono disponibili soltanto **Potenza Attiva** ed **Energia**, entrambe selezionate inizialmente. L’opzione Energia controlla sia `*_energy_accumulated` sia `*_energy_total_1m`. Le nuove categorie locali non sono disponibili nel cloud. Gli account ecoPlug mantengono il proprio insieme fisso di entità.
 
 ### Entità aggiuntive
 
@@ -389,7 +389,7 @@ Questa funzione modifica la configurazione sul dispositivo e richiede la conness
 
 I nomi delle voci ecoMain seguono i formati `ecoMain <serial> (Local)` e `ecoMain <serial> (Cloud)`. Gli identificatori univoci usano rispettivamente `ecomain:<serial>:mode_local` e `ecomain:<serial>:mode_cloud`.
 
-I nomi seguenti sono **chiavi di misurazione**, non `entity_id` completi di Home Assistant. I sensori usano le chiavi come nomi; Home Assistant aggiunge il nome del dispositivo e gestisce l’effettivo identificatore `sensor.…`, che l’utente può rinominare. **Potenza attiva** descrive la misurazione; le chiavi esistenti `power_rt` e `power_avg_1m` rimangono invariate.
+I nomi seguenti sono **chiavi di misurazione**, non `entity_id` completi di Home Assistant. I sensori usano le chiavi come nomi; Home Assistant aggiunge il nome del dispositivo e gestisce l’effettivo identificatore `sensor.…`, che l’utente può rinominare. **Potenza Attiva** descrive la misurazione; le chiavi esistenti `power_rt` e `power_avg_1m` rimangono invariate.
 
 ### Modalità locale (Modbus): catalogo completo
 
@@ -403,28 +403,28 @@ Il firmware 136–138 supporta solo le prime tre misurazioni, selezionate inizia
 
 | Misurazione | Suffisso | Unità | Ambito |
 | --- | --- | --- | --- |
-| Potenza attiva | `power_rt` | W | A |
-| Energia attiva diretta | `energy_fwd_total` | Wh | A |
-| Energia attiva inversa | `energy_rev_total` | Wh | A |
-| Energia reattiva diretta | `reactive_energy_fwd_total` | varh | A |
-| Energia reattiva inversa | `reactive_energy_rev_total` | varh | A |
-| Energia apparente | `apparent_energy_total` | VAh | A |
-| Potenza apparente | `apparent_power_rt` | VA | A |
-| Potenza reattiva | `reactive_power_rt` | var | A |
+| Potenza Attiva | `power_rt` | W | A |
+| Energia Attiva Diretta | `energy_fwd_total` | Wh | A |
+| Energia Attiva Inversa | `energy_rev_total` | Wh | A |
+| Energia Reattiva Diretta | `reactive_energy_fwd_total` | varh | A |
+| Energia Reattiva Inversa | `reactive_energy_rev_total` | varh | A |
+| Energia Apparente | `apparent_energy_total` | VAh | A |
+| Potenza Apparente | `apparent_power_rt` | VA | A |
+| Potenza Reattiva | `reactive_power_rt` | var | A |
 | Tensione | `voltage_rt` | V | C |
 | Corrente | `current_rt` | A | C |
-| Fattore di potenza | `power_factor_rt` | — | C |
+| Fattore Di Potenza | `power_factor_rt` | — | C |
 | Frequenza | `frequency_rt` | Hz | `main` |
 
 La frequenza ha solo la chiave completa `main_frequency_rt`, senza fase o canale. Esempi: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` indica un valore istantaneo e `_total` un contatore cumulativo. Il fattore di potenza è adimensionale, non una percentuale. Il verso del trasformatore di corrente (CT) determina la direzione diretta/inversa; un CT invertito può causare potenza attiva negativa e aumento del contatore inverso.
 
 ### Modalità cloud
 
-Le due misurazioni selezionate inizialmente, **Potenza attiva** (`power`) ed **Energia** (`energy`), generano tre tipi di sensori:
+Le due misurazioni selezionate inizialmente, **Potenza Attiva** (`power`) ed **Energia** (`energy`), generano tre tipi di sensori:
 
 | Selezione | Suffisso | Unità | Significato |
 | --- | --- | --- | --- |
-| Potenza attiva | `power_avg_1m` | W | Potenza attiva media di un minuto |
+| Potenza Attiva | `power_avg_1m` | W | Potenza attiva media di un minuto |
 | Energia | `energy_total_1m` | Wh | Incremento grezzo di energia di un minuto, non un contatore cumulativo |
 | Energia | `energy_accumulated` | Wh | Energia sommata da Home Assistant |
 
@@ -438,8 +438,8 @@ Ogni presa ecoPlug selezionata ha tre entità fisse:
 
 | Entità | Nome nel codice | Dati |
 | --- | --- | --- |
-| Sensore | `power_rt` | Potenza attiva, W (`MEASUREMENT`) |
-| Sensore | `energy_total` | Energia cumulativa, kWh (`TOTAL_INCREASING`) |
+| Sensore | `power_rt` | Potenza Attiva, W (`MEASUREMENT`) |
+| Sensore | `energy_total` | Energia Cumulativa, kWh (`TOTAL_INCREASING`) |
 | Interruttore | Nome del dispositivo | Accensione/spegnimento della presa |
 
 I nomi dei sensori restano `power_rt` ed `energy_total`; le descrizioni tradotte non garantiscono nomi visualizzati tradotti. L’interruttore usa il nome del dispositivo senza suffisso aggiuntivo.

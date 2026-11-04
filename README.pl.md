@@ -411,20 +411,20 @@ Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsłu
 
 | Kategoria | Znaczenie | Domyślnie |
 | --- | --- | --- |
-| Energia czynna w kierunku zgodnym | Energia czynna zgromadzona zgodnie ze strzałką przekładnika (Wh) | Włączona |
-| Energia czynna w kierunku przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
-| Energia bierna w kierunku zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
-| Energia bierna w kierunku przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
-| Energia pozorna | Energia pozorna (VAh) | Wyłączona |
-| Moc czynna | Chwilowa moc czynna (W) | Włączona |
-| Moc bierna | Moc bierna (var) | Wyłączona |
-| Moc pozorna | Moc pozorna (VA) | Wyłączona |
+| Energia Czynna W Kierunku Zgodnym | Energia czynna zgromadzona zgodnie ze strzałką przekładnika (Wh) | Włączona |
+| Energia Czynna W Kierunku Przeciwnym | Energia czynna zgromadzona przeciwnie do strzałki (Wh) | Włączona |
+| Energia Bierna W Kierunku Zgodnym | Energia bierna zgromadzona w kierunku zgodnym (varh) | Wyłączona |
+| Energia Bierna W Kierunku Przeciwnym | Energia bierna zgromadzona w kierunku przeciwnym (varh) | Wyłączona |
+| Energia Pozorna | Energia pozorna (VAh) | Wyłączona |
+| Moc Czynna | Chwilowa moc czynna (W) | Włączona |
+| Moc Bierna | Moc bierna (var) | Wyłączona |
+| Moc Pozorna | Moc pozorna (VA) | Wyłączona |
 | Napięcie | Napięcie elektryczne (V) | Wyłączona |
 | Prąd | Natężenie prądu (A) | Wyłączona |
-| Współczynnik mocy | Stosunek mocy czynnej do pozornej, bez jednostki | Wyłączona |
+| Współczynnik Mocy | Stosunek mocy czynnej do pozornej, bez jednostki | Wyłączona |
 | Częstotliwość | Częstotliwość sieci (Hz), tylko ecoMain | Wyłączona |
 
-Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę trójfazową lub wartość dla każdego kanału. ecoSub udostępnia pomiary kanałów. Chmura oferuje tylko **Moc czynną** i **Energię**, obie domyślnie wybrane. Energia obejmuje licznik skumulowany oraz surowe przyrosty minutowe. Stały zestaw encji ecoPlug pozostaje bez zmian.
+Dostępność zależy od rejestrów urządzenia: nie każda kategoria ma sumę trójfazową lub wartość dla każdego kanału. ecoSub udostępnia pomiary kanałów. Chmura oferuje tylko **Moc Czynną** i **Energię**, obie domyślnie wybrane. Energia obejmuje licznik skumulowany oraz surowe przyrosty minutowe. Stały zestaw encji ecoPlug pozostaje bez zmian.
 
 ### Własne encje formuł
 
@@ -498,7 +498,7 @@ Przykład:
 
 ## Nazewnictwo i znaczenie encji
 
-Poniższe nazwy to **klucze pomiarów**, a nie pełne identyfikatory `entity_id` Home Assistant. Czujniki używają tych kluczy jako nazw; Home Assistant dodaje nazwę urządzenia i zarządza właściwym identyfikatorem `sensor.…`, który użytkownik może zmienić. **Moc czynna** określa rodzaj pomiaru; dotychczasowe klucze `power_rt` i `power_avg_1m` pozostają bez zmian.
+Poniższe nazwy to **klucze pomiarów**, a nie pełne identyfikatory `entity_id` Home Assistant. Czujniki używają tych kluczy jako nazw; Home Assistant dodaje nazwę urządzenia i zarządza właściwym identyfikatorem `sensor.…`, który użytkownik może zmienić. **Moc Czynna** określa rodzaj pomiaru; dotychczasowe klucze `power_rt` i `power_avg_1m` pozostają bez zmian.
 
 ### Tryb lokalny (Modbus): pełny katalog
 
@@ -512,28 +512,28 @@ Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone 
 
 | Pomiar | Sufiks | Jednostka | Zakres |
 | --- | --- | --- | --- |
-| Moc czynna | `power_rt` | W | A |
-| Energia czynna w kierunku zgodnym | `energy_fwd_total` | Wh | A |
-| Energia czynna w kierunku przeciwnym | `energy_rev_total` | Wh | A |
-| Energia bierna w kierunku zgodnym | `reactive_energy_fwd_total` | varh | A |
-| Energia bierna w kierunku przeciwnym | `reactive_energy_rev_total` | varh | A |
-| Energia pozorna | `apparent_energy_total` | VAh | A |
-| Moc pozorna | `apparent_power_rt` | VA | A |
-| Moc bierna | `reactive_power_rt` | var | A |
+| Moc Czynna | `power_rt` | W | A |
+| Energia Czynna W Kierunku Zgodnym | `energy_fwd_total` | Wh | A |
+| Energia Czynna W Kierunku Przeciwnym | `energy_rev_total` | Wh | A |
+| Energia Bierna W Kierunku Zgodnym | `reactive_energy_fwd_total` | varh | A |
+| Energia Bierna W Kierunku Przeciwnym | `reactive_energy_rev_total` | varh | A |
+| Energia Pozorna | `apparent_energy_total` | VAh | A |
+| Moc Pozorna | `apparent_power_rt` | VA | A |
+| Moc Bierna | `reactive_power_rt` | var | A |
 | Napięcie | `voltage_rt` | V | C |
 | Prąd | `current_rt` | A | C |
-| Współczynnik mocy | `power_factor_rt` | — | C |
+| Współczynnik Mocy | `power_factor_rt` | — | C |
 | Częstotliwość | `frequency_rt` | Hz | `main` |
 
 Częstotliwość ma wyłącznie pełny klucz `main_frequency_rt`, bez fazy lub kanału. Przykłady: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` oznacza wartość chwilową, a `_total` licznik skumulowany. Współczynnik mocy jest bezwymiarowy, nie jest procentem. Kierunek przekładnika prądowego (CT) wyznacza kierunek zgodny i przeciwny; odwrotny montaż może powodować ujemną moc czynną i wzrost licznika energii w kierunku przeciwnym.
 
 ### Tryb chmury
 
-Dwa domyślnie wybrane pomiary, **Moc czynna** (`power`) i **Energia** (`energy`), tworzą trzy rodzaje czujników:
+Dwa domyślnie wybrane pomiary, **Moc Czynna** (`power`) i **Energia** (`energy`), tworzą trzy rodzaje czujników:
 
 | Wybór | Sufiks | Jednostka | Znaczenie |
 | --- | --- | --- | --- |
-| Moc czynna | `power_avg_1m` | W | Średnia moc czynna z jednej minuty |
+| Moc Czynna | `power_avg_1m` | W | Średnia moc czynna z jednej minuty |
 | Energia | `energy_total_1m` | Wh | Surowy przyrost energii z jednej minuty, nie licznik skumulowany |
 | Energia | `energy_accumulated` | Wh | Energia sumowana przez Home Assistant |
 
@@ -547,8 +547,8 @@ Każde wybrane gniazdko ecoPlug ma trzy stałe encje:
 
 | Encja | Nazwa w kodzie | Dane |
 | --- | --- | --- |
-| Czujnik | `power_rt` | Moc czynna, W (`MEASUREMENT`) |
-| Czujnik | `energy_total` | Energia skumulowana, kWh (`TOTAL_INCREASING`) |
+| Czujnik | `power_rt` | Moc Czynna, W (`MEASUREMENT`) |
+| Czujnik | `energy_total` | Energia Skumulowana, kWh (`TOTAL_INCREASING`) |
 | Przełącznik | Nazwa urządzenia | Włączanie i wyłączanie gniazdka |
 
 Nazwy czujników pozostają `power_rt` i `energy_total`; przetłumaczone opisy nie oznaczają przetłumaczonych nazw wyświetlanych. Przełącznik używa nazwy urządzenia bez dodatkowego sufiksu.

@@ -412,10 +412,10 @@ Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmwa
 
 | Kategorie | Bedeutung | Standard |
 | --- | --- | --- |
-| Wirkenergie vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
-| Wirkenergie rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
-| Blindenergie vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
-| Blindenergie rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
+| Wirkenergie Vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
+| Wirkenergie Rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
+| Blindenergie Vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
+| Blindenergie Rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
 | Scheinenergie | Scheinenergie (VAh) | Aus |
 | Wirkleistung | Momentane Wirkleistung (W) | Ein |
 | Blindleistung | Blindleistung (var) | Aus |
@@ -514,10 +514,10 @@ Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardm�
 | Messgröße | Suffix | Einheit | Bereich |
 | --- | --- | --- | --- |
 | Wirkleistung | `power_rt` | W | A |
-| Wirkenergie vorwärts | `energy_fwd_total` | Wh | A |
-| Wirkenergie rückwärts | `energy_rev_total` | Wh | A |
-| Blindenergie vorwärts | `reactive_energy_fwd_total` | varh | A |
-| Blindenergie rückwärts | `reactive_energy_rev_total` | varh | A |
+| Wirkenergie Vorwärts | `energy_fwd_total` | Wh | A |
+| Wirkenergie Rückwärts | `energy_rev_total` | Wh | A |
+| Blindenergie Vorwärts | `reactive_energy_fwd_total` | varh | A |
+| Blindenergie Rückwärts | `reactive_energy_rev_total` | varh | A |
 | Scheinenergie | `apparent_energy_total` | VAh | A |
 | Scheinleistung | `apparent_power_rt` | VA | A |
 | Blindleistung | `reactive_power_rt` | var | A |

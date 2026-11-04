@@ -23,6 +23,16 @@ optional apparent-energy selection and formulas. Options regressions preserve
 configured measurements, formulas and entity identities during temporary
 connection failures or capability loss.
 
+Protocol 1.0.6 coverage adds confirmed firmware-140 gating, the eight
+ecoSolarMonitor measurements and their defaults, signed/scaled register decoding,
+master-owned child-index-4 identities, solar-only selection and grouped formula
+inputs. Simulated hardware checks cover channel phase/CT settings, PV capacity
+and temperature coefficient, inverter-channel masks, changed-value writes and
+readback errors. Flow journeys cover per-meter channel sections, centralized
+ecoSolarMonitor commissioning, immediate hardware saves, Back/Cancel drafts,
+and preservation of hidden/offline selections. Measurement labels use Title Case;
+physical solar sensor names retain their measurement keys.
+
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 
 Setup and options share the local validation path. Regression coverage includes
