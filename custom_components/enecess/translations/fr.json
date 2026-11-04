@@ -59,7 +59,7 @@
       },
       "ecomain_local_setup": {
         "title": "Configurer l'appareil",
-        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}\n\nSélectionnez les appareils ecoSub à ajouter avec cet ecoMain. S’il n’y en a aucun, continuez sans sélection.",
+        "description": "Numéro de série : {ecomain_serial}\nAdresse : {ecomain_host}\n\nSélectionnez les ecoSub et ecoSolarMonitor en ligne à ajouter avec cet ecoMain. Continuez directement s’il n’y en a aucun.",
         "data": {
           "ecomain_selected_slaves": "Sélectionner les modules esclaves à ajouter",
           "flow_action": "Action"
@@ -222,16 +222,18 @@
         "title": "Types de mesures",
         "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
         "data": {
-          "measurement_types": "Types de mesures",
-          "flow_action": "Action"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "Action",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       },
       "measurement_types_legacy": {
         "title": "Types de mesures",
         "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.\n\nPassez au micrologiciel 139 ou ultérieur pour accéder à davantage de types de mesures.",
         "data": {
-          "measurement_types": "Types de mesures",
-          "flow_action": "Action"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "Action",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       }
     },
@@ -398,16 +400,130 @@
         "title": "Types de mesures",
         "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.",
         "data": {
-          "measurement_types": "Types de mesures",
-          "flow_action": "Action"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "Action",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       },
       "measurement_types_legacy": {
         "title": "Types de mesures",
         "description": "Version du micrologiciel : {firmware_version}\n\nSélectionnez les mesures que vous souhaitez consulter. Choisissez au moins un type.\n\nPassez au micrologiciel 139 ou ultérieur pour accéder à davantage de types de mesures.",
         "data": {
-          "measurement_types": "Types de mesures",
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "Action",
+          "solar_measurement_types": "ecoSolarMonitor"
+        }
+      },
+      "channel_device": {
+        "title": "Configuration des canaux",
+        "description": "Sélectionnez le compteur dont vous souhaitez modifier les canaux.",
+        "data": {
+          "channel_device": "Appareil",
           "flow_action": "Action"
+        }
+      },
+      "channel_configuration": {
+        "title": "Configuration des canaux",
+        "description": "Configurez {device}. L’enregistrement met immédiatement à jour et vérifie les réglages de l’appareil. Retour et Annuler conservent les modifications déjà enregistrées sur le matériel.",
+        "data": {
+          "flow_action": "Action"
+        },
+        "sections": {
+          "channel_1": {
+            "name": "Canal 1",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_2": {
+            "name": "Canal 2",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_3": {
+            "name": "Canal 3",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_4": {
+            "name": "Canal 4",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_5": {
+            "name": "Canal 5",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_6": {
+            "name": "Canal 6",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_7": {
+            "name": "Canal 7",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_8": {
+            "name": "Canal 8",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_9": {
+            "name": "Canal 9",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "channel_10": {
+            "name": "Canal 10",
+            "data": {
+              "phase": "Phase",
+              "transformer": "Transformateur de courant"
+            }
+          },
+          "main_transformers": {
+            "name": "Transformateurs de courant du circuit principal",
+            "data": {
+              "l1": "L1",
+              "l2": "L2",
+              "l3": "L3"
+            }
+          }
+        }
+      },
+      "solar_configuration": {
+        "title": "Configuration ecoSolarMonitor",
+        "description": "Configurez l’ecoMain actuel : puissance PV installée en W (entier) et coefficient de température en %/°C (pas de 0,001). Les canaux d’onduleur sont affichés pour ecoMain et les ecoSub détectés en ligne, même sans mesures HA. Les appareils masqués restent inchangés. L’enregistrement met immédiatement à jour et vérifie le matériel.",
+        "data": {
+          "capacity": "Puissance PV installée",
+          "temperature_coefficient": "Coefficient de température de puissance",
+          "inverter_channels_0": "ecoMain",
+          "inverter_channels_1": "ecoSub 1",
+          "inverter_channels_2": "ecoSub 2",
+          "inverter_channels_3": "ecoSub 3",
+          "flow_action": "Action"
+        },
+        "data_description": {
+          "capacity": "Saisissez un entier fini de 0 à 2147483647 W.",
+          "temperature_coefficient": "Saisissez une valeur finie de -32,768 à 32,767 %/°C avec trois décimales au maximum."
         }
       }
     },
@@ -434,11 +550,27 @@
       "formula_result_type_locked": "Le type de résultat ne peut pas changer. Créez une nouvelle entité de formule.",
       "no_formula_entities": "Aucune entité de formule configurée.",
       "invalid_input": "Saisie invalide.",
-      "slave_in_use": "Supprimez les entités supplémentaires utilisant les mesures de cet appareil secondaire avant de le décocher."
+      "slave_in_use": "Supprimez les entités supplémentaires utilisant les mesures de cet appareil secondaire avant de le décocher.",
+      "settings_read_failed": "Impossible de lire tous les réglages. Réessayez, revenez en arrière ou annulez ; aucune valeur manquante ne sera écrite.",
+      "settings_write_failed": "Impossible d’enregistrer ce réglage ou groupe d’onduleur. Vérifiez la connexion et réessayez. Les modifications réussies sont conservées.",
+      "settings_verify_failed": "La valeur relue ne correspond pas à ce réglage ou groupe d’onduleur. Vérifiez la sélection et réessayez.",
+      "settings_unavailable": "Ces réglages nécessitent un client ecoMain disponible en mode local.",
+      "settings_firmware_too_old": "La configuration des canaux et d’ecoSolarMonitor nécessite un micrologiciel confirmé de version 140 ou ultérieure.",
+      "settings_phase_write_failed": "Impossible d’enregistrer la phase dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
+      "settings_phase_verify_failed": "La valeur relue pour la phase dans ce groupe ne correspond pas à votre sélection. Réessayez.",
+      "settings_transformer_write_failed": "Impossible d’enregistrer le transformateur de courant dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
+      "settings_transformer_verify_failed": "La valeur relue pour le transformateur de courant dans ce groupe ne correspond pas à votre sélection. Réessayez.",
+      "settings_main_l1_write_failed": "Impossible d’enregistrer le transformateur principal L1 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
+      "settings_main_l1_verify_failed": "La valeur relue pour le transformateur principal L1 dans ce groupe ne correspond pas à votre sélection. Réessayez.",
+      "settings_main_l2_write_failed": "Impossible d’enregistrer le transformateur principal L2 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
+      "settings_main_l2_verify_failed": "La valeur relue pour le transformateur principal L2 dans ce groupe ne correspond pas à votre sélection. Réessayez.",
+      "settings_main_l3_write_failed": "Impossible d’enregistrer le transformateur principal L3 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
+      "settings_main_l3_verify_failed": "La valeur relue pour le transformateur principal L3 dans ce groupe ne correspond pas à votre sélection. Réessayez."
     },
     "abort": {
       "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local.",
-      "user_cancelled": "Annulé."
+      "user_cancelled": "Annulé.",
+      "settings_unavailable": "Ces réglages nécessitent un client ecoMain disponible en mode local."
     }
   },
   "selector": {
@@ -459,7 +591,8 @@
       "options": {
         "1": "ecoSub 1",
         "2": "ecoSub 2",
-        "3": "ecoSub 3"
+        "3": "ecoSub 3",
+        "4": "ecoSolarMonitor"
       }
     },
     "extra_action": {
@@ -473,7 +606,9 @@
         "measurement_types": "Types de mesures",
         "channel_phases": "Phases des canaux",
         "add_formula": "Ajouter une entité de formule",
-        "edit_formula": "Modifier une entité de formule"
+        "edit_formula": "Modifier une entité de formule",
+        "channel_configuration": "Configuration des canaux",
+        "solar_configuration": "Configuration ecoSolarMonitor"
       }
     },
     "extra_entity_operation": {
@@ -492,19 +627,19 @@
     },
     "measurement_types": {
       "options": {
-        "power": "Puissance active",
-        "energy_forward": "Énergie active directe",
-        "energy_reverse": "Énergie active inverse",
-        "reactive_energy_forward": "Énergie réactive directe",
-        "reactive_energy_reverse": "Énergie réactive inverse",
-        "apparent_energy": "Énergie apparente",
-        "apparent_power": "Puissance apparente",
-        "reactive_power": "Puissance réactive",
+        "power": "Puissance Active",
+        "energy_forward": "Énergie Active Directe",
+        "energy_reverse": "Énergie Active Inverse",
+        "reactive_energy_forward": "Énergie Réactive Directe",
+        "reactive_energy_reverse": "Énergie Réactive Inverse",
+        "apparent_energy": "Énergie Apparente",
+        "apparent_power": "Puissance Apparente",
+        "reactive_power": "Puissance Réactive",
         "voltage": "Tension",
         "current": "Courant",
-        "power_factor": "Facteur de puissance",
+        "power_factor": "Facteur De Puissance",
         "frequency": "Fréquence",
-        "energy": "Énergie active (cumul et incrément par minute)"
+        "energy": "Énergie Active (Cumul Et Incrément Par Minute)"
       }
     },
     "phase_device": {
@@ -536,6 +671,38 @@
         "save": "Enregistrer",
         "back": "Retour",
         "cancel": "Annuler"
+      }
+    },
+    "current_transformer": {
+      "options": {
+        "30": "30 A",
+        "100": "100 A"
+      }
+    },
+    "inverter_channels": {
+      "options": {
+        "1": "Canal 1",
+        "2": "Canal 2",
+        "3": "Canal 3",
+        "4": "Canal 4",
+        "5": "Canal 5",
+        "6": "Canal 6",
+        "7": "Canal 7",
+        "8": "Canal 8",
+        "9": "Canal 9",
+        "10": "Canal 10"
+      }
+    },
+    "solar_measurement_types": {
+      "options": {
+        "solar_irradiance": "Irradiance",
+        "solar_tilt_angle": "Angle D’Inclinaison",
+        "solar_module_temperature": "Température Du Module",
+        "solar_actual_power": "Puissance Réelle",
+        "solar_estimated_power": "Puissance Estimée",
+        "solar_performance_ratio": "Ratio De Performance",
+        "solar_actual_energy": "Énergie Réelle Cumulée",
+        "solar_estimated_energy": "Énergie Estimée Cumulée"
       }
     }
   }

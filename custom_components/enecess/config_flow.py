@@ -27,6 +27,7 @@ from .const import (
     CONF_ECOMAIN_PORT,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
     CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
+    CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION,
     CONF_LOCAL_MDNS_SCAN_INTERVAL,
     CONST_ADD_MODE,
     CONST_ADD_MODE_CLOUD,
@@ -66,6 +67,7 @@ from .const import (
     CONST_EXTRA_ENTITY_SOURCES,
     CONST_MDNS_IP,
     CONST_MEASUREMENT_TYPES,
+    CONST_SOLAR_MEASUREMENT_TYPES,
     DEVICE_CONFIGS,
     DOMAIN,
     DiscoveryConfig,
@@ -74,6 +76,7 @@ from .const import (
 from .ecomain.model import (
     CLOUD_MEASUREMENTS,
     LOCAL_MEASUREMENTS,
+    SOLAR_MEASUREMENTS,
     available_local_measurements,
 )
 from .ecomain.phase import async_read_phases, async_write_phases
@@ -89,12 +92,14 @@ from .extra import (
     get_entry_extra_entities,
     get_entry_measurement_types,
     get_entry_slaves,
+    get_entry_solar_measurement_types,
     normalize_extra_entity,
 )
 from .flow_navigation import FlowNavigationMixin, navigable_step
 from .formula_flow import FormulaFlowMixin
 from .local_validation import async_validate_local_device
 from .registry import async_remove_unconfigured_registry_entries
+from .settings_flow import SettingsFlowMixin
 
 try:
     from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
@@ -113,7 +118,11 @@ class DiscoveredDevice:
 
 
 def _measurement_schema(
-    entry_data: dict, selected: list[str], *, preserve_selected: bool = False
+    entry_data: dict,
+    selected: list[str],
+    *,
+    preserve_selected: bool = False,
+    entry_options: dict | None = None,
 ) -> vol.Schema:
     choices = (
         CLOUD_MEASUREMENTS
@@ -129,7 +138,27 @@ def _measurement_schema(
             for item in LOCAL_MEASUREMENTS
             if item in choices or (preserve_selected and item in selected)
         )
-    return vol.Schema(
+    fields = {}
+    if (
+        entry_data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
+        and (entry_data.get(CONST_ECOMAIN_FIRMWARE_VERSION) or 0)
+        >= CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION
+        and 4 in get_entry_slaves(entry_data, entry_options)
+    ):
+        fields[
+            vol.Required(
+                CONST_SOLAR_MEASUREMENT_TYPES,
+                default=get_entry_solar_measurement_types(entry_options),
+            )
+        ] = selector.SelectSelector(
+            selector.SelectSelectorConfig(
+                options=list(SOLAR_MEASUREMENTS),
+                multiple=True,
+                translation_key=CONST_SOLAR_MEASUREMENT_TYPES,
+                mode=SelectSelectorMode.LIST,
+            )
+        )
+    fields.update(
         {
             vol.Required(
                 CONST_MEASUREMENT_TYPES,
@@ -143,6 +172,25 @@ def _measurement_schema(
                 )
             )
         }
+    )
+    return vol.Schema(fields)
+
+
+def _has_measurements(entry_data: dict, options: dict) -> bool:
+    """Count configured selections even while firmware or devices are unavailable."""
+    return bool(
+        set(get_entry_measurement_types(entry_data, options)).intersection(
+            CLOUD_MEASUREMENTS
+            if entry_data.get(CONST_ADD_MODE) == CONST_ADD_MODE_CLOUD
+            else LOCAL_MEASUREMENTS
+        )
+        or (
+            entry_data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
+            and 4 in get_entry_slaves(entry_data, options)
+            and set(get_entry_solar_measurement_types(options)).intersection(
+                SOLAR_MEASUREMENTS
+            )
+        )
     )
 
 
@@ -281,6 +329,7 @@ class ConfigFlow(
         self._entry_data: dict[str, Any] = {}
         self._extra_entities: list[dict[str, Any]] = []
         self._measurement_types: list[str] | None = None
+        self._solar_measurement_types: list[str] | None = None
         self._navigation_initial_state = self._navigation_snapshot()
 
     @property
@@ -614,7 +663,7 @@ class ConfigFlow(
             minimum_firmware=CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
             slave_register_start=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
             slave_register_count=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
-            allowed_slaves=set(self._ecomain_available_slaves),
+            allowed_slaves={*self._ecomain_available_slaves, "4"},
             firmware_timeout=CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
         )
         if result.error is not None:
@@ -1094,10 +1143,18 @@ class ConfigFlow(
         errors = {}
         if user_input is not None:
             selected = user_input.get(CONST_MEASUREMENT_TYPES)
-            error = "no_measurements_selected" if not selected else None
+            options = self._options_data()
+            proposed = {**options, CONST_MEASUREMENT_TYPES: selected}
+            if CONST_SOLAR_MEASUREMENT_TYPES in user_input:
+                proposed[CONST_SOLAR_MEASUREMENT_TYPES] = user_input[
+                    CONST_SOLAR_MEASUREMENT_TYPES
+                ]
+            error = (
+                "no_measurements_selected"
+                if not _has_measurements(self._entry_data, proposed)
+                else None
+            )
             if not error:
-                options = self._options_data()
-                proposed = {**options, CONST_MEASUREMENT_TYPES: selected}
                 if _selection_removes_extra_sources(
                     self._entry_data, options, proposed
                 ):
@@ -1106,10 +1163,16 @@ class ConfigFlow(
                 errors["base"] = error
             else:
                 self._measurement_types = list(selected)
+                if CONST_SOLAR_MEASUREMENT_TYPES in proposed:
+                    self._solar_measurement_types = list(
+                        proposed[CONST_SOLAR_MEASUREMENT_TYPES]
+                    )
                 return await self.async_step_extra_entities()
         return self.async_show_form(
             **_measurement_form_details(self._entry_data),
-            data_schema=_measurement_schema(self._entry_data, selected or []),
+            data_schema=_measurement_schema(
+                self._entry_data, selected or [], entry_options=self._options_data()
+            ),
             errors=errors,
         )
 
@@ -1366,6 +1429,11 @@ class ConfigFlow(
 
     def _options_data(self) -> dict[str, Any]:
         return {
+            **(
+                {CONST_SOLAR_MEASUREMENT_TYPES: list(self._solar_measurement_types)}
+                if self._solar_measurement_types is not None
+                else {}
+            ),
             CONST_ECOMAIN_SELECTED_SLAVES: self._entry_data.get(
                 CONST_ECOMAIN_SELECTED_SLAVES, []
             ),
@@ -1440,6 +1508,8 @@ class ConfigFlow(
         if not slaves:
             return []
         allowed = set(self._ecomain_available_slaves)
+        if self._mode != CONST_ADD_MODE_CLOUD:
+            allowed.add("4")
         return sorted({int(s) for s in slaves if s in allowed})
 
     def _get_slave_index(self, slave: dict[str, Any]) -> int | None:
@@ -1461,7 +1531,7 @@ class ConfigFlow(
 
 
 class EnecessOptionsFlow(
-    FlowNavigationMixin, FormulaFlowMixin, config_entries.OptionsFlow
+    FlowNavigationMixin, FormulaFlowMixin, SettingsFlowMixin, config_entries.OptionsFlow
 ):
     """Handle mutable enecess options."""
 
@@ -1489,6 +1559,9 @@ class EnecessOptionsFlow(
         self._available_slaves: list[str] = []
         self._phase_device: int | None = None
         self._phase_values: dict[str, str | None] = {}
+        self._channel_device: int | None = None
+        self._channel_values: dict[str, dict[str, str | None]] = {}
+        self._solar_values: dict[str, int | float | list[str]] = {}
         self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
@@ -1545,6 +1618,10 @@ class EnecessOptionsFlow(
                 self._entry.data, self._options, proposed
             ):
                 return await self._show_options_menu({"base": "slave_in_use"})
+            if not _has_measurements(self._entry.data, proposed):
+                return await self._show_options_menu(
+                    {"base": "no_measurements_selected"}
+                )
             self._options[CONST_ECOMAIN_SELECTED_SLAVES] = selected
         action = user_input[CONST_EXTRA_ACTION]
         if action == "add_formula":
@@ -1556,6 +1633,13 @@ class EnecessOptionsFlow(
             return await self.async_step_measurement_types()
         if action == "channel_phases":
             return await self.async_step_phase_device()
+        if action == "channel_configuration":
+            self._channel_device = None
+            self._channel_values = {}
+            return await self.async_step_channel_device()
+        if action == "solar_configuration":
+            self._solar_values = {}
+            return await self.async_step_solar_configuration()
         if action == CONST_EXTRA_ACTION_ADD_TRANSFORM:
             return await self.async_step_extra_transform()
         if action == CONST_EXTRA_ACTION_ADD_AGGREGATE:
@@ -1576,9 +1660,17 @@ class EnecessOptionsFlow(
         errors = {}
         if user_input is not None:
             selected = user_input.get(CONST_MEASUREMENT_TYPES)
-            error = "no_measurements_selected" if not selected else None
+            proposed = {**self._options, CONST_MEASUREMENT_TYPES: selected}
+            if CONST_SOLAR_MEASUREMENT_TYPES in user_input:
+                proposed[CONST_SOLAR_MEASUREMENT_TYPES] = user_input[
+                    CONST_SOLAR_MEASUREMENT_TYPES
+                ]
+            error = (
+                "no_measurements_selected"
+                if not _has_measurements(self._measurement_entry_data, proposed)
+                else None
+            )
             if not error:
-                proposed = {**self._options, CONST_MEASUREMENT_TYPES: selected}
                 if _selection_removes_extra_sources(
                     self._measurement_entry_data, self._options, proposed
                 ):
@@ -1587,11 +1679,18 @@ class EnecessOptionsFlow(
                 errors["base"] = error
             else:
                 self._options[CONST_MEASUREMENT_TYPES] = list(selected)
+                if CONST_SOLAR_MEASUREMENT_TYPES in proposed:
+                    self._options[CONST_SOLAR_MEASUREMENT_TYPES] = list(
+                        proposed[CONST_SOLAR_MEASUREMENT_TYPES]
+                    )
                 return await self._show_options_menu()
         return self.async_show_form(
             **_measurement_form_details(self._measurement_entry_data),
             data_schema=_measurement_schema(
-                self._measurement_entry_data, selected or [], preserve_selected=True
+                self._measurement_entry_data,
+                selected or [],
+                preserve_selected=True,
+                entry_options=self._options,
             ),
             errors=errors,
         )
@@ -1976,7 +2075,12 @@ class EnecessOptionsFlow(
             self._entry.data.get(CONST_ADD_MODE) != CONST_ADD_MODE_CLOUD
             and (self._firmware_version or 0) >= CONF_ECOMAIN_PHASE_FIRMWARE_VERSION
         ):
-            actions.append("channel_phases")
+            if self._firmware_version >= CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION:
+                actions.append("channel_configuration")
+                if 4 in get_entry_slaves(self._entry.data, self._options):
+                    actions.append("solar_configuration")
+            else:
+                actions.append("channel_phases")
         if self._extra_entities:
             actions.append(CONST_EXTRA_ACTION_REMOVE)
         selected_slaves = [
@@ -2046,7 +2150,7 @@ class EnecessOptionsFlow(
             minimum_firmware=CONF_ECOMAIN_MIN_FIRMWARE_VERSION,
             slave_register_start=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
             slave_register_count=CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_COUNT,
-            allowed_slaves=set(self._ecomain_available_slaves),
+            allowed_slaves={*self._ecomain_available_slaves, "4"},
             firmware_timeout=CONF_ECOMAIN_FIRMWARE_READ_TIMEOUT,
         )
         if result.firmware_version is not None:

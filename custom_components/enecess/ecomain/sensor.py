@@ -7,6 +7,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -82,7 +83,13 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
     entity_description: EnecessSensorDescription
 
     def __init__(
-        self, coordinator, mode: str, serial: str, description: EnecessSensorDescription
+        self,
+        coordinator,
+        mode: str,
+        serial: str,
+        description: EnecessSensorDescription,
+        *,
+        via_device_id: str | None = None,
     ) -> None:
         """Bind a measurement to its stable device and entity identities."""
         super().__init__(coordinator)
@@ -112,7 +119,11 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
                 name=f"ecoSolarMonitor {serial} ({mode_key.title()})"
                 if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
                 else f"ecoSub {serial} #{spec.device_index} ({mode_key.title()})",
-                via_device=_device_identifier(serial, 0, mode_key),
+                **(
+                    {"via_device_id": via_device_id}
+                    if via_device_id is not None
+                    else {"via_device": _device_identifier(serial, 0, mode_key)}
+                ),
             )
             self._attr_unique_id = _sensor_unique_id(
                 serial, spec.device_index, spec.key, mode_key
@@ -153,6 +164,8 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
         extra_config: dict,
         source_description: SensorEntityDescription | None,
         device_index: int,
+        *,
+        via_device_id: str | None = None,
     ) -> None:
         """Build a derived sensor while preserving saved formulas and names."""
         super().__init__(coordinator)
@@ -237,7 +250,11 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
                 name=f"ecoSolarMonitor {serial} ({mode_key.title()})"
                 if device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
                 else f"ecoSub {serial} #{device_index} ({mode_key.title()})",
-                via_device=_device_identifier(serial, 0, mode_key),
+                **(
+                    {"via_device_id": via_device_id}
+                    if via_device_id is not None
+                    else {"via_device": _device_identifier(serial, 0, mode_key)}
+                ),
             )
         self._attr_unique_id = _sensor_unique_id(
             serial, device_index, extra_config["key"], mode_key
@@ -309,6 +326,23 @@ async def async_setup_entry(
             return
 
     descs = build_sensor_descriptions(specs)
+    via_device_id = None
+    if any(desc.spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX for desc in descs):
+        mode_key = (
+            CONST_ADD_MODE_CLOUD
+            if mode == CONST_ADD_MODE_CLOUD
+            else CONST_ADD_MODE_LOCAL
+        )
+        device_registry = dr.async_get(hass)
+        master = device_registry.async_get_or_create(
+            config_entry_id=entry.entry_id,
+            identifiers={_device_identifier(serial, 0, mode_key)},
+            manufacturer="enecess",
+            model="ecoMain",
+            name=f"ecoMain {serial} ({mode_key.title()})",
+        )
+        if "via_device_id" in DeviceInfo.__annotations__:
+            via_device_id = master.id
     entities = []
     for desc in descs:
         if desc.spec.kind == "energy_accumulated":
@@ -316,7 +350,11 @@ async def async_setup_entry(
                 EcoMainAccumulatedEnergySensor(coordinator, mode, serial, desc)
             )
         else:
-            entities.append(EcoMainSensor(coordinator, mode, serial, desc))
+            entities.append(
+                EcoMainSensor(
+                    coordinator, mode, serial, desc, via_device_id=via_device_id
+                )
+            )
 
     source_descs = build_entry_descriptions(entry.data, entry.options)
     configured_descs = build_entry_descriptions(
@@ -339,7 +377,13 @@ async def async_setup_entry(
         device_index = extra_entity_device_index(configured_descs, extra)
         entities.append(
             EcoMainExtraSensor(
-                coordinator, mode, serial, extra, source_desc, device_index
+                coordinator,
+                mode,
+                serial,
+                extra,
+                source_desc,
+                device_index,
+                via_device_id=via_device_id,
             )
         )
 

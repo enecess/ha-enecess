@@ -99,7 +99,7 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
         actions = next(value.config["options"] for key, value in result["data_schema"].schema.items() if str(key) == "extra_action")
         self.assertNotIn("channel_phases", actions)
 
-    async def test_phase_action_requires_firmware_139_or_later(self):
+    async def test_phase_action_for_139_is_replaced_by_channel_configuration_on_140(self):
         for version in (None, 135, 136, 138, 139, 140):
             with self.subTest(version=version):
                 entry = self.entry()
@@ -108,7 +108,8 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
                 result = await flow._show_options_menu()
                 actions = next(value.config["options"] for key, value in result["data_schema"].schema.items()
                                if str(key) == "extra_action")
-                self.assertEqual(version is not None and version >= 139, "channel_phases" in actions)
+                self.assertEqual(version == 139, "channel_phases" in actions)
+                self.assertEqual(version is not None and version >= 140, "channel_configuration" in actions)
 
     async def test_entry_specs_filter_unsupported_saved_selections(self):
         data = {**self.entry().data, "ecomain_firmware_version": 138}

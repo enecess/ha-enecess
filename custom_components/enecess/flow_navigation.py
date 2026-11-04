@@ -3,6 +3,7 @@
 from copy import deepcopy
 from functools import wraps
 
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers import selector
 from homeassistant.helpers.selector import SelectSelectorMode
 import voluptuous as vol
@@ -20,6 +21,8 @@ SAVE_STEPS = {
     "measurement_types_local",
     "measurement_types_legacy",
     "channel_phases",
+    "channel_configuration",
+    "solar_configuration",
     "ecoplug_select",
 }
 BRANCH_STEPS = {
@@ -31,6 +34,7 @@ BRANCH_STEPS = {
     "ecoplug_cloud_login",
     "ecomain_cloud_master",
     "phase_device",
+    "channel_device",
     "extra_formula_edit",
     "extra_aggregate_kind",
 }
@@ -46,6 +50,7 @@ STATE_FIELDS = (
     "_ecoplug_devices",
     "_entry_data",
     "_measurement_types",
+    "_solar_measurement_types",
     "_options",
     "_extra_entities",
     "_firmware_version",
@@ -53,6 +58,9 @@ STATE_FIELDS = (
     "_available_slaves",
     "_phase_device",
     "_phase_values",
+    "_channel_device",
+    "_channel_values",
+    "_solar_values",
     "_cloud_slave_map",
     "_formula_edit_key",
     "_formula_draft",
@@ -128,6 +136,7 @@ def navigable_step(handler):
                         self._entry_data = {}
                         self._extra_entities = []
                         self._measurement_types = None
+                        self._solar_measurement_types = None
                 if step in BRANCH_STEPS:
                     self._navigation_choices[step] = deepcopy(values)
                 user_input = values
@@ -181,6 +190,10 @@ class FlowNavigationMixin:
                     "_options",
                     "_extra_entities",
                     "_measurement_types",
+                    "_solar_measurement_types",
+                    "_channel_device",
+                    "_channel_values",
+                    "_solar_values",
                     "_formula_draft",
                     "_formula_edit_key",
                 )
@@ -227,30 +240,10 @@ class FlowNavigationMixin:
             self, "_navigation_discovery_state"
         ):
             return super().async_show_form(**form)
-        fields = {}
         values = self._navigation_inputs.get(step, {})
-        for key, validator in form["data_schema"].schema.items():
-            name = str(key)
-            default = vol.UNDEFINED
-            if isinstance(key, vol.Marker) and key.default is not vol.UNDEFINED:
-                default = key.default()
-            candidate = values.get(name, default)
-            if candidate is not vol.UNDEFINED:
-                try:
-                    default = vol.Schema(validator)(candidate)
-                except vol.Invalid:
-                    default = vol.UNDEFINED
-            # Required fields are checked on Continue, so empty forms can go Back.
-            marker = (
-                vol.Required
-                if step == "user" and isinstance(key, vol.Required)
-                else vol.Optional
-            )
-            fields[
-                marker(
-                    name, default=default, description=getattr(key, "description", None)
-                )
-            ] = validator
+        fields = self._navigation_fields(
+            form["data_schema"], values, root_required=step == "user"
+        )
         if step == "user":
             return super().async_show_form(
                 **{**form, "data_schema": vol.Schema(fields)}
@@ -286,6 +279,44 @@ class FlowNavigationMixin:
             )
         )
         return super().async_show_form(**{**form, "data_schema": vol.Schema(fields)})
+
+    def _navigation_fields(self, schema, values, *, root_required=False):
+        """Make nested inputs optional for navigation while preserving draft values."""
+        fields = {}
+        for key, validator in schema.schema.items():
+            name = str(key)
+            default = vol.UNDEFINED
+            if isinstance(key, vol.Marker) and key.default is not vol.UNDEFINED:
+                default = key.default()
+            candidate = values.get(name, default)
+            if isinstance(validator, section):
+                validator = section(
+                    vol.Schema(
+                        self._navigation_fields(
+                            validator.schema,
+                            candidate if isinstance(candidate, dict) else {},
+                        )
+                    ),
+                    validator.options,
+                )
+                default = {}
+            elif candidate is not vol.UNDEFINED:
+                try:
+                    default = vol.Schema(validator)(candidate)
+                except vol.Invalid:
+                    default = vol.UNDEFINED
+            # Required fields are checked on Continue, so empty forms can go Back.
+            marker = (
+                vol.Required
+                if root_required and isinstance(key, vol.Required)
+                else vol.Optional
+            )
+            fields[
+                marker(
+                    name, default=default, description=getattr(key, "description", None)
+                )
+            ] = validator
+        return fields
 
     async def _async_navigate(self, action):
         history = self._navigation_history

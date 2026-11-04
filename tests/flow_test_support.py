@@ -101,7 +101,15 @@ def load_flow(test):
 
     module('homeassistant.config_entries', ConfigFlow=Flow, OptionsFlow=Flow,
            ConfigEntry=types.SimpleNamespace)
-    module('homeassistant.data_entry_flow', FlowResult=dict)
+    class Section:
+        def __init__(self, schema, options=None):
+            self.schema = schema
+            self.options = {"collapsed": False, **(options or {})}
+
+        def __call__(self, value):
+            return self.schema(value)
+
+    module('homeassistant.data_entry_flow', FlowResult=dict, section=Section)
     module('homeassistant.core', HomeAssistant=object, callback=lambda f: f)
     module('homeassistant.components.zeroconf', ZeroconfServiceInfo=object)
     module('homeassistant.helpers.device_registry')
@@ -129,8 +137,22 @@ def load_flow(test):
                 raise vol.Invalid('not an offered choice')
             return value
 
+    class NumberSelector:
+        def __init__(self, config):
+            self.config = config
+
+        def __call__(self, value):
+            value = vol.Coerce(float)(value)
+            if value < self.config.get('min', float('-inf')):
+                raise vol.Invalid('value too small')
+            if value > self.config.get('max', float('inf')):
+                raise vol.Invalid('value too large')
+            return value
+
     module('homeassistant.helpers.selector', SelectSelector=Selector,
            SelectSelectorConfig=lambda **kwargs: kwargs,
+           NumberSelector=NumberSelector, NumberSelectorConfig=lambda **kwargs: kwargs,
+           NumberSelectorMode=types.SimpleNamespace(BOX='box', SLIDER='slider'),
            TextSelector=Selector, TextSelectorConfig=lambda **kwargs: kwargs,
            SelectSelectorMode=types.SimpleNamespace(LIST='list', DROPDOWN='dropdown'))
 

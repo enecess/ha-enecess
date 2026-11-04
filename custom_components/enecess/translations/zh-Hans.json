@@ -59,7 +59,7 @@
       },
       "ecomain_local_setup": {
         "title": "设备设置",
-        "description": "序列号：{ecomain_serial}\n地址：{ecomain_host}\n\n选择要一并添加的 ecoSub，没有从机可直接继续。",
+        "description": "序列号：{ecomain_serial}\n地址：{ecomain_host}\n\n选择要随此 ecoMain 添加的在线 ecoSub 和 ecoSolarMonitor。没有子设备时可直接继续。",
         "data": {
           "ecomain_selected_slaves": "选择要添加的从机",
           "flow_action": "操作"
@@ -222,16 +222,18 @@
         "title": "测量类型",
         "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。",
         "data": {
-          "measurement_types": "测量类型",
-          "flow_action": "操作"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "操作",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       },
       "measurement_types_legacy": {
         "title": "测量类型",
         "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。\n\n更多测量类型需升级至固件 139 或以上。",
         "data": {
-          "measurement_types": "测量类型",
-          "flow_action": "操作"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "操作",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       }
     },
@@ -398,16 +400,130 @@
         "title": "测量类型",
         "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。",
         "data": {
-          "measurement_types": "测量类型",
-          "flow_action": "操作"
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "操作",
+          "solar_measurement_types": "ecoSolarMonitor"
         }
       },
       "measurement_types_legacy": {
         "title": "测量类型",
         "description": "固件版本：{firmware_version}\n\n选择需要查看的测量类型，至少选择一项。\n\n更多测量类型需升级至固件 139 或以上。",
         "data": {
-          "measurement_types": "测量类型",
+          "measurement_types": "ecoMain / ecoSub",
+          "flow_action": "操作",
+          "solar_measurement_types": "ecoSolarMonitor"
+        }
+      },
+      "channel_device": {
+        "title": "通道配置",
+        "description": "选择要修改通道设置的电表。",
+        "data": {
+          "channel_device": "设备",
           "flow_action": "操作"
+        }
+      },
+      "channel_configuration": {
+        "title": "通道配置",
+        "description": "配置 {device}。保存后立即写入设备并回读校验。返回或取消不会撤销已经保存到设备的更改。",
+        "data": {
+          "flow_action": "操作"
+        },
+        "sections": {
+          "channel_1": {
+            "name": "通道 1",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_2": {
+            "name": "通道 2",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_3": {
+            "name": "通道 3",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_4": {
+            "name": "通道 4",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_5": {
+            "name": "通道 5",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_6": {
+            "name": "通道 6",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_7": {
+            "name": "通道 7",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_8": {
+            "name": "通道 8",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_9": {
+            "name": "通道 9",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "channel_10": {
+            "name": "通道 10",
+            "data": {
+              "phase": "相位",
+              "transformer": "电流互感器"
+            }
+          },
+          "main_transformers": {
+            "name": "主回路电流互感器",
+            "data": {
+              "l1": "L1",
+              "l2": "L2",
+              "l3": "L3"
+            }
+          }
+        }
+      },
+      "solar_configuration": {
+        "title": "ecoSolarMonitor 配置",
+        "description": "配置当前 ecoMain：光伏总装机容量以 W 为单位，须为整数；功率温度系数单位为 %/°C，精度为 0.001。逆变器通道包括 ecoMain 和当前检测在线的 ecoSub，即使未选择在 HA 中创建其测量。未显示的设备保持原值。保存后立即写入并回读校验。",
+        "data": {
+          "capacity": "光伏总装机容量",
+          "temperature_coefficient": "功率温度系数",
+          "inverter_channels_0": "ecoMain",
+          "inverter_channels_1": "ecoSub 1",
+          "inverter_channels_2": "ecoSub 2",
+          "inverter_channels_3": "ecoSub 3",
+          "flow_action": "操作"
+        },
+        "data_description": {
+          "capacity": "输入 0 至 2147483647 W 范围内的有限整数。",
+          "temperature_coefficient": "输入 -32.768 至 32.767 %/°C 范围内的有限数值，最多三位小数。"
         }
       }
     },
@@ -434,11 +550,27 @@
       "formula_result_type_locked": "不能更改结果类型，请新建公式实体。",
       "no_formula_entities": "尚未配置公式实体。",
       "invalid_input": "输入无效。",
-      "slave_in_use": "请先移除使用此从机测量数据的额外实体，再取消选择从机。"
+      "slave_in_use": "请先移除使用此从机测量数据的额外实体，再取消选择从机。",
+      "settings_read_failed": "无法完整读取设备设置。请重试、返回或取消；不会写入缺失的值。",
+      "settings_write_failed": "无法保存此设置或逆变器分组。请检查连接后重试，其他已成功的更改会保留。",
+      "settings_verify_failed": "此设置或逆变器分组的设备回读值与选择不一致。请核对选择并重试。",
+      "settings_unavailable": "此设置需要本地模式下可用的 ecoMain 客户端。",
+      "settings_firmware_too_old": "通道和 ecoSolarMonitor 配置需要已确认的固件版本 140 或更高版本。",
+      "settings_phase_write_failed": "无法保存此分组的相位。请检查连接后重试；已成功的更改会保留。",
+      "settings_phase_verify_failed": "此分组的相位回读值与选择不一致，请重试。",
+      "settings_transformer_write_failed": "无法保存此分组的电流互感器。请检查连接后重试；已成功的更改会保留。",
+      "settings_transformer_verify_failed": "此分组的电流互感器回读值与选择不一致，请重试。",
+      "settings_main_l1_write_failed": "无法保存此分组的主回路 L1 电流互感器。请检查连接后重试；已成功的更改会保留。",
+      "settings_main_l1_verify_failed": "此分组的主回路 L1 电流互感器回读值与选择不一致，请重试。",
+      "settings_main_l2_write_failed": "无法保存此分组的主回路 L2 电流互感器。请检查连接后重试；已成功的更改会保留。",
+      "settings_main_l2_verify_failed": "此分组的主回路 L2 电流互感器回读值与选择不一致，请重试。",
+      "settings_main_l3_write_failed": "无法保存此分组的主回路 L3 电流互感器。请检查连接后重试；已成功的更改会保留。",
+      "settings_main_l3_verify_failed": "此分组的主回路 L3 电流互感器回读值与选择不一致，请重试。"
     },
     "abort": {
       "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",
-      "user_cancelled": "已取消。"
+      "user_cancelled": "已取消。",
+      "settings_unavailable": "此设置需要本地模式下可用的 ecoMain 客户端。"
     }
   },
   "selector": {
@@ -459,7 +591,8 @@
       "options": {
         "1": "ecoSub 1",
         "2": "ecoSub 2",
-        "3": "ecoSub 3"
+        "3": "ecoSub 3",
+        "4": "ecoSolarMonitor"
       }
     },
     "extra_action": {
@@ -473,7 +606,9 @@
         "measurement_types": "测量类型",
         "channel_phases": "通道相位",
         "add_formula": "添加公式实体",
-        "edit_formula": "编辑公式实体"
+        "edit_formula": "编辑公式实体",
+        "channel_configuration": "通道配置",
+        "solar_configuration": "ecoSolarMonitor 配置"
       }
     },
     "extra_entity_operation": {
@@ -536,6 +671,38 @@
         "save": "保存",
         "back": "返回上一步",
         "cancel": "取消"
+      }
+    },
+    "current_transformer": {
+      "options": {
+        "30": "30 A",
+        "100": "100 A"
+      }
+    },
+    "inverter_channels": {
+      "options": {
+        "1": "通道 1",
+        "2": "通道 2",
+        "3": "通道 3",
+        "4": "通道 4",
+        "5": "通道 5",
+        "6": "通道 6",
+        "7": "通道 7",
+        "8": "通道 8",
+        "9": "通道 9",
+        "10": "通道 10"
+      }
+    },
+    "solar_measurement_types": {
+      "options": {
+        "solar_irradiance": "辐照度",
+        "solar_tilt_angle": "倾角",
+        "solar_module_temperature": "组件温度",
+        "solar_actual_power": "实际功率",
+        "solar_estimated_power": "理论功率",
+        "solar_performance_ratio": "性能比",
+        "solar_actual_energy": "累计实际电量",
+        "solar_estimated_energy": "累计理论电量"
       }
     }
   }
