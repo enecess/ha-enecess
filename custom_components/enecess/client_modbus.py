@@ -135,6 +135,21 @@ class EnecessModbusClient:
                     f"Invalid register write echo at {address}: {resp}"
                 )
 
+    async def write_registers(self, address: int, values: list[int]) -> None:
+        """Write a range and require a matching function-16 address/count echo."""
+        async with self._connection() as client:
+            resp = await client.write_registers(
+                address=address, values=values, device_id=CONF_ECOMAIN_UNIT_ID
+            )
+            if resp is None or resp.isError():
+                raise ModbusException(f"Register write failed at {address}: {resp}")
+            if getattr(resp, "address", None) != address or getattr(
+                resp, "count", None
+            ) != len(values):
+                raise ModbusException(
+                    f"Invalid register write echo at {address}: {resp}"
+                )
+
     async def async_set_target(self, host: str, port: int) -> None:
         """Close the previous transport when discovery changes its target."""
         if host == self._host and port == self._port:
