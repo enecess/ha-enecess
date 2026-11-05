@@ -155,9 +155,22 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         self.assertEqual(
             [
                 self.transport.values[address]
-                for address in (5000, 5001, 5002, 2100, 2129)
+                for address in (5000, 5001, 5002, 2200, 2229)
             ],
             [65535, 32767, 32768, 1, 1],
+        )
+        self.assertFalse(any(2100 <= c[1] <= 2139 for c in self.transport.commands))
+        self.assertEqual(
+            [c for c in self.transport.commands if 2200 <= c[1] <= 2239],
+            [
+                ("read", 2200, 10, 255),
+                ("read", 2220, 10, 255),
+                ("read", 2210, 10, 255),
+                ("write", 2200, 1, 255),
+                ("read", 2200, 1, 255),
+                ("write", 2229, 1, 255),
+                ("read", 2229, 1, 255),
+            ],
         )
 
     async def test_native_section_error_addresses_visible_parent_and_save_requires_unknown_choice(

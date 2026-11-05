@@ -165,7 +165,7 @@ async def async_read_solar_settings(
     parameters = await client.read_holding_registers(5000, 3)
     inverter_channels = {}
     for device_index in dict.fromkeys(device_indices):
-        flags = await client.read_holding_registers(2100 + 10 * device_index, 10)
+        flags = await client.read_holding_registers(2200 + 10 * device_index, 10)
         inverter_channels[device_index] = [
             channel
             for channel, value in zip(_INVERTER_CHANNELS, flags.registers, strict=True)
@@ -229,7 +229,7 @@ async def async_write_solar_settings(
     writes.extend(
         (
             f"inverter_channels_{device_index}",
-            2100 + 10 * device_index + offset,
+            2200 + 10 * device_index + offset,
             [int(channel in channels)],
         )
         for device_index, channels in desired.inverter_channels.items()

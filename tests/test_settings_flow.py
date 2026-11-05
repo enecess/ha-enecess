@@ -208,7 +208,7 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             fields["temperature_coefficient"].config["unit_of_measurement"], "%/°C"
         )
-        self.transport.values.update({2110: 1, 2130: 1})
+        self.transport.values.update({2210: 1, 2230: 1})
         result = await self.submit(
             result,
             capacity=123456.0,
@@ -220,12 +220,28 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             [
                 self.transport.values[a]
-                for a in (5000, 5001, 5002, 2100, 2109, 2122, 2110, 2130)
+                for a in (5000, 5001, 5002, 2200, 2209, 2222, 2210, 2230)
             ],
             [57920, 1, 0xFE70, 1, 1, 1, 1, 1],
         )
-        self.assertFalse(any(2130 <= c[1] <= 2139 for c in self.transport.commands))
-        self.assertFalse(any(2110 <= c[1] <= 2119 for c in self.transport.commands))
+        self.assertFalse(any(2230 <= c[1] <= 2239 for c in self.transport.commands))
+        self.assertFalse(any(2210 <= c[1] <= 2219 for c in self.transport.commands))
+        self.assertFalse(any(2100 <= c[1] <= 2139 for c in self.transport.commands))
+        self.assertEqual(
+            [c for c in self.transport.commands if 2200 <= c[1] <= 2239],
+            [
+                ("read", 2200, 10, 255),
+                ("read", 2220, 10, 255),
+                ("read", 2200, 10, 255),
+                ("read", 2220, 10, 255),
+                ("write", 2200, 1, 255),
+                ("read", 2200, 1, 255),
+                ("write", 2209, 1, 255),
+                ("read", 2209, 1, 255),
+                ("write", 2222, 1, 255),
+                ("read", 2222, 1, 255),
+            ],
+        )
 
     async def test_numeric_boundary_rejects_fraction_and_precision_without_io(self):
         result = await self.open("solar_configuration")
@@ -250,7 +266,7 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
     ):
         result = await self.open("solar_configuration")
         self.transport.fail_writes.add(5000)
-        self.transport.ignore_writes.add(2120)
+        self.transport.ignore_writes.add(2220)
         result = await self.submit(
             result,
             capacity=100,
@@ -272,11 +288,11 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await self.submit(result)
         self.assertEqual(result["step_id"], "init")
         self.assertEqual(
-            [c[1] for c in self.transport.commands if c[0] != "read"], [5000, 2120]
+            [c[1] for c in self.transport.commands if c[0] != "read"], [5000, 2220]
         )
 
     async def test_solar_read_failure_retry_only_reads_and_cancel_has_no_io(self):
-        self.transport.fail_reads.add(2120)
+        self.transport.fail_reads.add(2220)
         result = await self.open("solar_configuration")
         self.assertEqual(result["errors"], {"base": "settings_read_failed"})
         self.assertEqual(list(map(str, result["data_schema"].schema)), ["flow_action"])
