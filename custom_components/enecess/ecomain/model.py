@@ -1,6 +1,7 @@
 """Build ecoMain register specifications and sensor descriptions."""
 
 from dataclasses import dataclass
+from decimal import Decimal
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -322,7 +323,13 @@ def build_sensor_descriptions(
                 native_unit_of_measurement=unit,
                 device_class=device_class,
                 state_class=state_class,
-                suggested_display_precision=CONF_SENSOR_DISPLAY_PRECISION,
+                suggested_display_precision=(
+                    CONF_SENSOR_DISPLAY_PRECISION
+                    if spec.address is None
+                    else max(
+                        0, -Decimal(str(spec.scale)).normalize().as_tuple().exponent
+                    )
+                ),
                 spec=spec,
             )
         )

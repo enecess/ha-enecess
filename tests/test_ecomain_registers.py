@@ -88,6 +88,46 @@ class RegisterTests(unittest.TestCase):
         self.assertTrue(all(s.source_key in keys for s in energy if s.kind == "energy_accumulated"))
         self.assertEqual(self.model.build_specs_local([], []), [])
 
+    def test_all_local_meter_descriptions_follow_register_resolution(self):
+        expected = {
+            "power": 2,
+            "energy_forward": 3,
+            "energy_reverse": 3,
+            "reactive_energy_forward": 3,
+            "reactive_energy_reverse": 3,
+            "apparent_energy": 3,
+            "reactive_power": 2,
+            "apparent_power": 2,
+            "voltage": 2,
+            "current": 2,
+            "power_factor": 2,
+            "frequency": 2,
+        }
+        specs = self.model.build_specs_local([1, 2, 3], list(expected))
+        descriptions = self.model.build_sensor_descriptions(specs)
+        self.assertEqual({desc.spec.measurement_type for desc in descriptions}, set(expected))
+        for desc in descriptions:
+            with self.subTest(key=desc.key):
+                self.assertEqual(desc.suggested_display_precision, expected[desc.spec.measurement_type])
+
+    def test_physical_precision_handles_address_zero_and_integral_scales(self):
+        for address, scale, expected in ((0, 1.0, 0), (0, .01, 2), (12, .1, 1),
+                                         (12, .001, 3), (12, 10.0, 0), (12, 1000.0, 0)):
+            with self.subTest(address=address, scale=scale):
+                spec = self.model.RegisterSpec(key="fictional_register", kind="power",
+                                               device_index=0, address=address, regs=1, scale=scale)
+                description, = self.model.build_sensor_descriptions([spec])
+                self.assertEqual(description.suggested_display_precision, expected)
+
+    def test_cloud_descriptions_keep_three_decimal_default(self):
+        specs = self.model.build_specs_cloud([1, 2, 3], ["power", "energy"])
+        descriptions = self.model.build_sensor_descriptions(specs)
+        self.assertEqual({desc.spec.kind for desc in descriptions},
+                         {"power", "energy_delta", "energy_accumulated"})
+        for desc in descriptions:
+            with self.subTest(key=desc.key):
+                self.assertEqual(desc.suggested_display_precision, 3)
+
     def test_descriptions_keep_reactive_energy_out_of_active_energy_class(self):
         specs = self.model.build_specs_local([], ["reactive_energy_forward", "power_factor", "apparent_power"])
         descriptions = {d.key: d for d in self.model.build_sensor_descriptions(specs)}

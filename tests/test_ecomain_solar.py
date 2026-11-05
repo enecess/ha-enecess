@@ -54,6 +54,24 @@ class SolarModelTests(unittest.TestCase):
                 self.assertIsNone(desc.translation_key)
                 self.assertEqual(strings["selector"]["solar_measurement_types"]["options"][desc.key], name)
 
+    def test_all_solar_descriptions_follow_register_resolution(self):
+        expected = {
+            "solar_irradiance": 1,
+            "solar_tilt_angle": 1,
+            "solar_module_temperature": 1,
+            "solar_actual_power": 3,
+            "solar_estimated_power": 3,
+            "solar_performance_ratio": 2,
+            "solar_actual_energy": 3,
+            "solar_estimated_energy": 3,
+        }
+        specs = self.model.build_specs_local([4], [], list(expected))
+        descriptions = self.model.build_sensor_descriptions(specs)
+        self.assertEqual({desc.key for desc in descriptions}, set(expected))
+        for desc in descriptions:
+            with self.subTest(key=desc.key):
+                self.assertEqual(desc.suggested_display_precision, expected[desc.key])
+
     def test_index_four_never_expands_into_meter_channels(self):
         specs = self.model.build_specs_local([1, 4], ["power"])
         self.assertFalse(any(spec.key.startswith("sub4_") for spec in specs))
