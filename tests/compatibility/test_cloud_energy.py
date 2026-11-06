@@ -9,6 +9,7 @@ from homeassistant.components.sensor import SensorExtraStoredData
 from homeassistant.core import State
 from homeassistant.helpers import restore_state
 from homeassistant.helpers.entity_platform import EntityPlatform
+from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from custom_components import enecess
@@ -161,7 +162,24 @@ class CloudEnergyTests(RealHARuntimeFixture):
         await restarted.async_refresh()
         self.assertEqual(restarted.data["main_all_energy_accumulated"], 15)
 
-    async def test_disabled_existing_sensor_total_is_preserved_on_upgrade(self):
+    async def test_fresh_cloud_storage_accumulates_first_energy_sample(self):
+        _, _, coordinator = self.make_coordinator()
+        await coordinator.async_config_entry_first_refresh()
+        self.assertEqual(coordinator.data["main_all_energy_accumulated"], 5)
+        await coordinator.async_refresh()
+        self.assertEqual(coordinator.data["main_all_energy_accumulated"], 10)
+
+    async def test_fresh_power_only_cloud_storage_loads(self):
+        entry = self.make_entry("cloud")
+        self.hass.config_entries.async_update_entry(
+            entry, options={"measurement_types": ["power_avg_1m"]}
+        )
+        _, _, coordinator = self.make_coordinator(entry)
+        await coordinator.async_config_entry_first_refresh()
+        self.assertEqual(coordinator.data["main_all_power_avg_1m"], 20)
+        self.assertNotIn("main_all_energy_accumulated", coordinator.data)
+
+    async def test_disabled_renamed_legacy_sensor_total_is_preserved_on_upgrade(self):
         entry, _, coordinator = self.make_coordinator()
         source, _ = self.make_entities(coordinator)
         registry = entity_registry.async_get(self.hass)
@@ -170,24 +188,70 @@ class CloudEnergyTests(RealHARuntimeFixture):
             "enecess",
             source.unique_id,
             config_entry=entry,
-            suggested_object_id="fictional_renamed_energy",
             disabled_by=entity_registry.RegistryEntryDisabler.USER,
         )
-        restore_state.async_get(self.hass).last_states[registered.entity_id] = (
-            restore_state.StoredState(
-                State(registered.entity_id, "0.1", {"unit_of_measurement": "kWh"}),
-                SensorExtraStoredData(100, "Wh"),
-                dt_util.utcnow(),
-            )
+        registered = registry.async_update_entity(
+            registered.entity_id,
+            new_entity_id="sensor.fictional_renamed_energy",
+            name="My retained energy name",
         )
+        stored = restore_state.StoredState(
+            State(registered.entity_id, "0.1", {"unit_of_measurement": "kWh"}),
+            SensorExtraStoredData(100, "Wh"),
+            dt_util.utcnow(),
+        )
+        restored = restore_state.async_get(self.hass)
+        await restored.store.async_save(
+            [stored.as_dict() | {"entity_registry_id": registered.id}]
+        )
+        await restored.async_load()
         await coordinator.async_config_entry_first_refresh()
-        self.assertEqual(coordinator.data.get("main_all_energy_accumulated"), 100)
+        self.assertEqual(coordinator.data["main_all_energy_accumulated"], 100)
         await coordinator.async_refresh()
         self.assertEqual(coordinator.data["main_all_energy_accumulated"], 105)
+        self.assertEqual(
+            registry.async_get(registered.entity_id).name, "My retained energy name"
+        )
+        self.assertEqual(
+            registry.async_get(registered.entity_id).disabled_by,
+            entity_registry.RegistryEntryDisabler.USER,
+        )
         await coordinator.async_shutdown()
         _, _, restarted = self.make_coordinator(entry)
         await restarted.async_config_entry_first_refresh()
         self.assertEqual(restarted.data["main_all_energy_accumulated"], 105)
+
+    async def test_existing_cloud_storage_owns_totals_even_when_empty(self):
+        for stored, first, second in (
+            ({}, 5, 10),
+            ({"main_all_energy_accumulated": 40}, 40, 45),
+        ):
+            with self.subTest(stored=stored):
+                entry, _, coordinator = self.make_coordinator()
+                source, _ = self.make_entities(coordinator)
+                registered = entity_registry.async_get(self.hass).async_get_or_create(
+                    "sensor", "enecess", source.unique_id, config_entry=entry
+                )
+                restored = restore_state.async_get(self.hass)
+                await restored.store.async_save(
+                    [
+                        restore_state.StoredState(
+                            State(registered.entity_id, "999"),
+                            SensorExtraStoredData(999, "Wh"),
+                            dt_util.utcnow(),
+                        ).as_dict()
+                        | {"entity_registry_id": registered.id}
+                    ]
+                )
+                await restored.async_load()
+                store = Store(self.hass, 1, f"enecess.{entry.entry_id}.cloud_energy")
+                await store.async_save(stored)
+                await coordinator.async_config_entry_first_refresh()
+                self.assertEqual(coordinator.data["main_all_energy_accumulated"], first)
+                await coordinator.async_refresh()
+                self.assertEqual(
+                    coordinator.data["main_all_energy_accumulated"], second
+                )
 
     async def test_removing_entry_deletes_totals(self):
         entry, _, coordinator = self.make_coordinator()

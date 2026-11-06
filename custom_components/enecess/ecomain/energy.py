@@ -45,13 +45,17 @@ class CloudEnergyStore:
         else:
             # Preserve the previous RestoreSensor total even if it is disabled.
             registry = entity_registry.async_get(self._hass)
-            states = restore_state.async_get(self._hass).last_states
+            restored = restore_state.async_get(self._hass)
             keys = {spec.key for spec in specs if spec.kind == "energy_accumulated"}
             for entity in entity_registry.async_entries_for_config_entry(
                 registry, self._entry.entry_id
             ):
                 key = entity.unique_id.partition(":key_")[2].removesuffix(":mode_cloud")
-                previous = states.get(entity.entity_id)
+                previous = (
+                    restored.async_get_stored_state(entity.entity_id)
+                    if hasattr(restored, "async_get_stored_state")
+                    else restored.last_states.get(entity.entity_id)
+                )
                 if key not in keys or previous is None or previous.extra_data is None:
                     continue
                 extra = previous.extra_data.as_dict()

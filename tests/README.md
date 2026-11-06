@@ -41,8 +41,10 @@ selection and connection cleanup on cancellation. Cloud accumulation and restore
 checks run in the real-HA compatibility suite instead of using sensor doubles.
 
 For isolated checks against installed Home Assistant releases from 2025.9.0 to
-2026.9.4, see [the compatibility matrix](compatibility/README.md). Its smoke
-suite uses real HA objects and runs separately from the framework doubles above.
+the latest stable release, see [the compatibility matrix](compatibility/README.md).
+The matrix samples the newest patch every three months as well as the exact
+minimum and current release. Its smoke suite uses real HA objects and runs
+separately from the framework doubles above.
 
 Flow journey tests start at setup or options entry points and submit the schema
 returned by each page. The selector double rejects unavailable choices and wrong

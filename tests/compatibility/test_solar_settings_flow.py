@@ -3,14 +3,9 @@
 from types import MethodType, SimpleNamespace
 import json
 
-from homeassistant.data_entry_flow import section
-from homeassistant.helpers import config_validation as cv
+from homeassistant.data_entry_flow import FlowResultType, section
+from homeassistant.helpers.data_entry_flow import FlowManagerResourceView
 from homeassistant.helpers.selector import NumberSelector, SelectSelectorMode
-
-if hasattr(cv, "to_field_list"):
-    from probatio import to_field_list as convert
-else:
-    from voluptuous_serialize import convert
 
 from custom_components.enecess.client_modbus import EnecessModbusClient
 from custom_components.enecess.config_flow import ConfigFlow
@@ -46,6 +41,12 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         self.flow.context = {}
         self.flow._available_slaves = ["1", "2", "4"]
 
+    def serialize(self, result):
+        # Use the same schema conversion as HA's flow HTTP API in each release.
+        return FlowManagerResourceView(None)._prepare_result_json(
+            {**result, "type": FlowResultType.FORM}
+        )["data_schema"]
+
     async def submit(self, result, **values):
         return await getattr(self.flow, "async_step_" + result["step_id"])(
             result["data_schema"](values)
@@ -63,9 +64,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         self.assertEqual(
             sum(isinstance(value, section) for value in fields.values()), 11
         )
-        serialized = convert(
-            result["data_schema"], custom_serializer=cv.custom_serializer
-        )
+        serialized = self.serialize(result)
         channels = [item for item in serialized if item["name"].startswith("channel_")]
         self.assertEqual(len(channels), 10)
         for item in channels:
@@ -92,9 +91,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         )
         result = await self.submit(result, flow_action="back")
         result = await self.submit(result, channel_device="1")
-        serialized = convert(
-            result["data_schema"], custom_serializer=cv.custom_serializer
-        )
+        serialized = self.serialize(result)
         self.assertEqual(
             sum(item.get("type") == "expandable" for item in serialized), 10
         )
@@ -112,9 +109,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         }
         self.assertIsInstance(fields["capacity"], NumberSelector)
         self.assertIsInstance(fields["temperature_coefficient"], NumberSelector)
-        serialized = convert(
-            result["data_schema"], custom_serializer=cv.custom_serializer
-        )
+        serialized = self.serialize(result)
         self.assertEqual(
             serialized[0]["selector"]["number"]["unit_of_measurement"], "W"
         )
@@ -139,9 +134,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
                 self.assertEqual(result["errors"], {field: "invalid_input"})
                 self.assertEqual(self.transport.commands, [])
                 json.dumps(
-                    convert(
-                        result["data_schema"], custom_serializer=cv.custom_serializer
-                    ),
+                    self.serialize(result),
                     allow_nan=False,
                 )
         result = await self.submit(
@@ -191,9 +184,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         self.assertEqual(
             result["errors"], {"channel_1": "settings_transformer_verify_failed"}
         )
-        serialized = convert(
-            result["data_schema"], custom_serializer=cv.custom_serializer
-        )
+        serialized = self.serialize(result)
         self.assertTrue(set(result["errors"]) <= {item["name"] for item in serialized})
         self.transport.commands.clear()
         result = await self.submit(result, flow_action="cancel")

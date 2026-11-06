@@ -1,8 +1,15 @@
 # Home Assistant compatibility checks
 
 The minimum supported Home Assistant version is **2025.9.0**, declared in
-`hacs.json`. The sampled matrix covers 2025.9.0, 2025.12.0, 2026.3.0,
-2026.6.0 and 2026.9.4. It does not guarantee every intervening or future release.
+`hacs.json`. Each run selects that exact minimum, the newest stable patch in
+each quarterly sample month after September 2025 (December, March, June,
+September, and so on), and the latest stable HA release. Selection uses PyPI release
+metadata, excludes prereleases and releases whose distributions are all yanked,
+deduplicates overlapping samples, and orders versions chronologically.
+
+The matrix selected on **2026-11-06** is **2025.9.0, 2025.12.5, 2026.3.4,
+2026.6.4, 2026.9.4 and 2026.11.0**. It does not guarantee every intervening patch
+or future release.
 
 ## Run in WSL
 
@@ -24,18 +31,21 @@ python3 tests/compatibility/run_matrix.py \
 The runner creates one virtual environment per HA release, runs dependency
 validation, existing offline unit tests, real-HA smoke tests and compilation,
 and retains separate logs, package versions and `results/summary.json`.
+The exact selected releases and Python versions are written to
+`results/matrix.json` before any environment is created or installed. Metadata
+and constraint downloads have bounded response sizes and a 30-second timeout.
 Any failed command produces a nonzero final exit status. `uv` can download
 Python 3.13/3.14 when a suitable interpreter is unavailable.
 
-The 2025 releases use Python 3.13; the 2026 releases require Python 3.14.2 or
-newer. The matrix installs integration dependencies from its production
-manifest under each release's official `homeassistant/package_constraints.txt`.
+The runner uses Python 3.13 below the supported HA 2026.3 boundary and
+Python 3.14 from that boundary onward; the sampled 2026 releases require
+Python 3.14.2 or newer. The matrix installs integration dependencies from its
+production manifest under each release's official `homeassistant/package_constraints.txt`.
 The manifest requires `pymodbus>=3.11.1`; HA selects the exact compatible version.
-The tested resolutions are 3.11.1 for HA 2025.9.0, 3.11.2 for HA 2025.12.0,
-2026.3.0 and 2026.6.0, and 3.13.1 for HA 2026.9.4. The plain offline unit-test
-environment separately pins 3.15.0 for reproducibility; it does not replace
-the constrained HA matrix.
-For HA 2025.9.0 and 2025.12.0, the runner fixes `pycares==4.11.0` because
+Each release's exact resolved dependencies are retained in its freeze log.
+The plain offline unit-test environment separately pins 3.15.0 for
+reproducibility; it does not replace the constrained HA matrix.
+For the sampled HA 2025 releases, the runner fixes `pycares==4.11.0` because
 their `aiodns==3.5.0` imports APIs removed in pycares 5. This is an old-HA test
 environment constraint, not a production integration dependency.
 Do not install `tests/requirements.txt` over these HA environments: it pins
@@ -104,7 +114,14 @@ deduplication, ignored discoveries and cancellation that retains the original
 discovery card and identity. Notification regressions check unchanged local and
 ecoPlug data, availability recovery and immediate control updates. Cloud energy
 continues counting identical successful deltas and excludes failed polls; pending
-storage checkpoints are not postponed by additional refreshes.
+storage checkpoints are not postponed by additional refreshes. Missing storage
+works for both energy-enabled and power-only entries. Legacy native Wh totals
+are migrated even when their entity is disabled and renamed; existing entry
+storage, including an empty store, takes precedence. Restored totals skip the
+first sample and continue accumulating on later successful polls. Current HA's
+registry-aware stored-state accessor and older HA's state lookup share this
+coverage. Entity tests preserve unique IDs, entity IDs and user names while
+checking the display-name composition appropriate to each HA release.
 
 Protocol 1.0.5 regressions check apparent-energy metadata and UInt64 decoding,
 ecoSub online-status filtering and recovery, cross-device formula availability,
@@ -116,7 +133,9 @@ real HA sensor metadata and key-based names. Real EntityPlatform registration
 checks solar-only parent/child linkage and preserves custom names. Native HA
 section and numeric-selector schemas are serialized and submitted for channel/CT
 and centralized PV commissioning, including incomplete Back/Cancel inputs,
-unknown stored choices and visible error locations. Formula checks include the
+unknown stored choices and visible error locations. Serialization uses HA's
+flow API view so each release exercises its own serializer without installing
+an obsolete serializer just for tests. Formula checks include the
 four new solar input groups. Modbus settings and readback tests use simulated
 responses; this is schema/runtime coverage, not a browser or hardware test.
 
@@ -125,7 +144,7 @@ and queued controls during unload or shutdown, and reject new requests after
 shutdown. Cloud channel parsing rejects invalid identifiers while retaining valid
 readings and zero values.
 
-The existing five-release matrix is retained for protocol 1.0.6. Its logs and
+The current six-release matrix covers protocol 1.0.6. Its logs and
 `results/summary.json` report the test counts and outcomes for each run. Passing
 these checks does not imply that uncovered behavior or all HA quality-scale
 requirements are correct.

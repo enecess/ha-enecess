@@ -3,6 +3,7 @@
 import logging
 from datetime import timedelta
 
+from homeassistant.const import MAJOR_VERSION, MINOR_VERSION
 from homeassistant.helpers import entity_registry
 from homeassistant.helpers.entity_platform import EntityPlatform
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -95,9 +96,14 @@ class RealHAEntityRegressionTests(runtime_fixture.RealHARuntimeFixture):
         self.assertTrue(all(entity.has_entity_name for entity in entities))
         self.assertEqual(formula.name, "My chosen formula")
         self.assertEqual(formula.native_value, 20.0)
+        device_prefix = (
+            "ecoMain FICTIONAL-COMPAT-MAIN-001 (Cloud) "
+            if (MAJOR_VERSION, MINOR_VERSION) >= (2026, 11)
+            else ""
+        )
         for index, entity_id in enumerate(existing_ids):
             self.assertEqual(registry.async_get(entity_id).name, f"User name {index}")
             self.assertEqual(
                 self.hass.states.get(entity_id).attributes["friendly_name"],
-                f"User name {index}",
+                f"{device_prefix}User name {index}",
             )

@@ -83,6 +83,7 @@ class RealHARuntimeFixture(unittest.IsolatedAsyncioTestCase):
         self.hass = HomeAssistant(self.temp.name)
         frame.async_setup(self.hass)
         self.hass.config_entries = ConfigEntries(self.hass, {})
+        await self.hass.config_entries.async_initialize()
         if hasattr(device_registry, "async_setup"):
             device_registry.async_setup(self.hass)
         await device_registry.async_load(self.hass)
