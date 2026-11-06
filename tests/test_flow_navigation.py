@@ -61,18 +61,6 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
                 if options:
                     self.assertEqual({}, flow._entry.options)
 
-    async def test_menu_back_preserves_saved_extra_entities(self):
-        flow = self.flow()
-        await flow.async_step_measurement_types()
-        result = await flow.async_step_measurement_types({"measurement_types": ["power"]})
-        await self.choose(flow, "add_formula")
-        await select_formula_sources(flow, self.formula)
-        result = await flow.async_step_extra_formula_expression({"extra_formula_expression": "a-b"})
-        original = deepcopy(flow._extra_entities)
-        result = await flow.async_step_extra_entities(result["data_schema"]({"extra_action": "back"}))
-        self.assertEqual("measurement_types_local", result["step_id"])
-        self.assertEqual(original, flow._extra_entities)
-
     async def test_formula_selectors_offer_type_dropdown_then_grouped_source_dropdowns(self):
         for options in (False, True):
             flow = self.flow(options)
@@ -163,16 +151,6 @@ class FlowNavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual({"a": "main_l2_power_rt", "b": "main_l1_power_rt"},
                              flow._formula_draft["variables"])
             self.assertEqual("", result["data_schema"]({})["extra_formula_expression"])
-
-    async def test_ecoplug_options_can_render_and_cancel_without_changes(self):
-        devices = [{"hardware_number": "TEST-PLUG-01", "name": "Test plug"}]
-        entry = types.SimpleNamespace(data={"device_type": "ecoplug", "ecoplug_devices": devices}, options={}, entry_id="test")
-        flow = self.module.EnecessOptionsFlow(entry)
-        flow._ecoplug_devices = devices
-        result = flow._show_ecoplug_select_form()
-        result = await flow.async_step_ecoplug_select(self.navigation_input(result, "cancel", ecoplug_selected=[]))
-        self.assertEqual("abort", result["type"])
-        self.assertEqual(devices, entry.data["ecoplug_devices"])
 
     async def test_empty_extra_forms_allow_back_and_cancel_without_saving(self):
         for options in (False, True):

@@ -461,9 +461,19 @@ Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządz
 - Usuń wzór przez **Usuń dodatkową encję**. Przed odznaczeniem pomiaru usuń wzory, które go używają.
 - Brak danych lub niemożliwe obliczenie oznacza niedostępny wynik.
 
+### ecoSolarMonitor i ustawienia instalacji (lokalny firmware od 140)
+
+Te funkcje wymagają pomyślnego odczytu firmware **140 lub nowszego**. Każdy ecoMain ma jeden ecoSolarMonitor o indeksie `4`, a ecoSub nadal używa indeksów `1`–`3`. Wybierz wykryty ecoSolarMonitor i jego osobną grupę pomiarów. Osiem pomiarów obejmuje natężenie promieniowania, kąt nachylenia, temperaturę modułu, moc rzeczywistą i szacowaną (domyślnie wybrane) oraz współczynnik wydajności i skumulowaną energię rzeczywistą i szacowaną (opcjonalne). Nie ma on dziesięciu kanałów licznika i należy do bieżącego ecoMain, nawet jeśli kanały falownika pochodzą z ecoSub.
+
+Po dodaniu otwórz **Konfiguruj**. Firmware 139 udostępnia **Fazy kanałów**, a od 140 **Konfiguracja kanałów** pozwala ustawić fazę i przekładnik prądowy (30 A lub 100 A) każdego kanału ecoMain lub wybranego ecoSub online. Przekładniki obwodu głównego L1/L2/L3 ecoMain obsługują tylko 100 A. ecoSolarMonitor nie znajduje się na liście liczników.
+
+Po wybraniu ecoSolarMonitor strona **Konfiguracja ecoSolarMonitor** ustawia moc zainstalowanej fotowoltaiki bieżącego ecoMain (liczba całkowita `0`–`2147483647` W), temperaturowy współczynnik mocy (`-32.768`–`32.767` %/°C, do trzech miejsc po przecinku) i kanały falownika `1`–`10`, pogrupowane według ecoMain i każdego ecoSub online, również bez wybranych pomiarów HA. Pusty wybór czyści widoczną grupę; ukryte urządzenia i urządzenia offline zachowują wartości sprzętowe.
+
+**Zapisz** natychmiast odczytuje sprzęt, zapisuje tylko zmiany i weryfikuje je przez ponowny odczyt. Błąd częściowy nie cofa udanych zapisów. **Wstecz** i **Anuluj** nie cofają już zapisanych ustawień sprzętu. Wybory HA i dodatkowe encje są zapisywane osobno na końcu przepływu opcji. Strony działają tylko lokalnie, nie tworzą encji sterowania i nie są pokazane na starszych zrzutach ekranu.
+
 ### Fazy kanałów (tylko lokalnie)
 
-- Dla lokalnego wpisu ecoMain otwórz **Konfiguruj**, wybierz akcję **Fazy kanałów**, a następnie ecoMain lub skonfigurowany ecoSub online.
+- Dla firmware 139 otwórz **Konfiguruj**, wybierz **Fazy kanałów**, a następnie ecoMain lub skonfigurowany ecoSub online. Od wersji 140 użyj opisanej wyżej **Konfiguracji kanałów**.
 - Przypisz **L1**, **L2** lub **L3** do każdego z dziesięciu kanałów.
 - Integracja odczytuje bieżące fazy, zapisuje tylko zmiany i ponownie je odczytuje w celu weryfikacji.
 - Błędy zapisu lub weryfikacji są wskazywane przy odpowiednich polach; udane zmiany nie są automatycznie cofane.

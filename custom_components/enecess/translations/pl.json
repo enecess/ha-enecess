@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "ecoMain {ecomain_serial}",
+    "flow_title": "{name}",
     "step": {
       "user": {
         "title": "Dodaj urządzenie",
@@ -191,7 +191,8 @@
         "description": "Zaloguj się ponownie na to samo konto w chmurze, aby przywrócić dostęp.",
         "data": {
           "username": "Nazwa użytkownika",
-          "password": "Hasło"
+          "password": "Hasło",
+          "flow_action": "Działanie"
         }
       },
       "measurement_types_local": {

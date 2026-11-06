@@ -14,6 +14,27 @@ class CloudPayloadStructureTests(RealHARuntimeFixture):
         self.addAsyncCleanup(coordinator.async_shutdown)
         return coordinator
 
+    async def test_persisted_string_slave_keys_keep_sensor_identity_and_request_target(
+        self,
+    ):
+        entry = self.make_entry("cloud")
+        self.hass.config_entries.async_update_entry(
+            entry,
+            data={**entry.data, "ecomain_cloud_slave_map": {"1": "FICTIONAL-SUB-001"}},
+            options={"ecomain_selected_slaves": [1]},
+        )
+        api = AsyncMock()
+        api.get_passageway.return_value = {
+            "ch_info": [{"ch_number": 0, "power": 7.5, "energy": 2}]
+        }
+        coordinator = EcoMainCloudCoordinator(self.hass, entry, api)
+        self.addAsyncCleanup(coordinator.async_shutdown)
+        values = await coordinator._async_update_data()
+        self.assertEqual(values["sub1_ch1_power_avg_1m"], 7.5)
+        self.assertEqual(values["sub1_ch1_energy_accumulated"], 2)
+        self.assertNotIn("sub1_all_power_avg_1m", values)
+        api.get_passageway.assert_any_await("fictional-token", "FICTIONAL-SUB-001")
+
     async def test_bad_channel_elements_keep_valid_household_and_channel_values(self):
         coordinator = self.coordinator(
             {

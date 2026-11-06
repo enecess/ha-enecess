@@ -163,3 +163,11 @@ It targets Python 3.13, permits package-relative imports in this standalone
 integration, and omits Core's Python 3.14-only ban on future annotations.
 Narrow inline exceptions document intentional UI error boundaries and an
 immediately invoked loop helper; they do not disable those checks globally.
+
+Automatic reauth regressions start both ecoMain and ecoPlug flows through real
+HA config entries, load all six locale resources through HA's translation cache,
+and resolve the displayed flow titles and form field labels. Discovery titles
+are checked with and without loaded translations. Persisted JSON slave-map keys
+are normalized before cloud polling while retaining their hardware request
+targets and accumulated-energy keys. Shared sensor identity and cloud-energy
+regressions continue to exercise the same base sensor used in production.

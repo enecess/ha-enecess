@@ -13,7 +13,6 @@ from custom_components.enecess.ecomain.model import (
     build_specs_cloud,
 )
 from custom_components.enecess.ecomain.sensor import (
-    EcoMainAccumulatedEnergySensor,
     EcoMainSensor,
     EcoMainExtraSensor,
 )
@@ -34,7 +33,7 @@ class RealHAEntityRegressionTests(runtime_fixture.RealHARuntimeFixture):
         power = EcoMainSensor(
             coordinator, "cloud", runtime_fixture.SERIAL, descriptions[0]
         )
-        energy = EcoMainAccumulatedEnergySensor(
+        energy = EcoMainSensor(
             coordinator,
             "cloud",
             runtime_fixture.SERIAL,

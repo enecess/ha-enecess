@@ -284,9 +284,8 @@ class ConfigFlow(
             elif username != entry.data[CONST_CLOUD_USERNAME].strip():
                 errors["base"] = "account_mismatch"
             else:
-                api = EnecessApi(
-                    async_get_clientsession(self.hass), CONF_CLOUD_BASE_URL
-                )
+                session = async_get_clientsession(self.hass)
+                api = EnecessApi(session, CONF_CLOUD_BASE_URL)
                 try:
                     token = await api.generate_token(username, password)
                 except EnecessAuthError:
@@ -1116,7 +1115,7 @@ class ConfigFlow(
                 {},
             )
             if slave:
-                slave_map[int(sid_str)] = slave.get("hardware_number")
+                slave_map[int(sid_str)] = str(slave["hardware_number"])
 
         if self._entry_by_unique_id(f"ecomain:{serial}:mode_cloud") is not None:
             return self.async_abort(reason="already_configured")  # type: ignore[return-value]
@@ -1563,7 +1562,7 @@ class EnecessOptionsFlow(
         self._channel_device: int | None = None
         self._channel_values: dict[str, dict[str, str | None]] = {}
         self._solar_values: dict[str, int | float | list[str]] = {}
-        self._cloud_slave_map: dict[int, Any] = self._normalize_slave_map(
+        self._cloud_slave_map: dict[int, str] = self._normalize_slave_map(
             entry.data.get(CONST_ECOMAIN_CLOUD_SLAVE_MAP, {})
         )
 
@@ -1848,10 +1847,8 @@ class EnecessOptionsFlow(
         return self.async_create_entry(title="", data={})
 
     async def _async_refresh_ecoplug_devices(self) -> dict[str, str] | None:
-        api = EnecessApi(
-            session=async_get_clientsession(self.hass),
-            base_url=CONF_CLOUD_BASE_URL,
-        )
+        session = async_get_clientsession(self.hass)
+        api = EnecessApi(session=session, base_url=CONF_CLOUD_BASE_URL)
         try:
             token = await api.generate_token(
                 self._entry.data[CONST_CLOUD_USERNAME],
@@ -2160,9 +2157,8 @@ class EnecessOptionsFlow(
         return {"base": result.error} if result.error is not None else None
 
     async def _async_refresh_cloud_slaves(self) -> dict[str, str] | None:
-        api = EnecessApi(
-            session=async_get_clientsession(self.hass), base_url=CONF_CLOUD_BASE_URL
-        )
+        session = async_get_clientsession(self.hass)
+        api = EnecessApi(session=session, base_url=CONF_CLOUD_BASE_URL)
         try:
             token = await api.generate_token(
                 self._entry.data[CONST_CLOUD_USERNAME],
@@ -2194,7 +2190,7 @@ class EnecessOptionsFlow(
             slave_index = self._get_slave_index(slave)
             if slave_index is not None and str(slave_index) in allowed:
                 self._available_slaves.append(str(slave_index))
-                self._cloud_slave_map[slave_index] = slave.get("hardware_number")
+                self._cloud_slave_map[slave_index] = str(slave["hardware_number"])
         self._available_slaves = sorted(set(self._available_slaves), key=int)
         return None
 
@@ -2282,7 +2278,7 @@ class EnecessOptionsFlow(
             return int(suffix)
         return None
 
-    def _normalize_slave_map(self, slave_map: dict[Any, Any]) -> dict[int, Any]:
+    def _normalize_slave_map(self, slave_map: dict[int | str, str]) -> dict[int, str]:
         normalized = {}
         for idx, hardware_number in (slave_map or {}).items():
             try:

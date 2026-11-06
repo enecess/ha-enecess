@@ -3,11 +3,13 @@
 import asyncio
 import json
 from pathlib import Path
+from string import Formatter
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 from homeassistant import loader
 from homeassistant.config_entries import SOURCE_IGNORE
+from homeassistant.helpers.translation import async_get_translations
 from test_runtime import RealHARuntimeFixture
 
 from custom_components.enecess import config_flow as flow_module, const as c
@@ -25,6 +27,7 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
             "custom_components.enecess",
             path,
             json.loads((path / "manifest.json").read_text()),
+            {child.name for child in path.iterdir()},
         )
         self.hass.data[loader.DATA_INTEGRATIONS][c.DOMAIN] = integration
         context = patch(
@@ -75,6 +78,64 @@ class DiscoveryFlowTests(RealHARuntimeFixture):
                     "title_placeholders"
                 ]
                 self.assertEqual(placeholders.get("name"), expected)
+
+    async def test_automatic_reauth_titles_resolve_for_both_products(self):
+        for kind, title in (("cloud", "My ecoMain"), ("plug", "My ecoPlug")):
+            entry = self.make_entry(kind)
+            self.hass.config_entries.async_update_entry(entry, title=title)
+            entry.async_start_reauth(self.hass)
+            await self.hass.async_block_till_done()
+            progress = next(entry.async_get_active_flows(self.hass, {"reauth"}))
+            for language in ("en", "de", "fr", "it", "pl", "zh-Hans"):
+                with self.subTest(kind=kind, language=language):
+                    translations = await async_get_translations(
+                        self.hass, language, "config", {c.DOMAIN}
+                    )
+                    template = translations["component.enecess.config.flow_title"]
+                    placeholders = progress["context"]["title_placeholders"]
+                    required = {
+                        field for _, field, _, _ in Formatter().parse(template) if field
+                    }
+                    self.assertLessEqual(required, placeholders.keys())
+                    self.assertEqual(template.format_map(placeholders), title)
+
+    async def test_automatic_reauth_fields_have_localized_labels(self):
+        for kind in ("cloud", "plug"):
+            entry = self.make_entry(kind)
+            entry.async_start_reauth(self.hass)
+            await self.hass.async_block_till_done()
+            progress = next(entry.async_get_active_flows(self.hass, {"reauth"}))
+            result = await self.hass.config_entries.flow.async_configure(
+                progress["flow_id"]
+            )
+            self.assertEqual(result["step_id"], "reauth_confirm")
+            fields = {str(field) for field in result["data_schema"].schema}
+            self.assertEqual(fields, {"username", "password", "flow_action"})
+            for language in ("en", "de", "fr", "it", "pl", "zh-Hans"):
+                translations = await async_get_translations(
+                    self.hass, language, "config", {c.DOMAIN}
+                )
+                for field in fields:
+                    with self.subTest(kind=kind, language=language, field=field):
+                        key = (
+                            f"component.enecess.config.step.reauth_confirm.data.{field}"
+                        )
+                        self.assertTrue(translations.get(key))
+
+    async def test_loaded_discovery_titles_resolve_in_every_locale(self):
+        result = await self.discover()
+        progress = self.hass.config_entries.flow.async_progress()[0]
+        for language in ("en", "de", "fr", "it", "pl", "zh-Hans"):
+            with self.subTest(language=language):
+                translations = await async_get_translations(
+                    self.hass, language, "config", {c.DOMAIN}
+                )
+                template = translations["component.enecess.config.flow_title"]
+                self.assertEqual(
+                    template.format_map(progress["context"]["title_placeholders"]),
+                    "ecoMain FICTIONAL-DISCOVERY-001",
+                )
+        self.assertEqual(result["step_id"], "ecomain_local_confirm")
 
     async def test_repeated_discovery_keeps_only_original_pending_card(self):
         first = await self.discover()

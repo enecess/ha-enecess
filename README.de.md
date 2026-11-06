@@ -462,9 +462,19 @@ Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angebot
 - Lösche Formeln über **Zusätzliche Entität entfernen**. Lösche Formeln, die eine Messgröße nutzen, bevor du diese abwählst.
 - Fehlen Daten oder lässt sich die Formel nicht berechnen, ist das Ergebnis nicht verfügbar.
 
+### ecoSolarMonitor und Installationseinstellungen (lokale Firmware ab 140)
+
+Diese Funktionen erfordern eine erfolgreiche Erkennung von Firmware **140 oder neuer**. Jeder ecoMain besitzt einen ecoSolarMonitor mit Geräteindex `4`; ecoSub verwendet weiterhin `1`–`3`. Wähle den erkannten ecoSolarMonitor und seine separate Messgrößengruppe. Die acht Messgrößen sind Einstrahlung, Neigungswinkel, Modultemperatur, tatsächliche und geschätzte Leistung (standardmäßig ausgewählt) sowie Performance Ratio, kumulierte tatsächliche und geschätzte Energie (optional). Er hat keine zehn Messkanäle und gehört auch dann zum aktuellen ecoMain, wenn Wechselrichterkanäle von ecoSub stammen.
+
+Öffne nach dem Hinzufügen **Konfigurieren**. Firmware 139 bietet **Kanalphasen**; ab 140 bietet **Kanalkonfiguration** pro Kanal von ecoMain oder einem ausgewählten, erreichbaren ecoSub die Phase und den Stromwandler (30 A oder 100 A). Die Hauptstromkreiswandler für L1/L2/L3 des ecoMain unterstützen nur 100 A. ecoSolarMonitor ist kein auswählbarer Zehnkanalzähler.
+
+Bei ausgewähltem ecoSolarMonitor bietet **ecoSolarMonitor-Konfiguration** die installierte PV-Leistung des aktuellen ecoMain (ganzzahlig `0`–`2147483647` W), den Leistungstemperaturkoeffizienten (`-32.768`–`32.767` %/°C, höchstens drei Nachkommastellen) und Wechselrichterkanäle `1`–`10`, gruppiert nach ecoMain und allen erreichbaren ecoSubs, auch ohne ausgewählte HA-Messungen. Eine leere Auswahl löscht die angezeigte Gruppe; ausgeblendete oder nicht erreichbare Geräte behalten ihre Hardwarewerte.
+
+**Speichern** liest sofort die Hardware, schreibt nur Änderungen und prüft sie durch Rücklesen. Teilfehler rollen erfolgreiche Änderungen nicht zurück. **Zurück** und **Abbrechen** machen gespeicherte Hardwarewerte nicht rückgängig. HA-Auswahlen und zusätzliche Entitäten werden erst beim Abschluss des Optionsablaufs gespeichert. Diese Seiten sind nur lokal verfügbar, erzeugen keine Steuerentitäten und sind in den bisherigen Screenshots nicht dargestellt.
+
 ### Kanalphasen (nur lokal)
 
-- Wähle bei einem lokalen ecoMain-Eintrag unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub.
+- Wähle mit Firmware 139 unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub. Ab Firmware 140 gilt die oben beschriebene **Kanalkonfiguration**.
 - Ordne jedem der zehn Kanäle **L1**, **L2** oder **L3** zu.
 - Die Integration liest die aktuellen Phasen, schreibt nur Änderungen und liest sie zur Prüfung erneut.
 - Schreib- und Prüffehler erscheinen an den betroffenen Feldern; erfolgreiche Änderungen werden nicht automatisch zurückgenommen.
@@ -700,7 +710,7 @@ Prüfe vor der Installation einer neuen Version die Versionshinweise. Wenn ein U
 
 Die Integration filtert in mehreren Schritten:
 
-1. **Verfügbare Slaves**: Es werden nur Slave-Indizes unterstützt, die in der Konfiguration hinterlegt sind (derzeit `1`, `2`, `3`).
+1. **Verfügbare Untergeräte**: ecoSub verwendet die Indizes `1`, `2`, `3`; lokale Firmware ab 140 unterstützt zusätzlich einen ecoSolarMonitor mit Index `4`.
 2. **Online-Slaves** (lokaler Modus):
     - Die Integration liest spezielle „Slave online“-Register.
     - Nur als online markierte Slaves werden zur Auswahl angeboten.

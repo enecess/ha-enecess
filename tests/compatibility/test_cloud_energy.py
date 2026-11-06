@@ -17,8 +17,8 @@ from custom_components.enecess.client_api import EnecessApiError
 from custom_components.enecess.ecomain.coordinator import EcoMainCloudCoordinator
 from custom_components.enecess.ecomain.model import build_sensor_descriptions
 from custom_components.enecess.ecomain.sensor import (
-    EcoMainAccumulatedEnergySensor,
     EcoMainExtraSensor,
+    EcoMainSensor,
 )
 from test_runtime import RealHARuntimeFixture, SERIAL
 
@@ -40,9 +40,7 @@ class CloudEnergyTests(RealHARuntimeFixture):
             for desc in build_sensor_descriptions(coordinator.specs)
             if desc.key == "main_all_energy_accumulated"
         )
-        source = EcoMainAccumulatedEnergySensor(
-            coordinator, "cloud", SERIAL, description
-        )
+        source = EcoMainSensor(coordinator, "cloud", SERIAL, description)
         formula = EcoMainExtraSensor(
             coordinator,
             "cloud",

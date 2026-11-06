@@ -4,7 +4,6 @@ import asyncio
 from datetime import timedelta
 import logging
 import math
-from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -93,7 +92,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
         self.specs = list(specs)
         self.firmware_version: int | None = None
         self._validated_target: tuple[str, int] | None = None
-        self._poll_tasks: set[asyncio.Task[Any]] = set()
+        self._poll_tasks: set[asyncio.Task[object]] = set()
 
     async def async_shutdown(self) -> None:
         """Finish cancelled polls before the entry closes its Modbus connection."""
@@ -218,13 +217,16 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         self._username: str = entry.data[CONST_CLOUD_USERNAME]
         self._password: str = entry.data[CONST_CLOUD_PASSWORD]
         self._serial: str = entry.data[CONST_ECOMAIN_SERIAL]
-        self._slave_map: dict[int, Any] = entry.data.get(
-            CONST_ECOMAIN_CLOUD_SLAVE_MAP, {}
-        )
+        self._slave_map: dict[int, str] = {
+            int(index): str(hardware_number)
+            for index, hardware_number in entry.data.get(
+                CONST_ECOMAIN_CLOUD_SLAVE_MAP, {}
+            ).items()
+        }
 
         self.specs = build_entry_specs(entry.data, entry.options)
         self._energy = CloudEnergyStore(hass, entry)
-        self._poll_tasks: set[asyncio.Task[Any]] = set()
+        self._poll_tasks: set[asyncio.Task[object]] = set()
 
     async def _async_setup(self) -> None:
         """Restore shared totals before the first cloud sample is processed."""
@@ -252,12 +254,12 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 self._entry, data={**self._entry.data, CONST_CLOUD_TOKEN: token}
             )
 
-    async def _fetch(self) -> dict[int, Any]:
+    async def _fetch(self) -> dict[int, dict[str, object]]:
         """Fetch raw cloud payload for main + slaves."""
-        targets: dict[int, Any] = {0: self._serial, **(self._slave_map or {})}
+        targets: dict[int, str] = {0: self._serial, **self._slave_map}
 
-        async def _get(idx: int, hw: Any) -> tuple[int, Any]:
-            return idx, await self._api.get_passageway(self._token, str(hw))
+        async def _get(idx: int, hw: str) -> tuple[int, dict[str, object]]:
+            return idx, await self._api.get_passageway(self._token, hw)
 
         # Keep every request inside the poll deadline, including failed attempts.
         results = await asyncio.gather(
@@ -272,7 +274,7 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
         data = await self._fetch()
         values: dict[str, float] = {}
 
-        def _store(key: str, raw: Any) -> None:
+        def _store(key: str, raw: object) -> None:
             if raw is None or isinstance(raw, bool):
                 return
             try:
@@ -321,7 +323,7 @@ class EcoMainCloudCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 _store(f"{prefix}_ch{ch_no}_energy_total_1m", energy)
 
         _apply(0)
-        for idx in sorted((self._slave_map or {}).keys()):
+        for idx in sorted(self._slave_map):
             _apply(idx)
 
         return values

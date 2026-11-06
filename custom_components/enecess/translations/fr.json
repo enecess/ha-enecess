@@ -1,6 +1,6 @@
 {
   "config": {
-    "flow_title": "ecoMain {ecomain_serial}",
+    "flow_title": "{name}",
     "step": {
       "user": {
         "title": "Ajouter un appareil",
@@ -191,7 +191,8 @@
         "description": "Reconnectez-vous avec le même compte cloud pour rétablir l'accès.",
         "data": {
           "username": "Nom d'utilisateur",
-          "password": "Mot de passe"
+          "password": "Mot de passe",
+          "flow_action": "Action"
         }
       },
       "measurement_types_local": {

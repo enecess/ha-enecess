@@ -357,9 +357,19 @@ Sono disponibili solo le misurazioni abilitate e supportate dal firmware. I grup
 - Elimina una formula con **Rimuovi entità aggiuntiva**. Prima di deselezionare una misurazione, elimina le formule che la usano.
 - Se mancano dati o il calcolo non è possibile, il risultato non è disponibile.
 
+### ecoSolarMonitor e impostazioni di installazione (firmware locale 140 o successivo)
+
+Queste funzioni richiedono il rilevamento riuscito del firmware **140 o successivo**. Ogni ecoMain possiede un ecoSolarMonitor con indice `4`; ecoSub mantiene gli indici `1`–`3`. Seleziona l’ecoSolarMonitor rilevato e il suo gruppo separato di misure. Le otto misure sono irraggiamento, inclinazione, temperatura del modulo, potenza effettiva e stimata (selezionate inizialmente), rapporto di prestazione ed energia cumulativa effettiva e stimata (facoltative). Non ha dieci canali di misura e appartiene all’ecoMain corrente anche se i canali dell’inverter provengono da ecoSub.
+
+Dopo l’aggiunta apri **Configura**. Il firmware 139 offre **Fasi dei canali**; dalla versione 140, **Configurazione canali** imposta fase e trasformatore di corrente (30 A o 100 A) di ogni canale di ecoMain o di un ecoSub selezionato e online. I trasformatori del circuito principale L1/L2/L3 di ecoMain supportano solo 100 A. ecoSolarMonitor è escluso dalla selezione dei contatori.
+
+Con ecoSolarMonitor selezionato, **Configurazione ecoSolarMonitor** imposta la capacità FV installata dell’ecoMain corrente (intero `0`–`2147483647` W), il coefficiente di temperatura della potenza (`-32.768`–`32.767` %/°C, massimo tre decimali) e i canali inverter `1`–`10`, raggruppati per ecoMain e ogni ecoSub online, anche senza misure HA selezionate. Una selezione vuota cancella il gruppo visualizzato; i dispositivi nascosti o offline mantengono i valori hardware.
+
+**Salva** legge subito l’hardware, scrive solo i valori cambiati e li verifica rileggendoli. Un errore parziale non annulla le scritture riuscite. **Indietro** e **Annulla** non annullano le impostazioni hardware già salvate. Le selezioni HA e le entità aggiuntive vengono salvate separatamente alla fine del flusso delle opzioni. Queste pagine sono solo locali, non creano entità di controllo e non sono mostrate nelle vecchie schermate.
+
 ### Fasi dei canali in modalità locale
 
-- Apri **Impostazioni → Dispositivi e servizi → enecess → Configura**, scegli **Fasi dei canali** e seleziona ecoMain oppure un ecoSub configurato e online.
+- Con il firmware 139 apri **Configura**, scegli **Fasi dei canali** e seleziona ecoMain oppure un ecoSub configurato e online. Dalla versione 140 usa **Configurazione canali**, descritta sopra.
 - La pagina mostra la fase corrente dei dieci canali del dispositivo selezionato.
 
 - Assegna **L1**, **L2** o **L3** a ciascun canale.

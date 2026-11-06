@@ -235,14 +235,6 @@ def build_source_options(
     return options
 
 
-def find_source_description(
-    descriptions: list[EnecessSensorDescription],
-    source_key: str,
-) -> EnecessSensorDescription | None:
-    """Find a source sensor description by key."""
-    return next((desc for desc in descriptions if desc.key == source_key), None)
-
-
 def make_extra_key(
     operation: str, sources: list[str], existing: list[dict[str, Any]]
 ) -> str:

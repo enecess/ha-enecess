@@ -25,14 +25,14 @@ from ..const import (
     CONST_EXTRA_OPERATION_AVERAGE,
     CONST_EXTRA_OPERATION_INVERT,
     CONST_EXTRA_OPERATION_SUM,
-    DOMAIN,
 )
 from ..extra import (
     build_entry_descriptions,
     build_entry_specs,
+    device_identifier,
     extra_entity_device_index,
-    find_source_description,
     get_entry_extra_entities,
+    sensor_unique_id,
 )
 from ..formula import (
     FORMULA_RESULT_TYPES,
@@ -56,23 +56,6 @@ _FORMULA_UNITS = {
     "frequency": "Hz",
     "number": None,
 }
-
-
-def _device_identifier(serial: str, idx: int, mode: str) -> tuple[str, str]:
-    mode_key = (
-        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
-    )
-    sub = f":sub_{idx}" if idx != 0 else ""
-    idt = f"ecomain:{serial}{sub}:mode_{mode_key}"
-    return DOMAIN, idt
-
-
-def _sensor_unique_id(serial: str, idx: int, key: str, mode: str) -> str:
-    mode_key = (
-        CONST_ADD_MODE_CLOUD if mode == CONST_ADD_MODE_CLOUD else CONST_ADD_MODE_LOCAL
-    )
-    sub = f":sub_{idx}" if idx != 0 else ""
-    return f"ecomain:{serial}{sub}:key_{key}:mode_{mode_key}"
 
 
 class EcoMainSensor(CoordinatorEntity, SensorEntity):
@@ -103,15 +86,15 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
         spec = description.spec
         if spec.device_index == 0:
             self._attr_device_info = DeviceInfo(
-                identifiers={_device_identifier(serial, 0, mode_key)},
+                identifiers={device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
                 model="ecoMain",
                 name=f"ecoMain {serial} ({mode_key.title()})",
             )
-            self._attr_unique_id = _sensor_unique_id(serial, 0, spec.key, mode_key)
+            self._attr_unique_id = sensor_unique_id(serial, 0, spec.key, mode_key)
         else:
             self._attr_device_info = DeviceInfo(
-                identifiers={_device_identifier(serial, spec.device_index, mode_key)},
+                identifiers={device_identifier(serial, spec.device_index, mode_key)},
                 manufacturer="enecess",
                 model="ecoSolarMonitor"
                 if spec.device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
@@ -122,10 +105,10 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
                 **(
                     {"via_device_id": via_device_id}
                     if via_device_id is not None
-                    else {"via_device": _device_identifier(serial, 0, mode_key)}
+                    else {"via_device": device_identifier(serial, 0, mode_key)}
                 ),
             )
-            self._attr_unique_id = _sensor_unique_id(
+            self._attr_unique_id = sensor_unique_id(
                 serial, spec.device_index, spec.key, mode_key
             )
 
@@ -138,15 +121,6 @@ class EcoMainSensor(CoordinatorEntity, SensorEntity):
     def native_value(self):
         """Return the current decoded measurement from the coordinator."""
         return (self.coordinator.data or {}).get(self.entity_description.key)
-
-
-class EcoMainAccumulatedEnergySensor(EcoMainSensor):
-    """Expose the shared cloud total without owning its accumulation lifecycle."""
-
-    @property
-    def available(self) -> bool:
-        """Return whether this successful poll contains a valid cumulative value."""
-        return self.coordinator.last_update_success and self.native_value is not None
 
 
 class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
@@ -235,14 +209,14 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
         )
         if device_index == 0:
             self._attr_device_info = DeviceInfo(
-                identifiers={_device_identifier(serial, 0, mode_key)},
+                identifiers={device_identifier(serial, 0, mode_key)},
                 manufacturer="enecess",
                 model="ecoMain",
                 name=f"ecoMain {serial} ({mode_key.title()})",
             )
         else:
             self._attr_device_info = DeviceInfo(
-                identifiers={_device_identifier(serial, device_index, mode_key)},
+                identifiers={device_identifier(serial, device_index, mode_key)},
                 manufacturer="enecess",
                 model="ecoSolarMonitor"
                 if device_index == CONF_ECOMAIN_SOLAR_DEVICE_INDEX
@@ -253,10 +227,10 @@ class EcoMainExtraSensor(CoordinatorEntity, SensorEntity):
                 **(
                     {"via_device_id": via_device_id}
                     if via_device_id is not None
-                    else {"via_device": _device_identifier(serial, 0, mode_key)}
+                    else {"via_device": device_identifier(serial, 0, mode_key)}
                 ),
             )
-        self._attr_unique_id = _sensor_unique_id(
+        self._attr_unique_id = sensor_unique_id(
             serial, device_index, extra_config["key"], mode_key
         )
 
@@ -336,25 +310,17 @@ async def async_setup_entry(
         device_registry = dr.async_get(hass)
         master = device_registry.async_get_or_create(
             config_entry_id=entry.entry_id,
-            identifiers={_device_identifier(serial, 0, mode_key)},
+            identifiers={device_identifier(serial, 0, mode_key)},
             manufacturer="enecess",
             model="ecoMain",
             name=f"ecoMain {serial} ({mode_key.title()})",
         )
         if "via_device_id" in DeviceInfo.__annotations__:
             via_device_id = master.id
-    entities = []
-    for desc in descs:
-        if desc.spec.kind == "energy_accumulated":
-            entities.append(
-                EcoMainAccumulatedEnergySensor(coordinator, mode, serial, desc)
-            )
-        else:
-            entities.append(
-                EcoMainSensor(
-                    coordinator, mode, serial, desc, via_device_id=via_device_id
-                )
-            )
+    entities = [
+        EcoMainSensor(coordinator, mode, serial, desc, via_device_id=via_device_id)
+        for desc in descs
+    ]
 
     source_descs = build_entry_descriptions(entry.data, entry.options)
     configured_descs = build_entry_descriptions(
@@ -371,7 +337,9 @@ async def async_setup_entry(
         sources = extra.get("sources") or []
         if not sources:
             continue
-        source_desc = find_source_description(source_descs, sources[0])
+        source_desc = next(
+            (desc for desc in source_descs if desc.key == sources[0]), None
+        )
         if source_desc is None:
             continue
         device_index = extra_entity_device_index(configured_descs, extra)

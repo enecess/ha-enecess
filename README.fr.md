@@ -423,9 +423,19 @@ Seules les mesures activées et prises en charge par le micrologiciel sont propo
 - Supprimez une formule via **Supprimer une entité supplémentaire**. Avant de décocher une mesure, supprimez les formules qui l’utilisent.
 - Si des données manquent ou si le calcul est impossible, le résultat est indisponible.
 
+### ecoSolarMonitor et réglages d’installation (firmware local 140 ou ultérieur)
+
+Ces fonctions exigent une détection réussie du firmware **140 ou ultérieur**. Chaque ecoMain possède un ecoSolarMonitor à l’indice `4`, les ecoSub conservant les indices `1`–`3`. Sélectionnez l’ecoSolarMonitor détecté puis son groupe de mesures distinct. Ses huit mesures sont l’irradiance, l’inclinaison, la température du module, les puissances réelle et estimée (sélectionnées par défaut), puis le ratio de performance et les énergies cumulées réelle et estimée (facultatives). Il ne possède pas dix canaux de compteur et appartient à l’ecoMain courant, même si des canaux d’onduleur proviennent d’un ecoSub.
+
+Après l’ajout, ouvrez **Configurer**. Le firmware 139 propose **Phases des canaux** ; à partir de 140, **Configuration des canaux** permet de régler la phase et le transformateur de courant (30 A ou 100 A) de chaque canal d’ecoMain ou d’un ecoSub sélectionné et en ligne. Les transformateurs du circuit principal L1/L2/L3 d’ecoMain acceptent seulement 100 A. ecoSolarMonitor est exclu du choix des compteurs.
+
+Si ecoSolarMonitor est sélectionné, **Configuration ecoSolarMonitor** règle la puissance PV installée de l’ecoMain courant (entier `0`–`2147483647` W), le coefficient de température de puissance (`-32.768`–`32.767` %/°C, trois décimales au maximum) et les canaux d’onduleur `1`–`10`, regroupés sous ecoMain et chaque ecoSub en ligne, même sans mesures HA sélectionnées. Un groupe affiché vide est effacé ; les appareils masqués ou hors ligne conservent leurs valeurs matérielles.
+
+**Enregistrer** lit immédiatement le matériel, écrit seulement les modifications et les vérifie par relecture. Un échec partiel n’annule pas les écritures réussies. **Retour** et **Annuler** n’annulent pas les réglages matériels déjà enregistrés. Les sélections HA et les entités supplémentaires sont enregistrées séparément à la fin du flux d’options. Ces pages sont locales, ne créent aucune entité de commande et ne figurent pas dans les anciennes captures d’écran.
+
 ### Phases des canaux (mode local uniquement)
 
-- Pour une entrée ecoMain locale, ouvrez **Configurer**, choisissez l’action **Phases des canaux**, puis ecoMain ou un ecoSub configuré et en ligne.
+- Avec le firmware 139, ouvrez **Configurer**, choisissez **Phases des canaux**, puis ecoMain ou un ecoSub configuré et en ligne. À partir de 140, utilisez **Configuration des canaux**, décrite ci-dessus.
 - Attribuez **L1**, **L2** ou **L3** à chacun des dix canaux.
 - L’intégration lit les phases actuelles, écrit uniquement les modifications et les relit pour vérification.
 - Les erreurs d’écriture ou de vérification apparaissent sur les champs concernés ; les modifications réussies ne sont pas annulées automatiquement.
@@ -661,7 +671,7 @@ Consultez les notes de version avant d’installer une nouvelle version. Si une 
 
 L’intégration applique plusieurs filtres :
 
-1. **Esclaves supportés** : seuls les indices d’esclaves définis dans la configuration sont pris en charge (actuellement `1`, `2`, `3`).
+1. **Sous-appareils disponibles** : ecoSub utilise les indices `1`, `2`, `3` ; le firmware local 140 ou ultérieur ajoute un ecoSolarMonitor avec indice `4`.
 2. **Esclaves en ligne** (mode local) :
     - L’intégration lit des registres « esclaves en ligne ».
     - Seuls les esclaves marqués comme en ligne sont proposés.
