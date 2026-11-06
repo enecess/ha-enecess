@@ -11,6 +11,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import device_registry as dr, entity_registry as er, selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.selector import SelectSelectorMode
+from pymodbus import ModbusException
 import voluptuous as vol
 from zeroconf import ServiceStateChange
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo
@@ -1770,7 +1771,7 @@ class EnecessOptionsFlow(
                     < CONF_ECOMAIN_PHASE_FIRMWARE_VERSION
                 ):
                     errors["base"] = "phase_firmware_too_old"
-            except Exception:  # noqa: BLE001 - Convert driver and malformed-register failures into form errors.
+            except (ModbusException, OSError, TimeoutError):
                 errors["base"] = "phase_read_failed"
         if not errors and user_input is not None and self._phase_values:
             desired = {
@@ -1779,7 +1780,7 @@ class EnecessOptionsFlow(
             }
             try:
                 errors = await async_write_phases(client, self._phase_device, desired)
-            except Exception:  # noqa: BLE001 - Convert driver and malformed-register failures into form errors.
+            except (ModbusException, OSError, TimeoutError):
                 errors = {"base": "phase_write_failed"}
             if not errors:
                 return await self._show_options_menu()
@@ -1787,7 +1788,7 @@ class EnecessOptionsFlow(
         elif not errors:
             try:
                 self._phase_values = await async_read_phases(client, self._phase_device)
-            except Exception:  # noqa: BLE001 - Convert driver and malformed-register failures into form errors.
+            except (ModbusException, OSError, TimeoutError):
                 errors["base"] = "phase_read_failed"
         fields = {}
         # A failed read must never turn a default phase into an unintended write.

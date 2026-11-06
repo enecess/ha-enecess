@@ -10,6 +10,7 @@ from unittest.mock import AsyncMock, patch
 from homeassistant.config_entries import ConfigEntries, current_entry
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.entity_platform import EntityPlatform
+from pymodbus import ModbusException
 
 from custom_components import enecess
 from custom_components.enecess.client_modbus import EnecessModbusClient
@@ -149,6 +150,8 @@ class LifecycleTests(RealHARuntimeFixture):
             await self.hass.async_stop(force=True)
             self.assertFalse(transport.connected)
             self.assertEqual(transport.close_count, 1)
+            with self.assertRaises(asyncio.CancelledError):
+                await entry.runtime_data.modbus_client.read_holding_registers(3009, 1)
             with self.assertNoLogs("homeassistant.core", level="ERROR"):
                 await entry._async_process_on_unload(self.hass)
 
@@ -244,9 +247,99 @@ class LifecycleTests(RealHARuntimeFixture):
             self.assertFalse(await enecess.async_unload_entry(self.hass, entry))
             self.assertTrue(transport.connected)
             self.assertEqual(transport.close_count, 0)
+            self.assertEqual((await entry.runtime_data.modbus_client.read_holding_registers(3009, 1)).registers, [139])
             self.assertTrue(await enecess.async_unload_entry(self.hass, entry))
             self.assertFalse(transport.connected)
             self.assertEqual(transport.close_count, 1)
+
+    async def test_short_measurement_read_does_not_publish_fabricated_energy(self):
+        from homeassistant.helpers.update_coordinator import UpdateFailed
+        from custom_components.enecess.ecomain.coordinator import EcoMainModbusCoordinator
+        from custom_components.enecess.ecomain.model import build_specs_local
+
+        class ShortTransport(Transport):
+            async def read_holding_registers(self, **kwargs):
+                response = await super().read_holding_registers(**kwargs)
+                if kwargs["address"] != 3009:
+                    response.registers.pop()
+                return response
+
+        transport = ShortTransport([139])
+        with self.transport_context(transport):
+            client = EnecessModbusClient("192.0.2.1", 502)
+            coordinator = EcoMainModbusCoordinator(
+                self.hass, self.make_entry("local"), client,
+                build_specs_local([], ["energy_forward"]),
+            )
+            try:
+                with self.assertRaises(UpdateFailed):
+                    await coordinator._async_update_data()
+                self.assertIsNone(coordinator.data)
+            finally:
+                await client.async_close()
+
+    async def test_unload_cancels_settings_and_queued_requests_before_later_writes(self):
+        from custom_components.enecess.ecomain.settings import (
+            ChannelSettings,
+            async_write_channel_settings,
+        )
+
+        entry = self.make_entry("local")
+        token = current_entry.set(entry)
+        self.addCleanup(current_entry.reset, token)
+        started = asyncio.Event()
+        closed = asyncio.Event()
+        writes = []
+        transports = []
+
+        class SettingsTransport(Transport):
+            def __init__(self, **kwargs):
+                super().__init__([139])
+                transports.append(self)
+
+            def close(self):
+                super().close()
+                closed.set()
+
+            async def write_register(self, *, address, value, device_id):
+                writes.append((address, value))
+                if len(writes) == 1:
+                    started.set()
+                    await closed.wait()
+                    raise ModbusException("Fictional closed settings transport")
+                return SimpleNamespace(address=address, registers=[value], isError=lambda: False)
+
+        with (
+            self.transport_context(Transport([139])),
+            patch("custom_components.enecess.client_modbus.AsyncModbusTcpClient", SettingsTransport),
+            patch.object(ConfigEntries, "async_forward_entry_setups", new_callable=AsyncMock),
+            patch.object(ConfigEntries, "async_unload_platforms", new_callable=AsyncMock, return_value=True),
+        ):
+            await enecess.async_setup_entry(self.hass, entry)
+            client = entry.runtime_data.modbus_client
+            settings = asyncio.create_task(async_write_channel_settings(
+                client, 0, ChannelSettings(phases={}, transformers={"channel_1": "30", "channel_2": "30"}, main_transformers={})
+            ))
+            await asyncio.wait_for(started.wait(), 1)
+            queued = asyncio.create_task(client.read_holding_registers(3009, 1))
+            await asyncio.sleep(0)
+            self.assertFalse(queued.done())
+            try:
+                self.assertTrue(await enecess.async_unload_entry(self.hass, entry))
+                outcomes = await asyncio.wait_for(asyncio.gather(settings, queued, return_exceptions=True), 1)
+                self.assertTrue(all(isinstance(outcome, asyncio.CancelledError) for outcome in outcomes))
+                self.assertEqual(writes, [(2043, 30)])
+                self.assertEqual(len(transports), 1)
+                self.assertFalse(transports[0].connected)
+                self.assertIsNone(getattr(entry, "runtime_data", None))
+                with self.assertRaises(asyncio.CancelledError):
+                    await client.write_register(2044, 30)
+                self.assertEqual(writes, [(2043, 30)])
+            finally:
+                settings.cancel()
+                queued.cancel()
+                await asyncio.gather(settings, queued, return_exceptions=True)
+                await client.async_close()
 
     async def test_verified_firmware_change_reloads_without_options_change(self):
         entry = self.make_entry("local")

@@ -42,12 +42,6 @@ class SettingsFlowMixin:
             )
         except (ModbusException, OSError, TimeoutError):
             return None, "settings_read_failed"
-        if (
-            len(response.registers) != 1
-            or type(response.registers[0]) is not int
-            or not 0 <= response.registers[0] <= 65535
-        ):
-            return None, "settings_read_failed"
         self._firmware_version = response.registers[0]
         self._firmware_target = self._local_target
         if self._firmware_version < CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION:

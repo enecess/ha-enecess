@@ -56,9 +56,13 @@ class EnecessModbusClient:
         self._port = port
         self._client: AsyncModbusTcpClient | None = None
         self._lock = asyncio.Lock()
+        self._shutdown_requested = False
+        self._requests: set[asyncio.Task[object]] = set()
 
     async def async_connect(self) -> None:
         """Connect on demand, reusing an established connection."""
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
         if self._client is not None and self._client.connected:
             return
         if self._client is None:
@@ -84,24 +88,42 @@ class EnecessModbusClient:
         self._client.close()
         self._client = None
 
+    async def async_shutdown(self) -> None:
+        """Cancel active and queued requests and permanently release the transport."""
+        self._shutdown_requested = True
+        current = asyncio.current_task()
+        requests = [task for task in self._requests if task is not current]
+        for task in requests:
+            task.cancel()
+        if requests:
+            await asyncio.gather(*requests, return_exceptions=True)
+        await self.async_close()
+
     @asynccontextmanager
     async def _connection(self) -> AsyncIterator[AsyncModbusTcpClient]:
         """Serialize requests and preserve cancellation across pymodbus versions."""
-        async with self._lock:
-            try:
-                await self.async_connect()
-                assert self._client is not None
-                yield self._client
-            except asyncio.CancelledError:
-                await self.async_close()
-                raise
-            except ModbusException as err:
-                # Some pymodbus versions translate cancellation into an I/O error.
-                task = asyncio.current_task()
-                if task is not None and task.cancelling():
+        if self._shutdown_requested:
+            raise asyncio.CancelledError
+        task = asyncio.current_task()
+        assert task is not None
+        self._requests.add(task)
+        try:
+            async with self._lock:
+                try:
+                    await self.async_connect()
+                    assert self._client is not None
+                    yield self._client
+                except asyncio.CancelledError:
                     await self.async_close()
-                    raise asyncio.CancelledError from err
-                raise
+                    raise
+                except ModbusException as err:
+                    # Some pymodbus versions translate cancellation into an I/O error.
+                    if task.cancelling():
+                        await self.async_close()
+                        raise asyncio.CancelledError from err
+                    raise
+        finally:
+            self._requests.discard(task)
 
     async def read_holding_registers(
         self, address: int, count: int
@@ -111,13 +133,21 @@ class EnecessModbusClient:
             resp = await client.read_holding_registers(
                 address=address, count=count, device_id=CONF_ECOMAIN_UNIT_ID
             )
-            if resp.isError():
+            if resp is None or resp.isError():
                 raise ModbusException(str(resp))
-            if len(resp.registers) != count:
-                raise ModbusException(
-                    f"Expected {count} registers at {address}, got {len(resp.registers)}"
+            registers = getattr(resp, "registers", None)
+            if (
+                not isinstance(registers, list)
+                or len(registers) != count
+                or any(
+                    type(value) is not int or not 0 <= value <= 65535
+                    for value in registers
                 )
-            return ModbusReadResult(registers=list(resp.registers))
+            ):
+                raise ModbusException(
+                    f"Invalid register response at {address}: {registers!r}"
+                )
+            return ModbusReadResult(registers=list(registers))
 
     async def write_register(self, address: int, value: int) -> None:
         """Write one register and require a matching function-06 response echo."""

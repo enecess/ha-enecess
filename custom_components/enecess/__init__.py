@@ -127,7 +127,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> b
             async def _async_close_on_stop(event: Event) -> None:
                 """Release the socket when HA stops without unloading entries."""
                 await coordinator.async_shutdown()
-                await client.async_close()
+                await client.async_shutdown()
 
             entry.async_on_unload(
                 hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, _async_close_on_stop)
@@ -143,7 +143,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> b
             finally:
                 await coordinator.async_shutdown()
                 if client is not None:
-                    await client.async_close()
+                    await client.async_shutdown()
                 if hasattr(entry, "runtime_data"):
                     del entry.runtime_data
     return True
@@ -158,6 +158,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: EnecessConfigEntry) -> 
     if runtime is not None:
         await runtime.coordinator.async_shutdown()
         if runtime.modbus_client is not None:
-            await runtime.modbus_client.async_close()
+            await runtime.modbus_client.async_shutdown()
         del entry.runtime_data
     return True

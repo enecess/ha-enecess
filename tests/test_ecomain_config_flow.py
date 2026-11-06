@@ -165,9 +165,9 @@ class MeasurementFlowTests(unittest.IsolatedAsyncioTestCase):
 class FirmwareTests(unittest.IsolatedAsyncioTestCase):
     async def test_unreadable_firmware_uses_local_connection_error(self):
         module = load_flow(self)
-        for response in (ConnectionRefusedError(), TimeoutError(), types.SimpleNamespace(registers=[]), types.SimpleNamespace(registers=[None])):
+        for response in (ConnectionRefusedError(), TimeoutError()):
             with self.subTest(response=response):
-                read = AsyncMock(side_effect=response) if isinstance(response, Exception) else AsyncMock(return_value=response)
+                read = AsyncMock(side_effect=response)
                 client = types.SimpleNamespace(read_holding_registers=read, async_close=AsyncMock())
                 result = await module.async_validate_local_device(
                     client, firmware_register=3009, minimum_firmware=136,
@@ -206,6 +206,27 @@ class PhaseFlowTests(unittest.IsolatedAsyncioTestCase):
                                       options={}, entry_id="test")
         self.flow = self.module.EnecessOptionsFlow(entry)
         entry.runtime_data = types.SimpleNamespace(modbus_client=client)
+
+    async def test_programming_errors_in_phase_reads_and_writes_are_not_form_errors(self):
+        for operation in ("firmware", "read", "write"):
+            with self.subTest(operation=operation):
+                self.flow._phase_device = 0
+                self.flow._phase_values = {}
+                method = "write_register" if operation == "write" else "read_holding_registers"
+                if operation == "write":
+                    result = await self.flow.async_step_channel_phases()
+                    values = result["data_schema"]({})
+                    values["channel_1"] = "L2"
+                else:
+                    values = None
+                async def request(**kwargs):
+                    if operation == "read" and kwargs["address"] == 3009:
+                        from test_ecomain_phase import Response
+                        return Response(registers=[139])
+                    raise TypeError("fictional phase bug")
+                with patch.object(self.transport, method, side_effect=request):
+                    with self.assertRaisesRegex(TypeError, "fictional phase bug"):
+                        await self.flow.async_step_channel_phases(values)
 
     async def test_old_firmware_blocks_phase_read_and_save(self):
         for version in (135, 136, 138):

@@ -2,19 +2,11 @@
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Protocol
 
+from pymodbus import ModbusException
+
+from .client_modbus import EnecessModbusClient
 from .const import CONF_ECOMAIN_SOLAR_DEVICE_INDEX, CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION
-
-
-class LocalModbusClient(Protocol):
-    """Define the temporary connection operations required for validation."""
-
-    async def read_holding_registers(self, address: int, count: int) -> Any:
-        """Read holding registers from the local device."""
-
-    async def async_close(self) -> None:
-        """Close the temporary Modbus connection."""
 
 
 @dataclass(frozen=True)
@@ -27,7 +19,7 @@ class LocalValidationResult:
 
 
 async def async_validate_local_device(
-    client: LocalModbusClient,
+    client: EnecessModbusClient,
     *,
     firmware_register: int,
     minimum_firmware: int,
@@ -43,18 +35,12 @@ async def async_validate_local_device(
                 client.read_holding_registers(firmware_register, 1),
                 timeout=firmware_timeout,
             )
-            if (
-                len(response.registers) != 1
-                or type(response.registers[0]) is not int
-                or not 0 <= response.registers[0] <= 65535
-            ):
-                return LocalValidationResult(error="cannot_connect_local")
             firmware_version = response.registers[0]
             if firmware_version < minimum_firmware:
                 return LocalValidationResult(
                     error="cannot_connect_local", firmware_version=firmware_version
                 )
-        except Exception:  # noqa: BLE001 -- Map client and malformed-response failures at the flow boundary.
+        except (ModbusException, OSError, TimeoutError):
             return LocalValidationResult(error="cannot_connect_local")
 
         try:
@@ -64,10 +50,7 @@ async def async_validate_local_device(
                 slave_register_start,
                 slave_register_count,
             )
-            if len(response.registers) != slave_register_count or any(
-                type(value) is not int or value not in (0, 1)
-                for value in response.registers
-            ):
+            if any(value not in (0, 1) for value in response.registers):
                 return LocalValidationResult(
                     error="cannot_connect_local", firmware_version=firmware_version
                 )
@@ -79,7 +62,7 @@ async def async_validate_local_device(
             return LocalValidationResult(
                 online_slaves=online_slaves, firmware_version=firmware_version
             )
-        except Exception:  # noqa: BLE001 -- Present connection and response failures as a form error.
+        except (ModbusException, OSError, TimeoutError):
             return LocalValidationResult(
                 error="cannot_connect_local", firmware_version=firmware_version
             )

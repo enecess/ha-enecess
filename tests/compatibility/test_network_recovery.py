@@ -234,6 +234,27 @@ class ModbusRecoveryTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertIs(self.client._client, original)
 
+    async def test_normal_close_allows_the_next_request_to_reconnect(self):
+        await self.client.read_holding_registers(3009, 1)
+        await self.client.async_close()
+        self.assertEqual((await self.client.read_holding_registers(3009, 1)).registers, [139])
+        self.assertEqual(len(self.requests), 2)
+
+    async def test_terminal_shutdown_rejects_every_new_request_without_reconnecting(self):
+        await self.client.read_holding_registers(3009, 1)
+        await self.client.async_shutdown()
+        await self.client.async_shutdown()
+        for request in (
+            self.client.async_connect(),
+            self.client.read_holding_registers(3009, 1),
+            self.client.write_register(2000, 1),
+            self.client.write_registers(5000, [1, 0]),
+        ):
+            with self.assertRaises(asyncio.CancelledError):
+                await request
+        self.assertIsNone(self.client._client)
+        self.assertEqual(len(self.requests), 1)
+
     async def test_cancelled_read_closes_transport_and_propagates_cancellation(self):
         self.drop = 99
         task = asyncio.create_task(self.client.read_holding_registers(3009, 1))

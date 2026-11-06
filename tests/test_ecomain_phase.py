@@ -121,6 +121,16 @@ class PhaseTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(self.modbus.ModbusException):
             await self.phase.async_read_phases(self.client, 0)
 
+    async def test_malformed_register_payloads_are_rejected_at_client_boundary(self):
+        for registers in (None, [], [1, 2], ["1"], [True], [1.5], [-1], [65536]):
+            with self.subTest(registers=registers):
+                with patch.object(self.transport, "read_holding_registers", AsyncMock(return_value=Response(registers=registers))):
+                    with self.assertRaises(self.modbus.ModbusException):
+                        await self.client.read_holding_registers(2000, 1)
+        with patch.object(self.transport, "read_holding_registers", AsyncMock(return_value=None)):
+            with self.assertRaises(self.modbus.ModbusException):
+                await self.client.read_holding_registers(2000, 1)
+
     async def test_invalid_inputs_fail_before_any_io(self):
         for device in [-1, 4, True, "0", 0.0]:
             with self.assertRaises(ValueError):

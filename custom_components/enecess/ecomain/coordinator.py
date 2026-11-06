@@ -135,15 +135,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
             firmware = await self._client.read_holding_registers(
                 CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER, 1
             )
-            if len(firmware.registers) != 1:
-                raise UpdateFailed("Incomplete ecoMain firmware response")
             version = firmware.registers[0]
-            if (
-                not isinstance(version, int)
-                or isinstance(version, bool)
-                or not 0 <= version <= 65535
-            ):
-                raise UpdateFailed("Invalid ecoMain firmware response")
             if version < CONF_ECOMAIN_MIN_FIRMWARE_VERSION:
                 raise UpdateFailed(
                     f"ecoMain firmware {version} is unsupported; version {CONF_ECOMAIN_MIN_FIRMWARE_VERSION}+ is required"
@@ -170,10 +162,7 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
                 CONF_ECOMAIN_SLAVE_ONLINE_REGISTER_START,
                 status_count,
             )
-            if len(status.registers) != status_count or any(
-                type(value) is not int or value not in (0, 1)
-                for value in status.registers
-            ):
+            if any(value not in (0, 1) for value in status.registers):
                 raise UpdateFailed("Invalid ecoSub online status response")
             online = {
                 index
@@ -189,10 +178,6 @@ class EcoMainModbusCoordinator(DataUpdateCoordinator[dict[str, float]]):
         reg_map: dict[int, int] = {}
         for start, count in build_read_blocks(active_specs):
             rr = await self._client.read_holding_registers(start, count)
-            if len(rr.registers) != count:
-                raise UpdateFailed(
-                    f"Incomplete register read at {start}: expected {count}, got {len(rr.registers)}"
-                )
             reg_map.update(((start + i), r) for i, r in enumerate(rr.registers))
 
         out: dict[str, float] = {}

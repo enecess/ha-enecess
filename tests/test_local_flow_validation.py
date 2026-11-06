@@ -22,10 +22,10 @@ class ValidationClient:
         self.started.set()
         if self.block:
             await asyncio.Event().wait()
-        result = [self.firmware] if address == 3009 else self.slaves
+        result = self.firmware if address == 3009 else self.slaves
         if isinstance(result, Exception):
             raise result
-        return SimpleNamespace(registers=result)
+        return SimpleNamespace(registers=[result] if address == 3009 else result)
 
     async def async_close(self):
         self.closed = True
@@ -75,6 +75,16 @@ class LocalFlowValidationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(flow._firmware_version, 139)
         self.assertEqual(flow._available_slaves, [])
         self.assertTrue(client.closed)
+
+    async def test_validation_programming_error_is_not_a_device_connection_error(self):
+        for probe in ("firmware", "slaves"):
+            with self.subTest(probe=probe):
+                client = ValidationClient()
+                setattr(client, probe, TypeError("fictional validation bug"))
+                with patch.object(self.module, "EnecessModbusClient", return_value=client):
+                    with self.assertRaisesRegex(TypeError, "fictional validation bug"):
+                        await self.options_flow()._async_refresh_local_slaves()
+                self.assertTrue(client.closed)
 
     async def test_options_rejects_old_firmware_with_local_connection_error(self):
         flow = self.options_flow()

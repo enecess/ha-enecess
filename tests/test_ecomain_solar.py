@@ -132,30 +132,35 @@ class SolarModelTests(unittest.TestCase):
 
 
 class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
-    async def test_validation_rejects_unconfirmed_firmware_before_solar_status_read(self):
-        load_flow(self)
+    async def test_validation_rejects_malformed_firmware_at_client_boundary(self):
+        module = load_flow(self)
         validate = import_module("custom_components.enecess.local_validation").async_validate_local_device
 
-        class Client:
-            async def read_holding_registers(self, start, count):
-                self.calls.append((start, count))
-                return SimpleNamespace(registers=self.firmware if start == 3009 else [0, 0, 0, 1])
+        class Transport:
+            connected = True
 
-            async def async_close(self):
-                pass
+            async def read_holding_registers(self, *, address, count, device_id):
+                self.calls.append((address, count))
+                return SimpleNamespace(registers=self.firmware, isError=lambda: False)
+
+            def close(self):
+                self.connected = False
 
         for firmware in (["140"], [140, 140], [140.5], [65676], [True], [None], []):
             with self.subTest(firmware=firmware):
-                client = Client()
-                client.firmware = firmware
-                client.calls = []
+                transport = Transport()
+                transport.firmware = firmware
+                transport.calls = []
+                client = module.EnecessModbusClient("192.0.2.1", 502)
+                client._client = transport
                 result = await validate(client, firmware_register=3009, minimum_firmware=136,
                                         slave_register_start=3101, slave_register_count=3,
                                         allowed_slaves={"1", "2", "3", "4"}, firmware_timeout=5)
                 self.assertEqual(result.error, "cannot_connect_local")
-                self.assertEqual(client.calls, [(3009, 1)])
+                self.assertEqual(transport.calls, [(3009, 1)])
+                self.assertFalse(transport.connected)
 
-    async def test_firmware_gate_status_length_and_online_recovery(self):
+    async def test_firmware_gate_and_online_recovery(self):
         model, runtime = load_runtime()
         specs = [model.RegisterSpec(key=key, kind=values[4], device_index=4,
                                    address=values[0], regs=values[1], scale=values[2],
@@ -212,20 +217,15 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         client.online[-1] = 1
         self.assertIn("solar_actual_power", await coordinator._async_update_data())
         self.assertEqual(len(coordinator.specs), len(specs))
-        for version in (139, 138, None):
+        for version in (139, 138):
             with self.subTest(version=version):
                 client.version = version
                 entry.data["ecomain_host"] = f"offline-{version}"
                 client.calls.clear()
-                if version is None:
-                    with self.assertRaisesRegex(RuntimeError, "firmware"):
-                        await coordinator._async_update_data()
-                    self.assertEqual(client.calls, [(3009, 1)])
-                else:
-                    values = await coordinator._async_update_data()
-                    self.assertNotIn("solar_actual_power", values)
-                    self.assertIn((3101, 3), client.calls)
-                    self.assertTrue(all(start < 4000 for start, _ in client.calls))
+                values = await coordinator._async_update_data()
+                self.assertNotIn("solar_actual_power", values)
+                self.assertIn((3101, 3), client.calls)
+                self.assertTrue(all(start < 4000 for start, _ in client.calls))
 
     async def test_validation_reads_four_statuses_only_after_confirmed_firmware_140(self):
         load_flow(self)
@@ -256,22 +256,27 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
                     self.assertTrue(client.closed)
 
     async def test_validation_rejects_incomplete_or_invalid_fourth_status(self):
-        load_flow(self)
+        module = load_flow(self)
         validate = import_module("custom_components.enecess.local_validation").async_validate_local_device
 
-        class Client:
-            async def read_holding_registers(self, start, count):
-                return SimpleNamespace(registers=[140] if start == 3009 else self.status)
+        class Transport:
+            connected = True
 
-            async def async_close(self):
-                pass
+            async def read_holding_registers(self, *, address, count, device_id):
+                return SimpleNamespace(registers=[140] if address == 3009 else self.status, isError=lambda: False)
+
+            def close(self):
+                self.connected = False
 
         for status in ([1, 0, 0], [1, 0, 0, True], [1, 0, 0, 2], [1, 0, 0, None]):
             with self.subTest(status=status):
-                client = Client()
-                client.status = status
+                transport = Transport()
+                transport.status = status
+                client = module.EnecessModbusClient("192.0.2.1", 502)
+                client._client = transport
                 result = await validate(client, firmware_register=3009, minimum_firmware=136,
                                         slave_register_start=3101, slave_register_count=3,
                                         allowed_slaves={"1", "2", "3", "4"}, firmware_timeout=5)
                 self.assertEqual(result.error, "cannot_connect_local")
                 self.assertEqual(result.firmware_version, 140)
+                self.assertFalse(transport.connected)

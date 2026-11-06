@@ -162,22 +162,6 @@ class PollingTests(unittest.IsolatedAsyncioTestCase):
         covered = {i for start, count in calls for i in range(start, start + count)}
         self.assertEqual(covered, {s.address for s in specs})
 
-    async def test_short_read_fails_without_fabricating_energy(self):
-        model, coordinator = load_runtime()
-
-        class Client:
-            async def async_set_target(self, host, port):
-                pass
-
-            async def read_holding_registers(self, start, count):
-                if start == 3009:
-                    return SimpleNamespace(registers=[139])
-                return SimpleNamespace(registers=[1] * (count - 1))
-
-        poller = coordinator.EcoMainModbusCoordinator(None, SimpleNamespace(data={"ecomain_host": "offline"}), Client(), model.build_specs_local([]))
-        with self.assertRaisesRegex(RuntimeError, "[Ss]hort|[Ii]ncomplete"):
-            await poller._async_update_data()
-
     async def test_read_blocks_do_not_split_uint64_or_cross_gaps(self):
         model, coordinator = load_runtime()
         specs = model.build_specs_local([1, 2, 3], ["energy_forward", "energy_reverse", "reactive_energy_forward", "reactive_energy_reverse"])
@@ -190,7 +174,7 @@ class PollingTests(unittest.IsolatedAsyncioTestCase):
     async def test_firmware_capabilities_filter_reads_and_restore_after_target_change(self):
         model, coordinator = load_runtime()
         self.assertEqual(model.available_local_measurements(None), ("power", "energy_forward", "energy_reverse"))
-        for firmware in (135, 136, 138, 139, 140, None, "139", True):
+        for firmware in (135, 136, 138, 139, 140):
             with self.subTest(firmware=firmware):
                 calls = []
 

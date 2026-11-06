@@ -1,9 +1,10 @@
 """Real HA ecoSub availability with synthetic protocol register responses."""
 
-from types import SimpleNamespace
+from types import MethodType, SimpleNamespace
 
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
+from custom_components.enecess.client_modbus import EnecessModbusClient
 from custom_components.enecess.ecomain.coordinator import EcoMainModbusCoordinator
 from custom_components.enecess.ecomain.model import (
     build_sensor_descriptions,
@@ -13,30 +14,39 @@ from custom_components.enecess.ecomain.sensor import EcoMainSensor, EcoMainExtra
 import test_runtime as runtime_fixture
 
 
+READ_REGISTERS = EnecessModbusClient.read_holding_registers
+CLOSE_CLIENT = EnecessModbusClient.async_close
+
+
 class RegisterClient:
     """Return stale measurements even when a fictional ecoSub is offline."""
 
     def __init__(self):
+        self.connected = True
         self.online = [0, 0, 1]
         self.calls = []
 
     async def async_set_target(self, host, port):
         pass
 
-    async def read_holding_registers(self, address, count):
+    async def read_holding_registers(self, address, count, device_id=None):
         self.calls.append((address, count))
         if address == 3009:
-            return SimpleNamespace(registers=[139])
+            return SimpleNamespace(registers=[139], isError=lambda: False)
         if address == 3101:
-            return SimpleNamespace(registers=self.online)
+            return SimpleNamespace(registers=self.online, isError=lambda: False)
         values = {}
         for start in range(1000, 1088, 2):
             raw = start * 100
             values[start] = raw & 0xFFFF
             values[start + 1] = raw >> 16
         return SimpleNamespace(
-            registers=[values.get(index, 0) for index in range(address, address + count)]
+            registers=[values.get(index, 0) for index in range(address, address + count)],
+            isError=lambda: False,
         )
+
+    def close(self):
+        self.connected = False
 
 
 class EcoSubOnlineTests(runtime_fixture.RealHARuntimeFixture):
@@ -106,11 +116,16 @@ class EcoSubOnlineTests(runtime_fixture.RealHARuntimeFixture):
         self.assertIsNone(extra.native_value)
 
     async def test_malformed_online_status_never_publishes_stale_sub_values(self):
-        coordinator, client, _ = self.make_coordinator()
+        coordinator, transport, _ = self.make_coordinator()
+        client = EnecessModbusClient(coordinator._entry.data["ecomain_host"], 502)
+        client._client = transport
+        client.read_holding_registers = MethodType(READ_REGISTERS, client)
+        coordinator._client = client
+        self.addAsyncCleanup(CLOSE_CLIENT, client)
         for invalid in ([1], [True, 0, 1], [2, 0, 1], [1, None, 1]):
             with self.subTest(response=invalid):
-                client.online = invalid
-                with self.assertRaisesRegex(UpdateFailed, "ecoSub.*status"):
+                transport.online = invalid
+                with self.assertRaises(UpdateFailed):
                     await coordinator._async_update_data()
 
     async def test_no_selected_sub_does_not_require_online_status_read(self):
