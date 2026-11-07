@@ -8,25 +8,17 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 
 ## Unterstützte Geräte
 
-- **ecoMain**
-    - Lokal (Modbus TCP, mit zeroconf / mDNS-Erkennung)
-    - Cloud (enecess Cloud)
-- **ecoSolarMonitor**: nur lokal über den zugehörigen ecoMain mit bestätigter Firmware **140 oder neuer**. Die Auswahl erfolgt bei ecoMain, nicht als eigener Gerätetyp beim Hinzufügen der Integration.
-- **ecoPlug**
-    - Nur Cloud (enecess Cloud)
-    - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
-    - Über **Konfigurieren / Optionen** kann die Auswahl später geändert werden.
+- **ecoMain**: lokal über Modbus TCP (automatische Erkennung oder manuelle Einrichtung) und über die enecess-Cloud.
+- **ecoSolarMonitor**: nur lokal; über die Untergeräteliste des zugehörigen ecoMain hinzufügen.
+- **ecoPlug**: nur über die enecess-Cloud. Du kannst mehrere Steckdosen eines Kontos auswählen und die Auswahl später unter **Konfigurieren** ändern.
 
-> Die lokale Einrichtung erfordert Firmware **136 oder neuer**. Firmware unter 136 unterstützt kein Modbus und kann ebenso wie eine falsche Adresse oder ein Netzwerkfehler zu `cannot_connect_local` führen. Prüfe bei Fehlern Adresse, TCP-Port 502, Netzwerkverbindung und Firmwareversion; aktualisiere ecoMain bei Bedarf mit den offiziellen Werkzeugen. Im Cloud-Modus entfällt diese Prüfung.
+Lokale ecoMain-Funktionen nach Firmwareversion:
 
-- Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.
-- Lokale Firmware ab 139: auch die neun weiteren Messgrößen und Einstellungen der Kanalphasen.
-- Bestätigte lokale Firmware ab 140: Protokoll 1.0.6 ergänzt ecoSolarMonitor-Messungen sowie Kanal- und PV-Installationseinstellungen.
-- Ältere Firmware blendet nicht unterstützte Messgrößen aus.
+- **136–138**: Wirkleistung sowie Wirkenergie vorwärts und rückwärts.
+- **Ab 139**: neun weitere Messgrößen; Firmware 139 verwendet **Kanalphasen**.
+- **Ab 140**: ecoSolarMonitor, **Kanalkonfiguration** und PV-Installationseinstellungen.
 
-Protokoll 1.0.5 (Firmware ab 139) bietet optionale Scheinenergie (VAh) mit eigener Formel-Quellengruppe. Zähler verwenden `TOTAL_INCREASING`, Scheinenergieformeln `TOTAL`, ohne Geräteklasse.
-
-Offline-Sensoren von ecoSub und ecoSolarMonitor sind nicht verfügbar; andere Geräte werden weiter aktualisiert. Lade die Integration nach einem Firmwareupdate bei gleicher IP-Adresse neu, damit sie die Firmware erneut prüft. Auch **Konfigurieren** aktualisiert Firmware und erkannte Geräte. Neue Solarmessungen und Installationseinstellungen setzen eine erfolgreiche Erkennung von Firmware 140 oder neuer voraus; unbekannte oder ältere Firmware schaltet sie nicht frei.
+Firmware unter 136 unterstützt keine lokale Verbindung; aktualisiere sie mit den offiziellen Werkzeugen. Sind ecoSub oder ecoSolarMonitor offline, werden ihre Sensoren nicht verfügbar. Andere Geräte aktualisieren sich weiter und deine Auswahl bleibt erhalten. Lade die Integration nach einem Firmwareupdate neu.
 
 ---
 
@@ -64,27 +56,20 @@ Folge der offiziellen HACS-Anleitung:
 
 ## Integration in Home Assistant hinzufügen
 
-- Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
-- **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
-- Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
-- Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
-- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener HA-Änderungen; bereits gespeicherte Hardwarewerte bleiben wirksam.
+Wähle unter **Aktion** **Weiter**, **Speichern**, **Zurück** oder **Abbrechen** und sende das Formular ab. In Menüs wählst du die Funktion unter **Nächste Aktion**; zum Abschluss speicherst du die Konfiguration mit **Fertigstellen**.
 
-Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
+Für ecoMain gibt es zwei Einstiege:
 
-### Weg 1: Über „Gefunden“ (zeroconf / mDNS Auto-Discovery)
+### Weg 1: Über „Gefunden“ (zeroconf / mDNS)
 
-Diese Integration unterstützt **zeroconf** (mDNS-Scan).
-Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assistant befindet:
+Die Integration unterstützt **zeroconf (mDNS)**. Wenn ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assistant befindet:
 
-1. Zu **Einstellungen → Geräte & Dienste** gehen.
-2. Unter **Gefunden** sollte ein **enecess / ecoMain**-Eintrag erscheinen.
-3. Auf **Hinzufügen** beim gefundenen Gerät klicken.
-4. Die Integration startet automatisch die Konfiguration mit der **Automatischen Erkennung (Lokal)**, wobei Seriennummer und IP-Adresse aus der zeroconf-Erkennung
-   übernommen werden.
-5. Den Schritten der **Automatischen Erkennung (Lokal)** folgen (Slaves auswählen, bestätigen, fertigstellen).
+1. Öffne **Einstellungen → Geräte & Dienste**.
+2. Suche unter **Gefunden** die Karte **enecess / ecoMain**.
+3. Wähle auf der Karte **Hinzufügen**.
+4. **Automatische Erkennung (Lokal)** startet mit der erkannten Seriennummer und IP-Adresse.
+5. Wähle Geräte und Messgrößen wie unten beschrieben.
 
-> **Ablauf-Screenshot:**
 > ![Discovered integration card](docs/images/ha-add-integration-1.png)
 
 ---
@@ -95,19 +80,15 @@ Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 
 > ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
 
-### Weg 2: Über „Integration hinzufügen“ (manuell)
+### Weg 2: Über „Integration hinzufügen“
 
-1. Zu **Einstellungen → Geräte & Dienste** gehen.
-2. Auf **Integration hinzufügen** klicken.
-3. Nach **enecess** suchen.
-4. Gerätetyp auswählen: **ecoMain**.
-5. Hinzufügungsmethode wählen:
-    - **Automatische Erkennung (Lokal)**
-    - **Manuelle Einrichtung (Lokal)**
-    - **Kontoanmeldung (Cloud)**
+1. Öffne **Einstellungen → Geräte & Dienste → Integration hinzufügen**.
+2. Suche nach **enecess**.
+3. Wähle den Gerätetyp:
+   - **ecoMain**: anschließend **Automatische Erkennung (Lokal)**, **Manuelle Einrichtung (Lokal)** oder **Kontoanmeldung (Cloud)**.
+   - **ecoPlug**: direkt zur Cloud-Anmeldung.
 
-> **Ablauf-Screenshot:**
-> ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+> ![Discovered integration card](docs/images/ha-add-integration-1.png)
 
 ---
 
@@ -127,53 +108,22 @@ Wenn dein ecoMain eingeschaltet ist und sich im selben Netzwerk wie Home Assista
 
 ---
 
-## ecoMain – Hinzufügungsmethoden & Schritt-für-Schritt-Abläufe
+## ecoMain einrichten
 
-ecoMain kann auf drei Arten hinzugefügt werden:
-
-1. **Automatische Erkennung (Lokal)**
-    - Startbar über:
-        - „Integration hinzufügen“ → enecess → ecoMain → Methode: *Automatische Erkennung (Lokal)*
-        - Oder durch Klick auf eine **gefundene ecoMain-Karte** (zeroconf) auf der Seite „Geräte & Dienste“.
-2. **Manuelle Einrichtung (Lokal)**
-3. **Kontoanmeldung (Cloud)**
+ecoMain unterstützt **Automatische Erkennung (Lokal)**, **Manuelle Einrichtung (Lokal)** und **Kontoanmeldung (Cloud)**. Die automatische Erkennung lässt sich auch über eine gefundene ecoMain-Karte starten.
 
 ### A) Automatische Erkennung (Lokal)
 
-Verwende diese Methode, wenn:
+Für ecoMain und Home Assistant im selben LAN mit erlaubter mDNS-Erkennung:
 
-- ecoMain sich im gleichen LAN wie Home Assistant befindet.
-- mDNS / Bonjour / zeroconf im Netzwerk funktioniert.
+1. Starte über **Integration hinzufügen → enecess → ecoMain → Automatische Erkennung (Lokal)** oder **Hinzufügen** auf der gefundenen ecoMain-Karte.
+2. Wähle ecoMain anhand von Seriennummer und IP / Hostname und bestätige die Gerätedaten.
+3. Wähle unter **Gerät konfigurieren → Hinzuzufügende Slaves auswählen** die gewünschten ecoSub oder **ecoSolarMonitor**. Du kannst auch ohne Untergeräte fortfahren.
+4. Wähle unter **Messgrößen** getrennt die Werte für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
+5. Konfiguriere bei Bedarf **Zusätzliche Entitäten**, etwa invertierte oder absolute Leistung, Summen oder Mittelwerte. Wähle abschließend **Fertigstellen**.
 
-Sie wird in zwei Szenarien genutzt:
+Wird nichts gefunden, verwende **Manuelle Einrichtung (Lokal)**. Prüfe das gemeinsame Subnetz / VLAN und ob dein Router Multicast / mDNS zulässt.
 
-- **Manueller Start**: du wählst explizit **Automatische Erkennung (Lokal)** als Hinzufügungsmethode.
-- **Gefundener Start**: du klickst auf die **gefundene ecoMain-Karte**.
-  Die Integration übernimmt Seriennummer und IP aus zeroconf und führt den gleichen Ablauf fort.
-
-Schritte (für beide Starts):
-
-1. ecoMain-Konfiguration starten:
-    - Entweder über **Integration hinzufügen → enecess → ecoMain → Automatische Erkennung (Lokal)**,
-    - oder über **Hinzufügen** auf der **gefundenen** ecoMain-Karte.
-2. Die Integration durchsucht das Netzwerk per **mDNS** nach passenden Diensten.
-3. Wenn Geräte gefunden wurden, den gewünschten ecoMain anhand der **Seriennummer** (und angezeigter IP/Hostname) auswählen.
-4. Geräteinformationen (Seriennummer, Adresse) bestätigen.
-5. Die Integration prüft die **Firmwareversion**, verbindet sich per **Modbus TCP** und erkennt online verfügbare ecoSub sowie bei bestätigter Firmware ab 140 auch ecoSolarMonitor.
-6. Wähle unter **Gerät konfigurieren** im Feld **Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub. Wähle **Aktion** → **Weiter** und sende das Formular ab. Ohne erkannte Untergeräte kannst du ecoMain allein hinzufügen.
-7. Wähle unter **Messgrößen** die Werte getrennt in **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**. Wähle **Aktion** → **Speichern** und sende das Formular ab. Danach kannst du **Zusätzliche Entitäten** konfigurieren:
-    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
-    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
-    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
-8. Wähle unter **Zusätzliche Entitäten** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um den Integrationseintrag zu erstellen.
-
-Tipps bei Problemen:
-
-- Wenn keine Geräte über mDNS gefunden werden, **Manuelle Einrichtung (Lokal)** ausprobieren.
-- Sicherstellen, dass Home Assistant und ecoMain im gleichen Subnetz/VLAN sind.
-- Einige Router blockieren Multicast/mDNS zwischen WLAN/Ethernet-Segmenten.
-
-> **Ablauf-Screenshot:**
 > ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
 
 ---
@@ -184,19 +134,13 @@ Tipps bei Problemen:
 
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 
----
-
 <!-- screenshot-placeholder: local-subdevices -->
 
-> Screenshot ergänzen: **Gerät konfigurieren** mit **Hinzuzufügende Slaves auswählen**, Online-ecoSub und **ecoSolarMonitor** sowie **Aktion → Weiter**.
-
----
+> Screenshot ergänzen: **Gerät konfigurieren** mit ecoSub und ecoSolarMonitor in der Untergeräteliste.
 
 <!-- screenshot-placeholder: local-measurements -->
 
-> Screenshot ergänzen: **Messgrößen** mit Firmwareversion, getrennten Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**, fünf Solar-Standardwerten und **Aktion → Speichern**.
-
----
+> Screenshot ergänzen: **Messgrößen** mit den Gruppen ecoSolarMonitor und ecoMain / ecoSub und ihrer Standardauswahl.
 
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 
@@ -204,44 +148,18 @@ Tipps bei Problemen:
 
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
----
-
 ### B) Manuelle Einrichtung (Lokal)
 
-Verwende diese Methode, wenn:
+Wenn die automatische Erkennung fehlschlägt: Ermittle die **IP / den Hostnamen** von ecoMain im Router oder in den Geräteeinstellungen und halte die Seriennummer vom Typenschild bereit.
 
-- Die automatische Erkennung deinen ecoMain nicht findet.
-- Du IP/Hostname und Seriennummer von ecoMain bereits kennst.
+1. Wähle **ecoMain → Manuelle Einrichtung (Lokal)**.
+2. Gib **Master-Seriennummer** und **Adresse (IP oder Hostname)** ein und bestätige die Gerätedaten.
+3. Wähle unter **Gerät konfigurieren → Hinzuzufügende Slaves auswählen** die gewünschten ecoSub oder **ecoSolarMonitor**, oder fahre ohne Untergeräte fort.
+4. Wähle unter **Messgrößen** Werte für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
+5. Konfiguriere bei Bedarf **Zusätzliche Entitäten** und wähle **Fertigstellen**.
 
-Vorbereitung:
+Home Assistant muss die Adresse über Netzwerk und Firewall erreichen können. Modbus TCP verwendet Port **502**; eine Eingabe im Formular ist nicht nötig. Prüfe bei Verbindungsproblemen Adresse, Netzwerkkabel und Netzwerkzugriff.
 
-- **IP-Adresse** von ecoMain über Router/DHCP-Liste oder Geräteeinstellungen ermitteln.
-- **Master-Seriennummer** bereithalten.
-
-Schritte:
-
-1. In der Konfiguration wählen:
-    - Gerätetyp: **ecoMain**
-    - Hinzufügungsmethode: **Manuelle Einrichtung (Lokal)**
-2. Eingeben:
-    - **Master-Seriennummer**
-    - **Adresse (IP oder Hostname)**
-3. Geräteinformationen bestätigen.
-4. Die Integration prüft die **Firmwareversion**, verbindet sich per **Modbus TCP** und erkennt online verfügbare ecoSub sowie bei bestätigter Firmware ab 140 auch ecoSolarMonitor.
-5. Wähle unter **Gerät konfigurieren** im Feld **Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub. Wähle **Aktion** → **Weiter** und sende das Formular ab. Ohne erkannte Untergeräte kannst du ecoMain allein hinzufügen.
-6. Wähle unter **Messgrößen** die Werte getrennt in **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**. Wähle **Aktion** → **Speichern** und sende das Formular ab. Danach kannst du **Zusätzliche Entitäten** konfigurieren:
-    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
-    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
-    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
-7. Wähle unter **Zusätzliche Entitäten** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um den Integrationseintrag zu erstellen.
-
-Tipps bei Problemen:
-
-- Prüfen, ob Home Assistant die IP-Adresse erreichen kann (gleiches LAN, Routing/Firewall).
-- Standard-Modbus-Port ist **502** (fest in der Integration hinterlegt, nicht per UI änderbar).
-- Bei Verbindungsfehlern IP/Hostname und Netzwerk-Erreichbarkeit erneut prüfen.
-
-> **Ablauf-Screenshot:**
 > ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
 
 ---
@@ -252,19 +170,13 @@ Tipps bei Problemen:
 
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 
----
-
 <!-- screenshot-placeholder: local-subdevices -->
 
-> Screenshot ergänzen: **Gerät konfigurieren** mit **Hinzuzufügende Slaves auswählen**, Online-ecoSub und **ecoSolarMonitor** sowie **Aktion → Weiter**.
-
----
+> Screenshot ergänzen: **Gerät konfigurieren** mit ecoSub und ecoSolarMonitor in der Untergeräteliste.
 
 <!-- screenshot-placeholder: local-measurements -->
 
-> Screenshot ergänzen: **Messgrößen** mit Firmwareversion, getrennten Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**, fünf Solar-Standardwerten und **Aktion → Speichern**.
-
----
+> Screenshot ergänzen: **Messgrößen** mit den Gruppen ecoSolarMonitor und ecoMain / ecoSub und ihrer Standardauswahl.
 
 > ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
 
@@ -272,40 +184,16 @@ Tipps bei Problemen:
 
 > ![Local accomplish](docs/images/ecomain-local-accomplish.png)
 
----
-
 ### C) Kontoanmeldung (Cloud)
 
-Verwende diese Methode, wenn:
+Zum Lesen über die **enecess-Cloud** muss ecoMain bereits mit deinem Konto in der **offiziellen enecess-App (Android / iOS)** verknüpft sein. Verwende dieselben Zugangsdaten; die Integration erstellt kein neues Konto.
 
-- Du ecoMain-Daten über die **enecess Cloud** abrufen möchtest.
-- Dein ecoMain bereits in deinem **enecess App**-Konto registriert ist.
+1. Wähle **ecoMain → Kontoanmeldung (Cloud)** und gib **Benutzername** und **Passwort** der App ein.
+2. Wähle ecoMain und bei Bedarf ecoSub aus.
+3. Wähle **Messgrößen**, konfiguriere bei Bedarf **Zusätzliche Entitäten** und wähle **Fertigstellen**.
 
-> **Wichtig:** Die Cloud-Anmeldung verwendet **genau dasselbe Konto und Passwort** wie die offizielle **enecess App** (Android / iOS). Es wird kein neues Konto angelegt.
+Cloud-Daten aktualisieren sich etwa alle **60 Sekunden**, lokale Daten alle **5 Sekunden**.
 
-Schritte:
-
-1. In der Konfiguration wählen:
-    - Gerätetyp: **ecoMain**
-    - Hinzufügungsmethode: **Kontoanmeldung (Cloud)**
-2. Cloud-Zugangsdaten eingeben (die gleichen wie in der **enecess App**):
-    - **Benutzername**
-    - **Passwort**
-3. Die Integration meldet sich an und listet verfügbare ecoMain-Master auf.
-4. Den gewünschten ecoMain-Master auswählen.
-5. Wenn im Cloud-Konto ecoSub-Geräte vorhanden sind, werden sie geladen und du kannst auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
-    - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
-    - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
-    - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
-7. Vorgang abschließen – der Integrationseintrag wird erstellt.
-
-Hinweise:
-
-- Cloud-Daten werden als bereits verarbeitete Werte gemäß deiner Cloud-Konfiguration zurückgegeben.
-- Das Cloud-Abfrageintervall ist in der Regel länger als das lokale Polling (`~60 s` vs. `~5 s`).
-
-> **Ablauf-Screenshot:**
 > ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
 
 ---
@@ -334,18 +222,16 @@ Hinweise:
 
 ---
 
-## ecoPlug-Cloud-Einrichtung und Entitätsverhalten
+## ecoPlug über die Cloud einrichten
 
-ecoPlug wird ausschließlich über die **enecess Cloud** unterstützt. Die Integration bietet weder eine lokale ecoPlug-Einrichtung noch die Konfiguration zusätzlicher Entitäten.
+ecoPlug unterstützt **nur die enecess-Cloud**, ohne lokale Einrichtung oder zusätzliche Entitäten.
 
-Schritte:
-
-1. Gehe zu **Einstellungen → Geräte & Dienste → Integration hinzufügen** und wähle **enecess**.
-2. Wähle als Gerätetyp **ecoPlug**.
-3. Gib den Benutzernamen und das Passwort deines enecess-App-Kontos ein.
-4. Wähle nach der Anmeldung **eine oder mehrere** Steckdosen aus der Liste aus. Jede Auswahl zeigt den Namen und die Seriennummer der Steckdose.
-5. Schließe die Einrichtung ab, um für dieses Konto einen ecoPlug-Integrationseintrag mit allen ausgewählten Steckdosen zu erstellen.
-6. Um die Auswahl später anzupassen, öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, füge Steckdosen hinzu oder entferne sie und speichere die Optionen.
+1. Öffne **Einstellungen → Geräte & Dienste → Integration hinzufügen** und wähle **enecess**.
+2. Wähle **ecoPlug**.
+3. Melde dich mit Benutzername und Passwort der enecess-App an.
+4. Wähle **eine oder mehrere** Steckdosen; jede Option zeigt Name und Seriennummer.
+5. Schließe die Einrichtung ab. Für das Konto entsteht ein ecoPlug-Eintrag mit allen ausgewählten Steckdosen.
+6. Ändere die Auswahl später unter **Einstellungen → Geräte & Dienste → enecess → Konfigurieren** und speichere die Optionen.
 
 > ![Gerätetyp ecoPlug auswählen](docs/images/ecoplug-select-device-type.png)
 
@@ -365,100 +251,81 @@ Schritte:
 
 > ![ecoPlug-Optionen öffnen](docs/images/ecoplug-options.png)
 
-Jeder ausgewählte ecoPlug erstellt genau diese Entitäten:
+Jede ausgewählte Steckdose bietet:
 
-- Ein **Schalter**, der die Steckdose über die Cloud ein- oder ausschaltet.
-- `power_rt`: ein Wirkleistungssensor in **W**.
-- `energy_total`: ein Gesamtenergiesensor in **kWh**.
+- Einen **Schalter** zum Ein- und Ausschalten über die Cloud.
+- `power_rt`: Wirkleistung in **W**.
+- `energy_total`: kumulierte Energie in **kWh**.
 
-ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nach einer erfolgreichen Steuerungsanfrage wird der Schalterstatus sofort auf den von der Cloud akzeptierten Zielstatus gesetzt. Die späteren Cloud-Abfragen bleiben maßgeblich und können den Status korrigieren, wenn die Steckdose oder die Cloud einen anderen Wert meldet.
+Die Daten aktualisieren sich etwa alle **60 Sekunden**. Nach erfolgreichem Schalten erscheint der Zielstatus sofort; spätere Cloud-Daten bestimmen den aktuellen Status.
 
 ---
 
 ## Konfiguration und Optionen
 
-- Zwischenseiten bieten unter **Aktion**: **Weiter**/**Speichern**, **Zurück** oder **Abbrechen**.
-- **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
-- Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
-- Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
-- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener HA-Änderungen; bereits gespeicherte Hardwarewerte bleiben wirksam.
-
 ### Bestehenden Eintrag bearbeiten
 
-Öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**, um veränderbare Optionen anzupassen.
+Öffne **Einstellungen → Geräte & Dienste → enecess → Konfigurieren**.
 
-Änderbar:
+- ecoMain: ausgewählte ecoSub/ecoSolarMonitor, Messgrößen, zusätzliche Entitäten und lokale Installationseinstellungen ändern.
+- ecoPlug: ausgewählte Steckdosen ändern.
+- Für einen anderen Gerätetyp, Verbindungsweg oder ecoMain entferne den Eintrag und füge ihn neu hinzu.
 
-- Ausgewählte ecoSub/ecoSolarMonitor-Geräte.
-- Konfiguration zusätzlicher Entitäten.
-- Messgrößen und lokale Kanalphasen; bestätigte Firmware ab 140 bietet zusätzlich Kanal- und PV-Installationseinstellungen.
-
-Nicht änderbar:
-
-- Gerätetyp.
-- Hinzufügungsmethode.
-- Ausgewählter ecoMain-Master / Seriennummer.
-
-> **Ablauf-Screenshot:**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
+
+---
+
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
 
-Für einen bestehenden lokalen Eintrag:
+Solarmessungen zu einem bestehenden lokalen Eintrag hinzufügen oder ändern:
 
-1. Öffne **Konfigurieren**, um **ecoMain anpassen** aufzurufen. Wähle oder behalte **ecoSolarMonitor** und gewünschte ecoSub unter **Hinzuzufügende Slaves auswählen**. Wähle **Nächste Aktion** → **Messgrößen** und sende das Formular ab.
-2. Wähle Werte in **ecoSolarMonitor** und **ecoMain / ecoSub**. Mit **Aktion** → **Speichern** und Absenden kehrst du zu **ecoMain anpassen** zurück.
-3. Nutze bei Bedarf **Kanalkonfiguration** oder **ecoSolarMonitor-Konfiguration**; die Verfügbarkeit folgt der aktuellen Geräteauswahl im Entwurf. Wähle abschließend **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um die HA-Auswahl zu speichern.
+1. Wähle unter **ecoMain anpassen → Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub, dann **Messgrößen**.
+2. Wähle Werte für **ecoSolarMonitor** und **ecoMain / ecoSub**, dann **Speichern**.
+3. Öffne bei Bedarf **Kanalkonfiguration** oder **ecoSolarMonitor-Konfiguration**. Wähle anschließend im Menü **Fertigstellen**.
 
 <!-- screenshot-placeholder: options-menu -->
 
-> Screenshot ergänzen: **ecoMain anpassen** mit Untergeräteauswahl und **Nächste Aktion** für Messgrößen, Kanalkonfiguration, ecoSolarMonitor-Konfiguration und **Fertigstellen**.
-
-Wenn du nicht änderbare Einstellungen anpassen möchtest:
-
-1. Zu **Einstellungen → Geräte & Dienste** gehen.
-2. Den **enecess**-Eintrag suchen.
-3. Den Integrationseintrag löschen/entfernen.
-4. Die Integration mit den neuen Einstellungen erneut hinzufügen.
+> Screenshot ergänzen: **ecoMain anpassen** mit Untergeräteliste und Menü **Nächste Aktion**.
 
 ### Messgrößen
 
-- Wähle **Messgrößen** nach den Untergeräten und vor zusätzlichen Entitäten. Später öffnest du **Konfigurieren → ecoMain anpassen**, wählst **Nächste Aktion** → **Messgrößen** und sendest das Formular ab.
-- Mit ausgewähltem ecoSolarMonitor und bestätigter lokaler Firmware ab 140 erscheinen getrennte Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**. Zusammen ist mindestens ein Wert erforderlich; jede Gruppe darf leer sein. Eine reine Solarauswahl ist möglich.
-- Wähle **Aktion** → **Speichern** und sende das Formular ab. Speichere die HA-Auswahl abschließend im Einrichtungs-/Optionsmenü über **Nächste Aktion** → **Fertigstellen** und erneutes Absenden.
-- Gespeicherte Geräte und Messgrößen bleiben bei Offlinephasen, fehlgeschlagenen Firmwareprüfungen und Downgrades erhalten, ebenso Entitäts-IDs, eigene Namen und deaktivierte Einträge. Nicht verfügbare Fähigkeiten machen Sensoren nicht verfügbar. Nur ausdrückliches Abwählen entfernt sie.
-- Entferne abhängige zusätzliche Entitäten vor dem Abwählen ihrer Geräte oder Messgrößen. Neue Solaroptionen erfordern bestätigte Firmware ab 140. Die vierzehn Werte und fünf Standardauswahlen stehen im [Solarkatalog](#solar-entities).
+Wähle die Werte nach dem Hinzufügen der Geräte. Später änderst du sie unter **Konfigurieren → ecoMain anpassen → Nächste Aktion → Messgrößen**.
 
-Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur Wirkleistung sowie Wirkenergie vorwärts und rückwärts:
+- **ecoSolarMonitor** und **ecoMain / ecoSub** werden getrennt ausgewählt. Insgesamt muss mindestens ein Wert bleiben; eine reine Solarauswahl ist möglich.
+- Wähle **Speichern** und abschließend im Menü **Fertigstellen**.
+- Entferne abhängige zusätzliche Entitäten, bevor du Geräte oder Messgrößen abwählst.
 
-| Kategorie | Bedeutung | Standard |
+Lokale ecoMain-/ecoSub-Optionen stehen hier, Solarwerte im [Solarkatalog](#solar-entities).
+
+| Kategorie | Bedeutung | Standardauswahl |
 | --- | --- | --- |
-| Wirkenergie Vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ein |
-| Wirkenergie Rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ein |
-| Blindenergie Vorwärts | Kumulierte Blindenergie in Vorwärtsrichtung (varh) | Aus |
-| Blindenergie Rückwärts | Kumulierte Blindenergie in Rückwärtsrichtung (varh) | Aus |
-| Scheinenergie | Scheinenergie (VAh) | Aus |
-| Wirkleistung | Momentane Wirkleistung (W) | Ein |
-| Blindleistung | Blindleistung (var) | Aus |
-| Scheinleistung | Scheinleistung (VA) | Aus |
-| Spannung | Elektrische Spannung (V) | Aus |
-| Strom | Stromstärke (A) | Aus |
-| Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Aus |
-| Frequenz | Netzfrequenz (Hz), nur ecoMain | Aus |
+| Wirkenergie Vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ja |
+| Wirkenergie Rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ja |
+| Blindenergie Vorwärts | Kumulierte Blindenergie vorwärts (varh) | Nein |
+| Blindenergie Rückwärts | Kumulierte Blindenergie rückwärts (varh) | Nein |
+| Scheinenergie | Scheinenergie (VAh) | Nein |
+| Wirkleistung | Momentane Wirkleistung (W) | Ja |
+| Blindleistung | Blindleistung (var) | Nein |
+| Scheinleistung | Scheinleistung (VA) | Nein |
+| Spannung | Spannung (V) | Nein |
+| Strom | Stromstärke (A) | Nein |
+| Leistungsfaktor | Verhältnis von Wirk- zu Scheinleistung, ohne Einheit | Nein |
+| Frequenz | Netzfrequenz (Hz), nur ecoMain | Nein |
 
-Die verfügbaren Werte richten sich nach den Geräteregistern; nicht jede Kategorie besitzt einen Dreiphasen-Gesamtwert oder Werte für jeden Kanal. ecoSub stellt Kanalmessungen bereit. Im Cloud-Modus sind nur **Wirkleistung** und **Energie** verfügbar, beide standardmäßig ausgewählt. Energie umfasst den kumulierten Zähler und die rohen 1-Minuten-Zuwächse. Die festen ecoPlug-Entitäten bleiben unverändert.
+Die Entitätstabellen unten zeigen die verfügbaren Phasen, Gesamtwerte und Kanäle. Die Cloud bietet nur **Wirkleistung** und **Wirkenergie (Kumuliert Und Minuteninkrement)**, beide standardmäßig ausgewählt. ecoPlug hat feste Schalter-, Leistungs- und Energieentitäten.
 
 ### Benutzerdefinierte Formelentitäten
 
-Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mittelwert zweier Leistungswerte.
+Erstelle Sensoren aus Messwerten, etwa die Differenz oder den Mittelwert zweier Leistungen.
 
-1. Wähle **Formelentität hinzufügen** bei der ecoMain-Einrichtung oder unter **Konfigurieren**.
-2. Gib einen Namen ein und wähle den Ergebnistyp im Dropdown-Menü.
-3. Wähle auf der nächsten Seite Quellen aus Dropdown-Menüs mit Mehrfachauswahl, gruppiert nach ihrem Datentyp und unabhängig vom Ergebnistyp. Jede Gruppe ist optional; wähle insgesamt mindestens eine Quelle.
-4. Die Formelseite zeigt, wofür `a`, `b` usw. stehen. Gib die Formel ein und prüfe, ob ihre Einheit zum Ergebnistyp passt.
+1. Aktiviere die benötigten Werte unter **Messgrößen**, dann wähle **Formelentität hinzufügen**.
+2. Gib einen Namen ein und wähle **Ergebnistyp / Einheit**.
+3. Wähle unter **Quellentitäten auswählen** mindestens eine Quelle. Die Quellen sind nach Messgröße gruppiert; du kannst Gruppen kombinieren.
+4. Gib unter **Formelausdruck** die Formel mit den angezeigten Variablen `a`, `b` usw. ein und prüfe die Ergebniseinheit.
 
-Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh), kumulierte Scheinenergie (VAh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk-, Blind- und Scheinenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
+Solarleistung steht unter **Wirkleistung (W)**, kumulierte und gestrige/heutige Energie unter **Wirkenergie (kumuliert, Wh)**. Bestrahlungsstärke, Modultemperatur, Neigungswinkel und Performance Ratio haben eigene Gruppen. Die Optionen zeigen tatsächliche Namen und Einheiten, etwa `solar_today_actual_energy (Wh)`.
 
-Wähle bei bestätigter lokaler Firmware ab 140 zuerst ecoSolarMonitor und aktiviere die benötigten Werte unter **Messgrößen**. Unter **Quellentitäten auswählen** erscheinen `solar_actual_power` und `solar_estimated_power` in **Wirkleistung (W)**; beide kumulierten und alle vier täglichen Energien stehen in **Wirkenergie (kumuliert, Wh)**. **Bestrahlungsstärke (W/m²)**, **Modultemperatur (°C)**, **Neigungswinkel (°)** und **Performance Ratio (%)** sind eigene Gruppen; die letzte enthält alle drei Performance Ratios. Die Auswahl zeigt tatsächliche HA-Namen und Einheiten, etwa `solar_today_actual_energy (Wh)`; leere Gruppen bleiben verborgen. Solarquellen ergänzen keine Ergebnistypen: Wähle einen verfügbaren Typ, gegebenenfalls **Zahl (ohne Einheit)**, und prüfe die Einheiten selbst.
+Beim Fortfahren von der Quellenseite wird der bisherige Ausdruck gelöscht, auch beim Bearbeiten. Gib ihn erneut ein. Für Ergebnisse ohne Einheit wähle **Zahl (ohne Einheit)**.
 
 > ![Formelentität hinzufügen](docs/images/ecomain-formula-add.png)
 
@@ -466,69 +333,60 @@ Wähle bei bestätigter lokaler Firmware ab 140 zuerst ecoSolarMonitor und aktiv
 
 > ![Formelname und Ergebnistyp festlegen](docs/images/ecomain-formula-setup.png)
 
----
-
 <!-- screenshot-placeholder: solar-formula-sources -->
 
-> Screenshot ergänzen: **Quellentitäten auswählen**, mit aktivierten Solarnamen und Einheiten in den Gruppen für Wirkleistung, Wirkenergie, Bestrahlungsstärke, Modultemperatur, Neigungswinkel und Performance Ratio.
-
----
+> Screenshot ergänzen: **Quellentitäten auswählen** mit aktivierten Solarquellen und Einheiten.
 
 > ![Formelausdruck eingeben](docs/images/ecomain-formula-expression.png)
 
 | Formel | Ergebnis für zwei Leistungswerte |
 | --- | --- |
-| `max(a-b,0)` | a minus b, negative Ergebnisse werden zu 0 |
+| `max(a-b,0)` | a minus b; negative Ergebnisse werden zu 0 |
 | `(a+b)/2` | Mittlere Leistung von a und b |
 
-- Erlaubt sind `+`, `-`, `*`, `/`, Klammern, `abs`, `min`, `max` und `round`.
-- Unter **Formelentität bearbeiten** änderst du Namen, Quellen oder Formel. Für einen anderen Ergebnistyp oder eine andere Einheit erstelle eine neue Entität.
-- Lösche Formeln über **Zusätzliche Entität entfernen**. Lösche Formeln, die eine Messgröße nutzen, bevor du diese abwählst.
-- Fehlen Daten oder lässt sich die Formel nicht berechnen, ist das Ergebnis nicht verfügbar.
+- Unterstützt: `+`, `-`, `*`, `/`, Klammern, `abs`, `min`, `max` und `round`.
+- Mit **Formelentität bearbeiten** änderst du Name, Quellen oder Formel. Für einen anderen Ergebnistyp oder eine andere Einheit erstelle eine neue Entität.
+- Lösche Formeln mit **Zusätzliche Entität entfernen**, bevor du ihre Messgrößen abwählst.
+- Fehlende Daten oder Berechnungsfehler machen das Ergebnis nicht verfügbar.
 
 ### Installationseinstellungen (lokale Firmware ab 140)
 
-Öffne nach der lokalen Einrichtung **Konfigurieren → ecoMain anpassen**. Diese Seiten erfordern bestätigte Firmware **140 oder neuer** und prüfen sie vor dem Hardwarezugriff erneut. Firmware **139** verwendet weiterhin **Kanalphasen**, wie in den Phasen-Screenshots gezeigt. Die Seiten sind nur lokal verfügbar und erzeugen keine Steuerentitäten.
+Öffne **Konfigurieren → ecoMain anpassen** und wähle unter **Nächste Aktion** **Kanalkonfiguration** oder **ecoSolarMonitor-Konfiguration**.
 
 #### Kanalkonfiguration
 
-1. Wähle **Nächste Aktion** → **Kanalkonfiguration** und sende das Formular ab. Wähle unter **Gerät** **ecoMain** oder einen ausgewählten, aktuell online verfügbaren **ecoSub**, dann **Aktion** → **Weiter** und sende ab. **ecoSolarMonitor** ist kein Zehnkanalzähler und fehlt in dieser Auswahl.
-2. Öffne die zehn Abschnitte **Kanal 1** bis **Kanal 10**. Jeder bietet **Phase** (**L1**, **L2**, **L3**) und **Stromwandler** (**30 A** oder **100 A**).
-3. ecoMain bietet zusätzlich **Stromwandler des Hauptstromkreises** für **L1/L2/L3**, jeweils nur **100 A**. Nicht unterstützte gespeicherte Werte erhalten keinen erfundenen Standard; wähle vor dem Speichern einen unterstützten Wert.
-4. Wähle **Aktion** → **Speichern** und sende das Formular ab, um die Hardware sofort zu schreiben und zu prüfen. Bei Erfolg öffnet sich das Optionsmenü.
+1. Wähle unter **Gerät** ecoMain oder einen ausgewählten, online verfügbaren ecoSub.
+2. Öffne **Kanal 1** bis **Kanal 10**. Wähle **Phase** (**L1, L2, L3**) und **Stromwandler** (**30 A** oder **100 A**).
+3. ecoMain bietet unter **Stromwandler des Hauptstromkreises** **L1, L2, L3**, jeweils nur **100 A**.
+4. Wähle **Speichern** und anschließend im Menü **Fertigstellen**.
 
 <!-- screenshot-placeholder: channel-device -->
 
-> Screenshot ergänzen: **Kanalkonfiguration → Gerät**, mit ecoMain und ausgewählten Online-ecoSub, **Aktion → Weiter**, ohne ecoSolarMonitor.
+> Screenshot ergänzen: **Kanalkonfiguration** mit Auswahl von ecoMain oder Online-ecoSub.
 
 <!-- screenshot-placeholder: channel-settings -->
 
-> Screenshot ergänzen: **Kanalkonfiguration**, zehn Kanalabschnitte mit **Phase** und **Stromwandler**, **Stromwandler des Hauptstromkreises** bei ecoMain sowie **Aktion → Speichern**.
+> Screenshot ergänzen: **Kanalkonfiguration** mit Phasen, Stromwandlern und Hauptstromkreis.
 
 #### ecoSolarMonitor-Konfiguration
 
-1. Behalte **ecoSolarMonitor** unter **ecoMain anpassen** ausgewählt. Wähle **Nächste Aktion** → **ecoSolarMonitor-Konfiguration** und sende das Formular ab. Die Einstellungen gehören zum aktuellen **ecoMain**, auch wenn Wechselrichterkanäle von ecoSub stammen.
-2. Gib **Installierte PV-Leistung** als ganze Zahl von **0** bis **4294967295 W** ein. Für **Temperaturkoeffizient der Leistung** gilt **-32.768** bis **32.767 %/°C**, mit höchstens **drei Nachkommastellen** (Schritt **0.001**).
-3. Wähle Wechselrichterkanäle **Kanal 1** bis **Kanal 10** in den angezeigten Listen **ecoMain**, **ecoSub 1**, **ecoSub 2** und **ecoSub 3**. Alle erkannten Online-ecoSub erscheinen hier, auch ohne ausgewählte HA-Messungen; eine weitere ecoSub-Auswahl ist nicht nötig.
-4. Eine leere angezeigte Liste **löscht** die Wechselrichterkanäle dieser Gruppe. Ausgeblendete/Offline-Gruppen behalten ihre Hardwarewerte.
-5. Wähle **Aktion** → **Speichern** und sende das Formular ab, um die Hardware sofort zu schreiben und zu prüfen und bei Erfolg zum Optionsmenü zurückzukehren.
+Öffne diese Seite, nachdem **ecoSolarMonitor** hinzugefügt wurde:
+
+1. Gib **Installierte PV-Leistung** als ganze Zahl in **W** ein.
+2. Gib **Temperaturkoeffizient der Leistung** des Moduls in **%/°C** mit höchstens drei Nachkommastellen ein.
+3. Wähle die Wechselrichterkanäle **Kanal 1** bis **Kanal 10** in den Listen **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3**.
+4. Eine leere Liste löscht die Wechselrichterkanäle dieser Gruppe.
+5. Wähle **Speichern** und anschließend im Menü **Fertigstellen**.
 
 <!-- screenshot-placeholder: solar-settings -->
 
-> Screenshot ergänzen: **ecoSolarMonitor-Konfiguration** mit **Installierte PV-Leistung**, **Temperaturkoeffizient der Leistung**, Wechselrichterkanälen der Online-Zähler und **Aktion → Speichern**.
+> Screenshot ergänzen: **ecoSolarMonitor-Konfiguration** mit PV-Leistung, Temperaturkoeffizient und Wechselrichterkanälen.
 
-Beim Speichern liest die Integration sofort die Hardware, schreibt nur Änderungen und prüft sie durch Rücklesen. Ein Teilfehler nimmt erfolgreiche Schreibvorgänge nicht zurück. Schreib- oder Prüffehler erscheinen am betroffenen Feld oder Kanalabschnitt; prüfe die angezeigten Werte vor einem erneuten Versuch. **Zurück**, **Abbrechen** und Abbrechen im Optionsmenü machen gespeicherte Hardwareänderungen nicht rückgängig. HA-Geräteauswahl, Messgrößen und zusätzliche Entitäten werden separat gespeichert: Wähle unter **ecoMain anpassen** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab.
+> **Gespeicherte Geräteeinstellungen gelten sofort. Ein späteres Abbrechen der Konfiguration macht sie nicht rückgängig.**
 
-### Kanalphasen (nur lokal)
+### Kanalphasen (lokale Firmware 139)
 
-- Wähle mit Firmware 139 unter **Konfigurieren** die Aktion **Kanalphasen** und anschließend ecoMain oder einen konfigurierten, erreichbaren ecoSub. Ab Firmware 140 gilt die oben beschriebene **Kanalkonfiguration**.
-- Ordne jedem der zehn Kanäle **L1**, **L2** oder **L3** zu.
-- Die Integration liest die aktuellen Phasen, schreibt nur Änderungen und liest sie zur Prüfung erneut.
-- Schreib- und Prüffehler erscheinen an den betroffenen Feldern; erfolgreiche Änderungen werden nicht automatisch zurückgenommen.
-- Prüfe die angezeigten Werte vor einem erneuten Versuch.
-- Diese Seite verändert die Gerätekonfiguration und ist im Cloud-Modus nicht verfügbar.
-
-Die in den Screenshots gezeigte Oberfläche kann je nach Home Assistant- oder Integrationsversion variieren.
+Wähle unter **Konfigurieren → Nächste Aktion → Kanalphasen** ecoMain oder einen ausgewählten, online verfügbaren ecoSub. Ordne jedem der zehn Kanäle **L1, L2 oder L3** zu und wähle **Speichern**. Ab Firmware 140 gilt die oben beschriebene **Kanalkonfiguration**.
 
 > ![Kanalphaseneinstellungen öffnen](docs/images/ecomain-phase-options.png)
 
@@ -542,56 +400,66 @@ Die in den Screenshots gezeigte Oberfläche kann je nach Home Assistant- oder In
 
 ## Gerätenamen
 
-Beim Anlegen des Integrationseintrags wird der Titel wie folgt vergeben:
+Die Standardtitel der Integrationseinträge lauten:
 
-- **Lokaler Modus:** `ecoMain <serial> (Local)`
-- **Cloud-Modus:** `ecoMain <serial> (Cloud)`
+- **Lokal:** `ecoMain <serial> (Local)`
+- **Cloud:** `ecoMain <serial> (Cloud)`
 
-Beispiele:
-
-- `ecoMain 12345678 (Local)`
-- `ecoMain 12345678 (Cloud)`
+Zum Beispiel: `ecoMain 12345678 (Local)` oder `ecoMain 12345678 (Cloud)`.
 
 ---
 
-## Entitätsbenennung & Bedeutung
+## Entitätsnamen und Bedeutung
 
-Die folgenden Namen sind **Messwertschlüssel**, keine vollständigen Home-Assistant-`entity_id`s. Die Sensoren verwenden diese Schlüssel als Namen; Home Assistant ergänzt den Gerätenamen und verwaltet die tatsächliche `sensor.…`-ID. Benutzerdefinierte Umbenennungen können davon abweichen. **Wirkleistung** bezeichnet die Messgröße; die bestehenden Schlüssel `power_rt` und `power_avg_1m` bleiben erhalten.
+Die Tabellen verbinden die Messbedeutung mit den tatsächlichen HA-Entitätsnamen. Kopiere für Automationen die vollständige `sensor.…`-ID von der HA-Entitätsseite. Zusätzliche Entitäten verwenden deinen bei der Konfiguration vergebenen Namen; du kannst sie auch in HA umbenennen.
 
-### Lokaler Modus (Modbus): vollständiger Messwertkatalog
+### Messstellen und Entitätsnamen
 
-Ein Schlüssel besteht aus `<Präfix>_<Suffix>`. Die Bereiche in der Tabelle bedeuten:
+ecoMain-/ecoSub-Namen bestehen aus Messstellenpräfix und Messgrößensuffix:
 
-- **A**: `main_l1`, `main_l2`, `main_l3`, `main_all` und alle Kanäle aus B.
-- **B**: `main_ch1`–`main_ch10` sowie `sub1_ch1`–`sub1_ch10`, `sub2_ch1`–`sub2_ch10`, `sub3_ch1`–`sub3_ch10` für ausgewählte ecoSub.
-- **C**: `main_l1`, `main_l2`, `main_l3` und B, ohne `main_all`.
+| Messstelle | Namenspräfix | Verfügbarkeit |
+| --- | --- | --- |
+| ecoMain-Phasen | `main_l1`, `main_l2`, `main_l3` | Nur lokal |
+| ecoMain-Dreiphasensumme | `main_all` | Einige lokale Werte und Cloud |
+| ecoMain-Kanäle | `main_ch1` … `main_ch10` | Lokal und Cloud |
+| Ausgewählte ecoSub-Kanäle | `sub1_ch1` … `sub3_ch10` | Zehn je ecoSub; nur ausgewählte Geräte |
 
-Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardmäßig ausgewählt sind. Ab Firmware 139 sind die neun weiteren Messgrößen optional auswählbar; sie werden nicht automatisch aktiviert. Es gibt keine ecoSub-Gesamtwerte oder ecoSub-Phasensensoren.
+ecoSub hat keine eigenen L1/L2/L3-, Dreiphasensummen- oder Frequenzentitäten. „Kanäle“ umfasst unten die zehn ecoMain-Kanäle und jeweils zehn pro ausgewähltem ecoSub.
 
-| Messgröße | Suffix | Einheit | Bereich |
-| --- | --- | --- | --- |
-| Wirkleistung | `power_rt` | W | A |
-| Wirkenergie Vorwärts | `energy_fwd_total` | Wh | A |
-| Wirkenergie Rückwärts | `energy_rev_total` | Wh | A |
-| Blindenergie Vorwärts | `reactive_energy_fwd_total` | varh | A |
-| Blindenergie Rückwärts | `reactive_energy_rev_total` | varh | A |
-| Scheinenergie | `apparent_energy_total` | VAh | A |
-| Scheinleistung | `apparent_power_rt` | VA | A |
-| Blindleistung | `reactive_power_rt` | var | A |
-| Spannung | `voltage_rt` | V | C |
-| Strom | `current_rt` | A | C |
-| Leistungsfaktor | `power_factor_rt` | — | C |
-| Frequenz | `frequency_rt` | Hz | `main` |
+### Vollständiger lokaler Messwertkatalog (Modbus)
 
-Die Frequenz hat ausschließlich den vollständigen Schlüssel `main_frequency_rt`, ohne Phase oder Kanal. Beispiele: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` bedeutet Momentanwert, `_total` einen kumulierten Zählerstand. Der Leistungsfaktor ist dimensionslos, kein Prozentwert. Die Richtung des Stromwandlers (CT) bestimmt vorwärts/rückwärts; ein umgekehrt montierter CT kann negative Wirkleistung und einen steigenden Rückwärtszähler verursachen.
+Firmware **136–138** unterstützt die ersten drei Messgrößen; **ab 139** sind alle zwölf verfügbar. Standardmäßig sind nur die ersten drei ausgewählt. Aktiviere weitere unter **Messgrößen**. Für nicht ausgewählte Messgrößen entstehen keine Sensoren.
+
+| Messgröße | HA-Namenssuffix / vollständiger Name | Einheit | ecoMain-Phasen | ecoMain-Gesamtwert | Kanäle | Standardauswahl |
+| --- | --- | --- | --- | --- | --- | --- |
+| Wirkleistung | `power_rt` | W | ✓ | ✓ | ✓ | Ja |
+| Wirkenergie Vorwärts | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Ja |
+| Wirkenergie Rückwärts | `energy_rev_total` | Wh | ✓ | ✓ | ✓ | Ja |
+| Blindenergie Vorwärts | `reactive_energy_fwd_total` | varh | ✓ | ✓ | ✓ | Nein |
+| Blindenergie Rückwärts | `reactive_energy_rev_total` | varh | ✓ | ✓ | ✓ | Nein |
+| Scheinenergie | `apparent_energy_total` | VAh | ✓ | ✓ | ✓ | Nein |
+| Scheinleistung | `apparent_power_rt` | VA | ✓ | ✓ | ✓ | Nein |
+| Blindleistung | `reactive_power_rt` | var | ✓ | ✓ | ✓ | Nein |
+| Spannung | `voltage_rt` | V | ✓ | — | ✓ | Nein |
+| Strom | `current_rt` | A | ✓ | — | ✓ | Nein |
+| Leistungsfaktor | `power_factor_rt` | Ohne Einheit | ✓ | — | ✓ | Nein |
+| Frequenz | `main_frequency_rt` (vollständiger Name) | Hz | — | — | — | Nein; einmal am ecoMain |
+
+Die Tabelle zeigt native Einheiten; HA kann sie entsprechend deinen Einstellungen zur Anzeige umrechnen.
+
+Beispiele: `main_l1_power_rt` ist die ecoMain-Wirkleistung auf L1, `main_all_reactive_power_rt` die Dreiphasensumme der Blindleistung, `main_ch1_voltage_rt` die Spannung an ecoMain-Kanal 1 und `sub1_ch1_reactive_energy_fwd_total` die kumulierte Blindenergie vorwärts an ecoSub 1, Kanal 1.
+
+#### Stromwandler-Richtung (CT)
+
+Der CT-Pfeil zeigt vorwärts. `energy_fwd_total` zählt Wirkenergie vorwärts, `energy_rev_total` rückwärts. Blindenergie unterscheidet ebenfalls beide Richtungen. `_rt` bedeutet Momentanwert, `_total` kumulierter Wert.
 
 <a id="solar-entities"></a>
 
 ### ecoSolarMonitor
 
-Jeder ecoMain besitzt einen **ecoSolarMonitor** (Geräteindex `4`, neben ecoSub `1`–`3`). Er bietet vierzehn einzeln wählbare Messwerte und hat keine zehn Messkanäle, auch wenn Wechselrichterkanäle von ecoSub stammen. Die Tabelle verbindet die sichtbaren Bezeichnungen unter **Messgrößen** mit den tatsächlichen HA-Namensbestandteilen mit Unterstrichen. Sie haben kein Messstellenpräfix. HA kann den Gerätenamen ergänzen und eine vollständige `sensor.…`-ID erzeugen; nutze die tatsächliche ID der Entitätsseite.
+ecoSolarMonitor gehört zum aktuellen ecoMain und bietet vierzehn Werte. Die ersten fünf sind standardmäßig ausgewählt; gestrige/heutige und weitere Werte kannst du bei Bedarf aktivieren.
 
-| Messgrößenbezeichnung | HA-Namensbestandteil | Native Einheit | Standardauswahl |
+| Messgröße | HA-Entitätsname | Einheit | Standardauswahl |
 | --- | --- | --- | --- |
 | Bestrahlungsstärke | `solar_irradiance` | W/m² | Ja |
 | Neigungswinkel | `solar_tilt_angle` | ° | Ja |
@@ -608,253 +476,121 @@ Jeder ecoMain besitzt einen **ecoSolarMonitor** (Geräteindex `4`, neben ecoSub 
 | Geschätzte Energie Heute | `solar_today_estimated_energy` | Wh | Nein |
 | Tatsächliche Energie Heute | `solar_today_actual_energy` | Wh | Nein |
 
-Solar ergänzt genau einen Sensor je ausgewähltem Solarwert: standardmäßig fünf, höchstens vierzehn, keine zehn Messkanäle.
-
-Bestrahlungsstärke, Neigungswinkel, Modultemperatur, beide Leistungswerte und die allgemeine Performance Ratio verwenden `MEASUREMENT`; beide kumulierten Energien verwenden `TOTAL_INCREASING`. HA kann die nativen Einheiten für die Anzeige umrechnen.
-
-Alle vierzehn Werte sind einzeln wählbar; die bisherigen fünf Standardwerte bleiben unverändert. Gespeicherte Auswahlen, auch leere, werden nicht erweitert. Alle Werte werden direkt aus den Geräteregistern gelesen und skaliert. Die Integration berechnet keine Tagesmengen, Differenzen, Performance Ratios oder Tageswechsel. Die heutigen Energiezähler verwenden `TOTAL_INCREASING`; die gestrigen Energiewerte und beide täglichen Performance Ratios sind Momentaufnahmen ohne Zustandsklasse. Auch null nach einem Tagesreset und aktuelle Werte nach einer Offlinephase werden direkt veröffentlicht. Aktivierte Tagesenergien und Performance Ratios erscheinen in den bestehenden Energie- bzw. Performance-Ratio-Formelgruppen; nicht ausgewählte Werte fehlen, die Ergebnistypen bleiben gleich.
-
-Protokoll 1.0.6: geschätzte/tatsächliche Leistung ab `4006`/`4008` (Int32, `0.01` W), kumulierte geschätzte/tatsächliche Energie ab `4010`/`4014` (UInt64, `0.001` Wh). Performance Ratio, geschätzte und tatsächliche Energie liegen für gestern bei `4018`/`4019`/`4023`, für heute bei `4027`/`4028`/`4032`. Performance Ratios verwenden Int16 und `0.1` %, Energiewerte vier Register mit dem niedrigsten Wort zuerst. `4001` enthält die unkompensierte Bestrahlungsstärke und `4003` die interne Temperatur des Einstrahlungssensors; diese Messwerte werden von der Integration nicht bereitgestellt und die Register nicht abgefragt.
+Die heutige Energie beginnt jeden Tag neu zu zählen. Gestrige Energie und gestrige Performance Ratio zeigen die Daten des Vortags.
 
 <!-- screenshot-placeholder: solar-entities -->
 
-> Screenshot ergänzen: ecoSolarMonitor-Gerät mit aktivierten Solarentitäten, tatsächlichen HA-Namen mit Unterstrichen und Einheiten.
+> Screenshot ergänzen: ecoSolarMonitor-Entitäten mit Namen und Einheiten.
 
-### Cloud-Modus
+### Vollständiger Cloud-Messwertkatalog
 
-Die beiden standardmäßig ausgewählten Messgrößen **Wirkleistung** (`power`) und **Energie** (`energy`) erzeugen drei Sensortypen:
+**Wirkleistung** und **Wirkenergie (Kumuliert Und Minuteninkrement)** sind standardmäßig ausgewählt. Sie gelten für die ecoMain-Summe und die Kanäle ausgewählter Geräte, ohne Phasenwerte.
 
-| Auswahl | Suffix | Einheit | Bedeutung |
+| Messoption | Bedeutung | HA-Namenssuffix | Einheit |
 | --- | --- | --- | --- |
-| Wirkleistung | `power_avg_1m` | W | Mittlere Wirkleistung über eine Minute |
-| Energie | `energy_total_1m` | Wh | Rohes Energieinkrement einer Minute, kein kumulierter Zähler |
-| Energie | `energy_accumulated` | Wh | Von Home Assistant aufsummierte Energie |
+| Wirkleistung | Mittlere Wirkleistung einer Minute | `power_avg_1m` | W |
+| Wirkenergie (Kumuliert Und Minuteninkrement) | Wirkenergiezuwachs einer Minute | `energy_total_1m` | Wh |
+| Wirkenergie (Kumuliert Und Minuteninkrement) | Geschätzte kumulierte Wirkenergie | `energy_accumulated` | Wh |
 
-Diese Suffixe gelten nur für `main_all` und die Kanäle B. Es gibt keine L1/L2/L3-Sensoren, keine ecoSub-Gesamtwerte und keine der zusätzlichen lokalen Messgrößen im Cloud-Modus. Beispiele: `main_all_power_avg_1m`, `main_ch1_energy_total_1m`, `sub1_ch1_energy_accumulated`.
+Die ecoMain-Summen heißen etwa `main_all_power_avg_1m`, `main_all_energy_total_1m` und `main_all_energy_accumulated`. Ersetze für Kanäle das Präfix durch `main_ch1` oder `sub1_ch1`.
 
-Für das Energie-Dashboard ist `*_energy_accumulated` vorgesehen (`TOTAL_INCREASING`), nicht `*_energy_total_1m` (ohne Energie-Geräteklasse oder Zustandsklasse). Der kumulierte Wert ist eine Schätzung aus gültigen Inkrementen erfolgreicher Abfragen. Ohne Zeitstempel oder eindeutige Messwert-ID können wiederholte Cloud-Werte mehrfach gezählt werden. Nach einem Neustart wird der gespeicherte Stand wiederhergestellt und das bereits geladene Inkrement zunächst nicht erneut addiert; dadurch können Werte fehlen. Dies ist kein exakter historischer Gerätezähler.
+Wähle für das Energie-Dashboard die kumulierte Entität `energy_accumulated` statt des Minuteninkrements `energy_total_1m`. Der Cloud-Gesamtwert ist eine Schätzung; Verbindungsabbrüche oder Neustarts können zu Abweichungen führen.
 
-### ecoPlug und zusätzliche Entitäten
+### ecoPlug-Entitäten
 
-Jede ausgewählte ecoPlug-Steckdose hat drei feste Entitäten:
+Jede Steckdose bietet drei feste Cloud-Entitäten:
 
-| Entität | Name im Code | Daten |
+| Bedeutung | HA-Entitätsname | Einheit |
 | --- | --- | --- |
-| Sensor | `power_rt` | Wirkleistung, W (`MEASUREMENT`) |
-| Sensor | `energy_total` | Kumulierte Energie, kWh (`TOTAL_INCREASING`) |
-| Schalter | Gerätename | Steckdose ein-/ausschalten |
+| Steckdosenschalter | Verwendet den Gerätenamen der Steckdose | — |
+| Wirkleistung | `power_rt` | W |
+| Kumulierte Wirkenergie | `energy_total` | kWh |
 
-Die Sensornamen bleiben `power_rt` und `energy_total`; die übersetzten Beschreibungen hier sind keine zugesagten Anzeigenamen. Der Schalter übernimmt den Gerätenamen, ohne zusätzliches Namenssuffix.
+ecoPlug verwendet kWh, ecoMain Wh.
 
-ecoMain unterstützt fünf zusätzliche Operationen: Vorzeichen umkehren und Absolutwert für eine Wirkleistungsquelle, Summe und Durchschnitt für kompatible Leistungs- oder Energiequellen sowie eine benutzerdefinierte Formel. Diese Entitäten entstehen nur durch Konfiguration; ihr Name ist der gespeicherte Benutzername oder ersatzweise der erzeugte Schlüssel. Verfügbare Quellen hängen von Modus, Firmware und ausgewählten Messgrößen ab.
+### Zusätzliche ecoMain-Entitäten
 
-Formelergebnisse unterstützen Wirkleistung (W), Wirkenergie (Wh), Blindenergie (varh), Scheinenergie (VAh), Scheinleistung (VA), Blindleistung (var), Spannung (V), Strom (A), Leistungsfaktor, Frequenz (Hz) und eine dimensionslose Zahl. Energieformeln verwenden `TOTAL`, die übrigen Ergebnisse `MEASUREMENT`. Details zu Quellen, Einheiten und Bearbeitung stehen unter [Benutzerdefinierte Formelentitäten](#benutzerdefinierte-formelentitäten); die Auswahl steht unter [Messgrößen](#messgrößen).
+Diese Entitäten werden für lokale oder Cloud-ecoMain manuell konfiguriert:
+
+| Operation | Quellen und Ergebnis |
+| --- | --- |
+| Invertieren | Eine Wirkleistungsquelle, Ergebnis `-a` |
+| Absolutwert | Eine Wirkleistungsquelle, Ergebnis `abs(a)` |
+| Summe | Summe mehrerer gleichartiger Wirkleistungs- oder kumulierter Wirkenergiequellen |
+| Durchschnitt | Mittelwert mehrerer gleichartiger Wirkleistungs- oder kumulierter Wirkenergiequellen |
+| Eigene Formel | Aktivierte, unterstützte Messwerte; verschiedene Typen sind kombinierbar, Einheiten selbst prüfen |
+
+Formeln bieten Ergebnistypen für Leistung, Energie, Spannung, Strom, Leistungsfaktor, Frequenz und Zahlen ohne Einheit. Wähle Typ und Einheit passend zur Berechnung. Einrichtung und Ausdrucksregeln stehen oben unter „Benutzerdefinierte Formelentitäten“.
+
+---
 
 ## FAQ / Fehlerbehebung
 
 ### F1: ecoMain erscheint nicht unter „Gefunden“
 
-**Mögliche Ursachen:**
+Prüfe, ob ecoMain und HA im selben Subnetz / VLAN liegen und Router oder Firewall Multicast / mDNS zwischen den relevanten Schnittstellen zulassen. Nutze andernfalls **Manuelle Einrichtung (Lokal)** mit IP und Seriennummer.
 
-- ecoMain und Home Assistant befinden sich nicht im selben Subnetz/VLAN.
-- Multicast / mDNS-Traffic wird durch Router oder Firewall blockiert.
+### F2: Keine kompatiblen Geräte gefunden
 
-**Was du tun kannst:**
+- **Lokal:** Stromversorgung und LAN prüfen; bei fehlgeschlagener Erkennung **Manuelle Einrichtung (Lokal)** versuchen.
+- **Cloud:** prüfen, ob ecoMain mit dem aktuellen enecess-App-Konto verknüpft ist.
 
-1. Prüfen, ob sich ecoMain und Home Assistant im selben Netzwerksegment befinden.
-2. Router-Einstellungen kontrollieren und Multicast/mDNS zwischen Interfaces erlauben.
-3. Wenn die Erkennung weiterhin fehlschlägt, **„Manuelle Einrichtung (Lokal)“** verwenden und IP + Seriennummer direkt eintragen.
+### F3: Verbindung zum Gerät nicht möglich
 
----
+Prüfe IP / Hostname, Netzwerk und Firewall. HA muss **TCP-Port 502** erreichen. Bei einem Geräteneustart später erneut versuchen; Firmware unter **136** zuerst mit offiziellen Werkzeugen aktualisieren.
 
-### F2: Ich bekomme „No compatible devices found“ (`no_devices_found`)
+### F4: Welche Firmware ist lokal erforderlich?
 
-Diese Meldung kann an mehreren Stellen auftreten:
+Mindestens **136**. Weitere Messgrößen und Installationsfunktionen stehen in der Firmwareübersicht am Anfang. Nutze die offiziellen enecess-Werkzeuge oder die App zum Aktualisieren; bei Fragen helfen Installationsbetrieb oder offizieller Support.
 
-- Automatische Erkennung abgeschlossen, aber kein ecoMain-Dienst gefunden.
-- Cloud-Login erfolgreich, aber kein ecoMain-Master in deinem Konto vorhanden.
-- Der im Cloud-Ablauf ausgewählte Master liefert keine gültigen Daten.
+### F5: Keine Verbindung zum Cloud-Dienst
 
-**Was du tun kannst:**
+Prüfe Internet und DNS von Home Assistant. Ist die enecess-Cloud vorübergehend nicht verfügbar, versuche es später erneut.
 
-- Für **lokale** Verbindungen:
-    - Prüfen, ob ecoMain eingeschaltet und im LAN erreichbar ist.
-    - **Manuelle Einrichtung (Lokal)** mit bekannter IP ausprobieren.
-- Für **Cloud**:
-    - In der enecess App oder im Web-Portal prüfen, ob ecoMain deinem **enecess App**-Konto korrekt hinzugefügt und zugewiesen ist.
+### F6: Benutzername oder Passwort ungültig
 
----
+Verwende dieselben Zugangsdaten wie in der enecess-App und teste die Anmeldung dort. Stelle das Konto gegebenenfalls in der App wieder her oder setze das Passwort zurück und trage es anschließend in der Integration ein.
 
-### F3: Ich bekomme „Unable to connect to device“ (`cannot_connect_local`)
+### F7: Gerät bereits konfiguriert
 
-Dieser Fehler entsteht, wenn der lokale Modbus-Client das Gerät einschließlich des Firmware-Registers nicht lesen kann.
+Derselbe ecoMain kann nicht zweimal mit demselben Verbindungsweg hinzugefügt werden. Suche unter **Einstellungen → Geräte & Dienste** den bestehenden Eintrag und öffne **Konfigurieren**. Für einen anderen ecoMain oder Verbindungsweg entferne ihn und füge ihn neu hinzu.
 
-**Häufige Ursachen:**
+### F8: Was lässt sich nachträglich ändern?
 
-- Falsche IP/Hostname.
-- Port 502 wird durch eine Firewall blockiert.
-- ecoMain ist aus dem Home-Assistant-Netzwerk nicht erreichbar.
-- ecoMain befindet sich in einem fehlerhaften Zustand oder startet gerade neu.
-- Firmware unter **136** unterstützt kein Modbus; aktualisiere ecoMain mit den offiziellen Werkzeugen.
+Bei ecoMain: Untergeräte, Messgrößen, zusätzliche Entitäten und lokale Installationseinstellungen. Bei ecoPlug: Steckdosenauswahl. Siehe „Konfiguration und Optionen“. Ein anderer Gerätetyp, Verbindungsweg oder ecoMain erfordert erneutes Hinzufügen.
 
-**Was du tun kannst:**
+### F9: Ein Eintrag funktioniert nach einem Update nicht mehr
 
-1. IP/Hostname von ecoMain kontrollieren.
-2. Die IP von einem anderen Gerät im gleichen Netzwerk anpingen.
-3. Sicherstellen, dass **TCP-Port 502** nicht blockiert ist.
-4. ecoMain neu starten und erneut versuchen.
+Lies die Versionshinweise und befolge die Upgrade-Anleitung. Falls eine neue Einrichtung nötig ist, entferne den alten Eintrag und füge ihn erneut hinzu.
 
----
+### F10: Warum fehlen Untergeräte oder Kanäle?
 
-### F4: Welche Firmware benötigt die lokale ecoMain-Einrichtung?
+Prüfe Stromversorgung und Verkabelung. Wähle unter **Konfigurieren → ecoMain anpassen** Geräte und benötigte **Messgrößen**, dann **Fertigstellen**.
 
-Die lokale Einrichtung erfordert Firmware **136 oder neuer**. Firmware unter 136 unterstützt kein Modbus und kann ebenso wie eine falsche Adresse oder ein Netzwerkfehler zu `cannot_connect_local` führen. Prüfe bei Fehlern Adresse, TCP-Port 502, Netzwerkverbindung und Firmwareversion; aktualisiere ecoMain bei Bedarf mit den offiziellen Werkzeugen. Im Cloud-Modus entfällt diese Prüfung.
+Neue Untergeräte müssen online sein. Bereits ausgewählte Geräte bleiben offline erhalten, ihre Sensoren sind nicht verfügbar. Entferne abhängige zusätzliche Entitäten vor dem Abwählen von Geräten oder Messgrößen.
 
-1. ecoMain mit den offiziellen enecess-Tools / der App / dem vorgesehenen Verfahren auf die **neueste Firmware** aktualisieren.
-2. Anschließend das lokale Hinzufügen erneut versuchen.
-3. Falls du nicht weißt, wie die Firmware aktualisiert wird, den Installateur oder den enecess-Support kontaktieren und erwähnen, dass die Home-Assistant-Integration
-   `cannot_connect_local` meldet.
+### F11: Warum sind Werte null oder negativ?
 
----
+- **CT-Richtung:** Pfeil mit der gewünschten Stromrichtung vergleichen; ein umgekehrter CT kann negative Leistung oder steigende Rückwärtsenergie verursachen.
+- **Keine Last:** Ohne Verbrauch bleiben Leistung und Energieänderungen nahe null.
+- **Cloud-Verzögerung:** Minutenmittelwerte und Minutenenergie ändern sich langsamer als lokale Werte.
 
-### F5: Ich bekomme „Unable to connect to the cloud service“ (`cannot_connect`)
+`*_energy_fwd_total` zählt Energie vorwärts, `*_energy_rev_total` rückwärts.
 
-Die Integration kann den enecess-Cloud-Server nicht erreichen.
+### F12: Warum fehlen L1/L2/L3 in der Cloud?
 
-**Mögliche Ursachen:**
+Phasenmessungen gibt es nur lokal. Die Cloud liefert ecoMain-Summe und Kanäle mit Minutenmittelwerten der Leistung, Minutenenergiezuwächsen und geschätzter kumulierter Energie. Die Namen stehen im Cloud-Katalog oben.
 
-- Home Assistant hat keinen Internetzugang.
-- DNS-Auflösung schlägt fehl.
-- Der Cloud-Endpunkt (`https://hems.enecess.com`) ist vorübergehend nicht erreichbar.
+### F13: Wie oft werden Daten aktualisiert?
 
-**Was du tun kannst:**
+Etwa alle **5 Sekunden** lokal und **60 Sekunden** über die Cloud. Cloud-Leistung und -Energie beruhen selbst auf Minutenwerten und ändern sich daher langsamer.
 
-1. Prüfen, ob Home Assistant generell auf das Internet zugreifen kann.
-2. Vom selben Netzwerk aus per Browser oder `curl` versuchen, die Cloud-URL aufzurufen.
-3. Später erneut versuchen, falls ein temporärer Ausfall vorliegt.
+### F14: Wie werden Cloud-Zugangsdaten gespeichert?
+
+Die Zugangsdaten liegen für spätere Verbindungen in der Home-Assistant-Konfiguration. Schütze HA und seine Sicherungen; entferne den Eintrag, wenn du keinen Cloud-Zugriff mehr brauchst.
 
 ---
 
-### F6: Ich bekomme „Invalid username or password“ (`auth_failed`)
+## Support / Rückmeldungen
 
-Der Cloud-Login wurde vom enecess-API-Server abgelehnt.
-
-**Wichtig:** Die Integration nutzt **genau dasselbe Konto wie die enecess App**. Wenn die Zugangsdaten in der App nicht funktionieren, funktionieren sie hier ebenfalls
-nicht.
-
-**Was du tun kannst:**
-
-1. Benutzername und Passwort prüfen (genau wie in der enecess App).
-2. Versuchen, dich direkt in der enecess App / im Cloud-Portal mit denselben Daten anzumelden.
-3. Wenn die Anmeldung dort auch scheitert, zuerst das Passwort in der App/dem Portal zurücksetzen und anschließend in der Integration aktualisieren.
-
----
-
-### F7: Es erscheint „This device has already been configured“ (`already_configured`)
-
-Die Integration verwendet pro ecoMain und Modus eine **eindeutige ID**:
-
-- Lokaler Modus: `ecomain:<serial>:mode_local`
-- Cloud-Modus: `ecomain:<serial>:mode_cloud`
-
-Wenn bereits ein Eintrag mit derselben ID existiert, kann das Gerät nicht nochmals hinzugefügt werden.
-
-**Was du tun kannst:**
-
-- Zu **Einstellungen → Geräte & Dienste** wechseln.
-- Den vorhandenen enecess / ecoMain-Eintrag mit derselben Seriennummer suchen.
-- Diesen Eintrag entfernen und den Konfigurationsablauf erneut starten, falls du neu konfigurieren möchtest.
-
----
-
-### F8: Was kann ich nachträglich ändern?
-
-Du kannst ausgewählte ecoSub/ecoSolarMonitor, Messgrößen und zusätzliche Entitäten ändern. Lokal bietet Firmware 139 **Kanalphasen**; bestätigte Firmware ab 140 bietet **Kanalkonfiguration** und bei ausgewähltem Solargerät **ecoSolarMonitor-Konfiguration**. Die HA-Auswahl wird erst mit **Fertigstellen** und Absenden im Optionsmenü gespeichert; Hardwarespeicherungen wirken sofort. Bei ecoPlug kannst du die Steckdosen ändern. Gerätetyp, Hinzufügungsmethode und ecoMain-Master bleiben unveränderbar.
-
----
-
-### F9: Nach einem Update der Integration funktioniert mein bestehender Eintrag nicht mehr
-
-Prüfe vor der Installation einer neuen Version die Versionshinweise. Wenn ein Update eine inkompatible Konfigurationsänderung einführt, kann der vorhandene Eintrag ungültig werden.
-
-**Was du tun kannst:**
-
-1. Den bestehenden enecess-Integrationseintrag entfernen.
-2. Die Integration mit der aktuellen Version neu hinzufügen.
-
----
-
-### F10: Warum sehe ich nur einige Slaves oder Kanäle?
-
-Neue lokale Untergeräte müssen online erkannt werden: ecoSub `1`–`3` sowie ecoSolarMonitor `4` bei bestätigter Firmware ab 140. Bestehende Auswahlen bleiben während Offlinephasen oder fehlgeschlagenen Firmwareprüfungen erhalten; ihre Sensoren sind nicht verfügbar, während andere Geräte weiter aktualisiert werden. Nur ausgewählte Geräte mit aktivierten Messungen erzeugen Sensoren. Prüfe Stromversorgung und Verdrahtung fehlender Geräte.
-
-Öffne **Konfigurieren → ecoMain anpassen**, wähle erkannte Geräte, dann **Messgrößen** und abschließend **Fertigstellen** und sende ab. Eine reine Solarauswahl ist möglich. Entferne abhängige zusätzliche Entitäten vor dem Abwählen. Lade die Integration nach Firmwareupdates neu. Solare Tageswerte stammen direkt vom Gerät; fehlende Tage oder Tageswechsel werden nicht nachberechnet.
-
----
-
-### F11: Warum sind einige Werte immer null oder negativ?
-
-Mögliche Gründe:
-
-- **CT-Richtung**:
-    - Ist der CT-Pfeil falsch herum montiert, können Vorwärts-Werte klein/nahe null bleiben, während Rückwärts-Werte anwachsen.
-    - CT-Einbau prüfen und sicherstellen, dass der Pfeil in die gewünschte Stromflussrichtung zeigt.
-- **Keine Last**:
-    - Sind keine Verbraucher angeschlossen oder ausgeschaltet, bleiben Leistung und Energiezuwachs entsprechend gering.
-- **Cloud vs. Lokal**:
-    - Der Cloud-Modus liefert verarbeitete Daten (`avg_1m`, `total_1m`), die sich nur im Minutentakt ändern.
-
-Merke:
-
-- `*_energy_fwd_total`: akkumulierte Energie bei Stromfluss in **Vorwärtsrichtung**.
-- `*_energy_rev_total`: akkumulierte Energie bei Stromfluss in **Rückwärtsrichtung**.
-
----
-
-### F12: Warum sehe ich im Cloud-Modus keine L1/L2/L3-Entitäten?
-
-L1/L2/L3 werden nur lokal unterstützt; verfügbare Messgrößen und Gesamtwerte sind im [Messwertkatalog](#entitätsbenennung--bedeutung) beschrieben. Die Cloud stellt nur Wirkleistung und Energie für `main_all` und die Kanäle der ausgewählten Geräte bereit: `*_power_avg_1m`, `*_energy_total_1m` und den von Home Assistant berechneten Wert `*_energy_accumulated`. Es gibt keine Cloud-Phasenwerte, ecoSub-Gesamtwerte oder zusätzlichen lokalen Messgrößen.
-
----
-
-### F13: Wie oft werden die Werte aktualisiert?
-
-- **Lokaler Modus**:
-    - Die Integration liest Modbus-Register in kurzen Intervallen (Standard ca. **alle 5 Sekunden**).
-    - Entitäten mit `_rt` werden nahezu in Echtzeit aktualisiert.
-- **Cloud-Modus**:
-    - Die Integration fragt den Cloud-Dienst in längeren Intervallen ab (Standard ca. **alle 60 Sekunden**).
-    - Cloud-Werte (`avg_1m`, `total_1m`) basieren auf einer 1-minütigen Aggregation im Backend.
-
-Die tatsächlichen Intervalle können sich in zukünftigen Versionen ändern.
-
----
-
-### F14: Wie werden meine Cloud-Zugangsdaten gespeichert?
-
-Wenn du die **Kontoanmeldung (Cloud)** verwendest, speichert die Integration:
-
-- Cloud-**Benutzername**
-- Cloud-**Passwort**
-- Cloud-**Token**, das von der API zurückgegeben wird
-
-Diese Daten werden in der Home-Assistant-Konfiguration (wie bei anderen Integrationen) abgelegt und genutzt, um:
-
-- Zugriffstokens zu erzeugen/zu erneuern,
-- deine ecoMain-Master und Slaves aus der Cloud zu lesen.
-
-Wenn du dir Sorgen um die Sicherheit machst:
-
-- Stelle sicher, dass deine Home-Assistant-Instanz gut geschützt ist (starkes OS-Passwort, gesicherte Backups usw.).
-- Entferne die Integration, wenn Home Assistant keinen Zugriff mehr auf dein enecess-Cloud-Konto haben soll.
-
----
-
-## Support / Feedback
-
-Wenn Probleme auftreten:
-
-- Home-Assistant-Logs sammeln.
-- Die verwendete Hinzufügungsmethode angeben (Lokal Auto / Lokal Manuell / Cloud).
-- Gerätemodell und Netzwerktopologie kurz beschreiben.
-- Die konkrete Fehlermeldung nennen (z. B. `cannot_connect_local`, `auth_failed` usw.).
+Füge einer Problemmeldung HA-Protokolle, Verbindungsart (lokal automatisch / lokal manuell / Cloud), ecoMain-/ecoSub-Modell, Installation, Netzwerkumgebung und die genaue Fehlermeldung der Oberfläche bei.
