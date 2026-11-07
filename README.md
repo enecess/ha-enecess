@@ -426,20 +426,30 @@ Availability follows the device registers: not every category has a three-phase 
 
 ### ecoSolarMonitor Measurements (Local Firmware 140 or Later)
 
-Select the detected **ecoSolarMonitor** sub-device, then choose its measurements in the separate **ecoSolarMonitor** group under **Measurement Types**. Each ecoMain owns exactly one ecoSolarMonitor device (child index `4`), alongside ecoSub indices `1`–`3`. It has eight measurements and no ten-channel meter layout. It belongs to the current ecoMain even when inverter channels come from an ecoSub.
+Select the detected **ecoSolarMonitor** sub-device, then choose its measurements in the separate **ecoSolarMonitor** group under **Measurement Types**. Each ecoMain owns exactly one ecoSolarMonitor device (child index `4`), alongside ecoSub indices `1`–`3`. It offers fourteen optional measurements, with the same first five selected by default, and has no ten-channel meter layout. It belongs to the current ecoMain even when inverter channels come from an ecoSub.
 
-| Measurement Label | Full Measurement Key | Native Unit | Selected by Default |
-| --- | --- | --- | --- |
-| Irradiance | `solar_irradiance` | W/m² | Yes |
-| Tilt Angle | `solar_tilt_angle` | ° | Yes |
-| Module Temperature | `solar_module_temperature` | °C | Yes |
-| Actual Power | `solar_actual_power` | W | Yes |
-| Estimated Power | `solar_estimated_power` | W | Yes |
-| Performance Ratio | `solar_performance_ratio` | % | No |
-| Cumulative Actual Energy | `solar_actual_energy` | Wh | No |
-| Cumulative Estimated Energy | `solar_estimated_energy` | Wh | No |
+| Measurement Label | Full Measurement Key | Native Unit | Register / Type / Scale | Selected by Default |
+| --- | --- | --- | --- | --- |
+| Irradiance | `solar_irradiance` | W/m² | 4000 / Int16 / 0.1 | Yes |
+| Tilt Angle | `solar_tilt_angle` | ° | 4004 / Int16 / 0.1 | Yes |
+| Module Temperature | `solar_module_temperature` | °C | 4002 / Int16 / 0.1 | Yes |
+| Actual Power | `solar_actual_power` | W | 4008 / Int32 / 0.01 | Yes |
+| Estimated Power | `solar_estimated_power` | W | 4006 / Int32 / 0.01 | Yes |
+| Performance Ratio | `solar_performance_ratio` | % | 4005 / Int16 / 0.1 | No |
+| Cumulative Actual Energy | `solar_actual_energy` | Wh | 4014 / UInt64 / 0.001 | No |
+| Cumulative Estimated Energy | `solar_estimated_energy` | Wh | 4010 / UInt64 / 0.001 | No |
+| Yesterday Performance Ratio | `solar_yesterday_performance_ratio` | % | 4018 / Int16 / 0.1 | No |
+| Yesterday Estimated Energy | `solar_yesterday_estimated_energy` | Wh | 4019 / UInt64 / 0.001 | No |
+| Yesterday Actual Energy | `solar_yesterday_actual_energy` | Wh | 4023 / UInt64 / 0.001 | No |
+| Today Performance Ratio | `solar_today_performance_ratio` | % | 4027 / Int16 / 0.1 | No |
+| Today Estimated Energy | `solar_today_estimated_energy` | Wh | 4028 / UInt64 / 0.001 | No |
+| Today Actual Energy | `solar_today_actual_energy` | Wh | 4032 / UInt64 / 0.001 | No |
 
-The first six use `MEASUREMENT`; both cumulative energy measurements use `TOTAL_INCREASING`. These Title Case labels describe measurement configuration and documentation. Physical sensor names use the full keys above, following the existing ecoMain naming convention; there are no translated entity-name labels.
+The first six use `MEASUREMENT`. Cumulative energy and today's two native device counters use `TOTAL_INCREASING`. Yesterday's two energy readings and both daily performance ratios are snapshots with no state class. All values are direct device readings multiplied by the protocol scale; the integration performs no daily accumulation, subtraction, PR calculation or date rollover. A new device value, including zero after a daily reset, is published directly, also after offline recovery. Existing saved selections, including an empty selection, are not expanded with new fields.
+
+Int16 fields occupy one register, Int32 two and UInt64 four, in low-word-first order; registers `4001` and `4003` are reserved and are never polled. Power resolution is `0.01` W and energy resolution is `0.001` Wh; signed performance ratios use `0.1` %.
+
+These Title Case labels describe measurement configuration and documentation. Physical sensor names use the full keys above, following the existing ecoMain naming convention; there are no translated entity-name labels.
 
 Configured selections survive temporary device outages, failed firmware probes and firmware downgrades. Existing entity IDs, custom names and disabled choices are retained; unavailable capabilities make their sensors unavailable. Only explicit deselection removes configured identities. Remove dependent extra entities before deselecting their devices or measurements. Solar-only measurement selection is supported when ecoSolarMonitor is selected.
 
@@ -454,7 +464,7 @@ Create a sensor from your measurements, such as the difference or average of two
 
 Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), cumulative apparent energy (VAh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active, reactive and apparent energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
 
-On confirmed local firmware 140 or later, enabled ecoSolarMonitor measurements are also formula inputs. Actual Power and Estimated Power join power sources; Cumulative Actual Energy and Cumulative Estimated Energy join cumulative active energy sources. Irradiance (W/m²), Module Temperature (°C), Tilt Angle (°) and Performance Ratio (%) have their own source groups. These inputs do not add formula result types: use an existing result type, including **Number** where appropriate, and check the resulting units.
+On confirmed local firmware 140 or later, enabled ecoSolarMonitor measurements are also formula inputs. Actual Power and Estimated Power join power sources; Cumulative Actual Energy, Cumulative Estimated Energy and all four daily energy readings join the existing active energy source group; the two daily performance ratios join the existing Performance Ratio group. Irradiance (W/m²), Module Temperature (°C), Tilt Angle (°) and Performance Ratio (%) have their own source groups. These inputs do not add formula result types: use an existing result type, including **Number** where appropriate, and check the resulting units.
 
 > ![Add formula entity](docs/images/ecomain-formula-add.png)
 
@@ -543,7 +553,7 @@ Ordinary ecoMain keys follow `<location>_<suffix>`:
 | Main branches | `main_ch1` … `main_ch10` | Local and cloud |
 | Selected slave branches | `sub1_ch1` … `sub3_ch10` | Ten channels per selected ecoSub |
 
-ecoSub devices have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected ecoSub. ecoSolarMonitor uses the eight full keys in [its measurement table](#ecosolarmonitor-measurements-local-firmware-140-or-later), without a location prefix or channel suffix.
+ecoSub devices have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected ecoSub. ecoSolarMonitor uses the fourteen full keys in [its measurement table](#ecosolarmonitor-measurements-local-firmware-140-or-later), without a location prefix or channel suffix.
 
 ### Complete local measurement catalog (Modbus)
 

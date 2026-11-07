@@ -43,6 +43,12 @@ SOLAR_MEASUREMENTS = (
     "solar_performance_ratio",
     "solar_actual_energy",
     "solar_estimated_energy",
+    "solar_yesterday_performance_ratio",
+    "solar_yesterday_estimated_energy",
+    "solar_yesterday_actual_energy",
+    "solar_today_performance_ratio",
+    "solar_today_estimated_energy",
+    "solar_today_actual_energy",
 )
 DEFAULT_SOLAR_MEASUREMENTS = SOLAR_MEASUREMENTS[:5]
 
@@ -141,6 +147,12 @@ _SOLAR_LAYOUT = {
     "solar_performance_ratio": (4005, 1, 0.1, True, "performance_ratio"),
     "solar_actual_energy": (4014, 4, 0.001, False, "energy"),
     "solar_estimated_energy": (4010, 4, 0.001, False, "energy"),
+    "solar_yesterday_performance_ratio": (4018, 1, 0.1, True, "performance_ratio"),
+    "solar_yesterday_estimated_energy": (4019, 4, 0.001, False, "energy"),
+    "solar_yesterday_actual_energy": (4023, 4, 0.001, False, "energy"),
+    "solar_today_performance_ratio": (4027, 1, 0.1, True, "performance_ratio"),
+    "solar_today_estimated_energy": (4028, 4, 0.001, False, "energy"),
+    "solar_today_actual_energy": (4032, 4, 0.001, False, "energy"),
 }
 
 
@@ -307,7 +319,14 @@ def build_sensor_descriptions(
     for spec in specs:
         unit, device_class = metadata[spec.kind]
         state_class = SensorStateClass.MEASUREMENT
-        if spec.kind in (
+        if spec.measurement_type in (
+            "solar_yesterday_performance_ratio",
+            "solar_yesterday_estimated_energy",
+            "solar_yesterday_actual_energy",
+            "solar_today_performance_ratio",
+        ):
+            state_class = None
+        elif spec.kind in (
             "energy",
             "energy_accumulated",
             "reactive_energy",

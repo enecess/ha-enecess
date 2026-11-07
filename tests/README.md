@@ -23,15 +23,24 @@ optional apparent-energy selection and formulas. Options regressions preserve
 configured measurements, formulas and entity identities during temporary
 connection failures or capability loss.
 
-Protocol 1.0.6 coverage adds confirmed firmware-140 gating, the eight
-ecoSolarMonitor measurements and their defaults, signed/scaled register decoding,
+Protocol 1.0.6 coverage adds confirmed firmware-140 gating, the fourteen optional
+ecoSolarMonitor measurements and unchanged five defaults, signed/scaled register decoding,
 master-owned child-index-4 identities, solar-only selection and grouped formula
 inputs. Simulated hardware checks cover channel phase/CT settings, PV capacity
 and temperature coefficient, inverter-channel masks, changed-value writes and
 readback errors. Flow journeys cover per-meter channel sections, centralized
 ecoSolarMonitor commissioning, immediate hardware saves, Back/Cancel drafts,
 and preservation of hidden/offline selections. Measurement labels use Title Case;
-physical solar sensor names retain their measurement keys.
+physical solar sensor names retain their measurement keys. Direct daily readings
+cover yesterday/today performance ratios and estimated/actual energy, exact
+selected read blocks `(4000, 1)`, `(4002, 1)`, `(4004, 32)`, partial complete-value
+reads, UInt64 high bits and signed ratios. The fixtures exercise today's counters
+resetting to zero, yesterday's values changing in both directions and offline
+recovery without derived totals. Today's native energy counters use
+`TOTAL_INCREASING`; yesterday's energies and both daily ratios have no state class.
+The corrected protocol uses Int32 power at 4006/4008 (0.01 W), UInt64 energy at
+4010/4014 and 4019/4023/4028/4032 (0.001 Wh), Int16 daily ratios at 4018/4027
+(0.1 %), and reserves 4001/4003. PV capacity remains UInt32, 0–4294967295 W.
 
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 

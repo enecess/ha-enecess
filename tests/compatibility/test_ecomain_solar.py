@@ -21,6 +21,8 @@ class SolarClient:
     def __init__(self):
         self.online = 1
         self.calls = []
+        self.daily = {4018: 0xFF85, 4019: 123456, 4023: 234567,
+                      4027: 876, 4028: 345678, 4032: 456789}
 
     async def async_set_target(self, host, port):
         pass
@@ -42,6 +44,9 @@ class SolarClient:
             4009: 0xFFFF,
             4013: 0x8000,
             4014: 1001,
+            **{address + word: (value >> (word * 16)) & 0xFFFF
+               for address, value in self.daily.items()
+               for word in range(1 if address in (4018, 4027) else 4)},
         }
         return SimpleNamespace(
             registers=[values.get(i, 0) for i in range(address, address + count)]
@@ -62,7 +67,7 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
             },
             options={
                 "measurement_types": [],
-                "solar_measurement_types": ["solar_actual_power"],
+                "solar_measurement_types": ["solar_actual_power", "solar_today_actual_energy"],
                 "extra_entities": [
                     {
                         "key": "extra_fictional_solar",
@@ -84,7 +89,7 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
         entry.runtime_data = SimpleNamespace(coordinator=coordinator)
         entities = []
         await sensor_platform.async_setup_entry(self.hass, entry, entities.extend)
-        self.assertEqual(len(entities), 2)
+        self.assertEqual(len(entities), 3)
         platform = EntityPlatform(
             hass=self.hass,
             logger=logging.getLogger(__name__),
@@ -137,6 +142,12 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
             {child.id},
         )
         registry.async_update_device(parent.id, name_by_user="Fictional master name")
+        daily_entity_id = entities[1].entity_id
+        self.assertEqual(entities[1].name, "solar_today_actual_energy")
+        self.assertEqual(entities[1].unique_id,
+                         f"ecomain:{runtime_fixture.SERIAL}:sub_4:key_solar_today_actual_energy:mode_local")
+        entity_registry.async_get(self.hass).async_update_entity(
+            daily_entity_id, name="Fictional daily solar name")
         entity_id = entities[0].entity_id
         entity_registry.async_get(self.hass).async_update_entity(
             entity_id, name="Fictional solar name"
@@ -146,6 +157,9 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
         await sensor_platform.async_setup_entry(self.hass, entry, entities.extend)
         await platform.async_add_entities(entities)
         self.assertEqual(entities[0].entity_id, entity_id)
+        self.assertEqual(entities[1].entity_id, daily_entity_id)
+        self.assertEqual(entity_registry.async_get(self.hass).async_get(daily_entity_id).name,
+                         "Fictional daily solar name")
         self.assertEqual(
             registry.async_get(parent.id).name_by_user, "Fictional master name"
         )
@@ -172,12 +186,34 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
                 "solar_performance_ratio",
                 "solar_actual_energy",
                 "solar_estimated_energy",
+                "solar_yesterday_performance_ratio",
+                "solar_yesterday_estimated_energy",
+                "solar_yesterday_actual_energy",
+                "solar_today_performance_ratio",
+                "solar_today_estimated_energy",
+                "solar_today_actual_energy",
             ],
         }
         descriptions = {
             desc.key: desc for desc in build_entry_descriptions(data, options)
         }
-        self.assertIn("solar_actual_power", descriptions)
+        self.assertEqual({key for key in descriptions if key.startswith("solar_")},
+                         set(options["solar_measurement_types"]))
+        for key, unit, device_class, state_class, precision in (
+            ("solar_yesterday_performance_ratio", "%", None, None, 1),
+            ("solar_yesterday_estimated_energy", "Wh", SensorDeviceClass.ENERGY, None, 3),
+            ("solar_yesterday_actual_energy", "Wh", SensorDeviceClass.ENERGY, None, 3),
+            ("solar_today_performance_ratio", "%", None, None, 1),
+            ("solar_today_estimated_energy", "Wh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING, 3),
+            ("solar_today_actual_energy", "Wh", SensorDeviceClass.ENERGY, SensorStateClass.TOTAL_INCREASING, 3),
+        ):
+            with self.subTest(key=key):
+                desc = descriptions[key]
+                self.assertEqual((desc.native_unit_of_measurement, desc.device_class,
+                                  desc.state_class, desc.suggested_display_precision),
+                                 (unit, device_class, state_class, precision))
+                self.assertEqual(desc.name, key)
+                self.assertIsNone(desc.translation_key)
         self.assertEqual(
             descriptions["solar_irradiance"].device_class, SensorDeviceClass.IRRADIANCE
         )
@@ -247,9 +283,27 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
             "solar_performance_ratio": 98.7,
             "solar_actual_energy": 1.001,
             "solar_estimated_energy": 9223372036854776.0,
+            "solar_yesterday_performance_ratio": -12.3,
+            "solar_yesterday_estimated_energy": 123.456,
+            "solar_yesterday_actual_energy": 234.567,
+            "solar_today_performance_ratio": 87.6,
+            "solar_today_estimated_energy": 345.678,
+            "solar_today_actual_energy": 456.789,
         }.items():
             with self.subTest(key=key):
                 self.assertAlmostEqual(coordinator.data[key], expected)
+        self.assertEqual([call for call in client.calls if call[0] >= 4000],
+                         [(4000, 1), (4002, 1), (4004, 32)])
+        daily_sensors = {key: EcoMainSensor(coordinator, "local", runtime_fixture.SERIAL, descriptions[key])
+                         for key in ("solar_yesterday_estimated_energy", "solar_yesterday_actual_energy",
+                                     "solar_today_estimated_energy", "solar_today_actual_energy")}
+        for raw, expected in (
+            ({4019: 123000, 4023: 235000, 4028: 0, 4032: 0}, (123, 235, 0, 0)),
+            ({4019: 124000, 4023: 230000, 4028: 1100, 4032: 2200}, (124, 230, 1.1, 2.2)),
+        ):
+            client.daily.update(raw)
+            await coordinator.async_refresh()
+            self.assertEqual(tuple(entity.native_value for entity in daily_sensors.values()), expected)
         self.assertTrue(sensor.available)
         self.assertEqual(sensor.native_value, -1)
         self.assertTrue(derived.available)
@@ -259,9 +313,14 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
         await coordinator.async_refresh()
         self.assertFalse(sensor.available)
         self.assertFalse(derived.available)
+        self.assertTrue(all(not entity.available for entity in daily_sensors.values()))
         self.assertEqual(coordinator.data["main_l1_power_rt"], 100)
         self.assertTrue(all(address < 4000 for address, _ in client.calls))
         client.online = 1
+        client.daily.update({4019: 125000, 4023: 229000, 4027: 0xFF9C, 4028: 3500, 4032: 4500})
         await coordinator.async_refresh()
+        self.assertEqual(coordinator.data["solar_today_performance_ratio"], -10)
+        self.assertTrue(all(entity.available for entity in daily_sensors.values()))
+        self.assertEqual(tuple(entity.native_value for entity in daily_sensors.values()), (125, 229, 3.5, 4.5))
         self.assertTrue(sensor.available)
         self.assertEqual(sensor.unique_id, identity)

@@ -683,7 +683,13 @@
         "solar_estimated_power": "Puissance Estimée",
         "solar_performance_ratio": "Ratio De Performance",
         "solar_actual_energy": "Énergie Réelle Cumulée",
-        "solar_estimated_energy": "Énergie Estimée Cumulée"
+        "solar_estimated_energy": "Énergie Estimée Cumulée",
+        "solar_yesterday_performance_ratio": "Ratio De Performance D’Hier",
+        "solar_yesterday_estimated_energy": "Énergie Estimée D’Hier",
+        "solar_yesterday_actual_energy": "Énergie Réelle D’Hier",
+        "solar_today_performance_ratio": "Ratio De Performance Du Jour",
+        "solar_today_estimated_energy": "Énergie Estimée Du Jour",
+        "solar_today_actual_energy": "Énergie Réelle Du Jour"
       }
     }
   }

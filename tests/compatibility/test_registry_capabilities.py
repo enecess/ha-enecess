@@ -45,6 +45,29 @@ class RegistryCapabilitiesTests(RealHARuntimeFixture):
         async_remove_unconfigured_registry_entries(self.hass, self.entry)
         self.assertIsNone(self.registry.async_get(self.record.entity_id))
 
+    async def test_daily_solar_registry_choices_survive_capability_loss_until_explicit_deselection(self):
+        self.hass.config_entries.async_update_entry(
+            self.entry, options={"measurement_types": [], "ecomain_selected_slaves": [4],
+                                 "solar_measurement_types": ["solar_today_actual_energy"]})
+        registered = self.registry.async_get_or_create(
+            "sensor", "enecess", f"ecomain:{SERIAL}:sub_4:key_solar_today_actual_energy:mode_local",
+            config_entry=self.entry, suggested_object_id="my_existing_daily_solar")
+        record = self.registry.async_update_entity(
+            registered.entity_id, name="My retained daily solar",
+            disabled_by=entity_registry.RegistryEntryDisabler.USER)
+        for version in (139, None, 140):
+            self.hass.config_entries.async_update_entry(
+                self.entry, data={**self.entry.data, "ecomain_firmware_version": version})
+            async_remove_unconfigured_registry_entries(self.hass, self.entry)
+            current = self.registry.async_get(record.entity_id)
+            self.assertIsNotNone(current)
+            self.assertEqual((current.id, current.name, current.disabled_by),
+                             (record.id, "My retained daily solar", entity_registry.RegistryEntryDisabler.USER))
+        self.hass.config_entries.async_update_entry(
+            self.entry, options={**self.entry.options, "solar_measurement_types": []})
+        async_remove_unconfigured_registry_entries(self.hass, self.entry)
+        self.assertIsNone(self.registry.async_get(record.entity_id))
+
     async def test_offline_displayed_options_save_keeps_real_registry_and_selections(self):
         self.mocks["read_holding_registers"].side_effect = ConnectionError("offline fixture")
         flow = ConfigFlow.async_get_options_flow(self.entry)

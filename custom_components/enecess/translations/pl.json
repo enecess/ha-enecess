@@ -683,7 +683,13 @@
         "solar_estimated_power": "Moc Szacowana",
         "solar_performance_ratio": "Współczynnik Wydajności",
         "solar_actual_energy": "Skumulowana Energia Rzeczywista",
-        "solar_estimated_energy": "Skumulowana Energia Szacowana"
+        "solar_estimated_energy": "Skumulowana Energia Szacowana",
+        "solar_yesterday_performance_ratio": "Wczorajszy Współczynnik Wydajności",
+        "solar_yesterday_estimated_energy": "Wczorajsza Energia Szacowana",
+        "solar_yesterday_actual_energy": "Wczorajsza Energia Rzeczywista",
+        "solar_today_performance_ratio": "Dzisiejszy Współczynnik Wydajności",
+        "solar_today_estimated_energy": "Dzisiejsza Energia Szacowana",
+        "solar_today_actual_energy": "Dzisiejsza Energia Rzeczywista"
       }
     }
   }

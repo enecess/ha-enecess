@@ -129,15 +129,22 @@ and preservation of configured entity IDs, custom names and disabled choices
 when firmware capabilities change or the device is temporarily unreachable.
 
 Protocol 1.0.6 checks exercise firmware-140 ecoSolarMonitor measurements with
-real HA sensor metadata and key-based names. Real EntityPlatform registration
-checks solar-only parent/child linkage and preserves custom names. Native HA
+all fourteen optional readings, unchanged five defaults, real HA sensor metadata
+and key-based names. Direct today energy counters retain `TOTAL_INCREASING`,
+while yesterday energy and daily performance-ratio snapshots have no state class.
+Daily reset-to-zero, changes in either direction and offline recovery publish
+current scaled device values without integration-side accounting. Real EntityPlatform
+registration checks solar-only parent/child linkage and preserves custom names. Native HA
 section and numeric-selector schemas are serialized and submitted for channel/CT
 and centralized PV commissioning, including incomplete Back/Cancel inputs,
 unknown stored choices and visible error locations. Serialization uses HA's
 flow API view so each release exercises its own serializer without installing
 an obsolete serializer just for tests. Formula checks include the
-four new solar input groups. Modbus settings and readback tests use simulated
-responses; this is schema/runtime coverage, not a browser or hardware test.
+four solar input groups plus daily energy and performance-ratio sources in the
+existing groups, with explicit source keys and unchanged formula result types.
+Real registries preserve daily entity IDs, custom names and disabled selections
+through capability loss until explicit deselection. Modbus settings and readback
+tests use simulated responses; this is schema/runtime coverage, not a browser or hardware test.
 
 ecoPlug lifecycle regressions cancel in-flight polls, authentication refreshes,
 and queued controls during unload or shutdown, and reject new requests after

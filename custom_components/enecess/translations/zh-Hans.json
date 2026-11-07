@@ -683,7 +683,13 @@
         "solar_estimated_power": "理论功率",
         "solar_performance_ratio": "性能比",
         "solar_actual_energy": "累计实际电量",
-        "solar_estimated_energy": "累计理论电量"
+        "solar_estimated_energy": "累计理论电量",
+        "solar_yesterday_performance_ratio": "昨日性能比",
+        "solar_yesterday_estimated_energy": "昨日理论电量",
+        "solar_yesterday_actual_energy": "昨日实际电量",
+        "solar_today_performance_ratio": "今日性能比",
+        "solar_today_estimated_energy": "今日理论电量",
+        "solar_today_actual_energy": "今日实际电量"
       }
     }
   }

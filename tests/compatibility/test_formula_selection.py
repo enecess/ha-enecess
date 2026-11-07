@@ -244,6 +244,45 @@ class FormulaSelectionTests(RealHARuntimeFixture):
             self.assertFalse(result["errors"])
             self.assertEqual(flow._extra_entities[0]["sources"], sources)
 
+    async def test_selected_daily_solar_sources_use_existing_groups_and_keep_explicit_keys(self):
+        for options in (False, True):
+            entry = self.make_entry("local")
+            selected = ["solar_yesterday_performance_ratio", "solar_today_performance_ratio",
+                        "solar_yesterday_estimated_energy", "solar_yesterday_actual_energy",
+                        "solar_today_actual_energy"]
+            self.hass.config_entries.async_update_entry(
+                entry, data={**entry.data, "ecomain_firmware_version": 140,
+                             "ecomain_selected_slaves": [4]},
+                options={"measurement_types": [], "solar_measurement_types": selected})
+            if options:
+                flow = ConfigFlow.async_get_options_flow(entry)
+                flow.handler = entry.entry_id
+            else:
+                flow = ConfigFlow()
+                flow._entry_data = dict(entry.data)
+                flow._measurement_types = []
+                flow._solar_measurement_types = selected
+            flow.hass = self.hass
+            flow.context = {}
+            result = await flow.async_step_extra_formula()
+            fields = {str(key): value for key, value in result["data_schema"].schema.items()}
+            self.assertEqual(fields["extra_formula_result_type"].config["options"], ["energy", "number"])
+            result = await flow.async_step_extra_formula(result["data_schema"]({
+                "extra_entity_name": "Fictional daily comparison", "extra_formula_result_type": "number"}))
+            fields = {str(key): value for key, value in result["data_schema"].schema.items()}
+            self.assertEqual({name: {item["value"] for item in control.config["options"]}
+                              for name, control in fields.items() if name.startswith("extra_formula_sources_")},
+                             {"extra_formula_sources_performance_ratio": set(selected[:2]),
+                              "extra_formula_sources_energy": set(selected[2:])})
+            result = await flow.async_step_extra_formula_sources(result["data_schema"]({
+                "extra_formula_sources_energy": ["solar_today_actual_energy", "solar_yesterday_actual_energy"]}))
+            self.assertEqual(flow._formula_draft["variables"],
+                             {"a": "solar_today_actual_energy", "b": "solar_yesterday_actual_energy"})
+            result = await flow.async_step_extra_formula_expression(result["data_schema"]({"extra_formula_expression": "a-b"}))
+            self.assertFalse(result.get("errors"))
+            self.assertEqual(flow._extra_entities[-1]["sources"],
+                             ["solar_today_actual_energy", "solar_yesterday_actual_energy"])
+
     async def test_cancel_from_source_page_leaves_no_formula(self):
         flow = ConfigFlow()
         flow.hass = self.hass

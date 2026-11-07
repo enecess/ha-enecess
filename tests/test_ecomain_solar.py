@@ -12,14 +12,20 @@ from test_ecomain_registers import load_runtime
 
 # Literal, hand-checked protocol expectations, independent of production layouts.
 SOLAR = {
-    "solar_irradiance": (4000, 1, .1, True, "irradiance", "W/m²", "irradiance", "Irradiance"),
-    "solar_tilt_angle": (4004, 1, .1, True, "tilt_angle", "°", None, "Tilt Angle"),
-    "solar_module_temperature": (4002, 1, .1, True, "temperature", "°C", "temperature", "Module Temperature"),
-    "solar_actual_power": (4008, 2, .01, True, "power", "W", "power", "Actual Power"),
-    "solar_estimated_power": (4006, 2, .01, True, "power", "W", "power", "Estimated Power"),
-    "solar_performance_ratio": (4005, 1, .1, True, "performance_ratio", "%", None, "Performance Ratio"),
-    "solar_actual_energy": (4014, 4, .001, False, "energy", "Wh", "energy", "Cumulative Actual Energy"),
-    "solar_estimated_energy": (4010, 4, .001, False, "energy", "Wh", "energy", "Cumulative Estimated Energy"),
+    "solar_irradiance": (4000, 1, .1, True, "irradiance", "W/m²", "irradiance", "Irradiance", "measurement"),
+    "solar_tilt_angle": (4004, 1, .1, True, "tilt_angle", "°", None, "Tilt Angle", "measurement"),
+    "solar_module_temperature": (4002, 1, .1, True, "temperature", "°C", "temperature", "Module Temperature", "measurement"),
+    "solar_actual_power": (4008, 2, .01, True, "power", "W", "power", "Actual Power", "measurement"),
+    "solar_estimated_power": (4006, 2, .01, True, "power", "W", "power", "Estimated Power", "measurement"),
+    "solar_performance_ratio": (4005, 1, .1, True, "performance_ratio", "%", None, "Performance Ratio", "measurement"),
+    "solar_actual_energy": (4014, 4, .001, False, "energy", "Wh", "energy", "Cumulative Actual Energy", "total_increasing"),
+    "solar_estimated_energy": (4010, 4, .001, False, "energy", "Wh", "energy", "Cumulative Estimated Energy", "total_increasing"),
+    "solar_yesterday_performance_ratio": (4018, 1, .1, True, "performance_ratio", "%", None, "Yesterday Performance Ratio", None),
+    "solar_yesterday_estimated_energy": (4019, 4, .001, False, "energy", "Wh", "energy", "Yesterday Estimated Energy", None),
+    "solar_yesterday_actual_energy": (4023, 4, .001, False, "energy", "Wh", "energy", "Yesterday Actual Energy", None),
+    "solar_today_performance_ratio": (4027, 1, .1, True, "performance_ratio", "%", None, "Today Performance Ratio", None),
+    "solar_today_estimated_energy": (4028, 4, .001, False, "energy", "Wh", "energy", "Today Estimated Energy", "total_increasing"),
+    "solar_today_actual_energy": (4032, 4, .001, False, "energy", "Wh", "energy", "Today Actual Energy", "total_increasing"),
 }
 
 
@@ -43,13 +49,13 @@ class SolarModelTests(unittest.TestCase):
                               "custom_components/enecess/strings.json").read_text())
         for desc in descriptions:
             with self.subTest(key=desc.key):
-                address, width, scale, signed, kind, unit, device_class, name = SOLAR[desc.key]
+                address, width, scale, signed, kind, unit, device_class, name, state_class = SOLAR[desc.key]
                 self.assertEqual((desc.spec.address, desc.spec.regs, desc.spec.scale,
                                   desc.spec.signed, desc.spec.kind, desc.spec.device_index,
                                   desc.spec.measurement_type),
                                  (address, width, scale, signed, kind, 4, desc.key))
                 self.assertEqual((desc.native_unit_of_measurement, desc.device_class), (unit, device_class))
-                self.assertEqual(desc.state_class, "total_increasing" if kind == "energy" else "measurement")
+                self.assertEqual(desc.state_class, state_class)
                 self.assertEqual(desc.name, desc.key)
                 self.assertIsNone(desc.translation_key)
                 self.assertEqual(strings["selector"]["solar_measurement_types"]["options"][desc.key], name)
@@ -64,6 +70,12 @@ class SolarModelTests(unittest.TestCase):
             "solar_performance_ratio": 1,
             "solar_actual_energy": 3,
             "solar_estimated_energy": 3,
+            "solar_yesterday_performance_ratio": 1,
+            "solar_yesterday_estimated_energy": 3,
+            "solar_yesterday_actual_energy": 3,
+            "solar_today_performance_ratio": 1,
+            "solar_today_estimated_energy": 3,
+            "solar_today_actual_energy": 3,
         }
         specs = self.model.build_specs_local([4], [], list(expected))
         descriptions = self.model.build_sensor_descriptions(specs)
@@ -89,14 +101,15 @@ class SolarModelTests(unittest.TestCase):
         self.assertEqual(deselected, [])
 
     def test_firmware_capabilities_preserve_configured_solar_identities(self):
-        options = {"measurement_types": [], "solar_measurement_types": ["solar_actual_power"]}
-        expected = {"ecomain:FICTIONAL-SOLAR-001:sub_4:key_solar_actual_power:mode_local"}
+        options = {"measurement_types": [], "solar_measurement_types": ["solar_actual_power", "solar_today_actual_energy"]}
+        expected = {"ecomain:FICTIONAL-SOLAR-001:sub_4:key_solar_actual_power:mode_local",
+                    "ecomain:FICTIONAL-SOLAR-001:sub_4:key_solar_today_actual_energy:mode_local"}
         for version in (136, 138, 139, None, 140, 145):
             with self.subTest(version=version):
                 data = local_data(version)
                 specs = self.extra.build_entry_specs(data, options)
                 self.assertEqual({spec.key for spec in specs},
-                                 {"solar_actual_power"} if version is not None and version >= 140 else set())
+                                 {"solar_actual_power", "solar_today_actual_energy"} if version is not None and version >= 140 else set())
                 self.assertEqual(self.extra.build_entry_sensor_unique_ids(data, options), expected)
                 self.assertIn(("enecess", "ecomain:FICTIONAL-SOLAR-001:sub_4:mode_local"),
                               self.extra.build_entry_device_identifiers(data, options))
@@ -124,11 +137,13 @@ class SolarModelTests(unittest.TestCase):
             "irradiance": {"solar_irradiance"}, "tilt_angle": {"solar_tilt_angle"},
             "temperature": {"solar_module_temperature"},
             "power": {"solar_actual_power", "solar_estimated_power"},
-            "performance_ratio": {"solar_performance_ratio"},
-            "energy": {"solar_actual_energy", "solar_estimated_energy"}})
+            "performance_ratio": {"solar_performance_ratio", "solar_yesterday_performance_ratio", "solar_today_performance_ratio"},
+            "energy": {"solar_actual_energy", "solar_estimated_energy", "solar_yesterday_actual_energy", "solar_yesterday_estimated_energy", "solar_today_actual_energy", "solar_today_estimated_energy"}})
         self.assertEqual(flow._formula_result_types(), ["power", "energy", "number"])
         flow._formula_context = (local_data(), {"measurement_types": [], "solar_measurement_types": ["solar_tilt_angle"]})
         self.assertEqual(flow._formula_result_types(), ["number"])
+        self.assertEqual({kind: set(sources) for kind, sources in flow._formula_source_groups().items()},
+                         {"tilt_angle": {"solar_tilt_angle"}})
 
 
 class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
@@ -169,6 +184,11 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
             online = [1, 0, 0, 1]
             calls = []
             performance_ratio = 987
+            today_performance_ratio = 876
+            yesterday_estimated = 123456
+            yesterday_actual = 234567
+            today_estimated = 345678
+            today_actual = 456789
 
             async def async_set_target(self, host, port):
                 pass
@@ -183,7 +203,14 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
                           4005: self.performance_ratio, 4006: 45678, 4007: 0,
                           4008: 0xFF9C, 4009: 0xFFFF, 4010: 0, 4011: 0,
                           4012: 0, 4013: 0x8000, 4014: 1001, 4015: 0,
-                          4016: 0, 4017: 0}
+                          4016: 0, 4017: 0, 4018: 0xFF85,
+                          4027: self.today_performance_ratio}
+                values.update({address + word: (value >> (word * 16)) & 0xFFFF
+                               for address, value in ((4019, self.yesterday_estimated),
+                                                      (4023, self.yesterday_actual),
+                                                      (4028, self.today_estimated),
+                                                      (4032, self.today_actual))
+                               for word in range(4)})
                 return SimpleNamespace(registers=[values.get(i, 0) for i in range(start, start + count)])
 
         client = Client()
@@ -191,6 +218,7 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         entry = SimpleNamespace(data=local_data())
         coordinator = runtime.EcoMainModbusCoordinator(None, entry, client, specs)
         values = await coordinator._async_update_data()
+        self.assertTrue(set(SOLAR).issubset(values))
         self.assertIn("solar_module_temperature", values)
         self.assertEqual(values["solar_irradiance"], 0)
         self.assertEqual(values["solar_tilt_angle"], 15)
@@ -200,12 +228,32 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         self.assertAlmostEqual(values["solar_estimated_power"], 456.78)
         self.assertAlmostEqual(values["solar_actual_energy"], 1.001)
         self.assertEqual(values["solar_estimated_energy"], 9223372036854776.0)
+        self.assertEqual(values["solar_yesterday_performance_ratio"], -12.3)
+        self.assertAlmostEqual(values["solar_yesterday_estimated_energy"], 123.456)
+        self.assertAlmostEqual(values["solar_yesterday_actual_energy"], 234.567)
+        self.assertAlmostEqual(values["solar_today_performance_ratio"], 87.6)
+        self.assertAlmostEqual(values["solar_today_estimated_energy"], 345.678)
+        self.assertAlmostEqual(values["solar_today_actual_energy"], 456.789)
+        self.assertEqual([call for call in client.calls if call[0] >= 4000],
+                         [(4000, 1), (4002, 1), (4004, 32)])
         self.assertIn((3101, 4), client.calls)
         covered = {index for start, count in client.calls for index in range(start, start + count)}
         self.assertTrue({4001, 4003}.isdisjoint(covered))
         self.assertTrue(all(count <= 125 for _, count in client.calls))
         self.assertTrue(all(any(start <= spec.address and spec.address + spec.regs <= start + count
                                 for start, count in client.calls) for spec in specs))
+        for yesterday_estimated, yesterday_actual, today_estimated, today_actual in (
+            (123000, 235000, 0, 0), (124000, 230000, 1100, 2200)
+        ):
+            client.yesterday_estimated = yesterday_estimated
+            client.yesterday_actual = yesterday_actual
+            client.today_estimated = today_estimated
+            client.today_actual = today_actual
+            values = await coordinator._async_update_data()
+            self.assertEqual(values["solar_yesterday_estimated_energy"], yesterday_estimated * .001)
+            self.assertEqual(values["solar_yesterday_actual_energy"], yesterday_actual * .001)
+            self.assertEqual(values["solar_today_estimated_energy"], today_estimated * .001)
+            self.assertEqual(values["solar_today_actual_energy"], today_actual * .001)
         client.online = [1, 0, 0, 0]
         client.calls.clear()
         values = await coordinator._async_update_data()
@@ -214,9 +262,15 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(start < 4000 for start, _ in client.calls))
         client.online[-1] = 1
         client.performance_ratio = 0xFF85
+        client.today_performance_ratio = 0xFF9C
+        client.today_actual = 3500
+        client.yesterday_actual = 229000
         values = await coordinator._async_update_data()
         self.assertIn("solar_actual_power", values)
         self.assertEqual(values["solar_performance_ratio"], -12.3)
+        self.assertEqual(values["solar_today_performance_ratio"], -10)
+        self.assertEqual(values["solar_today_actual_energy"], 3.5)
+        self.assertEqual(values["solar_yesterday_actual_energy"], 229)
         self.assertEqual(len(coordinator.specs), len(specs))
         for version in (139, 138):
             with self.subTest(version=version):
@@ -227,6 +281,41 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
                 self.assertNotIn("solar_actual_power", values)
                 self.assertIn((3101, 3), client.calls)
                 self.assertTrue(all(start < 4000 for start, _ in client.calls))
+
+    async def test_partial_daily_selection_reads_complete_values_without_reserved_words(self):
+        model, runtime = load_runtime()
+
+        class Client:
+            async def async_set_target(self, host, port):
+                pass
+
+            async def read_holding_registers(self, start, count):
+                self.calls.append((start, count))
+                if start == 3009:
+                    return SimpleNamespace(registers=[140])
+                if start == 3101:
+                    return SimpleNamespace(registers=[0, 0, 0, 1])
+                values = {4000: 123, 4018: 0xFF9C, 4023: 1001, 4026: 0x8000,
+                          4027: 321, 4032: 7654}
+                return SimpleNamespace(registers=[values.get(i, 0) for i in range(start, start + count)])
+
+        for selected, blocks, expected in (
+            (["solar_irradiance", "solar_yesterday_performance_ratio", "solar_yesterday_actual_energy"],
+             [(4000, 1), (4018, 1), (4023, 4)],
+             {"solar_irradiance": 12.3, "solar_yesterday_performance_ratio": -10,
+              "solar_yesterday_actual_energy": 9223372036854776.0}),
+            (["solar_today_performance_ratio", "solar_today_actual_energy"],
+             [(4027, 1), (4032, 4)],
+             {"solar_today_performance_ratio": 32.1, "solar_today_actual_energy": 7.654}),
+        ):
+            with self.subTest(selected=selected):
+                client = Client()
+                client.calls = []
+                coordinator = runtime.EcoMainModbusCoordinator(
+                    None, SimpleNamespace(data=local_data()), client,
+                    model.build_specs_local([4], [], selected))
+                self.assertEqual(await coordinator._async_update_data(), expected)
+                self.assertEqual([call for call in client.calls if call[0] >= 4000], blocks)
 
     async def test_validation_reads_four_statuses_only_after_confirmed_firmware_140(self):
         load_flow(self)

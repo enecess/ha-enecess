@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
 from flow_test_support import load_flow, submit_values
+from test_ecomain_solar import SOLAR
 
 
 class SolarFlowTests(unittest.IsolatedAsyncioTestCase):
@@ -64,7 +65,9 @@ class SolarFlowTests(unittest.IsolatedAsyncioTestCase):
             fields["ecomain_selected_slaves"].config["options"], ["2", "4"]
         )
         result = await self.submit(flow, result, ecomain_selected_slaves=["4"])
-        fields = list(map(str, result["data_schema"].schema))
+        controls = {str(key): value for key, value in result["data_schema"].schema.items()}
+        self.assertEqual(controls["solar_measurement_types"].config["options"], list(SOLAR))
+        fields = list(controls)
         self.assertEqual(fields[:2], ["solar_measurement_types", "measurement_types"])
         self.assertEqual(
             submit_values(result, {})["solar_measurement_types"],
@@ -80,19 +83,19 @@ class SolarFlowTests(unittest.IsolatedAsyncioTestCase):
             flow,
             result,
             measurement_types=[],
-            solar_measurement_types=["solar_actual_power"],
+            solar_measurement_types=["solar_today_actual_energy"],
         )
         self.assertEqual(result["step_id"], "extra_entities")
         self.assertEqual(flow._options_data()["measurement_types"], [])
         self.assertEqual(
-            flow._options_data()["solar_measurement_types"], ["solar_actual_power"]
+            flow._options_data()["solar_measurement_types"], ["solar_today_actual_energy"]
         )
         result = await self.submit(flow, result, extra_action="finish")
         self.assertEqual(result["type"], "create_entry")
         self.assertEqual(result["data"]["ecomain_selected_slaves"], [4])
         self.assertEqual(result["options"]["measurement_types"], [])
         self.assertEqual(
-            result["options"]["solar_measurement_types"], ["solar_actual_power"]
+            result["options"]["solar_measurement_types"], ["solar_today_actual_energy"]
         )
 
     async def test_options_local_discovery_offers_new_solar_device(self):
@@ -150,7 +153,7 @@ class SolarFlowTests(unittest.IsolatedAsyncioTestCase):
                 flow = self.options(
                     firmware=firmware,
                     measurement_types=[],
-                    solar_measurement_types=["solar_actual_power"],
+                    solar_measurement_types=["solar_actual_power", "solar_today_actual_energy"],
                     future_option="keep",
                 )
                 flow._available_slaves = []
@@ -188,25 +191,30 @@ class SolarFlowTests(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_solar_dependencies_block_measurement_and_child_deselection(self):
-        extra = {
-            "key": "extra_solar",
-            "name": "Fictional output",
-            "operation": "absolute",
-            "sources": ["solar_actual_power"],
-        }
-        flow = self.options(
-            measurement_types=["power"],
-            solar_measurement_types=["solar_actual_power"],
-            extra_entities=[extra],
-        )
-        result = await flow.async_step_init()
-        result = await self.submit(
-            flow, result, ecomain_selected_slaves=[], extra_action="finish"
-        )
-        self.assertEqual(result["errors"], {"base": "slave_in_use"})
-        result = await self.submit(flow, result, extra_action="measurement_types")
-        result = await self.submit(flow, result, solar_measurement_types=[])
-        self.assertEqual(result["errors"], {"base": "measurement_in_use"})
+        for source in ("solar_actual_power", "solar_today_actual_energy"):
+            with self.subTest(source=source):
+                extra = {
+                    "key": "extra_solar",
+                    "name": "Fictional output",
+                    "operation": "formula",
+                    "result_type": "number",
+                    "sources": [source],
+                    "variables": {"a": source},
+                    "expression": "a",
+                }
+                flow = self.options(
+                    measurement_types=["power"],
+                    solar_measurement_types=[source],
+                    extra_entities=[extra],
+                )
+                result = await flow.async_step_init()
+                result = await self.submit(
+                    flow, result, ecomain_selected_slaves=[], extra_action="finish"
+                )
+                self.assertEqual(result.get("errors"), {"base": "slave_in_use"})
+                result = await self.submit(flow, result, extra_action="measurement_types")
+                result = await self.submit(flow, result, solar_measurement_types=[])
+                self.assertEqual(result["errors"], {"base": "measurement_in_use"})
 
     async def test_new_actions_require_local_140_and_selected_solar(self):
         for firmware, mode, selected, expected in [
