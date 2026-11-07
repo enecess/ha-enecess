@@ -30,66 +30,106 @@ class CloudAuthTests(runtime.RealHARuntimeFixture):
                 await coordinator._async_update_data()
 
     async def test_permanent_auth_failure_requires_reauth(self):
-        for kind, cls in (
-            ("main", EcoMainCloudCoordinator),
-            ("plug", EcoPlugCloudCoordinator),
-        ):
-            with self.subTest(kind=kind):
-                entry = self.make_entry(kind)
+        with self.assertLogs(
+            "custom_components.enecess.ecoplug.coordinator", level="WARNING"
+        ) as logs:
+            for kind, cls in (
+                ("main", EcoMainCloudCoordinator),
+                ("plug", EcoPlugCloudCoordinator),
+            ):
+                with self.subTest(kind=kind):
+                    entry = self.make_entry(kind)
+                    api = AsyncMock()
+                    api.get_passageway.side_effect = EnecessAuthError("expired")
+                    api.get_plug_data.side_effect = EnecessAuthError("expired")
+                    api.get_plug_state.side_effect = EnecessAuthError("expired")
+                    api.generate_token.side_effect = EnecessAuthError("bad credentials")
+                    coordinator = cls(self.hass, entry, api)
+                    with self.assertRaises(ConfigEntryAuthFailed):
+                        await coordinator._async_update_data()
+                    api.generate_token.assert_awaited_once()
+                    self.assertIs(coordinator.config_entry, entry)
+        self.assertEqual(
+            logs.output,
+            [
+                "WARNING:custom_components.enecess.ecoplug.coordinator:"
+                "ecoPlug account token rejected; refreshing credentials"
+            ],
+        )
+
+    async def test_refresh_temporary_failure_is_update_failed(self):
+        with self.assertLogs(
+            "custom_components.enecess.ecoplug.coordinator", level="WARNING"
+        ) as logs:
+            for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
                 api = AsyncMock()
                 api.get_passageway.side_effect = EnecessAuthError("expired")
                 api.get_plug_data.side_effect = EnecessAuthError("expired")
                 api.get_plug_state.side_effect = EnecessAuthError("expired")
-                api.generate_token.side_effect = EnecessAuthError("bad credentials")
-                coordinator = cls(self.hass, entry, api)
+                api.generate_token.side_effect = EnecessApiError("temporary")
+                coordinator = cls(self.hass, self.make_entry("plug"), api)
+                with self.assertRaises(UpdateFailed):
+                    await coordinator._async_update_data()
+        self.assertEqual(
+            logs.output,
+            [
+                "WARNING:custom_components.enecess.ecoplug.coordinator:"
+                "ecoPlug account token rejected; refreshing credentials"
+            ],
+        )
+
+    async def test_rejected_retry_requires_reauth_and_stops(self):
+        with self.assertLogs(
+            "custom_components.enecess.ecoplug.coordinator", level="WARNING"
+        ) as logs:
+            for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
+                api = AsyncMock()
+                api.get_passageway.side_effect = EnecessAuthError("expired")
+                api.get_plug_data.side_effect = EnecessAuthError("expired")
+                api.get_plug_state.side_effect = EnecessAuthError("expired")
+                api.generate_token.return_value = "fictional-new-token"
+                coordinator = cls(self.hass, self.make_entry("plug"), api)
                 with self.assertRaises(ConfigEntryAuthFailed):
                     await coordinator._async_update_data()
                 api.generate_token.assert_awaited_once()
-                self.assertIs(coordinator.config_entry, entry)
-
-    async def test_refresh_temporary_failure_is_update_failed(self):
-        for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
-            api = AsyncMock()
-            api.get_passageway.side_effect = EnecessAuthError("expired")
-            api.get_plug_data.side_effect = EnecessAuthError("expired")
-            api.get_plug_state.side_effect = EnecessAuthError("expired")
-            api.generate_token.side_effect = EnecessApiError("temporary")
-            coordinator = cls(self.hass, self.make_entry("plug"), api)
-            with self.assertRaises(UpdateFailed):
-                await coordinator._async_update_data()
-
-    async def test_rejected_retry_requires_reauth_and_stops(self):
-        for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
-            api = AsyncMock()
-            api.get_passageway.side_effect = EnecessAuthError("expired")
-            api.get_plug_data.side_effect = EnecessAuthError("expired")
-            api.get_plug_state.side_effect = EnecessAuthError("expired")
-            api.generate_token.return_value = "fictional-new-token"
-            coordinator = cls(self.hass, self.make_entry("plug"), api)
-            with self.assertRaises(ConfigEntryAuthFailed):
-                await coordinator._async_update_data()
-            api.generate_token.assert_awaited_once()
-            request = (
-                api.get_passageway
-                if cls is EcoMainCloudCoordinator
-                else api.get_plug_data
-            )
-            self.assertEqual(request.await_count, 2)
+                request = (
+                    api.get_passageway
+                    if cls is EcoMainCloudCoordinator
+                    else api.get_plug_data
+                )
+                self.assertEqual(request.await_count, 2)
+        self.assertEqual(
+            logs.output,
+            [
+                "WARNING:custom_components.enecess.ecoplug.coordinator:"
+                "ecoPlug account token rejected; refreshing credentials"
+            ],
+        )
 
     async def test_successful_refresh_updates_token_and_retries(self):
-        for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
-            api = AsyncMock()
-            api.get_passageway.side_effect = [EnecessAuthError("expired"), {}]
-            api.get_plug_data.side_effect = [EnecessAuthError("expired"), {"data": []}]
-            api.get_plug_state.return_value = {}
-            api.generate_token.return_value = "fictional-refreshed-token"
-            entry = self.make_entry("plug")
-            coordinator = cls(self.hass, entry, api)
-            await coordinator._async_update_data()
-            self.assertEqual(
-                entry.data[c.CONST_CLOUD_TOKEN], "fictional-refreshed-token"
-            )
-            api.generate_token.assert_awaited_once()
+        with self.assertLogs(
+            "custom_components.enecess.ecoplug.coordinator", level="WARNING"
+        ) as logs:
+            for cls in (EcoMainCloudCoordinator, EcoPlugCloudCoordinator):
+                api = AsyncMock()
+                api.get_passageway.side_effect = [EnecessAuthError("expired"), {}]
+                api.get_plug_data.side_effect = [EnecessAuthError("expired"), {"data": []}]
+                api.get_plug_state.return_value = {}
+                api.generate_token.return_value = "fictional-refreshed-token"
+                entry = self.make_entry("plug")
+                coordinator = cls(self.hass, entry, api)
+                await coordinator._async_update_data()
+                self.assertEqual(
+                    entry.data[c.CONST_CLOUD_TOKEN], "fictional-refreshed-token"
+                )
+                api.generate_token.assert_awaited_once()
+        self.assertEqual(
+            logs.output,
+            [
+                "WARNING:custom_components.enecess.ecoplug.coordinator:"
+                "ecoPlug account token rejected; refreshing credentials"
+            ],
+        )
 
     async def test_temporary_retry_failure_is_not_auth(self):
         api = AsyncMock()

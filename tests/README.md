@@ -40,7 +40,9 @@ recovery without derived totals. Today's native energy counters use
 `TOTAL_INCREASING`; yesterday's energies and both daily ratios have no state class.
 The corrected protocol uses Int32 power at 4006/4008 (0.01 W), UInt64 energy at
 4010/4014 and 4019/4023/4028/4032 (0.001 Wh), Int16 daily ratios at 4018/4027
-(0.1 %), and reserves 4001/4003. PV capacity remains UInt32, 0–4294967295 W.
+(0.1 %). Register 4001 measures uncompensated irradiance and 4003 the irradiance
+sensor's internal temperature; neither measurement is exposed and neither register
+is polled by this integration. PV capacity remains UInt32, 0–4294967295 W.
 
 These tests do not replace validation in a complete Home Assistant runtime or frontend.
 

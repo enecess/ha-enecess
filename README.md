@@ -447,7 +447,7 @@ Select the detected **ecoSolarMonitor** sub-device, then choose its measurements
 
 The first six use `MEASUREMENT`. Cumulative energy and today's two native device counters use `TOTAL_INCREASING`. Yesterday's two energy readings and both daily performance ratios are snapshots with no state class. All values are direct device readings multiplied by the protocol scale; the integration performs no daily accumulation, subtraction, PR calculation or date rollover. A new device value, including zero after a daily reset, is published directly, also after offline recovery. Existing saved selections, including an empty selection, are not expanded with new fields.
 
-Int16 fields occupy one register, Int32 two and UInt64 four, in low-word-first order; registers `4001` and `4003` are reserved and are never polled. Power resolution is `0.01` W and energy resolution is `0.001` Wh; signed performance ratios use `0.1` %.
+Int16 fields occupy one register, Int32 two and UInt64 four, in low-word-first order. Register `4001` measures uncompensated irradiance and `4003` the irradiance sensor's internal temperature; this integration exposes neither measurement and does not poll either register. Power resolution is `0.01` W and energy resolution is `0.001` Wh; signed performance ratios use `0.1` %.
 
 These Title Case labels describe measurement configuration and documentation. Physical sensor names use the full keys above, following the existing ecoMain naming convention; there are no translated entity-name labels.
 
