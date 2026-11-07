@@ -11,6 +11,7 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 - **ecoMain**
     - Lokal (Modbus TCP, mit zeroconf / mDNS-Erkennung)
     - Cloud (enecess Cloud)
+- **ecoSolarMonitor**: nur lokal über den zugehörigen ecoMain mit bestätigter Firmware **140 oder neuer**. Die Auswahl erfolgt bei ecoMain, nicht als eigener Gerätetyp beim Hinzufügen der Integration.
 - **ecoPlug**
     - Nur Cloud (enecess Cloud)
     - Ein Kontoeintrag kann mehrere Steckdosen nach Name und Seriennummer auswählen.
@@ -20,11 +21,12 @@ Dieses Repository stellt eine benutzerdefinierte Home Assistant (HA) Integration
 
 - Lokale Firmware 136–138: Wirkleistung und Wirkenergie vorwärts/rückwärts.
 - Lokale Firmware ab 139: auch die neun weiteren Messgrößen und Einstellungen der Kanalphasen.
+- Bestätigte lokale Firmware ab 140: Protokoll 1.0.6 ergänzt ecoSolarMonitor-Messungen sowie Kanal- und PV-Installationseinstellungen.
 - Ältere Firmware blendet nicht unterstützte Messgrößen aus.
 
 Protokoll 1.0.5 (Firmware ab 139) bietet optionale Scheinenergie (VAh) mit eigener Formel-Quellengruppe. Zähler verwenden `TOTAL_INCREASING`, Scheinenergieformeln `TOTAL`, ohne Geräteklasse.
 
-Offline-ecoSub-Sensoren sind nicht verfügbar; andere Geräte werden weiter aktualisiert. Lade die Integration nach einem Firmwareupdate bei gleicher IP-Adresse neu.
+Offline-Sensoren von ecoSub und ecoSolarMonitor sind nicht verfügbar; andere Geräte werden weiter aktualisiert. Lade die Integration nach einem Firmwareupdate bei gleicher IP-Adresse neu, damit sie die Firmware erneut prüft. Auch **Konfigurieren** aktualisiert Firmware und erkannte Geräte. Neue Solarmessungen und Installationseinstellungen setzen eine erfolgreiche Erkennung von Firmware 140 oder neuer voraus; unbekannte oder ältere Firmware schaltet sie nicht frei.
 
 ---
 
@@ -66,7 +68,7 @@ Folge der offiziellen HACS-Anleitung:
 - **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
 - Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
 - Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
-- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
+- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener HA-Änderungen; bereits gespeicherte Hardwarewerte bleiben wirksam.
 
 Es gibt **zwei Wege**, den Konfigurationsablauf für ecoMain zu starten:
 
@@ -157,13 +159,13 @@ Schritte (für beide Starts):
 2. Die Integration durchsucht das Netzwerk per **mDNS** nach passenden Diensten.
 3. Wenn Geräte gefunden wurden, den gewünschten ecoMain anhand der **Seriennummer** (und angezeigter IP/Hostname) auswählen.
 4. Geräteinformationen (Seriennummer, Adresse) bestätigen.
-5. Die Integration prüft zuerst die **Firmwareversion** des Geräts und versucht danach, per **Modbus TCP** zu verbinden und **online Slaves** (ecoSub) zu erkennen.
-6. Falls Slaves entdeckt werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-7. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
+5. Die Integration prüft die **Firmwareversion**, verbindet sich per **Modbus TCP** und erkennt online verfügbare ecoSub sowie bei bestätigter Firmware ab 140 auch ecoSolarMonitor.
+6. Wähle unter **Gerät konfigurieren** im Feld **Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub. Wähle **Aktion** → **Weiter** und sende das Formular ab. Ohne erkannte Untergeräte kannst du ecoMain allein hinzufügen.
+7. Wähle unter **Messgrößen** die Werte getrennt in **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**. Wähle **Aktion** → **Speichern** und sende das Formular ab. Danach kannst du **Zusätzliche Entitäten** konfigurieren:
     - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
     - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
     - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
-8. Vorgang abschließen – der Integrationseintrag wird erstellt.
+8. Wähle unter **Zusätzliche Entitäten** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um den Integrationseintrag zu erstellen.
 
 Tipps bei Problemen:
 
@@ -184,11 +186,15 @@ Tipps bei Problemen:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Screenshot ergänzen: **Gerät konfigurieren** mit **Hinzuzufügende Slaves auswählen**, Online-ecoSub und **ecoSolarMonitor** sowie **Aktion → Weiter**.
 
 ---
 
-> ![Lokale Messgrößen auswählen](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Screenshot ergänzen: **Messgrößen** mit Firmwareversion, getrennten Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**, fünf Solar-Standardwerten und **Aktion → Speichern**.
 
 ---
 
@@ -221,13 +227,13 @@ Schritte:
     - **Master-Seriennummer**
     - **Adresse (IP oder Hostname)**
 3. Geräteinformationen bestätigen.
-4. Die Integration prüft zuerst die **Firmwareversion**, verbindet sich anschließend per **Modbus TCP** und sucht nach **online Slaves** (ecoSub).
-5. Falls Slaves gefunden werden, auswählen, welche Slaves hinzugefügt werden sollen (optional).
-6. **Messgrößen** auswählen, danach optional **zusätzliche Entitäten** konfigurieren:
+4. Die Integration prüft die **Firmwareversion**, verbindet sich per **Modbus TCP** und erkennt online verfügbare ecoSub sowie bei bestätigter Firmware ab 140 auch ecoSolarMonitor.
+5. Wähle unter **Gerät konfigurieren** im Feld **Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub. Wähle **Aktion** → **Weiter** und sende das Formular ab. Ohne erkannte Untergeräte kannst du ecoMain allein hinzufügen.
+6. Wähle unter **Messgrößen** die Werte getrennt in **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**. Wähle **Aktion** → **Speichern** und sende das Formular ab. Danach kannst du **Zusätzliche Entitäten** konfigurieren:
     - Invertierte Werte oder Absolutwerte aus Leistungsquellen erstellen.
     - Summe oder Durchschnitt aus mehreren Leistungs- oder Energiequellen desselben Typs erstellen.
     - Aggregierte Entitäten behalten `device_class`, `state_class` und Einheit des Quelltyps.
-7. Vorgang abschließen – der Integrationseintrag wird erstellt.
+7. Wähle unter **Zusätzliche Entitäten** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um den Integrationseintrag zu erstellen.
 
 Tipps bei Problemen:
 
@@ -248,11 +254,15 @@ Tipps bei Problemen:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Screenshot ergänzen: **Gerät konfigurieren** mit **Hinzuzufügende Slaves auswählen**, Online-ecoSub und **ecoSolarMonitor** sowie **Aktion → Weiter**.
 
 ---
 
-> ![Lokale Messgrößen auswählen](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Screenshot ergänzen: **Messgrößen** mit Firmwareversion, getrennten Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**, fünf Solar-Standardwerten und **Aktion → Speichern**.
 
 ---
 
@@ -371,7 +381,7 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 - **Zurück** behält deine Eingaben und erscheint nur, wenn es eine vorherige Seite gibt.
 - Über eine Karte für ein entdecktes Gerät: Die erste Seite hat keine Aktionsauswahl. **Abbrechen** auf späteren Einrichtungsseiten löscht die bisherigen Eingaben und öffnet die erste Seite; die Karte bleibt erhalten.
 - Über **Integration hinzufügen**: **Abbrechen** beendet die Einrichtung. Ein Vorgang aus einem Menü kehrt beim Abbrechen zu diesem Menü zurück.
-- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener Änderungen.
+- Im Startmenü der Optionen beendet **Abbrechen** die Konfiguration ohne Speichern offener HA-Änderungen; bereits gespeicherte Hardwarewerte bleiben wirksam.
 
 ### Bestehenden Eintrag bearbeiten
 
@@ -379,9 +389,9 @@ ecoPlug-Daten werden ungefähr alle **60 Sekunden** aus der Cloud abgerufen. Nac
 
 Änderbar:
 
-- Ausgewählte ecoSub-Slaves.
+- Ausgewählte ecoSub/ecoSolarMonitor-Geräte.
 - Konfiguration zusätzlicher Entitäten.
-- Messgrößen und im lokalen Modus die Kanalphasen.
+- Messgrößen und lokale Kanalphasen; bestätigte Firmware ab 140 bietet zusätzlich Kanal- und PV-Installationseinstellungen.
 
 Nicht änderbar:
 
@@ -392,7 +402,16 @@ Nicht änderbar:
 > **Ablauf-Screenshot:**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+Für einen bestehenden lokalen Eintrag:
+
+1. Öffne **Konfigurieren**, um **ecoMain anpassen** aufzurufen. Wähle oder behalte **ecoSolarMonitor** und gewünschte ecoSub unter **Hinzuzufügende Slaves auswählen**. Wähle **Nächste Aktion** → **Messgrößen** und sende das Formular ab.
+2. Wähle Werte in **ecoSolarMonitor** und **ecoMain / ecoSub**. Mit **Aktion** → **Speichern** und Absenden kehrst du zu **ecoMain anpassen** zurück.
+3. Nutze bei Bedarf **Kanalkonfiguration** oder **ecoSolarMonitor-Konfiguration**; die Verfügbarkeit folgt der aktuellen Geräteauswahl im Entwurf. Wähle abschließend **Nächste Aktion** → **Fertigstellen** und sende das Formular ab, um die HA-Auswahl zu speichern.
+
+<!-- screenshot-placeholder: options-menu -->
+
+> Screenshot ergänzen: **ecoMain anpassen** mit Untergeräteauswahl und **Nächste Aktion** für Messgrößen, Kanalkonfiguration, ecoSolarMonitor-Konfiguration und **Fertigstellen**.
 
 Wenn du nicht änderbare Einstellungen anpassen möchtest:
 
@@ -403,10 +422,11 @@ Wenn du nicht änderbare Einstellungen anpassen möchtest:
 
 ### Messgrößen
 
-- Wähle bei der Einrichtung von ecoMain nach den ecoSub-Geräten und vor den zusätzlichen Entitäten die **Messgrößen** aus.
-- Später lässt sich die Auswahl über **Konfigurieren → Messgrößen** ändern.
-- Mindestens eine Messgröße ist erforderlich.
-- Entferne zusätzliche Entitäten, die eine Messgröße verwenden, bevor du diese abwählst.
+- Wähle **Messgrößen** nach den Untergeräten und vor zusätzlichen Entitäten. Später öffnest du **Konfigurieren → ecoMain anpassen**, wählst **Nächste Aktion** → **Messgrößen** und sendest das Formular ab.
+- Mit ausgewähltem ecoSolarMonitor und bestätigter lokaler Firmware ab 140 erscheinen getrennte Gruppen **ecoSolarMonitor** und **ecoMain / ecoSub**. Zusammen ist mindestens ein Wert erforderlich; jede Gruppe darf leer sein. Eine reine Solarauswahl ist möglich.
+- Wähle **Aktion** → **Speichern** und sende das Formular ab. Speichere die HA-Auswahl abschließend im Einrichtungs-/Optionsmenü über **Nächste Aktion** → **Fertigstellen** und erneutes Absenden.
+- Gespeicherte Geräte und Messgrößen bleiben bei Offlinephasen, fehlgeschlagenen Firmwareprüfungen und Downgrades erhalten, ebenso Entitäts-IDs, eigene Namen und deaktivierte Einträge. Nicht verfügbare Fähigkeiten machen Sensoren nicht verfügbar. Nur ausdrückliches Abwählen entfernt sie.
+- Entferne abhängige zusätzliche Entitäten vor dem Abwählen ihrer Geräte oder Messgrößen. Neue Solaroptionen erfordern bestätigte Firmware ab 140. Die vierzehn Werte und fünf Standardauswahlen stehen im [Solarkatalog](#solar-entities).
 
 Ab Firmware 139 stehen im lokalen Modus zwölf Kategorien zur Verfügung; Firmware 136–138 unterstützt nur Wirkleistung sowie Wirkenergie vorwärts und rückwärts:
 
@@ -438,6 +458,8 @@ Erstelle einen Sensor aus deinen Messwerten, etwa für die Differenz oder den Mi
 
 Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angeboten. Leere Gruppen sind ausgeblendet; die Quellenauswahl aktiviert keine Messgrößen automatisch. Kumulierte Wirkenergie (Wh), kumulierte Blindenergie (varh), kumulierte Scheinenergie (VAh) und Cloud-Minuteninkremente der Wirkenergie (Wh) bilden separate Quellengruppen. Du kannst unterschiedliche Quellentypen kombinieren und musst die Einheiten der Formel selbst prüfen. Die Variablen `a`, `b` usw. gelten gruppenübergreifend. Bei jedem Fortfahren von der Quellenseite werden sie ab `a` neu zugeordnet und der bisherige Ausdruck gelöscht, auch beim Bearbeiten oder nach dem Zurückgehen. Wirk-, Blind- und Scheinenergieergebnisse verwenden `TOTAL` und dürfen für Nettoenergieberechnungen steigen oder fallen. **Zahl** liefert einen reinen Zahlenwert ohne Einheit oder Geräteklasse (`device_class`) mit `MEASUREMENT`.
 
+Wähle bei bestätigter lokaler Firmware ab 140 zuerst ecoSolarMonitor und aktiviere die benötigten Werte unter **Messgrößen**. Unter **Quellentitäten auswählen** erscheinen `solar_actual_power` und `solar_estimated_power` in **Wirkleistung (W)**; beide kumulierten und alle vier täglichen Energien stehen in **Wirkenergie (kumuliert, Wh)**. **Bestrahlungsstärke (W/m²)**, **Modultemperatur (°C)**, **Neigungswinkel (°)** und **Performance Ratio (%)** sind eigene Gruppen; die letzte enthält alle drei Performance Ratios. Die Auswahl zeigt tatsächliche HA-Namen und Einheiten, etwa `solar_today_actual_energy (Wh)`; leere Gruppen bleiben verborgen. Solarquellen ergänzen keine Ergebnistypen: Wähle einen verfügbaren Typ, gegebenenfalls **Zahl (ohne Einheit)**, und prüfe die Einheiten selbst.
+
 > ![Formelentität hinzufügen](docs/images/ecomain-formula-add.png)
 
 ---
@@ -446,7 +468,9 @@ Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angebot
 
 ---
 
-> ![Quellentitäten für die Formel auswählen](docs/images/ecomain-formula-sources.png)
+<!-- screenshot-placeholder: solar-formula-sources -->
+
+> Screenshot ergänzen: **Quellentitäten auswählen**, mit aktivierten Solarnamen und Einheiten in den Gruppen für Wirkleistung, Wirkenergie, Bestrahlungsstärke, Modultemperatur, Neigungswinkel und Performance Ratio.
 
 ---
 
@@ -462,19 +486,38 @@ Es werden nur von der Firmware unterstützte und aktivierte Messgrößen angebot
 - Lösche Formeln über **Zusätzliche Entität entfernen**. Lösche Formeln, die eine Messgröße nutzen, bevor du diese abwählst.
 - Fehlen Daten oder lässt sich die Formel nicht berechnen, ist das Ergebnis nicht verfügbar.
 
-### ecoSolarMonitor und Installationseinstellungen (lokale Firmware ab 140)
+### Installationseinstellungen (lokale Firmware ab 140)
 
-Diese Funktionen erfordern eine erfolgreiche Erkennung von Firmware **140 oder neuer**. Jeder ecoMain besitzt einen ecoSolarMonitor mit Geräteindex `4`; ecoSub verwendet weiterhin `1`–`3`. Wähle den erkannten ecoSolarMonitor und seine separate Messgrößengruppe. Die vierzehn Messgrößen sind Einstrahlung, Neigungswinkel, Modultemperatur, tatsächliche und geschätzte Leistung (standardmäßig ausgewählt) sowie Performance Ratio, kumulierte tatsächliche und geschätzte Energie sowie Performance Ratio, geschätzte und tatsächliche Energie jeweils für gestern und heute (optional). Er hat keine zehn Messkanäle und gehört auch dann zum aktuellen ecoMain, wenn Wechselrichterkanäle von ecoSub stammen.
+Öffne nach der lokalen Einrichtung **Konfigurieren → ecoMain anpassen**. Diese Seiten erfordern bestätigte Firmware **140 oder neuer** und prüfen sie vor dem Hardwarezugriff erneut. Firmware **139** verwendet weiterhin **Kanalphasen**, wie in den Phasen-Screenshots gezeigt. Die Seiten sind nur lokal verfügbar und erzeugen keine Steuerentitäten.
 
-Alle vierzehn Werte sind einzeln wählbar; die bisherigen fünf Standardwerte bleiben unverändert. Gespeicherte Auswahlen, auch leere, werden nicht erweitert. Alle Werte werden direkt aus den Geräteregistern gelesen und skaliert. Die Integration berechnet keine Tagesmengen, Differenzen, Performance Ratios oder Tageswechsel. Die heutigen Energiezähler verwenden `TOTAL_INCREASING`; die gestrigen Energiewerte und beide täglichen Performance Ratios sind Momentaufnahmen ohne Zustandsklasse. Auch null nach einem Tagesreset und aktuelle Werte nach einer Offlinephase werden direkt veröffentlicht. Aktivierte Tagesenergien und Performance Ratios erscheinen in den bestehenden Energie- bzw. Performance-Ratio-Formelgruppen; nicht ausgewählte Werte fehlen, die Ergebnistypen bleiben gleich.
+#### Kanalkonfiguration
 
-Protokoll 1.0.6: geschätzte/tatsächliche Leistung ab `4006`/`4008` (Int32, `0.01` W), kumulierte geschätzte/tatsächliche Energie ab `4010`/`4014` (UInt64, `0.001` Wh). Performance Ratio, geschätzte und tatsächliche Energie liegen für gestern bei `4018`/`4019`/`4023`, für heute bei `4027`/`4028`/`4032`. Performance Ratios verwenden Int16 und `0.1` %, Energiewerte vier Register mit dem niedrigsten Wort zuerst. `4001` enthält die unkompensierte Bestrahlungsstärke und `4003` die interne Temperatur des Einstrahlungssensors; diese Messwerte werden von der Integration nicht bereitgestellt und die Register nicht abgefragt.
+1. Wähle **Nächste Aktion** → **Kanalkonfiguration** und sende das Formular ab. Wähle unter **Gerät** **ecoMain** oder einen ausgewählten, aktuell online verfügbaren **ecoSub**, dann **Aktion** → **Weiter** und sende ab. **ecoSolarMonitor** ist kein Zehnkanalzähler und fehlt in dieser Auswahl.
+2. Öffne die zehn Abschnitte **Kanal 1** bis **Kanal 10**. Jeder bietet **Phase** (**L1**, **L2**, **L3**) und **Stromwandler** (**30 A** oder **100 A**).
+3. ecoMain bietet zusätzlich **Stromwandler des Hauptstromkreises** für **L1/L2/L3**, jeweils nur **100 A**. Nicht unterstützte gespeicherte Werte erhalten keinen erfundenen Standard; wähle vor dem Speichern einen unterstützten Wert.
+4. Wähle **Aktion** → **Speichern** und sende das Formular ab, um die Hardware sofort zu schreiben und zu prüfen. Bei Erfolg öffnet sich das Optionsmenü.
 
-Öffne nach dem Hinzufügen **Konfigurieren**. Firmware 139 bietet **Kanalphasen**; ab 140 bietet **Kanalkonfiguration** pro Kanal von ecoMain oder einem ausgewählten, erreichbaren ecoSub die Phase und den Stromwandler (30 A oder 100 A). Die Hauptstromkreiswandler für L1/L2/L3 des ecoMain unterstützen nur 100 A. ecoSolarMonitor ist kein auswählbarer Zehnkanalzähler.
+<!-- screenshot-placeholder: channel-device -->
 
-Bei ausgewähltem ecoSolarMonitor bietet **ecoSolarMonitor-Konfiguration** die installierte PV-Leistung des aktuellen ecoMain (ganzzahlig `0`–`4294967295` W), den Leistungstemperaturkoeffizienten (`-32.768`–`32.767` %/°C, höchstens drei Nachkommastellen) und Wechselrichterkanäle `1`–`10`, gruppiert nach ecoMain und allen erreichbaren ecoSubs, auch ohne ausgewählte HA-Messungen. Eine leere Auswahl löscht die angezeigte Gruppe; ausgeblendete oder nicht erreichbare Geräte behalten ihre Hardwarewerte.
+> Screenshot ergänzen: **Kanalkonfiguration → Gerät**, mit ecoMain und ausgewählten Online-ecoSub, **Aktion → Weiter**, ohne ecoSolarMonitor.
 
-**Speichern** liest sofort die Hardware, schreibt nur Änderungen und prüft sie durch Rücklesen. Teilfehler rollen erfolgreiche Änderungen nicht zurück. **Zurück** und **Abbrechen** machen gespeicherte Hardwarewerte nicht rückgängig. HA-Auswahlen und zusätzliche Entitäten werden erst beim Abschluss des Optionsablaufs gespeichert. Diese Seiten sind nur lokal verfügbar, erzeugen keine Steuerentitäten und sind in den bisherigen Screenshots nicht dargestellt.
+<!-- screenshot-placeholder: channel-settings -->
+
+> Screenshot ergänzen: **Kanalkonfiguration**, zehn Kanalabschnitte mit **Phase** und **Stromwandler**, **Stromwandler des Hauptstromkreises** bei ecoMain sowie **Aktion → Speichern**.
+
+#### ecoSolarMonitor-Konfiguration
+
+1. Behalte **ecoSolarMonitor** unter **ecoMain anpassen** ausgewählt. Wähle **Nächste Aktion** → **ecoSolarMonitor-Konfiguration** und sende das Formular ab. Die Einstellungen gehören zum aktuellen **ecoMain**, auch wenn Wechselrichterkanäle von ecoSub stammen.
+2. Gib **Installierte PV-Leistung** als ganze Zahl von **0** bis **4294967295 W** ein. Für **Temperaturkoeffizient der Leistung** gilt **-32.768** bis **32.767 %/°C**, mit höchstens **drei Nachkommastellen** (Schritt **0.001**).
+3. Wähle Wechselrichterkanäle **Kanal 1** bis **Kanal 10** in den angezeigten Listen **ecoMain**, **ecoSub 1**, **ecoSub 2** und **ecoSub 3**. Alle erkannten Online-ecoSub erscheinen hier, auch ohne ausgewählte HA-Messungen; eine weitere ecoSub-Auswahl ist nicht nötig.
+4. Eine leere angezeigte Liste **löscht** die Wechselrichterkanäle dieser Gruppe. Ausgeblendete/Offline-Gruppen behalten ihre Hardwarewerte.
+5. Wähle **Aktion** → **Speichern** und sende das Formular ab, um die Hardware sofort zu schreiben und zu prüfen und bei Erfolg zum Optionsmenü zurückzukehren.
+
+<!-- screenshot-placeholder: solar-settings -->
+
+> Screenshot ergänzen: **ecoSolarMonitor-Konfiguration** mit **Installierte PV-Leistung**, **Temperaturkoeffizient der Leistung**, Wechselrichterkanälen der Online-Zähler und **Aktion → Speichern**.
+
+Beim Speichern liest die Integration sofort die Hardware, schreibt nur Änderungen und prüft sie durch Rücklesen. Ein Teilfehler nimmt erfolgreiche Schreibvorgänge nicht zurück. Schreib- oder Prüffehler erscheinen am betroffenen Feld oder Kanalabschnitt; prüfe die angezeigten Werte vor einem erneuten Versuch. **Zurück**, **Abbrechen** und Abbrechen im Optionsmenü machen gespeicherte Hardwareänderungen nicht rückgängig. HA-Geräteauswahl, Messgrößen und zusätzliche Entitäten werden separat gespeichert: Wähle unter **ecoMain anpassen** die **Nächste Aktion** → **Fertigstellen** und sende das Formular ab.
 
 ### Kanalphasen (nur lokal)
 
@@ -541,6 +584,41 @@ Firmware 136–138 unterstützt nur die ersten drei Messgrößen, die standardm�
 | Frequenz | `frequency_rt` | Hz | `main` |
 
 Die Frequenz hat ausschließlich den vollständigen Schlüssel `main_frequency_rt`, ohne Phase oder Kanal. Beispiele: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` bedeutet Momentanwert, `_total` einen kumulierten Zählerstand. Der Leistungsfaktor ist dimensionslos, kein Prozentwert. Die Richtung des Stromwandlers (CT) bestimmt vorwärts/rückwärts; ein umgekehrt montierter CT kann negative Wirkleistung und einen steigenden Rückwärtszähler verursachen.
+
+<a id="solar-entities"></a>
+
+### ecoSolarMonitor
+
+Jeder ecoMain besitzt einen **ecoSolarMonitor** (Geräteindex `4`, neben ecoSub `1`–`3`). Er bietet vierzehn einzeln wählbare Messwerte und hat keine zehn Messkanäle, auch wenn Wechselrichterkanäle von ecoSub stammen. Die Tabelle verbindet die sichtbaren Bezeichnungen unter **Messgrößen** mit den tatsächlichen HA-Namensbestandteilen mit Unterstrichen. Sie haben kein Messstellenpräfix. HA kann den Gerätenamen ergänzen und eine vollständige `sensor.…`-ID erzeugen; nutze die tatsächliche ID der Entitätsseite.
+
+| Messgrößenbezeichnung | HA-Namensbestandteil | Native Einheit | Standardauswahl |
+| --- | --- | --- | --- |
+| Bestrahlungsstärke | `solar_irradiance` | W/m² | Ja |
+| Neigungswinkel | `solar_tilt_angle` | ° | Ja |
+| Modultemperatur | `solar_module_temperature` | °C | Ja |
+| Tatsächliche Leistung | `solar_actual_power` | W | Ja |
+| Geschätzte Leistung | `solar_estimated_power` | W | Ja |
+| Performance Ratio | `solar_performance_ratio` | % | Nein |
+| Kumulierte Tatsächliche Energie | `solar_actual_energy` | Wh | Nein |
+| Kumulierte Geschätzte Energie | `solar_estimated_energy` | Wh | Nein |
+| Performance Ratio Gestern | `solar_yesterday_performance_ratio` | % | Nein |
+| Geschätzte Energie Gestern | `solar_yesterday_estimated_energy` | Wh | Nein |
+| Tatsächliche Energie Gestern | `solar_yesterday_actual_energy` | Wh | Nein |
+| Performance Ratio Heute | `solar_today_performance_ratio` | % | Nein |
+| Geschätzte Energie Heute | `solar_today_estimated_energy` | Wh | Nein |
+| Tatsächliche Energie Heute | `solar_today_actual_energy` | Wh | Nein |
+
+Solar ergänzt genau einen Sensor je ausgewähltem Solarwert: standardmäßig fünf, höchstens vierzehn, keine zehn Messkanäle.
+
+Bestrahlungsstärke, Neigungswinkel, Modultemperatur, beide Leistungswerte und die allgemeine Performance Ratio verwenden `MEASUREMENT`; beide kumulierten Energien verwenden `TOTAL_INCREASING`. HA kann die nativen Einheiten für die Anzeige umrechnen.
+
+Alle vierzehn Werte sind einzeln wählbar; die bisherigen fünf Standardwerte bleiben unverändert. Gespeicherte Auswahlen, auch leere, werden nicht erweitert. Alle Werte werden direkt aus den Geräteregistern gelesen und skaliert. Die Integration berechnet keine Tagesmengen, Differenzen, Performance Ratios oder Tageswechsel. Die heutigen Energiezähler verwenden `TOTAL_INCREASING`; die gestrigen Energiewerte und beide täglichen Performance Ratios sind Momentaufnahmen ohne Zustandsklasse. Auch null nach einem Tagesreset und aktuelle Werte nach einer Offlinephase werden direkt veröffentlicht. Aktivierte Tagesenergien und Performance Ratios erscheinen in den bestehenden Energie- bzw. Performance-Ratio-Formelgruppen; nicht ausgewählte Werte fehlen, die Ergebnistypen bleiben gleich.
+
+Protokoll 1.0.6: geschätzte/tatsächliche Leistung ab `4006`/`4008` (Int32, `0.01` W), kumulierte geschätzte/tatsächliche Energie ab `4010`/`4014` (UInt64, `0.001` Wh). Performance Ratio, geschätzte und tatsächliche Energie liegen für gestern bei `4018`/`4019`/`4023`, für heute bei `4027`/`4028`/`4032`. Performance Ratios verwenden Int16 und `0.1` %, Energiewerte vier Register mit dem niedrigsten Wort zuerst. `4001` enthält die unkompensierte Bestrahlungsstärke und `4003` die interne Temperatur des Einstrahlungssensors; diese Messwerte werden von der Integration nicht bereitgestellt und die Register nicht abgefragt.
+
+<!-- screenshot-placeholder: solar-entities -->
+
+> Screenshot ergänzen: ecoSolarMonitor-Gerät mit aktivierten Solarentitäten, tatsächlichen HA-Namen mit Unterstrichen und Einheiten.
 
 ### Cloud-Modus
 
@@ -691,11 +769,7 @@ Wenn bereits ein Eintrag mit derselben ID existiert, kann das Gerät nicht nochm
 
 ### F8: Was kann ich nachträglich ändern?
 
-Öffne den **Konfigurieren**- / **Optionen**-Dialog des bestehenden Eintrags in Home Assistant.
-
-Du kannst ausgewählte ecoSub-Slaves, Messgrößen, zusätzliche Entitäten und im lokalen Modus die Kanalphasen ändern. Gerätetyp, Hinzufügungsmethode und ausgewählter ecoMain-Master können nicht direkt geändert werden.
-
-Für diese nicht änderbaren Werte entferne den bestehenden Eintrag und füge ihn mit den neuen Parametern erneut hinzu.
+Du kannst ausgewählte ecoSub/ecoSolarMonitor, Messgrößen und zusätzliche Entitäten ändern. Lokal bietet Firmware 139 **Kanalphasen**; bestätigte Firmware ab 140 bietet **Kanalkonfiguration** und bei ausgewähltem Solargerät **ecoSolarMonitor-Konfiguration**. Die HA-Auswahl wird erst mit **Fertigstellen** und Absenden im Optionsmenü gespeichert; Hardwarespeicherungen wirken sofort. Bei ecoPlug kannst du die Steckdosen ändern. Gerätetyp, Hinzufügungsmethode und ecoMain-Master bleiben unveränderbar.
 
 ---
 
@@ -712,25 +786,9 @@ Prüfe vor der Installation einer neuen Version die Versionshinweise. Wenn ein U
 
 ### F10: Warum sehe ich nur einige Slaves oder Kanäle?
 
-Die Integration filtert in mehreren Schritten:
+Neue lokale Untergeräte müssen online erkannt werden: ecoSub `1`–`3` sowie ecoSolarMonitor `4` bei bestätigter Firmware ab 140. Bestehende Auswahlen bleiben während Offlinephasen oder fehlgeschlagenen Firmwareprüfungen erhalten; ihre Sensoren sind nicht verfügbar, während andere Geräte weiter aktualisiert werden. Nur ausgewählte Geräte mit aktivierten Messungen erzeugen Sensoren. Prüfe Stromversorgung und Verdrahtung fehlender Geräte.
 
-1. **Verfügbare Untergeräte**: ecoSub verwendet die Indizes `1`, `2`, `3`; lokale Firmware ab 140 unterstützt zusätzlich einen ecoSolarMonitor mit Index `4`.
-2. **Online-Slaves** (lokaler Modus):
-    - Die Integration liest spezielle „Slave online“-Register.
-    - Nur als online markierte Slaves werden zur Auswahl angeboten.
-3. **Ausgewählte Slaves**:
-    - Entitäten werden nur für Slaves erzeugt, die du im Setup explizit ausgewählt hast.
-
-Du siehst also nur Entitäten für:
-
-- unterstützte Slave-Indizes,
-- die (im lokalen Modus) als online erkannt wurden,
-- und die du im Formular ausgewählt hast.
-
-Wenn erwartete Untergeräte fehlen:
-
-- Prüfen, ob die Slaves eingeschaltet und korrekt verdrahtet sind.
-- Integration entfernen und erneut hinzufügen, dabei die fehlenden Slaves mit auswählen.
+Öffne **Konfigurieren → ecoMain anpassen**, wähle erkannte Geräte, dann **Messgrößen** und abschließend **Fertigstellen** und sende ab. Eine reine Solarauswahl ist möglich. Entferne abhängige zusätzliche Entitäten vor dem Abwählen. Lade die Integration nach Firmwareupdates neu. Solare Tageswerte stammen direkt vom Gerät; fehlende Tage oder Tageswechsel werden nicht nachberechnet.
 
 ---
 

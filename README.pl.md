@@ -11,6 +11,7 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
 - **ecoMain**
     - Lokalnie (Modbus TCP, z wykrywaniem zeroconf / mDNS)
     - Chmura (enecess cloud)
+- **ecoSolarMonitor**: tylko lokalnie, przez nadrzędny ecoMain z potwierdzonym firmware **140 lub nowszym**. Wybierz go razem z ecoMain; nie jest osobnym typem urządzenia podczas dodawania integracji.
 - **ecoPlug**
     - Tylko chmura (enecess cloud)
     - Jeden wpis konta może wybrać wiele gniazdek według nazwy i numeru seryjnego.
@@ -20,11 +21,12 @@ To repozytorium udostępnia niestandardową integrację Home Assistant (HA) dla 
 
 - Lokalne oprogramowanie 136–138: moc czynna i energia czynna w kierunku zgodnym i przeciwnym.
 - Lokalne oprogramowanie od wersji 139: także dziewięć dodatkowych rodzajów i ustawienia faz kanałów.
+- Potwierdzone lokalne firmware od 140: protokół 1.0.6 dodaje pomiary ecoSolarMonitor oraz ustawienia instalacji kanałów i PV.
 - Starsze oprogramowanie ukrywa nieobsługiwane rodzaje pomiarów.
 
 Protokół 1.0.5 (firmware od 139) dodaje opcjonalną energię pozorną (VAh) z osobną grupą źródeł formuł. Liczniki używają `TOTAL_INCREASING`, a formuły `TOTAL`, bez klasy urządzenia.
 
-Czujniki ecoSub offline stają się niedostępne; pozostałe urządzenia nadal się aktualizują. Po aktualizacji firmware pod tym samym adresem IP przeładuj integrację.
+Czujniki ecoSub i ecoSolarMonitor offline stają się niedostępne; inne urządzenia nadal się aktualizują. Po aktualizacji firmware pod tym samym IP przeładuj integrację, aby ponownie wykryć wersję. **Konfiguruj** również odświeża firmware i wykryte urządzenia. Nowe pomiary solarne i ustawienia instalacji wymagają udanego wykrycia firmware 140 lub nowszego; nieznana lub starsza wersja ich nie włącza.
 
 ---
 
@@ -66,7 +68,7 @@ Skorzystaj z oficjalnego przewodnika HACS:
 - **Wstecz** zachowuje wpisane dane i pojawia się tylko wtedy, gdy istnieje poprzednia strona.
 - Z karty wykrytego urządzenia: pierwsza strona nie ma wyboru działania. Na kolejnych stronach **Anuluj** czyści bieżącą konfigurację i wraca do pierwszej strony; karta pozostaje dostępna.
 - Z **Dodaj integrację**: **Anuluj** kończy dodawanie. W operacji otwartej z menu wraca do tego menu.
-- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian.
+- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian HA; zapisane ustawienia sprzętu pozostają zastosowane.
 
 Istnieją dwa sposoby uruchomienia konfiguracji ecoMain:
 
@@ -156,13 +158,13 @@ Kroki:
 2. Integracja przeskanuje sieć przez **mDNS**.
 3. Jeśli urządzenia zostaną znalezione, wybierz właściwy ecoMain po **numerze seryjnym** oraz widocznym IP/hostname.
 4. Potwierdź informacje o urządzeniu.
-5. Integracja najpierw sprawdzi **wersję firmware**, a następnie spróbuje połączyć się przez **Modbus TCP** i wykryć online urządzenia podrzędne **ecoSub**.
-6. Jeśli ecoSub zostaną wykryte, wybierz urządzenia podrzędne do dodania (opcjonalnie).
-7. Wybierz **Rodzaje pomiarów**, a następnie opcjonalnie skonfiguruj **Extra Entities**:
+5. Integracja sprawdza **wersję firmware**, łączy się przez **Modbus TCP** i wykrywa ecoSub online oraz ecoSolarMonitor przy potwierdzonym firmware 140 lub nowszym.
+6. Na stronie **Konfiguracja urządzenia**, w polu **Wybierz urządzenia podrzędne do dodania**, wybierz **ecoSolarMonitor** oraz potrzebne ecoSub. Wybierz **Działanie** → **Dalej** i prześlij formularz. Bez wykrytych urządzeń podrzędnych możesz dodać sam ecoMain.
+7. Na stronie **Rodzaje pomiarów** wybierz odczyty w osobnych grupach **ecoSolarMonitor** (jeśli wybrany) oraz **ecoMain / ecoSub**. Wybierz **Działanie** → **Zapisz** i prześlij formularz, a następnie opcjonalnie skonfiguruj **Dodatkowe encje**:
     - utwórz encje odwrócone lub z wartością bezwzględną z istniejących źródeł mocy,
     - utwórz encje sumy lub średniej z wielu źródeł mocy albo energii tego samego typu,
     - encje agregujące zachowują `device_class`, `state_class` i jednostkę natywną źródeł.
-8. Zakończ, aby utworzyć wpis integracji.
+8. W **Dodatkowe encje** wybierz **Następna akcja** → **Zakończ** i prześlij formularz, aby utworzyć wpis integracji.
 
 Wskazówki diagnostyczne:
 
@@ -183,11 +185,15 @@ Wskazówki diagnostyczne:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Zrzut do dodania: **Konfiguracja urządzenia**, **Wybierz urządzenia podrzędne do dodania**, ecoSub online i **ecoSolarMonitor**, **Działanie → Dalej**.
 
 ---
 
-> ![Wybierz lokalne rodzaje pomiarów](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Zrzut do dodania: **Rodzaje pomiarów**, wersja firmware, osobne grupy **ecoSolarMonitor** i **ecoMain / ecoSub**, pięć domyślnych pomiarów solarnych, **Działanie → Zapisz**.
 
 ---
 
@@ -220,13 +226,13 @@ Kroki:
     - **Master Serial Number**
     - **Address (IP or Hostname)**
 3. Potwierdź informacje o urządzeniu.
-4. Integracja najpierw sprawdzi **wersję firmware**, a następnie połączy się przez **Modbus TCP** i wykryje online urządzenia **ecoSub**.
-5. Jeśli ecoSub zostaną wykryte, wybierz urządzenia podrzędne do dodania (opcjonalnie).
-6. Wybierz **Rodzaje pomiarów**, a następnie opcjonalnie skonfiguruj **Extra Entities**:
+4. Integracja sprawdza **wersję firmware**, łączy się przez **Modbus TCP** i wykrywa ecoSub online oraz ecoSolarMonitor przy potwierdzonym firmware 140 lub nowszym.
+5. Na stronie **Konfiguracja urządzenia**, w polu **Wybierz urządzenia podrzędne do dodania**, wybierz **ecoSolarMonitor** oraz potrzebne ecoSub. Wybierz **Działanie** → **Dalej** i prześlij formularz. Bez wykrytych urządzeń podrzędnych możesz dodać sam ecoMain.
+6. Na stronie **Rodzaje pomiarów** wybierz odczyty w osobnych grupach **ecoSolarMonitor** (jeśli wybrany) oraz **ecoMain / ecoSub**. Wybierz **Działanie** → **Zapisz** i prześlij formularz, a następnie opcjonalnie skonfiguruj **Dodatkowe encje**:
     - utwórz encje odwrócone lub z wartością bezwzględną z istniejących źródeł mocy,
     - utwórz encje sumy lub średniej z wielu źródeł mocy albo energii tego samego typu,
     - encje agregujące zachowują `device_class`, `state_class` i jednostkę natywną źródeł.
-7. Zakończ, aby utworzyć wpis integracji.
+7. W **Dodatkowe encje** wybierz **Następna akcja** → **Zakończ** i prześlij formularz, aby utworzyć wpis integracji.
 
 Wskazówki diagnostyczne:
 
@@ -247,11 +253,15 @@ Wskazówki diagnostyczne:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Zrzut do dodania: **Konfiguracja urządzenia**, **Wybierz urządzenia podrzędne do dodania**, ecoSub online i **ecoSolarMonitor**, **Działanie → Dalej**.
 
 ---
 
-> ![Wybierz lokalne rodzaje pomiarów](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Zrzut do dodania: **Rodzaje pomiarów**, wersja firmware, osobne grupy **ecoSolarMonitor** i **ecoMain / ecoSub**, pięć domyślnych pomiarów solarnych, **Działanie → Zapisz**.
 
 ---
 
@@ -370,7 +380,7 @@ Integracja pobiera dane ecoPlug z chmury mniej więcej co **60 sekund**. Po pomy
 - **Wstecz** zachowuje wpisane dane i pojawia się tylko wtedy, gdy istnieje poprzednia strona.
 - Z karty wykrytego urządzenia: pierwsza strona nie ma wyboru działania. Na kolejnych stronach **Anuluj** czyści bieżącą konfigurację i wraca do pierwszej strony; karta pozostaje dostępna.
 - Z **Dodaj integrację**: **Anuluj** kończy dodawanie. W operacji otwartej z menu wraca do tego menu.
-- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian.
+- Na stronie głównej opcji **Anuluj** zamyka konfigurację bez zapisywania oczekujących zmian HA; zapisane ustawienia sprzętu pozostają zastosowane.
 
 ### Edycja istniejącego wpisu
 
@@ -378,9 +388,9 @@ Otwórz **Settings -> Devices & services -> enecess -> Configure**, aby zmienić
 
 Możesz zmienić:
 
-- wybrane urządzenia podrzędne ecoSub,
+- wybrane urządzenia ecoSub/ecoSolarMonitor,
 - konfigurację Extra Entities,
-- rodzaje pomiarów i, w trybie lokalnym, fazy kanałów.
+- pomiary i lokalne fazy kanałów; potwierdzone firmware od 140 dodaje ustawienia kanałów i PV.
 
 Nie możesz zmienić:
 
@@ -391,7 +401,16 @@ Nie możesz zmienić:
 > **Zrzut ekranu procesu:**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+Dla istniejącego wpisu lokalnego:
+
+1. Otwórz **Konfiguruj**, aby przejść do **Dostosuj ecoMain**. Zachowaj lub wybierz **ecoSolarMonitor** i potrzebne ecoSub w **Wybierz urządzenia podrzędne do dodania**. Wybierz **Następna akcja** → **Rodzaje pomiarów** i prześlij formularz.
+2. Wybierz odczyty w **ecoSolarMonitor** i **ecoMain / ecoSub**. Wybierz **Działanie** → **Zapisz** i prześlij formularz, aby wrócić do **Dostosuj ecoMain**.
+3. W razie potrzeby wybierz **Konfiguracja kanałów** lub **Konfiguracja ecoSolarMonitor**; dostępność zależy od bieżącego wyboru urządzeń w szkicu. Na koniec wybierz **Następna akcja** → **Zakończ** i prześlij formularz, aby zapisać wybory HA.
+
+<!-- screenshot-placeholder: options-menu -->
+
+> Zrzut do dodania: **Dostosuj ecoMain**, wybór urządzeń oraz **Następna akcja** dla pomiarów, kanałów, ecoSolarMonitor i **Zakończ**.
 
 Jeśli chcesz zmienić ustawienia nieedytowalne:
 
@@ -402,10 +421,11 @@ Jeśli chcesz zmienić ustawienia nieedytowalne:
 
 ### Rodzaje pomiarów
 
-- Podczas dodawania ecoMain wybierz **Rodzaje pomiarów** po urządzeniach ecoSub, a przed dodatkowymi encjami.
-- Później można zmienić wybór przez **Konfiguruj → Rodzaje pomiarów**.
-- Wymagany jest co najmniej jeden rodzaj.
-- Przed odznaczeniem pomiaru usuń dodatkowe encje, które z niego korzystają.
+- Wybierz **Rodzaje pomiarów** po urządzeniach podrzędnych, a przed dodatkowymi encjami. Później otwórz **Konfiguruj → Dostosuj ecoMain**, wybierz **Następna akcja** → **Rodzaje pomiarów** i prześlij formularz.
+- Przy wybranym ecoSolarMonitor i potwierdzonym lokalnym firmware od 140 grupy **ecoSolarMonitor** i **ecoMain / ecoSub** są oddzielne. Wybierz co najmniej jeden odczyt łącznie; każda grupa może być pusta. Można wybrać wyłącznie pomiary solarne.
+- Wybierz **Działanie** → **Zapisz** i prześlij formularz. Ostatecznie zapisz wybory HA w menu dodawania/opcji przez **Następna akcja** → **Zakończ** i ponowne przesłanie.
+- Zapisane urządzenia i pomiary pozostają wybrane podczas awarii, nieudanego wykrywania firmware i obniżenia wersji; zachowane są ID, własne nazwy i stan wyłączenia encji. Niedostępne możliwości oznaczają niedostępne czujniki. Tylko jawne odznaczenie je usuwa.
+- Usuń zależne dodatkowe encje przed odznaczeniem ich urządzeń lub pomiarów. Nowe wybory solarne wymagają potwierdzonego firmware od 140. Czternaście odczytów i pięć domyślnych wyborów podano w [katalogu solarnym](#solar-entities).
 
 Tryb lokalny oferuje dwanaście kategorii od wersji 139; wersje 136–138 obsługują tylko moc czynną oraz energię czynną w kierunku zgodnym i przeciwnym:
 
@@ -437,6 +457,8 @@ Utwórz czujnik na podstawie pomiarów, np. różnicy lub średniej dwóch warto
 
 Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządzenia. Puste grupy są ukryte; wybór źródeł nie włącza pomiarów automatycznie. Skumulowana energia czynna (Wh), skumulowana energia bierna (varh), skumulowana energia pozorna (VAh) i minutowe przyrosty energii czynnej z chmury (Wh) tworzą osobne grupy. Możesz łączyć różne typy źródeł i musisz samodzielnie sprawdzić jednostki we wzorze. Zmienne `a`, `b` itd. są wspólne dla grup. Za każdym przejściem dalej ze strony źródeł, także podczas edycji lub po cofnięciu, są przypisywane ponownie od `a`, a poprzedni wzór jest usuwany. Wyniki energii czynnej, biernej i pozornej używają `TOTAL`, dopuszczając wzrosty i spadki dla energii netto. **Liczba** daje wynik czysto liczbowy bez jednostki ani klasy urządzenia (`device_class`), z `MEASUREMENT`.
 
+Przy potwierdzonym lokalnym firmware od 140 najpierw wybierz ecoSolarMonitor i włącz wymagane odczyty w **Rodzaje pomiarów**. W **Wybierz encje źródłowe** `solar_actual_power` i `solar_estimated_power` należą do **Moc czynna (W)**; obie energie skumulowane i cztery energie dzienne należą do **Energia czynna (skumulowana, Wh)**. **Natężenie promieniowania (W/m²)**, **Temperatura modułu (°C)**, **Kąt nachylenia (°)** i **Współczynnik wydajności (%)** to osobne grupy; ostatnia zawiera wszystkie trzy współczynniki. Wybory pokazują rzeczywiste nazwy HA i jednostki, np. `solar_today_actual_energy (Wh)`; puste grupy są ukryte. Źródła solarne nie dodają typów wyniku: wybierz dostępny istniejący typ, także **Liczba (bez jednostki)**, jeśli potrzeba, i sprawdź jednostki obliczeń.
+
 > ![Dodaj encję formuły](docs/images/ecomain-formula-add.png)
 
 ---
@@ -445,7 +467,9 @@ Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządz
 
 ---
 
-> ![Wybierz encje źródłowe formuły](docs/images/ecomain-formula-sources.png)
+<!-- screenshot-placeholder: solar-formula-sources -->
+
+> Zrzut do dodania: **Wybierz encje źródłowe**, włączone nazwy solarne i jednostki w grupach mocy czynnej, energii czynnej, promieniowania, temperatury, nachylenia i współczynnika wydajności.
 
 ---
 
@@ -461,19 +485,38 @@ Dostępne są tylko włączone pomiary obsługiwane przez oprogramowanie urządz
 - Usuń wzór przez **Usuń dodatkową encję**. Przed odznaczeniem pomiaru usuń wzory, które go używają.
 - Brak danych lub niemożliwe obliczenie oznacza niedostępny wynik.
 
-### ecoSolarMonitor i ustawienia instalacji (lokalny firmware od 140)
+### Ustawienia instalacji (lokalne firmware od 140)
 
-Te funkcje wymagają pomyślnego odczytu firmware **140 lub nowszego**. Każdy ecoMain ma jeden ecoSolarMonitor o indeksie `4`, a ecoSub nadal używa indeksów `1`–`3`. Wybierz wykryty ecoSolarMonitor i jego osobną grupę pomiarów. Czternaście pomiarów obejmuje natężenie promieniowania, kąt nachylenia, temperaturę modułu, moc rzeczywistą i szacowaną (domyślnie wybrane) oraz współczynnik wydajności i skumulowaną energię rzeczywistą i szacowaną oraz współczynnik wydajności, energię szacowaną i rzeczywistą dla wczoraj i dzisiaj (opcjonalne). Nie ma on dziesięciu kanałów licznika i należy do bieżącego ecoMain, nawet jeśli kanały falownika pochodzą z ecoSub.
+Po dodaniu lokalnego wpisu otwórz **Konfiguruj → Dostosuj ecoMain**. Strony wymagają potwierdzonego firmware **140 lub nowszego**, sprawdzanego ponownie przed dostępem do sprzętu. Firmware **139** zachowuje **Fazy kanałów**, pokazane na zrzutach faz. Strony działają tylko lokalnie i nie tworzą encji sterujących.
 
-Wszystkie czternaście pomiarów można wybierać osobno; pięć ustawień domyślnych pozostaje bez zmian. Zapisane wybory, również puste, nie są rozszerzane. Wszystkie wartości są odczytywane bezpośrednio z urządzenia i mnożone przez współczynnik protokołu. Integracja nie oblicza dziennych sum, różnic, współczynnika wydajności ani zmiany daty. Dzisiejsze dwa liczniki energii, sumowane przez urządzenie, używają `TOTAL_INCREASING`; wczorajsze energie i oba dzienne współczynniki wydajności są wartościami chwilowymi bez klasy stanu. Bieżące wartości, w tym zero po wyzerowaniu oraz po powrocie online, są publikowane bezpośrednio. Włączone dzienne energie i współczynniki wydajności trafiają do istniejących grup źródeł formuł; niewybrane wartości są pomijane, a typy wyników pozostają bez zmian.
+#### Konfiguracja kanałów
 
-Protokół 1.0.6: moc szacowana/rzeczywista od `4006`/`4008` (Int32, `0.01` W), skumulowana energia szacowana/rzeczywista od `4010`/`4014` (UInt64, `0.001` Wh). Wczorajszy współczynnik, energia szacowana i rzeczywista zaczynają się od `4018`/`4019`/`4023`, a dzisiejsze od `4027`/`4028`/`4032`. Współczynniki mają typ Int16 i skalę `0.1` %, a energie zajmują cztery rejestry, od najmniej znaczącego słowa. Rejestr `4001` zawiera natężenie promieniowania bez kompensacji, a `4003` temperaturę wewnętrzną czujnika promieniowania; integracja nie udostępnia tych pomiarów ani nie odpytuje tych rejestrów.
+1. Wybierz **Następna akcja** → **Konfiguracja kanałów** i prześlij formularz. W **Urządzenie** wybierz **ecoMain** albo wybrany, aktualnie dostępny online **ecoSub**, następnie **Działanie** → **Dalej** i prześlij. **ecoSolarMonitor** nie jest licznikiem dziesięciokanałowym i nie występuje na liście.
+2. Rozwiń dziesięć sekcji od **Kanał 1** do **Kanał 10**. Każda ma **Faza** (**L1**, **L2**, **L3**) i **Przekładnik prądowy** (**30 A** lub **100 A**).
+3. ecoMain ma dodatkową sekcję **Przekładniki prądowe obwodu głównego** z **L1/L2/L3**, każde ograniczone do **100 A**. Nieobsługiwane zapisane wartości nie otrzymują wymyślonej wartości domyślnej; przed zapisem wybierz obsługiwaną wartość.
+4. Wybierz **Działanie** → **Zapisz** i prześlij formularz, aby natychmiast zapisać i zweryfikować sprzęt, a po sukcesie wrócić do menu.
 
-Po dodaniu otwórz **Konfiguruj**. Firmware 139 udostępnia **Fazy kanałów**, a od 140 **Konfiguracja kanałów** pozwala ustawić fazę i przekładnik prądowy (30 A lub 100 A) każdego kanału ecoMain lub wybranego ecoSub online. Przekładniki obwodu głównego L1/L2/L3 ecoMain obsługują tylko 100 A. ecoSolarMonitor nie znajduje się na liście liczników.
+<!-- screenshot-placeholder: channel-device -->
 
-Po wybraniu ecoSolarMonitor strona **Konfiguracja ecoSolarMonitor** ustawia moc zainstalowanej fotowoltaiki bieżącego ecoMain (liczba całkowita `0`–`4294967295` W), temperaturowy współczynnik mocy (`-32.768`–`32.767` %/°C, do trzech miejsc po przecinku) i kanały falownika `1`–`10`, pogrupowane według ecoMain i każdego ecoSub online, również bez wybranych pomiarów HA. Pusty wybór czyści widoczną grupę; ukryte urządzenia i urządzenia offline zachowują wartości sprzętowe.
+> Zrzut do dodania: **Konfiguracja kanałów → Urządzenie**, ecoMain i wybrane ecoSub online, **Działanie → Dalej**, bez ecoSolarMonitor.
 
-**Zapisz** natychmiast odczytuje sprzęt, zapisuje tylko zmiany i weryfikuje je przez ponowny odczyt. Błąd częściowy nie cofa udanych zapisów. **Wstecz** i **Anuluj** nie cofają już zapisanych ustawień sprzętu. Wybory HA i dodatkowe encje są zapisywane osobno na końcu przepływu opcji. Strony działają tylko lokalnie, nie tworzą encji sterowania i nie są pokazane na starszych zrzutach ekranu.
+<!-- screenshot-placeholder: channel-settings -->
+
+> Zrzut do dodania: **Konfiguracja kanałów**, dziesięć sekcji z **Faza** i **Przekładnik prądowy**, **Przekładniki prądowe obwodu głównego** ecoMain, **Działanie → Zapisz**.
+
+#### Konfiguracja ecoSolarMonitor
+
+1. Zachowaj **ecoSolarMonitor** wybrany w **Dostosuj ecoMain**. Wybierz **Następna akcja** → **Konfiguracja ecoSolarMonitor** i prześlij formularz. Ustawienia należą do bieżącego nadrzędnego **ecoMain**, nawet jeśli kanały falownika pochodzą z ecoSub.
+2. Wpisz **Zainstalowana moc PV**: liczbę całkowitą od **0** do **4294967295 W**. Wpisz **Współczynnik temperaturowy mocy**: od **-32.768** do **32.767 %/°C**, z maksymalnie **trzema miejscami po przecinku** (krok **0.001**).
+3. Wybierz kanały falownika od **Kanał 1** do **Kanał 10** w widocznych listach **ecoMain**, **ecoSub 1**, **ecoSub 2** i **ecoSub 3**. Obejmują wszystkie wykryte ecoSub online, również bez wybranych pomiarów HA; dodatkowy wybór pomiarów ecoSub nie jest potrzebny.
+4. Pusta widoczna lista **czyści** kanały falownika tej grupy. Ukryte grupy i urządzenia offline zachowują wartości sprzętowe.
+5. Wybierz **Działanie** → **Zapisz** i prześlij formularz, aby natychmiast zapisać i zweryfikować sprzęt, a po sukcesie wrócić do menu.
+
+<!-- screenshot-placeholder: solar-settings -->
+
+> Zrzut do dodania: **Konfiguracja ecoSolarMonitor**, **Zainstalowana moc PV**, **Współczynnik temperaturowy mocy**, listy kanałów falownika liczników online, **Działanie → Zapisz**.
+
+Zapis natychmiast odczytuje sprzęt, zmienia tylko różniące się wartości i sprawdza je przez ponowny odczyt. Błąd częściowy nie cofa udanych zapisów. Błędy zapisu lub weryfikacji wskazują pole albo sekcję kanału; sprawdź widoczne wartości przed ponowieniem. **Wstecz**, **Anuluj** i anulowanie z menu nie cofają zapisanych ustawień sprzętu. Urządzenia, pomiary HA i dodatkowe encje są zapisywane osobno: w **Dostosuj ecoMain** wybierz **Następna akcja** → **Zakończ** i prześlij formularz.
 
 ### Fazy kanałów (tylko lokalnie)
 
@@ -540,6 +583,41 @@ Firmware 136–138 obsługuje tylko pierwsze trzy rodzaje pomiarów, zaznaczone 
 | Częstotliwość | `frequency_rt` | Hz | `main` |
 
 Częstotliwość ma wyłącznie pełny klucz `main_frequency_rt`, bez fazy lub kanału. Przykłady: `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` oznacza wartość chwilową, a `_total` licznik skumulowany. Współczynnik mocy jest bezwymiarowy, nie jest procentem. Kierunek przekładnika prądowego (CT) wyznacza kierunek zgodny i przeciwny; odwrotny montaż może powodować ujemną moc czynną i wzrost licznika energii w kierunku przeciwnym.
+
+<a id="solar-entities"></a>
+
+### ecoSolarMonitor
+
+Każdy ecoMain ma jeden **ecoSolarMonitor** (indeks `4`, obok ecoSub `1`–`3`). Udostępnia czternaście niezależnie wybieranych odczytów i nie ma dziesięciu kanałów licznika, nawet jeśli kanały falownika pochodzą z ecoSub. Tabela łączy etykiety z **Rodzaje pomiarów** z rzeczywistymi częściami nazw HA zawierającymi podkreślenia, bez prefiksu punktu pomiarowego. HA może dodać nazwę urządzenia i utworzyć pełne ID `sensor.…`; używaj rzeczywistego ID ze strony encji.
+
+| Etykieta pomiaru | Część nazwy HA | Jednostka natywna | Wybór domyślny |
+| --- | --- | --- | --- |
+| Natężenie Promieniowania | `solar_irradiance` | W/m² | Tak |
+| Kąt Nachylenia | `solar_tilt_angle` | ° | Tak |
+| Temperatura Modułu | `solar_module_temperature` | °C | Tak |
+| Moc Rzeczywista | `solar_actual_power` | W | Tak |
+| Moc Szacowana | `solar_estimated_power` | W | Tak |
+| Współczynnik Wydajności | `solar_performance_ratio` | % | Nie |
+| Skumulowana Energia Rzeczywista | `solar_actual_energy` | Wh | Nie |
+| Skumulowana Energia Szacowana | `solar_estimated_energy` | Wh | Nie |
+| Wczorajszy Współczynnik Wydajności | `solar_yesterday_performance_ratio` | % | Nie |
+| Wczorajsza Energia Szacowana | `solar_yesterday_estimated_energy` | Wh | Nie |
+| Wczorajsza Energia Rzeczywista | `solar_yesterday_actual_energy` | Wh | Nie |
+| Dzisiejszy Współczynnik Wydajności | `solar_today_performance_ratio` | % | Nie |
+| Dzisiejsza Energia Szacowana | `solar_today_estimated_energy` | Wh | Nie |
+| Dzisiejsza Energia Rzeczywista | `solar_today_actual_energy` | Wh | Nie |
+
+Pomiary solarne dodają jeden czujnik na wybrany odczyt: domyślnie pięć, maksymalnie czternaście, bez dziesięciu kanałów licznika.
+
+Promieniowanie, nachylenie, temperatura, obie moce i ogólny współczynnik wydajności używają `MEASUREMENT`; obie energie skumulowane używają `TOTAL_INCREASING`. HA może przeliczać jednostki natywne na potrzeby wyświetlania.
+
+Wszystkie czternaście pomiarów można wybierać osobno; pięć ustawień domyślnych pozostaje bez zmian. Zapisane wybory, również puste, nie są rozszerzane. Wszystkie wartości są odczytywane bezpośrednio z urządzenia i mnożone przez współczynnik protokołu. Integracja nie oblicza dziennych sum, różnic, współczynnika wydajności ani zmiany daty. Dzisiejsze dwa liczniki energii, sumowane przez urządzenie, używają `TOTAL_INCREASING`; wczorajsze energie i oba dzienne współczynniki wydajności są wartościami chwilowymi bez klasy stanu. Bieżące wartości, w tym zero po wyzerowaniu oraz po powrocie online, są publikowane bezpośrednio. Włączone dzienne energie i współczynniki wydajności trafiają do istniejących grup źródeł formuł; niewybrane wartości są pomijane, a typy wyników pozostają bez zmian.
+
+Protokół 1.0.6: moc szacowana/rzeczywista od `4006`/`4008` (Int32, `0.01` W), skumulowana energia szacowana/rzeczywista od `4010`/`4014` (UInt64, `0.001` Wh). Wczorajszy współczynnik, energia szacowana i rzeczywista zaczynają się od `4018`/`4019`/`4023`, a dzisiejsze od `4027`/`4028`/`4032`. Współczynniki mają typ Int16 i skalę `0.1` %, a energie zajmują cztery rejestry, od najmniej znaczącego słowa. Rejestr `4001` zawiera natężenie promieniowania bez kompensacji, a `4003` temperaturę wewnętrzną czujnika promieniowania; integracja nie udostępnia tych pomiarów ani nie odpytuje tych rejestrów.
+
+<!-- screenshot-placeholder: solar-entities -->
+
+> Zrzut do dodania: urządzenie ecoSolarMonitor i włączone encje solarne, rzeczywiste nazwy HA z podkreśleniami oraz jednostki.
 
 ### Tryb chmury
 
@@ -686,11 +764,7 @@ Jeśli wpis o tym samym ID już istnieje, nie można dodać go ponownie.
 
 ### Q8: Co mogę zmienić po konfiguracji?
 
-Otwórz przepływ **Configure** / **Options** dla wpisu integracji w Home Assistant.
-
-Możesz zmienić wybrane urządzenia ecoSub, rodzaje pomiarów, konfigurację Extra Entities oraz fazy kanałów w trybie lokalnym. Typ urządzenia, metoda dodawania i wybrane urządzenie główne ecoMain nie mogą być zmienione w miejscu.
-
-Aby zmienić ustawienia nieedytowalne, usuń istniejący wpis i dodaj go ponownie z nowymi parametrami.
+Możesz zmieniać wybrane ecoSub/ecoSolarMonitor, pomiary i dodatkowe encje. Lokalnie firmware 139 oferuje **Fazy kanałów**; potwierdzone firmware od 140 oferuje **Konfiguracja kanałów** i przy wybranym urządzeniu solarnym **Konfiguracja ecoSolarMonitor**. Wybory HA zapisują się dopiero po **Zakończ** i przesłaniu menu; sprzęt jest zapisywany natychmiast. Dla ecoPlug zmienisz wybrane gniazdka. Typ urządzenia, metoda i główne ecoMain nie zmieniają się w miejscu.
 
 ---
 
@@ -708,18 +782,11 @@ Przed instalacją nowej wersji zapoznaj się z informacjami o wydaniu. Aktualiza
 
 ### Q10: Dlaczego widzę tylko część urządzeń podrzędnych albo kanałów?
 
-**Możliwe przyczyny:**
+Nowe lokalne urządzenia podrzędne muszą być wykryte online: ecoSub `1`–`3` oraz ecoSolarMonitor `4` przy potwierdzonym firmware od 140. Istniejące wybory są zachowane offline i przy nieudanym wykryciu firmware; ich czujniki stają się niedostępne, a pozostałe nadal się aktualizują. Tylko wybrane urządzenia z włączonymi pomiarami tworzą czujniki. Sprawdź zasilanie i okablowanie brakujących urządzeń.
 
-- W czasie konfiguracji online były tylko niektóre ecoSub.
-- Wybrano tylko część urządzeń podrzędnych.
-- Tryb chmury zwraca dane tylko dla urządzeń przypisanych w konfiguracji chmurowej.
-- Niektóre kanały mogą nie być używane lub mogą zwracać zero.
+Otwórz **Konfiguruj → Dostosuj ecoMain**, wybierz wykryte urządzenia, następnie **Rodzaje pomiarów**, a na końcu **Zakończ** i prześlij formularz. Można wybrać tylko pomiary solarne. Przed odznaczeniem usuń zależne dodatkowe encje. Po aktualizacji firmware przeładuj integrację. Dzienne wartości solarne pochodzą bezpośrednio ze sprzętu; integracja nie odtwarza pominiętych dni ani nie oblicza zmiany daty.
 
-**Co możesz zrobić:**
-
-1. Sprawdź, czy ecoSub są online.
-2. Otwórz **Configure** i dostosuj wybrane urządzenia podrzędne.
-3. W razie potrzeby usuń i dodaj integrację ponownie.
+Tryb chmury nadal zależy od urządzeń przypisanych w konfiguracji chmurowej. Nieużywane kanały mogą zwracać zero.
 
 ---
 

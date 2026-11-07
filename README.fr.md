@@ -11,6 +11,7 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
 - **ecoMain**
     - Local (Modbus TCP, avec découverte zeroconf / mDNS)
     - Cloud (cloud enecess)
+- **ecoSolarMonitor** : uniquement en local, via son ecoMain parent avec firmware **140 ou ultérieur confirmé**. Sélectionnez-le avec ecoMain ; ce n’est pas un type d’appareil distinct lors de l’ajout de l’intégration.
 - **ecoPlug**
     - Cloud uniquement (cloud enecess)
     - Une entrée de compte peut sélectionner plusieurs prises par nom et numéro de série.
@@ -20,11 +21,12 @@ Ce dépôt fournit une intégration personnalisée pour **Home Assistant (HA)** 
 
 - Firmware local 136–138 : puissance active et énergie active directe/inverse.
 - Firmware local 139 ou plus récent : aussi les neuf autres types et le réglage des phases des canaux.
+- Firmware local 140 ou ultérieur confirmé : le protocole 1.0.6 ajoute les mesures ecoSolarMonitor et les réglages d’installation des canaux et du PV.
 - Les types non pris en charge sont masqués avec un ancien firmware.
 
 Le protocole 1.0.5 (firmware 139 ou ultérieur) ajoute l’énergie apparente facultative (VAh), avec son groupe de sources de formule. Les compteurs utilisent `TOTAL_INCREASING`, les formules `TOTAL`, sans classe d’appareil.
 
-Les capteurs des ecoSub hors ligne deviennent indisponibles ; les autres appareils continuent de se mettre à jour. Rechargez l’intégration après une mise à jour du firmware à la même adresse IP.
+Les capteurs ecoSub et ecoSolarMonitor hors ligne deviennent indisponibles ; les autres appareils continuent de se mettre à jour. Rechargez l’intégration après une mise à jour du firmware à la même adresse IP pour relancer sa détection. **Configurer** actualise aussi le firmware et les appareils détectés. Les nouvelles mesures solaires et les réglages d’installation exigent une détection réussie du firmware 140 ou ultérieur ; un firmware inconnu ou plus ancien ne les active pas.
 
 ---
 
@@ -62,7 +64,7 @@ Suivez le guide officiel d’utilisation de HACS :
 - **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
 - Depuis une carte de découverte : la première page ne propose pas de choix d’action. Sur les pages suivantes, **Annuler** efface la configuration en cours et revient à la première page ; la carte reste disponible.
 - Depuis **Ajouter une intégration** : **Annuler** termine l’ajout. Une opération ouverte depuis un menu revient à ce menu.
-- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
+- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements HA en attente ; les réglages matériels déjà enregistrés restent appliqués.
 
 Il existe **deux façons** de lancer le flux de configuration pour ecoMain :
 
@@ -140,14 +142,13 @@ Cette méthode couvre deux cas :
 2. L’intégration scanne le réseau via **mDNS** pour trouver les services correspondants.
 3. Si des appareils sont trouvés, sélectionnez le bon ecoMain par **numéro de série** (et IP/nom d’hôte affichés).
 4. Confirmez les informations de l’appareil (numéro de série et adresse).
-5. L’intégration vérifie d’abord la **version du firmware** de l’appareil, puis tente de se connecter via **Modbus TCP** et de détecter les **modules esclaves (ecoSub)**
-   en ligne.
-6. Si des esclaves sont détectés, choisissez ceux que vous souhaitez ajouter (facultatif).
-7. Sélectionnez les **Types de mesures**, puis configurez éventuellement des **entités supplémentaires** :
+5. L’intégration vérifie la **version du firmware**, se connecte via **Modbus TCP** et détecte les ecoSub en ligne ainsi qu’ecoSolarMonitor si le firmware 140 ou ultérieur est confirmé.
+6. Sur **Configurer l'appareil**, sélectionnez **ecoSolarMonitor** et les ecoSub souhaités dans **Sélectionner les modules esclaves à ajouter**. Choisissez **Action** → **Continuer** et soumettez le formulaire. Sans sous-appareil détecté, continuez avec ecoMain seul.
+7. Sur **Types de mesures**, choisissez les valeurs dans les groupes distincts **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**. Choisissez **Action** → **Enregistrer** et soumettez le formulaire, puis configurez éventuellement les **Entités supplémentaires** :
     - Créer des valeurs inversées ou absolues depuis des sources de puissance.
     - Créer une somme ou une moyenne depuis plusieurs sources de puissance ou d’énergie du même type.
     - Les entités agrégées conservent le `device_class`, le `state_class` et l’unité du type source.
-8. Terminez pour créer l’entrée d’intégration.
+8. Dans **Entités supplémentaires**, choisissez **Action suivante** → **Terminer** et soumettez le formulaire pour créer l’entrée d’intégration.
 
 Conseils en cas de problème :
 
@@ -162,11 +163,15 @@ Conseils en cas de problème :
 ---
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Capture à ajouter : **Configurer l'appareil**, avec **Sélectionner les modules esclaves à ajouter**, ecoSub en ligne et **ecoSolarMonitor**, puis **Action → Continuer**.
 
 ---
 
-> ![Choisir les types de mesures locales](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Capture à ajouter : **Types de mesures**, version du firmware, groupes distincts **ecoSolarMonitor** et **ecoMain / ecoSub**, cinq choix solaires par défaut et **Action → Enregistrer**.
 
 ---
 
@@ -197,13 +202,13 @@ Avant de commencer :
     - **Numéro de série du maître**
     - **Adresse (IP ou nom d’hôte)**
 3. Confirmez les informations de l’appareil.
-4. L’intégration va d’abord vérifier la **version du firmware**, puis se connecter via **Modbus TCP** et détecter les **modules esclaves (ecoSub)** en ligne.
-5. Si des esclaves sont détectés, sélectionnez ceux que vous souhaitez ajouter (facultatif).
-6. Sélectionnez les **Types de mesures**, puis configurez éventuellement des **entités supplémentaires** :
+4. L’intégration vérifie la **version du firmware**, se connecte via **Modbus TCP** et détecte les ecoSub en ligne ainsi qu’ecoSolarMonitor si le firmware 140 ou ultérieur est confirmé.
+5. Sur **Configurer l'appareil**, sélectionnez **ecoSolarMonitor** et les ecoSub souhaités dans **Sélectionner les modules esclaves à ajouter**. Choisissez **Action** → **Continuer** et soumettez le formulaire. Sans sous-appareil détecté, continuez avec ecoMain seul.
+6. Sur **Types de mesures**, choisissez les valeurs dans les groupes distincts **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**. Choisissez **Action** → **Enregistrer** et soumettez le formulaire, puis configurez éventuellement les **Entités supplémentaires** :
     - Créer des valeurs inversées ou absolues depuis des sources de puissance.
     - Créer une somme ou une moyenne depuis plusieurs sources de puissance ou d’énergie du même type.
     - Les entités agrégées conservent le `device_class`, le `state_class` et l’unité du type source.
-7. Terminez pour créer l’entrée d’intégration.
+7. Dans **Entités supplémentaires**, choisissez **Action suivante** → **Terminer** et soumettez le formulaire pour créer l’entrée d’intégration.
 
 Conseils en cas de problème :
 
@@ -218,11 +223,15 @@ Conseils en cas de problème :
 ---
 > ![Confirm local device](docs/images/ecomain-local-confirm.png)
 ---
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Capture à ajouter : **Configurer l'appareil**, avec **Sélectionner les modules esclaves à ajouter**, ecoSub en ligne et **ecoSolarMonitor**, puis **Action → Continuer**.
 
 ---
 
-> ![Choisir les types de mesures locales](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Capture à ajouter : **Types de mesures**, version du firmware, groupes distincts **ecoSolarMonitor** et **ecoMain / ecoSub**, cinq choix solaires par défaut et **Action → Enregistrer**.
 
 ---
 
@@ -332,7 +341,7 @@ L’intégration récupère les données ecoPlug depuis le cloud environ toutes 
 - **Retour** garde vos saisies et apparaît seulement si une page précédente existe.
 - Depuis une carte de découverte : la première page ne propose pas de choix d’action. Sur les pages suivantes, **Annuler** efface la configuration en cours et revient à la première page ; la carte reste disponible.
 - Depuis **Ajouter une intégration** : **Annuler** termine l’ajout. Une opération ouverte depuis un menu revient à ce menu.
-- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements en attente.
+- Depuis l’accueil des options, **Annuler** ferme la configuration sans enregistrer les changements HA en attente ; les réglages matériels déjà enregistrés restent appliqués.
 
 ### Modifier une entrée existante
 
@@ -340,9 +349,9 @@ Ouvrez **Paramètres → Appareils et services → enecess → Configurer** pour
 
 Modifiable :
 
-- Les esclaves ecoSub sélectionnés.
+- Les ecoSub/ecoSolarMonitor sélectionnés.
 - La configuration des entités supplémentaires.
-- Les types de mesures et, en mode local, les phases des canaux.
+- Les mesures et les phases locales ; le firmware 140 ou ultérieur confirmé ajoute les réglages des canaux et du PV.
 
 Non modifiable :
 
@@ -353,7 +362,16 @@ Non modifiable :
 > **Capture d’écran du processus :**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+Pour une entrée locale existante :
+
+1. Ouvrez **Configurer** pour accéder à **Ajuster ecoMain**. Gardez ou sélectionnez **ecoSolarMonitor** et les ecoSub souhaités dans **Sélectionner les modules esclaves à ajouter**. Choisissez **Action suivante** → **Types de mesures**, puis soumettez le formulaire.
+2. Choisissez les mesures dans **ecoSolarMonitor** et **ecoMain / ecoSub**. Avec **Action** → **Enregistrer**, soumettez le formulaire pour revenir à **Ajuster ecoMain**.
+3. Utilisez au besoin **Configuration des canaux** ou **Configuration ecoSolarMonitor** ; leur disponibilité suit la sélection d’appareils en cours. Terminez avec **Action suivante** → **Terminer** et soumettez le formulaire pour enregistrer les choix HA.
+
+<!-- screenshot-placeholder: options-menu -->
+
+> Capture à ajouter : **Ajuster ecoMain**, sélection des sous-appareils et **Action suivante** pour les mesures, les canaux, ecoSolarMonitor et **Terminer**.
 
 Si vous devez modifier un réglage non modifiable :
 
@@ -364,10 +382,11 @@ Si vous devez modifier un réglage non modifiable :
 
 ### Types de mesures
 
-- Pendant l’ajout d’ecoMain, sélectionnez les **Types de mesures** après les appareils ecoSub et avant les entités supplémentaires.
-- Pour les modifier ensuite, ouvrez **Configurer → Types de mesures**.
-- Au moins un type est requis.
-- Supprimez les entités supplémentaires qui utilisent une mesure avant de la désélectionner.
+- Choisissez **Types de mesures** après les sous-appareils et avant les entités supplémentaires. Ensuite, ouvrez **Configurer → Ajuster ecoMain**, choisissez **Action suivante** → **Types de mesures** et soumettez le formulaire.
+- Avec ecoSolarMonitor sélectionné et un firmware local 140 ou ultérieur confirmé, les groupes **ecoSolarMonitor** et **ecoMain / ecoSub** sont distincts. Choisissez au moins une mesure au total ; chaque groupe peut rester vide, ce qui permet une sélection solaire seule.
+- Choisissez **Action** → **Enregistrer** et soumettez le formulaire. Enregistrez finalement les choix HA dans le menu d’ajout/options avec **Action suivante** → **Terminer**, puis soumettez à nouveau.
+- Les appareils et mesures enregistrés sont conservés en cas de déconnexion, d’échec de détection du firmware ou de retour à une ancienne version, ainsi que leurs ID, noms personnalisés et états désactivés. Les capacités absentes rendent les capteurs indisponibles ; seule une désélection explicite les supprime.
+- Supprimez les entités supplémentaires dépendantes avant de désélectionner leurs mesures ou appareils. Les nouvelles sélections solaires exigent un firmware 140 ou ultérieur confirmé. Les quatorze mesures et cinq choix par défaut figurent au [catalogue solaire](#solar-entities).
 
 Le mode local propose douze catégories avec le firmware 139 ou ultérieur ; le firmware 136–138 prend en charge uniquement la puissance active et les énergies actives directe et inverse :
 
@@ -399,6 +418,8 @@ Créez un capteur à partir de vos mesures, par exemple la différence ou la moy
 
 Seules les mesures activées et prises en charge par le micrologiciel sont proposées. Les groupes vides sont masqués ; le choix des sources n’active aucune mesure automatiquement. L’énergie active cumulée (Wh), l’énergie réactive cumulée (varh), l’énergie apparente cumulée (VAh) et les incréments d’énergie active par minute du cloud (Wh) forment des groupes distincts. Vous pouvez combiner différents types de sources et devez vérifier vous-même les unités de la formule. Les variables `a`, `b`, etc. sont communes aux groupes. Chaque fois que vous continuez depuis la page des sources, y compris lors d’une modification ou après un retour, elles sont réattribuées à partir de `a` et l’expression précédente est effacée. Les résultats d’énergie active, réactive et apparente utilisent `TOTAL`, autorisant des hausses et des baisses pour l’énergie nette. **Nombre** produit une valeur purement numérique sans unité ni classe d’appareil (`device_class`), avec `MEASUREMENT`.
 
+Avec le firmware local 140 ou ultérieur confirmé, sélectionnez d’abord ecoSolarMonitor et activez les mesures nécessaires sous **Types de mesures**. Dans **Sélectionner les entités sources**, `solar_actual_power` et `solar_estimated_power` rejoignent **Puissance active (W)** ; les deux énergies cumulées et les quatre énergies journalières rejoignent **Énergie active (cumulée, Wh)**. **Irradiance (W/m²)**, **Température du module (°C)**, **Angle d’inclinaison (°)** et **Ratio de performance (%)** sont des groupes distincts ; le dernier contient les trois ratios. Les choix affichent les vrais noms HA et unités, par exemple `solar_today_actual_energy (Wh)` ; les groupes vides sont masqués. Aucun type de résultat n’est ajouté : choisissez un type existant disponible, y compris **Nombre (sans unité)** si nécessaire, et vérifiez les unités du calcul.
+
 > ![Ajouter une entité de formule](docs/images/ecomain-formula-add.png)
 
 ---
@@ -407,7 +428,9 @@ Seules les mesures activées et prises en charge par le micrologiciel sont propo
 
 ---
 
-> ![Choisir les sources de la formule](docs/images/ecomain-formula-sources.png)
+<!-- screenshot-placeholder: solar-formula-sources -->
+
+> Capture à ajouter : **Sélectionner les entités sources**, noms solaires activés et unités dans les groupes de puissance active, énergie active, irradiance, température, inclinaison et ratio de performance.
 
 ---
 
@@ -423,19 +446,38 @@ Seules les mesures activées et prises en charge par le micrologiciel sont propo
 - Supprimez une formule via **Supprimer une entité supplémentaire**. Avant de décocher une mesure, supprimez les formules qui l’utilisent.
 - Si des données manquent ou si le calcul est impossible, le résultat est indisponible.
 
-### ecoSolarMonitor et réglages d’installation (firmware local 140 ou ultérieur)
+### Réglages d’installation (firmware local 140 ou ultérieur)
 
-Ces fonctions exigent une détection réussie du firmware **140 ou ultérieur**. Chaque ecoMain possède un ecoSolarMonitor à l’indice `4`, les ecoSub conservant les indices `1`–`3`. Sélectionnez l’ecoSolarMonitor détecté puis son groupe de mesures distinct. Ses quatorze mesures sont l’irradiance, l’inclinaison, la température du module, les puissances réelle et estimée (sélectionnées par défaut), puis le ratio de performance et les énergies cumulées réelle et estimée ainsi que le ratio de performance, l’énergie estimée et l’énergie réelle pour hier et pour aujourd’hui (facultatifs). Il ne possède pas dix canaux de compteur et appartient à l’ecoMain courant, même si des canaux d’onduleur proviennent d’un ecoSub.
+Après l’ajout local, ouvrez **Configurer → Ajuster ecoMain**. Ces pages exigent un firmware **140 ou ultérieur confirmé**, revérifié avant l’accès au matériel. Le firmware **139** conserve **Phases des canaux**, illustré par les captures des phases. Ces pages sont locales et ne créent aucune entité de commande.
 
-Les quatorze mesures sont facultatives ; les cinq sélections par défaut restent inchangées. Les sélections enregistrées, même vides, ne sont pas étendues. Toutes les valeurs sont lues directement dans l’appareil puis multipliées par le facteur du protocole. L’intégration ne calcule ni cumul journalier, ni différence, ni ratio de performance, ni changement de date. Les deux compteurs d’énergie du jour utilisent `TOTAL_INCREASING` ; les énergies d’hier et les deux ratios journaliers sont des instantanés sans classe d’état. Les valeurs courantes, y compris zéro après une remise à zéro ou un retour en ligne, sont publiées directement. Les énergies et ratios journaliers activés rejoignent leurs groupes de sources de formule existants ; les valeurs non sélectionnées restent absentes et les types de résultat ne changent pas.
+#### Configuration des canaux
 
-Protocole 1.0.6 : puissances estimée/réelle à partir de `4006`/`4008` (Int32, `0.01` W), énergies cumulées estimée/réelle à partir de `4010`/`4014` (UInt64, `0.001` Wh). Le ratio, l’énergie estimée et l’énergie réelle d’hier commencent à `4018`/`4019`/`4023`, ceux du jour à `4027`/`4028`/`4032`. Les ratios sont en Int16 avec un facteur de `0.1` %, et chaque énergie occupe quatre registres, mot faible en premier. Le registre `4001` contient l’irradiance sans compensation et `4003` la température interne du capteur d’irradiance ; l’intégration n’expose pas ces mesures et n’interroge pas ces registres.
+1. Choisissez **Action suivante** → **Configuration des canaux** et soumettez le formulaire. Dans **Appareil**, choisissez **ecoMain** ou un **ecoSub** sélectionné et actuellement en ligne, puis **Action** → **Continuer** et soumettez. **ecoSolarMonitor** n’est pas un compteur à dix canaux et ne figure pas dans cette liste.
+2. Dépliez les dix sections, de **Canal 1** à **Canal 10**. Chacune propose **Phase** (**L1**, **L2**, **L3**) et **Transformateur de courant** (**30 A** ou **100 A**).
+3. Pour ecoMain, la section **Transformateurs de courant du circuit principal** propose **L1/L2/L3**, chacun limité à **100 A**. Une valeur stockée non prise en charge n’a pas de valeur par défaut inventée ; choisissez une valeur prise en charge avant d’enregistrer.
+4. Choisissez **Action** → **Enregistrer** et soumettez le formulaire pour écrire et vérifier immédiatement le matériel, puis revenir au menu en cas de succès.
 
-Après l’ajout, ouvrez **Configurer**. Le firmware 139 propose **Phases des canaux** ; à partir de 140, **Configuration des canaux** permet de régler la phase et le transformateur de courant (30 A ou 100 A) de chaque canal d’ecoMain ou d’un ecoSub sélectionné et en ligne. Les transformateurs du circuit principal L1/L2/L3 d’ecoMain acceptent seulement 100 A. ecoSolarMonitor est exclu du choix des compteurs.
+<!-- screenshot-placeholder: channel-device -->
 
-Si ecoSolarMonitor est sélectionné, **Configuration ecoSolarMonitor** règle la puissance PV installée de l’ecoMain courant (entier `0`–`4294967295` W), le coefficient de température de puissance (`-32.768`–`32.767` %/°C, trois décimales au maximum) et les canaux d’onduleur `1`–`10`, regroupés sous ecoMain et chaque ecoSub en ligne, même sans mesures HA sélectionnées. Un groupe affiché vide est effacé ; les appareils masqués ou hors ligne conservent leurs valeurs matérielles.
+> Capture à ajouter : **Configuration des canaux → Appareil**, ecoMain et ecoSub sélectionnés en ligne, **Action → Continuer**, sans ecoSolarMonitor.
 
-**Enregistrer** lit immédiatement le matériel, écrit seulement les modifications et les vérifie par relecture. Un échec partiel n’annule pas les écritures réussies. **Retour** et **Annuler** n’annulent pas les réglages matériels déjà enregistrés. Les sélections HA et les entités supplémentaires sont enregistrées séparément à la fin du flux d’options. Ces pages sont locales, ne créent aucune entité de commande et ne figurent pas dans les anciennes captures d’écran.
+<!-- screenshot-placeholder: channel-settings -->
+
+> Capture à ajouter : **Configuration des canaux**, dix sections avec **Phase**, **Transformateur de courant**, les **Transformateurs de courant du circuit principal** d’ecoMain et **Action → Enregistrer**.
+
+#### Configuration ecoSolarMonitor
+
+1. Gardez **ecoSolarMonitor** sélectionné dans **Ajuster ecoMain**. Choisissez **Action suivante** → **Configuration ecoSolarMonitor** et soumettez le formulaire. Ces réglages appartiennent à l’**ecoMain** parent courant, même si les canaux d’onduleur proviennent d’ecoSub.
+2. Saisissez **Puissance PV installée**, un entier de **0** à **4294967295 W**, puis **Coefficient de température de puissance**, de **-32.768** à **32.767 %/°C**, avec **trois décimales** au maximum (pas de **0.001**).
+3. Sélectionnez les canaux d’onduleur de **Canal 1** à **Canal 10** dans les listes affichées **ecoMain**, **ecoSub 1**, **ecoSub 2** et **ecoSub 3**. Tous les ecoSub détectés en ligne sont proposés, même sans mesures HA sélectionnées ; aucune sélection supplémentaire d’ecoSub n’est nécessaire.
+4. Une liste affichée vide **efface** les canaux d’onduleur de ce groupe. Les groupes masqués/hors ligne conservent leurs valeurs matérielles.
+5. Choisissez **Action** → **Enregistrer** et soumettez le formulaire pour écrire et vérifier immédiatement le matériel, puis revenir au menu en cas de succès.
+
+<!-- screenshot-placeholder: solar-settings -->
+
+> Capture à ajouter : **Configuration ecoSolarMonitor**, **Puissance PV installée**, **Coefficient de température de puissance**, listes de canaux d’onduleur des compteurs en ligne et **Action → Enregistrer**.
+
+L’enregistrement lit immédiatement le matériel, écrit uniquement les modifications et les vérifie par relecture. Un échec partiel n’annule pas les écritures réussies. Les erreurs d’écriture ou de vérification indiquent le champ ou la section concernée ; contrôlez les valeurs affichées avant de réessayer. **Retour**, **Annuler** et l’annulation depuis le menu ne rétablissent pas les anciennes valeurs matérielles. Les appareils, mesures HA et entités supplémentaires sont enregistrés séparément : dans **Ajuster ecoMain**, choisissez **Action suivante** → **Terminer** et soumettez le formulaire.
 
 ### Phases des canaux (mode local uniquement)
 
@@ -502,6 +544,41 @@ Le firmware 136–138 propose seulement les trois premières mesures, sélection
 | Fréquence | `frequency_rt` | Hz | `main` |
 
 La fréquence possède uniquement la clé complète `main_frequency_rt`, sans phase ni canal. Exemples : `main_all_reactive_power_rt`, `main_l2_voltage_rt`, `sub2_ch4_reactive_energy_fwd_total`. `_rt` indique une valeur instantanée et `_total` un compteur cumulé. Le facteur de puissance est sans unité, pas en pourcentage. Le sens du transformateur de courant (CT) définit les directions directe/inverse ; un CT inversé peut entraîner une puissance active négative et l’augmentation du compteur inverse.
+
+<a id="solar-entities"></a>
+
+### ecoSolarMonitor
+
+Chaque ecoMain possède un **ecoSolarMonitor** (indice `4`, à côté des ecoSub `1`–`3`). Il propose quatorze mesures indépendantes et ne possède pas dix canaux de compteur, même si les canaux d’onduleur proviennent d’ecoSub. Le tableau associe les libellés de **Types de mesures** aux véritables composants de nom HA avec traits de soulignement, sans préfixe de point de mesure. HA peut ajouter le nom de l’appareil et produire un ID `sensor.…` complet ; utilisez l’ID réel de la page de l’entité.
+
+| Libellé de mesure | Composant du nom HA | Unité native | Sélection par défaut |
+| --- | --- | --- | --- |
+| Irradiance | `solar_irradiance` | W/m² | Oui |
+| Angle D’Inclinaison | `solar_tilt_angle` | ° | Oui |
+| Température Du Module | `solar_module_temperature` | °C | Oui |
+| Puissance Réelle | `solar_actual_power` | W | Oui |
+| Puissance Estimée | `solar_estimated_power` | W | Oui |
+| Ratio De Performance | `solar_performance_ratio` | % | Non |
+| Énergie Réelle Cumulée | `solar_actual_energy` | Wh | Non |
+| Énergie Estimée Cumulée | `solar_estimated_energy` | Wh | Non |
+| Ratio De Performance D’Hier | `solar_yesterday_performance_ratio` | % | Non |
+| Énergie Estimée D’Hier | `solar_yesterday_estimated_energy` | Wh | Non |
+| Énergie Réelle D’Hier | `solar_yesterday_actual_energy` | Wh | Non |
+| Ratio De Performance Du Jour | `solar_today_performance_ratio` | % | Non |
+| Énergie Estimée Du Jour | `solar_today_estimated_energy` | Wh | Non |
+| Énergie Réelle Du Jour | `solar_today_actual_energy` | Wh | Non |
+
+Le solaire ajoute un capteur par mesure sélectionnée : cinq par défaut, quatorze au maximum, sans ajouter dix canaux de compteur.
+
+L’irradiance, l’inclinaison, la température, les deux puissances et le ratio général utilisent `MEASUREMENT` ; les deux énergies cumulées utilisent `TOTAL_INCREASING`. HA peut convertir les unités natives pour l’affichage.
+
+Les quatorze mesures sont facultatives ; les cinq sélections par défaut restent inchangées. Les sélections enregistrées, même vides, ne sont pas étendues. Toutes les valeurs sont lues directement dans l’appareil puis multipliées par le facteur du protocole. L’intégration ne calcule ni cumul journalier, ni différence, ni ratio de performance, ni changement de date. Les deux compteurs d’énergie du jour utilisent `TOTAL_INCREASING` ; les énergies d’hier et les deux ratios journaliers sont des instantanés sans classe d’état. Les valeurs courantes, y compris zéro après une remise à zéro ou un retour en ligne, sont publiées directement. Les énergies et ratios journaliers activés rejoignent leurs groupes de sources de formule existants ; les valeurs non sélectionnées restent absentes et les types de résultat ne changent pas.
+
+Protocole 1.0.6 : puissances estimée/réelle à partir de `4006`/`4008` (Int32, `0.01` W), énergies cumulées estimée/réelle à partir de `4010`/`4014` (UInt64, `0.001` Wh). Le ratio, l’énergie estimée et l’énergie réelle d’hier commencent à `4018`/`4019`/`4023`, ceux du jour à `4027`/`4028`/`4032`. Les ratios sont en Int16 avec un facteur de `0.1` %, et chaque énergie occupe quatre registres, mot faible en premier. Le registre `4001` contient l’irradiance sans compensation et `4003` la température interne du capteur d’irradiance ; l’intégration n’expose pas ces mesures et n’interroge pas ces registres.
+
+<!-- screenshot-placeholder: solar-entities -->
+
+> Capture à ajouter : appareil ecoSolarMonitor et entités solaires activées avec leurs vrais noms HA contenant des traits de soulignement et leurs unités.
 
 ### Mode cloud
 
@@ -652,11 +729,7 @@ Si une entrée avec le même ID existe déjà, vous ne pouvez pas l’ajouter un
 
 ### Q8 : Que puis-je modifier après la configuration ?
 
-Ouvrez le flux **Configurer** / **Options** de l’entrée existante dans Home Assistant.
-
-Vous pouvez modifier les esclaves ecoSub sélectionnés, les types de mesures, les entités supplémentaires et, en mode local, les phases des canaux. Le type d’appareil, la méthode d’ajout et le maître ecoMain sélectionné ne peuvent pas être modifiés directement.
-
-Pour ces réglages non modifiables, supprimez l’entrée existante puis ajoutez-la de nouveau avec les nouveaux paramètres.
+Vous pouvez modifier les ecoSub/ecoSolarMonitor sélectionnés, les mesures et les entités supplémentaires. En local, le firmware 139 propose **Phases des canaux** ; le firmware 140 ou ultérieur confirmé propose **Configuration des canaux** et, avec le solaire sélectionné, **Configuration ecoSolarMonitor**. Les choix HA sont enregistrés avec **Terminer** et la soumission du menu ; les écritures matérielles sont immédiates. Pour ecoPlug, vous pouvez modifier les prises. Le type d’appareil, la méthode et le maître ecoMain ne changent pas sur place.
 
 ---
 
@@ -673,25 +746,9 @@ Consultez les notes de version avant d’installer une nouvelle version. Si une 
 
 ### Q10 : Pourquoi je ne vois que certains esclaves ou canaux ?
 
-L’intégration applique plusieurs filtres :
+Les nouveaux sous-appareils locaux doivent être détectés en ligne : ecoSub `1`–`3`, et ecoSolarMonitor `4` avec firmware 140 ou ultérieur confirmé. Les sélections existantes sont conservées hors ligne ou en cas d’échec de détection du firmware ; leurs capteurs sont indisponibles, les autres continuent à s’actualiser. Seuls les appareils sélectionnés avec des mesures activées créent des capteurs. Vérifiez l’alimentation et le câblage des appareils absents.
 
-1. **Sous-appareils disponibles** : ecoSub utilise les indices `1`, `2`, `3` ; le firmware local 140 ou ultérieur ajoute un ecoSolarMonitor avec indice `4`.
-2. **Esclaves en ligne** (mode local) :
-    - L’intégration lit des registres « esclaves en ligne ».
-    - Seuls les esclaves marqués comme en ligne sont proposés.
-3. **Esclaves sélectionnés** :
-    - Seuls les esclaves que vous avez choisis dans le formulaire sont réellement créés en entités.
-
-Vous verrez donc des entités pour :
-
-- Des indices d’esclaves supportés
-- Détectés comme en ligne (local)
-- Et que vous avez explicitement sélectionnés
-
-Si des sous-appareils manquent :
-
-- Vérifiez que les esclaves sont alimentés et correctement câblés.
-- Supprimez puis ré-ajoutez l’intégration en incluant les esclaves manquants.
+Ouvrez **Configurer → Ajuster ecoMain**, choisissez les appareils détectés puis **Types de mesures**, enfin **Terminer** et soumettez. Une sélection solaire seule est possible. Supprimez les entités supplémentaires dépendantes avant de désélectionner. Rechargez après une mise à jour du firmware. Les valeurs solaires journalières proviennent directement du matériel ; l’intégration ne reconstitue pas les jours manqués ni les changements de date.
 
 ---
 

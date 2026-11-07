@@ -11,6 +11,7 @@ This repository provides a Home Assistant (HA) custom integration for **enecess*
 - **ecoMain**
     - Local (Modbus TCP, with zeroconf / mDNS discovery)
     - Cloud (enecess cloud)
+- **ecoSolarMonitor**: local only, through its parent ecoMain with confirmed firmware **140 or later**. Select it with ecoMain; it is not a separate device type in Add Integration.
 - **ecoPlug**
     - Cloud only (enecess cloud)
     - One account entry can select one or more plugs by name and serial number.
@@ -155,13 +156,13 @@ Steps (applies to both starts):
 2. The integration will scan your network via **mDNS** for matching services.
 3. If devices are found, select the correct ecoMain by **serial number** (and IP/hostname shown).
 4. Confirm the device information (serial and address).
-5. The integration will first check the **firmware version** of the device, then connect via **Modbus TCP** and detect **online sub-devices**: ecoSub, plus ecoSolarMonitor on firmware 140 or later.
-6. If sub-devices are detected, select which to add (optional).
-7. Select **Measurement Types**, then optionally configure **Extra Entities**:
+5. The integration checks the **firmware version**, connects via **Modbus TCP** and detects online ecoSub devices and, on confirmed firmware 140 or later, ecoSolarMonitor.
+6. On **Setup Device**, select **ecoSolarMonitor** in **Select Slaves to Add** along with any ecoSub devices you want, then choose **Action** → **Continue** and submit the form. If no sub-devices are detected, continue with ecoMain alone.
+7. On **Measurement Types**, choose readings separately in **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**. Choose **Action** → **Save** and submit the form, then optionally configure **Extra Entities**:
     - Create inverted or absolute-value entities from power sources.
     - Create sum or average entities from multiple power or energy sources of the same type.
     - Aggregate entities keep the same `device_class`, `state_class`, and native unit as their source type.
-8. Finish to create the integration entry.
+8. On **Extra Entities**, choose **Next Action** → **Finish** and submit the form to create the integration entry.
 
 Troubleshooting tips:
 
@@ -182,11 +183,15 @@ Troubleshooting tips:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Screenshot to add: **Setup Device**, showing **Select Slaves to Add** with online ecoSub devices and **ecoSolarMonitor**, plus **Action → Continue**.
 
 ---
 
-> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Screenshot to add: **Measurement Types**, with firmware version, separate **ecoSolarMonitor** and **ecoMain / ecoSub** groups, solar defaults and **Action → Save**.
 
 ---
 
@@ -219,13 +224,13 @@ Steps:
     - **Master Serial Number**
     - **Address (IP or Hostname)**
 3. Confirm the device information.
-4. The integration will first check the **firmware version**, then connect via **Modbus TCP** and detect **online sub-devices**: ecoSub, plus ecoSolarMonitor on firmware 140 or later.
-5. If sub-devices are detected, select which to add (optional).
-6. Select **Measurement Types**, then optionally configure **Extra Entities**:
+4. The integration checks the **firmware version**, connects via **Modbus TCP** and detects online ecoSub devices and, on confirmed firmware 140 or later, ecoSolarMonitor.
+5. On **Setup Device**, select **ecoSolarMonitor** in **Select Slaves to Add** along with any ecoSub devices you want, then choose **Action** → **Continue** and submit the form. If no sub-devices are detected, continue with ecoMain alone.
+6. On **Measurement Types**, choose readings separately in **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**. Choose **Action** → **Save** and submit the form, then optionally configure **Extra Entities**:
     - Create inverted or absolute-value entities from power sources.
     - Create sum or average entities from multiple power or energy sources of the same type.
     - Aggregate entities keep the same `device_class`, `state_class`, and native unit as their source type.
-7. Finish to create the integration entry.
+7. On **Extra Entities**, choose **Next Action** → **Finish** and submit the form to create the integration entry.
 
 Troubleshooting tips:
 
@@ -246,11 +251,15 @@ Troubleshooting tips:
 
 ---
 
-> ![Select online slaves](docs/images/ecomain-select-slaves.png)
+<!-- screenshot-placeholder: local-subdevices -->
+
+> Screenshot to add: **Setup Device**, showing **Select Slaves to Add** with online ecoSub devices and **ecoSolarMonitor**, plus **Action → Continue**.
 
 ---
 
-> ![Select local measurement types](docs/images/ecomain-measurement-types-local.png)
+<!-- screenshot-placeholder: local-measurements -->
+
+> Screenshot to add: **Measurement Types**, with firmware version, separate **ecoSolarMonitor** and **ecoMain / ecoSub** groups, solar defaults and **Action → Save**.
 
 ---
 
@@ -389,7 +398,16 @@ You cannot change:
 > **Process Screenshot:**
 > ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
 > ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-> ![Options placeholder](docs/images/ecomain-options-placeholder-3.png)
+
+For an existing local entry:
+
+1. Open **Configure** to reach **Adjust ecoMain**. In **Select Slaves to Add**, keep or select **ecoSolarMonitor** and any ecoSub devices you need. Set **Next Action** to **Measurement Types** and submit the form.
+2. Choose readings in the separate **ecoSolarMonitor** and **ecoMain / ecoSub** groups. Set **Action** to **Save** and submit the form to return to **Adjust ecoMain**.
+3. Optionally use **Channel Configuration** or **ecoSolarMonitor Configuration**; their availability follows your current draft selection. On the menu, choose **Next Action** → **Finish** and submit the form to save HA choices.
+
+<!-- screenshot-placeholder: options-menu -->
+
+> Screenshot to add: **Adjust ecoMain**, with the sub-device picker and **Next Action** choices for measurements, channel configuration, solar configuration and **Finish**.
 
 If you need to change immutable settings:
 
@@ -400,10 +418,11 @@ If you need to change immutable settings:
 
 ### Measurement Types
 
-- During ecoMain setup, select **Measurement Types** after choosing sub-devices and before configuring extra entities.
-- Open **Configure → Measurement Types** to change them later.
-- Select at least one type.
-- Remove any extra entities that depend on a measurement before deselecting it.
+- Select measurements after choosing sub-devices and before configuring extra entities. For later changes, use **Configure → Adjust ecoMain**, choose **Next Action** → **Measurement Types**, and submit the form.
+- With ecoSolarMonitor selected on confirmed local firmware 140 or later, **ecoSolarMonitor** and **ecoMain / ecoSub** are separate groups. Choose at least one reading across the two groups; either group can be empty, so solar-only selection is supported.
+- Choose **Action** → **Save** and submit the form. Complete the setup/options menu with **Next Action** → **Finish** and submit again to save HA choices.
+- Previously selected devices and measurements survive outages, failed firmware probes and firmware downgrades. Existing entity IDs, custom names and disabled choices are retained; unsupported or offline readings become unavailable. Only explicit deselection removes them.
+- Remove dependent extra entities before deselecting their measurements or devices. New solar selections require a confirmed firmware-140-or-later probe. The fourteen solar readings and five defaults are listed in [the solar entity catalog](#solar-entities).
 
 Local mode offers twelve measurement categories on firmware 139 or later; firmware 136–138 supports only active power and forward/reverse active energy:
 
@@ -424,35 +443,6 @@ Local mode offers twelve measurement categories on firmware 139 or later; firmwa
 
 Availability follows the device registers: not every category has a three-phase total or a value for every channel. ecoSub exposes channel measurements. Cloud mode offers only **Active Power** and **Energy**, both on by default. Energy controls both accumulated energy and raw one-minute increments. ecoPlug retains its fixed switch, power and energy entities.
 
-### ecoSolarMonitor Measurements (Local Firmware 140 or Later)
-
-Select the detected **ecoSolarMonitor** sub-device, then choose its measurements in the separate **ecoSolarMonitor** group under **Measurement Types**. Each ecoMain owns exactly one ecoSolarMonitor device (child index `4`), alongside ecoSub indices `1`–`3`. It offers fourteen optional measurements, with the same first five selected by default, and has no ten-channel meter layout. It belongs to the current ecoMain even when inverter channels come from an ecoSub.
-
-| Measurement Label | Full Measurement Key | Native Unit | Register / Type / Scale | Selected by Default |
-| --- | --- | --- | --- | --- |
-| Irradiance | `solar_irradiance` | W/m² | 4000 / Int16 / 0.1 | Yes |
-| Tilt Angle | `solar_tilt_angle` | ° | 4004 / Int16 / 0.1 | Yes |
-| Module Temperature | `solar_module_temperature` | °C | 4002 / Int16 / 0.1 | Yes |
-| Actual Power | `solar_actual_power` | W | 4008 / Int32 / 0.01 | Yes |
-| Estimated Power | `solar_estimated_power` | W | 4006 / Int32 / 0.01 | Yes |
-| Performance Ratio | `solar_performance_ratio` | % | 4005 / Int16 / 0.1 | No |
-| Cumulative Actual Energy | `solar_actual_energy` | Wh | 4014 / UInt64 / 0.001 | No |
-| Cumulative Estimated Energy | `solar_estimated_energy` | Wh | 4010 / UInt64 / 0.001 | No |
-| Yesterday Performance Ratio | `solar_yesterday_performance_ratio` | % | 4018 / Int16 / 0.1 | No |
-| Yesterday Estimated Energy | `solar_yesterday_estimated_energy` | Wh | 4019 / UInt64 / 0.001 | No |
-| Yesterday Actual Energy | `solar_yesterday_actual_energy` | Wh | 4023 / UInt64 / 0.001 | No |
-| Today Performance Ratio | `solar_today_performance_ratio` | % | 4027 / Int16 / 0.1 | No |
-| Today Estimated Energy | `solar_today_estimated_energy` | Wh | 4028 / UInt64 / 0.001 | No |
-| Today Actual Energy | `solar_today_actual_energy` | Wh | 4032 / UInt64 / 0.001 | No |
-
-The first six use `MEASUREMENT`. Cumulative energy and today's two native device counters use `TOTAL_INCREASING`. Yesterday's two energy readings and both daily performance ratios are snapshots with no state class. All values are direct device readings multiplied by the protocol scale; the integration performs no daily accumulation, subtraction, PR calculation or date rollover. A new device value, including zero after a daily reset, is published directly, also after offline recovery. Existing saved selections, including an empty selection, are not expanded with new fields.
-
-Int16 fields occupy one register, Int32 two and UInt64 four, in low-word-first order. Register `4001` measures uncompensated irradiance and `4003` the irradiance sensor's internal temperature; this integration exposes neither measurement and does not poll either register. Power resolution is `0.01` W and energy resolution is `0.001` Wh; signed performance ratios use `0.1` %.
-
-These Title Case labels describe measurement configuration and documentation. Physical sensor names use the full keys above, following the existing ecoMain naming convention; there are no translated entity-name labels.
-
-Configured selections survive temporary device outages, failed firmware probes and firmware downgrades. Existing entity IDs, custom names and disabled choices are retained; unavailable capabilities make their sensors unavailable. Only explicit deselection removes configured identities. Remove dependent extra entities before deselecting their devices or measurements. Solar-only measurement selection is supported when ecoSolarMonitor is selected.
-
 ### Custom formula entities
 
 Create a sensor from your measurements, such as the difference or average of two power readings.
@@ -464,7 +454,7 @@ Create a sensor from your measurements, such as the difference or average of two
 
 Only firmware-supported and enabled measurements are offered. Empty groups are hidden, and choosing formula sources never enables measurements automatically. Cumulative active energy (Wh), cumulative reactive energy (varh), cumulative apparent energy (VAh), and cloud 1-minute active energy increments (Wh) are separate source groups. You may combine different source types and must check the formula’s units yourself. Variables `a`, `b`, etc. are shared across groups. Each time you continue from the source page, including when editing or after going back, their bindings are regenerated from `a` and the previous expression is cleared. Active, reactive and apparent energy results use `TOTAL`, allowing increases and decreases for net energy calculations. **Number** produces a pure numeric result with no unit or device class and uses `MEASUREMENT`.
 
-On confirmed local firmware 140 or later, enabled ecoSolarMonitor measurements are also formula inputs. Actual Power and Estimated Power join power sources; Cumulative Actual Energy, Cumulative Estimated Energy and all four daily energy readings join the existing active energy source group; the two daily performance ratios join the existing Performance Ratio group. Irradiance (W/m²), Module Temperature (°C), Tilt Angle (°) and Performance Ratio (%) have their own source groups. These inputs do not add formula result types: use an existing result type, including **Number** where appropriate, and check the resulting units.
+On confirmed local firmware 140 or later, select ecoSolarMonitor and enable the required readings under **Measurement Types** first. On **Select Source Entities**, `solar_actual_power` and `solar_estimated_power` appear in **Active power (W)**; the two cumulative and all four daily energy readings appear in **Active energy (cumulative, Wh)**. **Irradiance (W/m²)**, **Module temperature (°C)**, **Tilt angle (°)** and **Performance ratio (%)** are separate groups, with all three performance-ratio readings in the last group. Choices show the actual HA names and units, such as `solar_today_actual_energy (Wh)`. Empty groups are hidden. Solar sources add no result types: choose an available existing type, including **Number (no unit)** where appropriate, and check the arithmetic units yourself.
 
 > ![Add formula entity](docs/images/ecomain-formula-add.png)
 
@@ -474,7 +464,9 @@ On confirmed local firmware 140 or later, enabled ecoSolarMonitor measurements a
 
 ---
 
-> ![Select formula source entities](docs/images/ecomain-formula-sources.png)
+<!-- screenshot-placeholder: solar-formula-sources -->
+
+> Screenshot to add: **Select Source Entities**, with enabled solar names and units under power, active energy, irradiance, module temperature, tilt angle and performance-ratio groups.
 
 ---
 
@@ -513,14 +505,36 @@ The interface shown in the screenshots may vary with the Home Assistant or integ
 
 ### Installation Settings (Local Firmware 140 or Later)
 
-Open **Configure** after commissioning the entry. These options require confirmed local firmware 140 or later and re-check firmware before accessing hardware settings. They are unavailable in cloud mode and do not create control entities.
+Open **Configure → Adjust ecoMain** after adding the local entry. These settings require confirmed firmware **140 or later** and re-check firmware before accessing hardware. Firmware **139** retains **Channel Phases**, shown in the phase screenshots. The following pages are local only and create no control entities.
 
-- **Channel Configuration**: select ecoMain or a selected, currently online ecoSub. Each of its ten channel sections offers **Phase** (`L1`, `L2`, `L3`) and a **Current Transformer** dropdown limited to **30 A** or **100 A**. ecoMain also has a separate **Main Circuit Current Transformers** section for L1/L2/L3, each limited to **100 A**. Unsupported stored values have no invented default; choose a supported value before saving. ecoSolarMonitor is excluded from this meter picker.
-- **ecoSolarMonitor Configuration**: available when ecoSolarMonitor is selected. Configure the current ecoMain's **Installed PV Capacity** (integer `0`–`4294967295` W) and **Power Temperature Coefficient** (`-32.768`–`32.767` %/°C, at most three decimal places). The same page groups inverter-channel selections under ecoMain and each detected online ecoSub, including ecoSubs whose HA measurements were not selected. Each group selects any of channels `1`–`10`; an empty selection clears that displayed group's inverter channels. Hidden/offline devices keep their existing hardware values. PV settings and inverter groups remain owned by the current ecoMain, with no extra ecoSub-selection step.
+#### Channel Configuration
 
-**Save** on either installation page immediately reads current hardware, writes only changed values and reads them back to verify. Successful writes are not rolled back if another field fails. Errors identify the affected field or channel section; check those values before retrying. **Back**, **Cancel**, or cancelling the options home page cannot undo hardware settings already saved. Pending HA selections and extra-entity changes are committed separately when finishing the options flow.
+1. Set **Next Action** to **Channel Configuration** and submit the form. In **Device**, choose **ecoMain** or a selected, currently online **ecoSub**, then choose **Action** → **Continue** and submit. **ecoSolarMonitor** is not a ten-channel meter and is excluded from this picker.
+2. Expand the ten sections, **Channel 1** through **Channel 10**. Each has **Phase** (**L1**, **L2**, **L3**) and **Current Transformer** (**30 A** or **100 A**).
+3. For ecoMain, the separate **Main Circuit Current Transformers** section has **L1**, **L2** and **L3**, each limited to **100 A**. Unsupported stored values have no invented default; choose a supported value before saving.
+4. Choose **Action** → **Save** and submit the form to write and verify the hardware settings and return to the options menu.
 
-The existing screenshots illustrate earlier flows; they do not show or validate these firmware-140 installation pages.
+<!-- screenshot-placeholder: channel-device -->
+
+> Screenshot to add: **Channel Configuration → Device**, showing ecoMain and selected online ecoSubs, plus **Action → Continue**; no ecoSolarMonitor choice.
+
+<!-- screenshot-placeholder: channel-settings -->
+
+> Screenshot to add: **Channel Configuration**, with ten channel sections showing **Phase** and **Current Transformer**, ecoMain’s **Main Circuit Current Transformers**, and **Action → Save**.
+
+#### ecoSolarMonitor Configuration
+
+1. Keep **ecoSolarMonitor** selected in **Adjust ecoMain**. Set **Next Action** to **ecoSolarMonitor Configuration** and submit the form. This configures the current parent **ecoMain**, even when inverter channels belong to ecoSub.
+2. Enter **Installed PV Capacity**: an integer from **0** to **4294967295 W**. Enter **Power Temperature Coefficient**: **-32.768** to **32.767 %/°C**, with at most **three decimal places** (step **0.001**).
+3. Select inverter channels **Channel 1** through **Channel 10** in the **ecoMain**, **ecoSub 1**, **ecoSub 2** and **ecoSub 3** lists that are displayed. All detected online ecoSubs are eligible here, including those whose HA measurements were not selected; no additional ecoSub-selection step is needed.
+4. Leave a displayed list empty to **clear** that group’s inverter channels. Hidden/offline groups keep their existing hardware values.
+5. Choose **Action** → **Save** and submit the form to write and verify these hardware settings and return to the options menu.
+
+<!-- screenshot-placeholder: solar-settings -->
+
+> Screenshot to add: **ecoSolarMonitor Configuration**, showing **Installed PV Capacity**, **Power Temperature Coefficient**, online meter inverter-channel lists and **Action → Save**.
+
+Saving either installation form immediately reads the current hardware, writes only changed values and verifies them by readback. Successful writes remain applied if another field fails. Write or verification errors identify the affected field or channel section; check the displayed values before retrying. **Back**, **Cancel**, and cancellation on the options menu cannot undo saved hardware changes. HA device/measurement selections and extra entities are saved separately: choose **Next Action** → **Finish** on **Adjust ecoMain** and submit the form.
 
 ## Device Naming
 
@@ -553,7 +567,7 @@ Ordinary ecoMain keys follow `<location>_<suffix>`:
 | Main branches | `main_ch1` … `main_ch10` | Local and cloud |
 | Selected slave branches | `sub1_ch1` … `sub3_ch10` | Ten channels per selected ecoSub |
 
-ecoSub devices have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected ecoSub. ecoSolarMonitor uses the fourteen full keys in [its measurement table](#ecosolarmonitor-measurements-local-firmware-140-or-later), without a location prefix or channel suffix.
+ecoSub devices have no separate L1/L2/L3, three-phase total or frequency entities. “Branches” below includes the ten main channels and ten channels per selected ecoSub. ecoSolarMonitor uses the fourteen full keys in [its measurement table](#solar-entities), without a location prefix or channel suffix.
 
 ### Complete local measurement catalog (Modbus)
 
@@ -583,6 +597,39 @@ With `s` selected slaves, the three default categories create `42 + 30 × s` sen
 #### Current transformer (CT) direction
 
 The CT arrow marks the forward direction. `energy_fwd_total` accumulates active energy in that direction; `energy_rev_total` accumulates active energy in the opposite direction. `reactive_energy_fwd_total` and `reactive_energy_rev_total` are the device's cumulative forward and reverse reactive energy readings. `_rt` denotes an instantaneous measurement; `fwd_total` and `rev_total` denote directional cumulative values.
+
+<a id="solar-entities"></a>
+
+### ecoSolarMonitor
+
+Each ecoMain owns one **ecoSolarMonitor** (child index `4`, alongside ecoSub indices `1`–`3`). It has fourteen independently selectable readings and no ten-channel layout, even when inverter channels come from an ecoSub. The friendly labels below match **Measurement Types**; the underscore-separated names are the actual HA sensor name components, without a meter location prefix. HA may add the device name and generate a full `sensor.…` entity ID; use the actual ID shown on the entity page.
+
+| Measurement label | HA name component | Native Unit | Register / Type / Scale | Selected by Default |
+| --- | --- | --- | --- | --- |
+| Irradiance | `solar_irradiance` | W/m² | 4000 / Int16 / 0.1 | Yes |
+| Tilt Angle | `solar_tilt_angle` | ° | 4004 / Int16 / 0.1 | Yes |
+| Module Temperature | `solar_module_temperature` | °C | 4002 / Int16 / 0.1 | Yes |
+| Actual Power | `solar_actual_power` | W | 4008 / Int32 / 0.01 | Yes |
+| Estimated Power | `solar_estimated_power` | W | 4006 / Int32 / 0.01 | Yes |
+| Performance Ratio | `solar_performance_ratio` | % | 4005 / Int16 / 0.1 | No |
+| Cumulative Actual Energy | `solar_actual_energy` | Wh | 4014 / UInt64 / 0.001 | No |
+| Cumulative Estimated Energy | `solar_estimated_energy` | Wh | 4010 / UInt64 / 0.001 | No |
+| Yesterday Performance Ratio | `solar_yesterday_performance_ratio` | % | 4018 / Int16 / 0.1 | No |
+| Yesterday Estimated Energy | `solar_yesterday_estimated_energy` | Wh | 4019 / UInt64 / 0.001 | No |
+| Yesterday Actual Energy | `solar_yesterday_actual_energy` | Wh | 4023 / UInt64 / 0.001 | No |
+| Today Performance Ratio | `solar_today_performance_ratio` | % | 4027 / Int16 / 0.1 | No |
+| Today Estimated Energy | `solar_today_estimated_energy` | Wh | 4028 / UInt64 / 0.001 | No |
+| Today Actual Energy | `solar_today_actual_energy` | Wh | 4032 / UInt64 / 0.001 | No |
+
+The ecoMain/ecoSub count formulas above count only selected ecoSubs as `s`. Solar adds one sensor per selected solar reading: five by default, up to fourteen; it does not add ten meter channels.
+
+The first six use `MEASUREMENT`. Cumulative energy and today's two native device counters use `TOTAL_INCREASING`. Yesterday's two energy readings and both daily performance ratios are snapshots with no state class. All values are direct device readings multiplied by the protocol scale; the integration performs no daily accumulation, subtraction, PR calculation or date rollover. A new device value, including zero after a daily reset, is published directly, also after offline recovery. Existing saved selections, including an empty selection, are not expanded with new fields.
+
+Int16 fields occupy one register, Int32 two and UInt64 four, in low-word-first order. Register `4001` measures uncompensated irradiance and `4003` the irradiance sensor's internal temperature; this integration exposes neither measurement and does not poll either register. Power resolution is `0.01` W and energy resolution is `0.001` Wh; signed performance ratios use `0.1` %.
+
+<!-- screenshot-placeholder: solar-entities -->
+
+> Screenshot to add: the ecoSolarMonitor device and its enabled solar entities, showing actual underscore-separated HA names and units.
 
 ### Complete cloud measurement catalog
 
@@ -747,11 +794,7 @@ If an entry with the same ID already exists, you cannot add it again.
 
 ### Q8: What can I change after setup?
 
-Open the entry’s **Configure** / **Options** flow from Home Assistant.
-
-For ecoMain entries, you can change selected ecoSub/ecoSolarMonitor devices, measurement types, extra entity configuration and local channel phases. Confirmed local firmware 140 or later also offers CT and PV installation settings, as described in [Installation Settings](#installation-settings-local-firmware-140-or-later). For an ecoPlug account entry, you can change which plugs are selected. Device type, add method, and the selected ecoMain master device cannot be changed in place.
-
-To change immutable settings, remove the existing entry and add it again with the new parameters.
+For ecoMain, change selected ecoSub/ecoSolarMonitor devices, measurement types, extra entities and local installation settings. Firmware 139 offers **Channel Phases**; confirmed firmware 140 or later offers **Channel Configuration** and, with solar selected, **ecoSolarMonitor Configuration**. Follow the existing-entry steps above and finish the options menu to save HA choices. Hardware saves apply immediately. For ecoPlug, change selected plugs. Device type, add method and the selected ecoMain master cannot be changed in place.
 
 ---
 
@@ -768,25 +811,9 @@ Check the release notes for upgrade instructions before installing a new version
 
 ### Q10: Why do I only see some slaves or channels?
 
-The integration uses multiple filters:
+New local sub-device choices must be detected online: ecoSub indices `1`–`3`, and ecoSolarMonitor index `4` with confirmed firmware 140 or later. Existing selections are retained while offline or during failed firmware probes; their sensors become unavailable while other devices continue updating. Only selected devices with enabled readings create sensors. Check power and wiring if a device is missing.
 
-1. **Available sub-devices**: ecoSub uses indices `1`, `2`, `3`; local firmware 140 or later also supports one ecoSolarMonitor at index `4`.
-2. **Online slaves** (local mode):
-    - The integration reads a set of “slave online” registers.
-    - New selections are offered only for online sub-devices. Options retain already selected devices while they are offline.
-3. **Selected sub-devices and measurements**:
-    - Only selected sub-devices with enabled measurements create sensors. Offline configured sensors remain registered but become unavailable.
-
-For new sub-device selections, entities are created for:
-
-- Supported slave indices
-- That are detected as online (local)
-- And that you chose in the setup form
-
-If some expected sub-devices are missing:
-
-- Check that the slaves are powered and correctly wired.
-- Open **Configure** to select detected sub-devices and their measurements. Reload after updating firmware.
+Open **Configure → Adjust ecoMain** to add a detected device and choose **Measurement Types**, then **Finish**. Solar-only measurement selection is supported. Remove dependent extra entities before deselecting a device or measurement. Reload after a firmware update. Solar daily values are read directly from the device; the integration does not reconstruct missed days or calculate day changes.
 
 ---
 
