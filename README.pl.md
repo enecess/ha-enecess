@@ -22,9 +22,11 @@ Oprogramowanie starsze niż 136 nie obsługuje połączenia lokalnego; zaktualiz
 
 ---
 
-## Instalacja przez HACS
+## Instalacja
 
-Integracja znajduje się na **domyślnej liście repozytoriów HACS**. Aby ją zainstalować, wyszukaj **enecess** bezpośrednio w HACS.
+**Home Assistant 2026.11 lub nowszy:** Znajdź **enecess** w **Settings → Marketplace**, wybierz **Install** i uruchom ponownie, jeśli pojawi się prośba ([oficjalny przewodnik](https://www.home-assistant.io/integrations/marketplace/)).
+
+**Home Assistant 2026.10 lub starszy:** Integracja znajduje się na **domyślnej liście repozytoriów HACS**. Aby ją zainstalować, wyszukaj **enecess** bezpośrednio w HACS.
 
 ### 1) Zainstaluj HACS (jeśli nie jest jeszcze zainstalowany)
 

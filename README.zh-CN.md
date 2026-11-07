@@ -22,9 +22,11 @@ ecoMain 本地功能与固件版本：
 
 ---
 
-## 通过 HACS 安装
+## 安装集成
 
-本集成已收录到 **HACS 默认仓库列表**，可直接在 HACS 中搜索 **enecess** 安装。
+**Home Assistant 2026.11 或更高版本：** 在 **Settings → Marketplace** 中找到 **enecess**，选择 **Install**，并按提示重启（[官方指南](https://www.home-assistant.io/integrations/marketplace/)）。
+
+**Home Assistant 2026.10 或更早版本：** 本集成已收录到 **HACS 默认仓库列表**，可直接在 HACS 中搜索 **enecess** 安装。
 
 ### 1）安装 HACS（如果你还没有安装）
 

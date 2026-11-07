@@ -22,9 +22,11 @@ Il firmware precedente alla versione 136 non supporta connessioni locali: aggior
 
 ---
 
-## Installazione con HACS
+## Installazione
 
-L’integrazione è inclusa nel **catalogo predefinito di HACS**. Cerca direttamente **enecess** in HACS per installarla.
+**Home Assistant 2026.11 o successivo:** Cerca **enecess** in **Settings → Marketplace**, seleziona **Install** e riavvia se richiesto ([guida ufficiale](https://www.home-assistant.io/integrations/marketplace/)).
+
+**Home Assistant 2026.10 o precedente:** L’integrazione è inclusa nel **catalogo predefinito di HACS**. Cerca direttamente **enecess** in HACS per installarla.
 
 1. Installa HACS seguendo la [guida ufficiale](https://hacs.xyz/docs/use/).
 2. Apri **HACS** in Home Assistant e cerca **enecess**.

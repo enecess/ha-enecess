@@ -22,9 +22,11 @@ Firmware unter 136 unterstützt keine lokale Verbindung; aktualisiere sie mit de
 
 ---
 
-## Installation mit HACS
+## Installation
 
-Diese Integration ist in der **HACS-Standardliste** enthalten. Suche direkt in HACS nach **enecess**, um sie zu installieren.
+**Home Assistant ab 2026.11:** Suche unter **Settings → Marketplace** nach **enecess**, wähle **Install** und folge einer eventuellen Neustartaufforderung ([offizielle Anleitung](https://www.home-assistant.io/integrations/marketplace/)).
+
+**Home Assistant bis 2026.10:** Diese Integration ist in der **HACS-Standardliste** enthalten. Suche direkt in HACS nach **enecess**, um sie zu installieren.
 
 ### 1) HACS installieren (falls noch nicht geschehen)
 

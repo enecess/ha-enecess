@@ -22,9 +22,11 @@ Les versions antérieures à 136 ne permettent pas de connexion locale ; utilise
 
 ---
 
-## Installation avec HACS
+## Installation
 
-Cette intégration figure dans la **liste des dépôts par défaut de HACS**. Recherchez directement **enecess** dans HACS pour l’installer.
+**Home Assistant 2026.11 ou ultérieur :** Dans **Settings → Marketplace**, trouvez **enecess**, choisissez **Install** et redémarrez si demandé ([guide officiel](https://www.home-assistant.io/integrations/marketplace/)).
+
+**Home Assistant 2026.10 ou antérieur :** Cette intégration figure dans la **liste des dépôts par défaut de HACS**. Recherchez directement **enecess** dans HACS pour l’installer.
 
 ### 1) Installer HACS (si ce n’est pas déjà fait)
 
