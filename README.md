@@ -74,11 +74,11 @@ The integration supports **zeroconf (mDNS)** discovery. With ecoMain powered on 
 
 ---
 
-> ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+> ![Discovered ecoMain card with Add](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
+> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### Way 2: From “Add Integration” (manual start)
 
@@ -132,21 +132,27 @@ If discovery finds nothing, try **Manual Setup (Local)**. Check that Home Assist
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Screenshot to add: **Setup Device**, with ecoSub and ecoSolarMonitor in the sub-device list.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Screenshot to add: **Measurement Types**, with ecoSolarMonitor and ecoMain / ecoSub groups and default selections.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types showing the five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Nine optional solar readings and the separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Name and assign ecoMain and ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
 
 ### B) Manual Setup (Local)
 
@@ -168,21 +174,27 @@ Home Assistant must be able to reach the address through your network and firewa
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Screenshot to add: **Setup Device**, with ecoSub and ecoSolarMonitor in the sub-device list.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Screenshot to add: **Measurement Types**, with ecoSolarMonitor and ecoMain / ecoSub groups and default selections.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types showing the five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Nine optional solar readings and the separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Name and assign ecoMain and ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
 
 ### C) Account Login (Cloud)
 
@@ -271,21 +283,17 @@ Open **Settings → Devices & services → enecess → Configure**.
 - For ecoPlug, change the selected plugs.
 - To change device type, connection method or the main ecoMain device, remove the entry and add it again.
 
-> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
-
----
-
-> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-
 To add or adjust solar measurements on an existing local entry:
 
 1. In **Adjust ecoMain → Select Slaves to Add**, select **ecoSolarMonitor** and the ecoSub devices you want, then open **Measurement Types**.
 2. Choose readings in **ecoSolarMonitor** and **ecoMain / ecoSub**, then select **Save**.
 3. Open **Channel Configuration** or **ecoSolarMonitor Configuration** if needed. Return to the menu and select **Finish**.
 
-<!-- screenshot-placeholder: options-menu -->
+> ![Adjust ecoMain with solar selected and upper actions](docs/images/ecomain-solar-options.jpg)
 
-> Screenshot to add: **Adjust ecoMain**, with sub-device selection and the **Next Action** menu.
+---
+
+> ![Next Action list with channel and solar configuration](docs/images/ecomain-solar-options-actions.jpg)
 
 ### Measurement Types
 
@@ -333,9 +341,11 @@ Continuing from the source page clears the previous expression, including when e
 
 > ![Set formula name and result type](docs/images/ecomain-formula-setup.png)
 
-<!-- screenshot-placeholder: solar-formula-sources -->
+---
 
-> Screenshot to add: **Select Source Entities**, with enabled solar sources and units.
+> ![Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+
+---
 
 > ![Enter formula expression](docs/images/ecomain-formula-expression.png)
 
@@ -360,13 +370,15 @@ Open **Configure → Adjust ecoMain** and choose **Channel Configuration** or **
 3. ecoMain's **Main Circuit Current Transformers** section contains **L1, L2, L3**, each supporting **100 A** only.
 4. Select **Save**, then **Finish** when back in the menu.
 
-<!-- screenshot-placeholder: channel-device -->
+> ![Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
-> Screenshot to add: **Channel Configuration**, selecting ecoMain or an online ecoSub.
+---
 
-<!-- screenshot-placeholder: channel-settings -->
+> ![Unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformer choices](docs/images/ecomain-solar-channel-settings.jpg)
 
-> Screenshot to add: **Channel Configuration**, with channel phases, current transformers and main circuit settings.
+---
+
+> ![Main Circuit Current Transformers with the 100 A choice](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor Configuration
 
@@ -378,9 +390,7 @@ Open this page after adding **ecoSolarMonitor**:
 4. Leaving a list empty clears that group's inverter channels.
 5. Select **Save**, then **Finish** when back in the menu.
 
-<!-- screenshot-placeholder: solar-settings -->
-
-> Screenshot to add: **ecoSolarMonitor Configuration**, with installed capacity, temperature coefficient and inverter channels.
+> ![Example PV capacity, temperature coefficient and inverter channels](docs/images/ecomain-solar-configuration.jpg)
 
 > **Device settings take effect immediately when saved. Cancelling configuration afterwards does not undo them.**
 
@@ -478,9 +488,7 @@ ecoSolarMonitor belongs to the current ecoMain and provides fourteen readings. T
 
 Today's energy starts accumulating again each day. Yesterday's energy and performance ratio show the previous day's data.
 
-<!-- screenshot-placeholder: solar-entities -->
-
-> Screenshot to add: ecoSolarMonitor entity list with names and units.
+> ![All fourteen enabled ecoSolarMonitor readings with names and units](docs/images/ecomain-solar-entities-all.jpg)
 
 ### Complete Cloud Measurement Catalog
 

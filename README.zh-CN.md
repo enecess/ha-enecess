@@ -76,11 +76,11 @@ ecoMain 的配置流程有 **两种入口**：
 
 ---
 
-> ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+> ![发现的 ecoMain 卡片及 Add 按钮](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
+> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### 方式二：从“添加集成”入口（手动启动）
 
@@ -150,27 +150,27 @@ ecoMain 目前支持三种添加方式：
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
+> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-<!-- screenshot-placeholder: local-subdevices -->
-
-> 待补截图：**设备设置**：子设备列表中的 ecoSub 和 ecoSolarMonitor。
+> ![Setup Device 中已选择 ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-<!-- screenshot-placeholder: local-measurements -->
-
-> 待补截图：**测量类型**：ecoSolarMonitor、ecoMain / ecoSub 分组及默认选择。
+> ![Measurement Types 中的五项默认太阳能读数](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![九项可选太阳能读数及独立的电表分组](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Extra Entities 中已选择 Finish](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![为 ecoMain 与 ecoSolarMonitor 命名并分配区域](docs/images/ecomain-solar-assign.jpg)
 
 ---
 
@@ -201,27 +201,27 @@ ecoMain 目前支持三种添加方式：
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
+> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-<!-- screenshot-placeholder: local-subdevices -->
-
-> 待补截图：**设备设置**：子设备列表中的 ecoSub 和 ecoSolarMonitor。
+> ![Setup Device 中已选择 ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-<!-- screenshot-placeholder: local-measurements -->
-
-> 待补截图：**测量类型**：ecoSolarMonitor、ecoMain / ecoSub 分组及默认选择。
+> ![Measurement Types 中的五项默认太阳能读数](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![九项可选太阳能读数及独立的电表分组](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Extra Entities 中已选择 Finish](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![为 ecoMain 与 ecoSolarMonitor 命名并分配区域](docs/images/ecomain-solar-assign.jpg)
 
 ---
 
@@ -324,19 +324,17 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 - ecoPlug 可调整已选择的插座。
 - 设备类型、添加方式和 ecoMain 主设备不能直接更改；如需更换，请移除条目后重新添加。
 
-> **流程截图：**
-> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
-> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-
 为已有本地条目添加或调整太阳能测量：
 
 1. 在**调整 ecoMain → 选择要添加的从机**中选择 **ecoSolarMonitor** 及需要的 ecoSub，进入**测量类型**。
 2. 分别选择 **ecoSolarMonitor** 和 **ecoMain / ecoSub** 的读数，选择**保存**。
 3. 按需进入**通道配置**或 **ecoSolarMonitor 配置**；返回菜单后选择**完成**。
 
-<!-- screenshot-placeholder: options-menu -->
+> ![Adjust ecoMain 中的太阳能选择与上部操作](docs/images/ecomain-solar-options.jpg)
 
-> 待补截图：**调整 ecoMain**：子设备选择和**下一步操作**菜单。
+---
+
+> ![Next Action 中的通道配置与太阳能配置入口](docs/images/ecomain-solar-options-actions.jpg)
 
 ### 测量类型
 
@@ -386,9 +384,7 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 ---
 
-<!-- screenshot-placeholder: solar-formula-sources -->
-
-> 待补截图：**选择源实体**：已启用的太阳能来源和单位。
+> ![Select Source Entities 中以 W 为单位的预估与实际太阳能功率](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -415,13 +411,15 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 3. ecoMain 的**主回路电流互感器**分区包含 **L1、L2、L3**，均只支持 **100 A**。
 4. 选择**保存**，返回菜单后选择**完成**。
 
-<!-- screenshot-placeholder: channel-device -->
+> ![Channel Configuration 中已选择 ecoMain](docs/images/ecomain-solar-channel-device.jpg)
 
-> 待补截图：**通道配置**：选择 ecoMain 或在线 ecoSub。
+---
 
-<!-- screenshot-placeholder: channel-settings -->
+> ![未保存的 Channel 4 示例：Phase L2 与 30 A、100 A 互感器选项](docs/images/ecomain-solar-channel-settings.jpg)
 
-> 待补截图：**通道配置**：通道相位、电流互感器和主回路设置。
+---
+
+> ![Main Circuit Current Transformers 中的 100 A 选项](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor 配置
 
@@ -433,9 +431,7 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 4. 列表留空会清除该组逆变器通道。
 5. 选择**保存**，返回菜单后选择**完成**。
 
-<!-- screenshot-placeholder: solar-settings -->
-
-> 待补截图：**ecoSolarMonitor 配置**：装机容量、温度系数和逆变器通道。
+> ![装机容量、温度系数与逆变器通道示例](docs/images/ecomain-solar-configuration.jpg)
 
 > **注意：设备设置保存后立即生效，之后取消配置也不会撤销。**
 
@@ -536,9 +532,7 @@ ecoSolarMonitor 属于当前 ecoMain，提供以下十四项读数。前五项�
 
 今日电量每天重新累计；昨日电量和昨日性能比显示前一天的数据。
 
-<!-- screenshot-placeholder: solar-entities -->
-
-> 待补截图：ecoSolarMonitor 实体列表：名称和单位。
+> ![已启用的全部十四项 ecoSolarMonitor 读数、名称与单位](docs/images/ecomain-solar-entities-all.jpg)
 
 ### 云端模式完整测量清单
 

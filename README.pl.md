@@ -74,11 +74,11 @@ Integracja obsługuje wykrywanie **zeroconf (mDNS)**. Gdy ecoMain jest włączon
 
 ---
 
-> ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+> ![Wykryta karta ecoMain z przyciskiem Add](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
+> ![Potwierdzenie danych lokalnego ecoMain](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### Sposób 2: przez „Dodaj integrację”
 
@@ -132,21 +132,27 @@ Jeśli nic nie znaleziono, spróbuj **Konfiguracja ręczna (lokalnie)**. Sprawd�
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Zrzut do dodania: **Konfiguracja urządzenia**, ecoSub i ecoSolarMonitor na liście urządzeń podrzędnych.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Zrzut do dodania: **Rodzaje pomiarów**, grupy ecoSolarMonitor i ecoMain / ecoSub oraz wybór domyślny.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Potwierdzenie danych lokalnego ecoMain](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device z wybranym ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types z pięcioma domyślnymi odczytami solarnymi](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Dziewięć opcjonalnych odczytów solarnych i osobna grupa liczników](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities z wybraną opcją Finish](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Nadawanie nazw i przypisywanie obszarów ecoMain i ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
 
 ### B) Konfiguracja ręczna (lokalnie)
 
@@ -168,21 +174,27 @@ Home Assistant musi mieć dostęp do adresu przez sieć i zaporę. Modbus TCP u�
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Zrzut do dodania: **Konfiguracja urządzenia**, ecoSub i ecoSolarMonitor na liście urządzeń podrzędnych.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Zrzut do dodania: **Rodzaje pomiarów**, grupy ecoSolarMonitor i ecoMain / ecoSub oraz wybór domyślny.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Potwierdzenie danych lokalnego ecoMain](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device z wybranym ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types z pięcioma domyślnymi odczytami solarnymi](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Dziewięć opcjonalnych odczytów solarnych i osobna grupa liczników](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities z wybraną opcją Finish](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Nadawanie nazw i przypisywanie obszarów ecoMain i ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
 
 ### C) Logowanie do konta (chmura)
 
@@ -271,21 +283,17 @@ Otwórz **Ustawienia → Urządzenia i usługi → enecess → Konfiguruj**.
 - ecoPlug: zmień wybrane gniazdka.
 - Zmiana typu urządzenia, metody połączenia lub głównego ecoMain wymaga usunięcia wpisu i ponownego dodania.
 
-> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
-
----
-
-> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-
 Aby dodać lub zmienić pomiary solarne w istniejącym wpisie lokalnym:
 
 1. W **Dostosuj ecoMain → Wybierz urządzenia podrzędne do dodania** wybierz **ecoSolarMonitor** i potrzebne ecoSub, potem **Rodzaje pomiarów**.
 2. Wybierz odczyty **ecoSolarMonitor** i **ecoMain / ecoSub**, a potem **Zapisz**.
 3. W razie potrzeby otwórz **Konfiguracja kanałów** lub **Konfiguracja ecoSolarMonitor**. Po powrocie do menu wybierz **Zakończ**.
 
-<!-- screenshot-placeholder: options-menu -->
+> ![Adjust ecoMain z wyborem urządzenia solarnego i górnymi opcjami](docs/images/ecomain-solar-options.jpg)
 
-> Zrzut do dodania: **Dostosuj ecoMain**, wybór urządzeń podrzędnych i menu **Następna akcja**.
+---
+
+> ![Next Action z konfiguracją kanałów i ecoSolarMonitor](docs/images/ecomain-solar-options-actions.jpg)
 
 ### Rodzaje pomiarów
 
@@ -333,9 +341,11 @@ Przejście dalej ze strony źródeł usuwa poprzednie wyrażenie, także przy ed
 
 > ![Ustaw nazwę formuły i typ wyniku](docs/images/ecomain-formula-setup.png)
 
-<!-- screenshot-placeholder: solar-formula-sources -->
+---
 
-> Zrzut do dodania: **Wybierz encje źródłowe**, włączone źródła solarne i jednostki.
+> ![Select Source Entities z szacowaną i rzeczywistą mocą solarną w W](docs/images/ecomain-solar-formula-sources.jpg)
+
+---
 
 > ![Wpisz wzór](docs/images/ecomain-formula-expression.png)
 
@@ -360,13 +370,15 @@ Otwórz **Konfiguruj → Dostosuj ecoMain** i wybierz **Konfiguracja kanałów**
 3. Sekcja ecoMain **Przekładniki prądowe obwodu głównego** zawiera **L1, L2, L3**, każda obsługuje tylko **100 A**.
 4. Wybierz **Zapisz**, a po powrocie do menu **Zakończ**.
 
-<!-- screenshot-placeholder: channel-device -->
+> ![Channel Configuration z wybranym ecoMain](docs/images/ecomain-solar-channel-device.jpg)
 
-> Zrzut do dodania: **Konfiguracja kanałów**, wybór ecoMain lub ecoSub online.
+---
 
-<!-- screenshot-placeholder: channel-settings -->
+> ![Niezapisany przykład Channel 4 z Phase L2 i przekładnikami 30 A lub 100 A](docs/images/ecomain-solar-channel-settings.jpg)
 
-> Zrzut do dodania: **Konfiguracja kanałów**, fazy, przekładniki prądowe i obwód główny.
+---
+
+> ![Main Circuit Current Transformers z opcją 100 A](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### Konfiguracja ecoSolarMonitor
 
@@ -378,9 +390,7 @@ Otwórz tę stronę po dodaniu **ecoSolarMonitor**:
 4. Pusta lista usuwa kanały falownika danej grupy.
 5. Wybierz **Zapisz**, a po powrocie do menu **Zakończ**.
 
-<!-- screenshot-placeholder: solar-settings -->
-
-> Zrzut do dodania: **Konfiguracja ecoSolarMonitor**, moc instalacji, współczynnik temperaturowy i kanały falownika.
+> ![Przykładowa moc PV, współczynnik temperaturowy i kanały falownika](docs/images/ecomain-solar-configuration.jpg)
 
 > **Zapisane ustawienia urządzenia działają natychmiast. Późniejsze anulowanie konfiguracji ich nie cofa.**
 
@@ -478,9 +488,7 @@ ecoSolarMonitor należy do bieżącego ecoMain i oferuje czternaście odczytów.
 
 Dzisiejsza energia zaczyna gromadzić się od nowa każdego dnia. Wczorajsza energia i współczynnik wydajności pokazują dane z poprzedniego dnia.
 
-<!-- screenshot-placeholder: solar-entities -->
-
-> Zrzut do dodania: lista encji ecoSolarMonitor, nazwy i jednostki.
+> ![Wszystkie czternaście włączonych odczytów ecoSolarMonitor z nazwami i jednostkami](docs/images/ecomain-solar-entities-all.jpg)
 
 ### Pełny katalog pomiarów chmurowych
 

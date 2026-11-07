@@ -70,11 +70,11 @@ L’intégration prend en charge **zeroconf (mDNS)**. Lorsque ecoMain est sous t
 
 ---
 
-> ![Discovered configure flow 1](docs/images/ecomain-discovered-configure-1.png)
+> ![Carte ecoMain découverte avec Add](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![Discovered configure flow 2](docs/images/ecomain-discovered-configure-2.png)
+> ![Confirmation des informations de l’ecoMain local](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### Méthode 2 : depuis « Ajouter une intégration »
 
@@ -128,21 +128,27 @@ Si rien n’est détecté, essayez **Configuration manuelle (local)**. Vérifiez
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Capture à ajouter : **Configurer l'appareil**, avec ecoSub et ecoSolarMonitor dans la liste des sous-appareils.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Capture à ajouter : **Types de mesures**, groupes ecoSolarMonitor et ecoMain / ecoSub et sélections par défaut.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Confirmation des informations de l’ecoMain local](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device avec ecoSolarMonitor sélectionné](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types avec les cinq mesures solaires par défaut](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Neuf mesures solaires facultatives et groupe de compteurs distinct](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities avec Finish sélectionné](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Nommer ecoMain et ecoSolarMonitor et leur attribuer une zone](docs/images/ecomain-solar-assign.jpg)
 
 ### B) Configuration manuelle (local)
 
@@ -164,21 +170,27 @@ Home Assistant doit pouvoir atteindre l’adresse à travers le réseau et le pa
 
 ---
 
-> ![Confirm local device](docs/images/ecomain-local-confirm.png)
-
-<!-- screenshot-placeholder: local-subdevices -->
-
-> Capture à ajouter : **Configurer l'appareil**, avec ecoSub et ecoSolarMonitor dans la liste des sous-appareils.
-
-<!-- screenshot-placeholder: local-measurements -->
-
-> Capture à ajouter : **Types de mesures**, groupes ecoSolarMonitor et ecoMain / ecoSub et sélections par défaut.
-
-> ![Extra entities placeholder](docs/images/ecomain-extra-entities-placeholder.png)
+> ![Confirmation des informations de l’ecoMain local](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Local accomplish](docs/images/ecomain-local-accomplish.png)
+> ![Setup Device avec ecoSolarMonitor sélectionné](docs/images/ecomain-solar-subdevices.jpg)
+
+---
+
+> ![Measurement Types avec les cinq mesures solaires par défaut](docs/images/ecomain-solar-measurements.jpg)
+
+---
+
+> ![Neuf mesures solaires facultatives et groupe de compteurs distinct](docs/images/ecomain-solar-measurements-daily.jpg)
+
+---
+
+> ![Extra Entities avec Finish sélectionné](docs/images/ecomain-solar-finish.jpg)
+
+---
+
+> ![Nommer ecoMain et ecoSolarMonitor et leur attribuer une zone](docs/images/ecomain-solar-assign.jpg)
 
 ### C) Connexion au compte (cloud)
 
@@ -267,21 +279,17 @@ Ouvrez **Paramètres → Appareils et services → enecess → Configurer**.
 - ecoPlug : prises sélectionnées.
 - Pour changer le type d’appareil, la méthode de connexion ou l’ecoMain principal, supprimez l’entrée et ajoutez-la à nouveau.
 
-> ![Options placeholder](docs/images/ecomain-options-placeholder-1.png)
-
----
-
-> ![Options placeholder](docs/images/ecomain-options-placeholder-2.png)
-
 Pour ajouter ou modifier les mesures solaires d’une entrée locale existante :
 
 1. Dans **Ajuster ecoMain → Sélectionner les modules esclaves à ajouter**, choisissez **ecoSolarMonitor** et les ecoSub souhaités, puis **Types de mesures**.
 2. Choisissez les valeurs **ecoSolarMonitor** et **ecoMain / ecoSub**, puis **Enregistrer**.
 3. Ouvrez au besoin **Configuration des canaux** ou **Configuration ecoSolarMonitor**. Revenez au menu et choisissez **Terminer**.
 
-<!-- screenshot-placeholder: options-menu -->
+> ![Adjust ecoMain avec sélection solaire et actions supérieures](docs/images/ecomain-solar-options.jpg)
 
-> Capture à ajouter : **Ajuster ecoMain**, sélection des sous-appareils et menu **Action suivante**.
+---
+
+> ![Next Action avec configuration des canaux et d’ecoSolarMonitor](docs/images/ecomain-solar-options-actions.jpg)
 
 ### Types de mesures
 
@@ -329,9 +337,11 @@ Continuer depuis la page des sources efface l’expression précédente, même l
 
 > ![Définir le nom et le type de résultat de la formule](docs/images/ecomain-formula-setup.png)
 
-<!-- screenshot-placeholder: solar-formula-sources -->
+---
 
-> Capture à ajouter : **Sélectionner les entités sources**, sources solaires activées et unités.
+> ![Select Source Entities avec puissances solaires estimée et réelle en W](docs/images/ecomain-solar-formula-sources.jpg)
+
+---
 
 > ![Saisir la formule](docs/images/ecomain-formula-expression.png)
 
@@ -356,13 +366,15 @@ Ouvrez **Configurer → Ajuster ecoMain**, puis **Configuration des canaux** ou 
 3. Pour ecoMain, **Transformateurs de courant du circuit principal** contient **L1, L2, L3**, chacun limité à **100 A**.
 4. Choisissez **Enregistrer**, puis **Terminer** au retour au menu.
 
-<!-- screenshot-placeholder: channel-device -->
+> ![Channel Configuration avec ecoMain sélectionné](docs/images/ecomain-solar-channel-device.jpg)
 
-> Capture à ajouter : **Configuration des canaux**, sélection d’ecoMain ou d’un ecoSub en ligne.
+---
 
-<!-- screenshot-placeholder: channel-settings -->
+> ![Exemple non enregistré de Channel 4 avec Phase L2 et choix de transformateur 30 A ou 100 A](docs/images/ecomain-solar-channel-settings.jpg)
 
-> Capture à ajouter : **Configuration des canaux**, phases, transformateurs de courant et circuit principal.
+---
+
+> ![Main Circuit Current Transformers avec le choix 100 A](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### Configuration ecoSolarMonitor
 
@@ -374,9 +386,7 @@ Ouvrez cette page après avoir ajouté **ecoSolarMonitor** :
 4. Une liste vide efface les canaux d’onduleur de ce groupe.
 5. Choisissez **Enregistrer**, puis **Terminer** au retour au menu.
 
-<!-- screenshot-placeholder: solar-settings -->
-
-> Capture à ajouter : **Configuration ecoSolarMonitor**, puissance installée, coefficient de température et canaux d’onduleur.
+> ![Exemple de puissance PV, coefficient de température et canaux d’onduleur](docs/images/ecomain-solar-configuration.jpg)
 
 > **Les réglages de l’appareil prennent effet dès leur enregistrement. Annuler ensuite la configuration ne les annule pas.**
 
@@ -474,9 +484,7 @@ ecoSolarMonitor appartient à l’ecoMain courant et fournit quatorze valeurs. L
 
 L’énergie du jour recommence à s’accumuler chaque jour. L’énergie et le ratio de performance d’hier affichent les données de la veille.
 
-<!-- screenshot-placeholder: solar-entities -->
-
-> Capture à ajouter : liste des entités ecoSolarMonitor avec noms et unités.
+> ![Les quatorze mesures ecoSolarMonitor activées avec noms et unités](docs/images/ecomain-solar-entities-all.jpg)
 
 ### Catalogue complet des mesures cloud
 
