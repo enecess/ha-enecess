@@ -139,7 +139,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
                 )
         result = await self.submit(
             result,
-            capacity=2147483647,
+            capacity=4294967295,
             temperature_coefficient=-32.768,
             inverter_channels_0=["1"],
             inverter_channels_2=["10"],
@@ -150,7 +150,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
                 self.transport.values[address]
                 for address in (5000, 5001, 5002, 2200, 2229)
             ],
-            [65535, 32767, 32768, 1, 1],
+            [65535, 65535, 32768, 1, 1],
         )
         self.assertFalse(any(2100 <= c[1] <= 2139 for c in self.transport.commands))
         self.assertEqual(
@@ -165,6 +165,38 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
                 ("read", 2229, 1, 255),
             ],
         )
+
+    async def test_unsigned_capacity_round_trips_through_native_form_and_readback(self):
+        for capacity, words in [
+            (2147483648, [0, 0x8000]),
+            (4294967295, [0xFFFF, 0xFFFF]),
+            (0, [0, 0]),
+        ]:
+            with self.subTest(capacity=capacity):
+                result = await self.flow._show_options_menu()
+                result = await self.submit(result, extra_action="solar_configuration")
+                result = await self.flow.async_step_solar_configuration(
+                    {"capacity": capacity, "temperature_coefficient": 0}
+                )
+                self.assertEqual(result["step_id"], "init")
+                self.assertEqual(
+                    [self.transport.values[5000], self.transport.values[5001]], words
+                )
+                result = await self.submit(result, extra_action="solar_configuration")
+                self.assertEqual(result["data_schema"]({})["capacity"], capacity)
+                result = await self.submit(result, flow_action="cancel")
+
+    async def test_invalid_capacity_is_rejected_before_io_by_native_form(self):
+        result = await self.flow._show_options_menu()
+        result = await self.submit(result, extra_action="solar_configuration")
+        for capacity in [-1, 0.5, True, 4294967296]:
+            with self.subTest(capacity=capacity):
+                self.transport.commands.clear()
+                result = await self.flow.async_step_solar_configuration(
+                    {"capacity": capacity, "temperature_coefficient": 0}
+                )
+                self.assertEqual(result["errors"], {"capacity": "invalid_input"})
+                self.assertEqual(self.transport.commands, [])
 
     async def test_native_section_error_addresses_visible_parent_and_save_requires_unknown_choice(
         self,

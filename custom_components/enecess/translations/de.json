@@ -503,7 +503,7 @@
           "flow_action": "Aktion"
         },
         "data_description": {
-          "capacity": "Geben Sie eine endliche Ganzzahl von 0 bis 2147483647 W ein.",
+          "capacity": "Geben Sie eine endliche Ganzzahl von 0 bis 4294967295 W ein.",
           "temperature_coefficient": "Geben Sie einen endlichen Wert von -32,768 bis 32,767 %/°C mit höchstens drei Nachkommastellen ein."
         }
       }

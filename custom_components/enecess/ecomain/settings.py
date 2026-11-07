@@ -6,6 +6,7 @@ from decimal import Decimal
 from pymodbus import ModbusException
 
 from ..client_modbus import EnecessModbusClient, decode_int16, decode_int32_word_swap
+from ..const import CONF_ECOMAIN_SOLAR_CAPACITY_MAX
 from .phase import async_read_phases, async_write_phases
 
 _CHANNELS = tuple(f"channel_{channel}" for channel in range(1, 11))
@@ -172,7 +173,7 @@ async def async_read_solar_settings(
             if value == 1
         ]
     return SolarSettings(
-        capacity=decode_int32_word_swap(parameters.registers[:2]),
+        capacity=decode_int32_word_swap(parameters.registers[:2], signed=False),
         temperature_coefficient=decode_int16(parameters.registers[2:]) / 1000,
         inverter_channels=inverter_channels,
     )
@@ -184,8 +185,13 @@ async def async_write_solar_settings(
     """Write representable host parameters and explicitly supplied inverter groups."""
     if not isinstance(desired, SolarSettings):
         raise TypeError("desired must be SolarSettings")
-    if type(desired.capacity) is not int or not 0 <= desired.capacity <= 2147483647:
-        raise ValueError("capacity must be an integer from 0 to 2147483647")
+    if (
+        type(desired.capacity) is not int
+        or not 0 <= desired.capacity <= CONF_ECOMAIN_SOLAR_CAPACITY_MAX
+    ):
+        raise ValueError(
+            f"capacity must be an integer from 0 to {CONF_ECOMAIN_SOLAR_CAPACITY_MAX}"
+        )
     if type(desired.temperature_coefficient) not in (int, float):
         raise ValueError("temperature_coefficient must be numeric")
     coefficient = Decimal(str(desired.temperature_coefficient)) * 1000

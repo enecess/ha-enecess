@@ -136,11 +136,11 @@ _SOLAR_LAYOUT = {
     "solar_irradiance": (4000, 1, 0.1, True, "irradiance"),
     "solar_tilt_angle": (4004, 1, 0.1, True, "tilt_angle"),
     "solar_module_temperature": (4002, 1, 0.1, True, "temperature"),
-    "solar_actual_power": (4010, 4, 0.001, True, "power"),
-    "solar_estimated_power": (4006, 4, 0.001, True, "power"),
-    "solar_performance_ratio": (4005, 1, 0.01, True, "performance_ratio"),
-    "solar_actual_energy": (4018, 4, 0.001, False, "energy"),
-    "solar_estimated_energy": (4014, 4, 0.001, False, "energy"),
+    "solar_actual_power": (4008, 2, 0.01, True, "power"),
+    "solar_estimated_power": (4006, 2, 0.01, True, "power"),
+    "solar_performance_ratio": (4005, 1, 0.1, True, "performance_ratio"),
+    "solar_actual_energy": (4014, 4, 0.001, False, "energy"),
+    "solar_estimated_energy": (4010, 4, 0.001, False, "energy"),
 }
 
 

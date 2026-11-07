@@ -503,7 +503,7 @@
           "flow_action": "Działanie"
         },
         "data_description": {
-          "capacity": "Wprowadź skończoną liczbę całkowitą od 0 do 2147483647 W.",
+          "capacity": "Wprowadź skończoną liczbę całkowitą od 0 do 4294967295 W.",
           "temperature_coefficient": "Wprowadź skończoną wartość od -32,768 do 32,767 %/°C, z maksymalnie trzema miejscami po przecinku."
         }
       }

@@ -15,11 +15,11 @@ SOLAR = {
     "solar_irradiance": (4000, 1, .1, True, "irradiance", "W/m²", "irradiance", "Irradiance"),
     "solar_tilt_angle": (4004, 1, .1, True, "tilt_angle", "°", None, "Tilt Angle"),
     "solar_module_temperature": (4002, 1, .1, True, "temperature", "°C", "temperature", "Module Temperature"),
-    "solar_actual_power": (4010, 4, .001, True, "power", "W", "power", "Actual Power"),
-    "solar_estimated_power": (4006, 4, .001, True, "power", "W", "power", "Estimated Power"),
-    "solar_performance_ratio": (4005, 1, .01, True, "performance_ratio", "%", None, "Performance Ratio"),
-    "solar_actual_energy": (4018, 4, .001, False, "energy", "Wh", "energy", "Cumulative Actual Energy"),
-    "solar_estimated_energy": (4014, 4, .001, False, "energy", "Wh", "energy", "Cumulative Estimated Energy"),
+    "solar_actual_power": (4008, 2, .01, True, "power", "W", "power", "Actual Power"),
+    "solar_estimated_power": (4006, 2, .01, True, "power", "W", "power", "Estimated Power"),
+    "solar_performance_ratio": (4005, 1, .1, True, "performance_ratio", "%", None, "Performance Ratio"),
+    "solar_actual_energy": (4014, 4, .001, False, "energy", "Wh", "energy", "Cumulative Actual Energy"),
+    "solar_estimated_energy": (4010, 4, .001, False, "energy", "Wh", "energy", "Cumulative Estimated Energy"),
 }
 
 
@@ -59,9 +59,9 @@ class SolarModelTests(unittest.TestCase):
             "solar_irradiance": 1,
             "solar_tilt_angle": 1,
             "solar_module_temperature": 1,
-            "solar_actual_power": 3,
-            "solar_estimated_power": 3,
-            "solar_performance_ratio": 2,
+            "solar_actual_power": 2,
+            "solar_estimated_power": 2,
+            "solar_performance_ratio": 1,
             "solar_actual_energy": 3,
             "solar_estimated_energy": 3,
         }
@@ -162,16 +162,13 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_firmware_gate_and_online_recovery(self):
         model, runtime = load_runtime()
-        specs = [model.RegisterSpec(key=key, kind=values[4], device_index=4,
-                                   address=values[0], regs=values[1], scale=values[2],
-                                   signed=values[3], measurement_type=key)
-                 for key, values in SOLAR.items()]
-        specs += model.build_specs_local([1], ["power"])
+        specs = model.build_specs_local([1, 4], ["power"], list(SOLAR))
 
         class Client:
             version = 140
             online = [1, 0, 0, 1]
             calls = []
+            performance_ratio = 987
 
             async def async_set_target(self, host, port):
                 pass
@@ -182,10 +179,11 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
                     return SimpleNamespace(registers=[self.version] if self.version is not None else [])
                 if start == 3101:
                     return SimpleNamespace(registers=self.online[:count])
-                values = {1000: 12300, 4000: 0, 4002: 0xFF85, 4004: 150, 4005: 9876,
-                          4006: 45678, 4010: 0xFC18, 4011: 0xFFFF, 4012: 0xFFFF,
-                          4013: 0xFFFF, 4014: 0, 4015: 0, 4016: 0, 4017: 0x8000,
-                          4018: 1000}
+                values = {1000: 12300, 4000: 0, 4002: 0xFF85, 4004: 150,
+                          4005: self.performance_ratio, 4006: 45678, 4007: 0,
+                          4008: 0xFF9C, 4009: 0xFFFF, 4010: 0, 4011: 0,
+                          4012: 0, 4013: 0x8000, 4014: 1001, 4015: 0,
+                          4016: 0, 4017: 0}
                 return SimpleNamespace(registers=[values.get(i, 0) for i in range(start, start + count)])
 
         client = Client()
@@ -196,11 +194,11 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("solar_module_temperature", values)
         self.assertEqual(values["solar_irradiance"], 0)
         self.assertEqual(values["solar_tilt_angle"], 15)
-        self.assertEqual(values["solar_performance_ratio"], 98.76)
+        self.assertAlmostEqual(values["solar_performance_ratio"], 98.7)
         self.assertEqual(values["solar_module_temperature"], -12.3)
         self.assertEqual(values["solar_actual_power"], -1)
-        self.assertAlmostEqual(values["solar_estimated_power"], 45.678)
-        self.assertEqual(values["solar_actual_energy"], 1)
+        self.assertAlmostEqual(values["solar_estimated_power"], 456.78)
+        self.assertAlmostEqual(values["solar_actual_energy"], 1.001)
         self.assertEqual(values["solar_estimated_energy"], 9223372036854776.0)
         self.assertIn((3101, 4), client.calls)
         covered = {index for start, count in client.calls for index in range(start, start + count)}
@@ -215,7 +213,10 @@ class SolarPollingTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(values["main_l1_power_rt"], 123)
         self.assertTrue(all(start < 4000 for start, _ in client.calls))
         client.online[-1] = 1
-        self.assertIn("solar_actual_power", await coordinator._async_update_data())
+        client.performance_ratio = 0xFF85
+        values = await coordinator._async_update_data()
+        self.assertIn("solar_actual_power", values)
+        self.assertEqual(values["solar_performance_ratio"], -12.3)
         self.assertEqual(len(coordinator.specs), len(specs))
         for version in (139, 138):
             with self.subTest(version=version):

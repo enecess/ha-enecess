@@ -503,7 +503,7 @@
           "flow_action": "Action"
         },
         "data_description": {
-          "capacity": "Saisissez un entier fini de 0 à 2147483647 W.",
+          "capacity": "Saisissez un entier fini de 0 à 4294967295 W.",
           "temperature_coefficient": "Saisissez une valeur finie de -32,768 à 32,767 %/°C avec trois décimales au maximum."
         }
       }

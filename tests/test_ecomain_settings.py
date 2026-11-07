@@ -375,7 +375,7 @@ class SolarSettingsTests(SettingsTestCase):
             inverter_channels=inverter_channels or {},
         )
 
-    async def test_reads_low_word_first_signed_parameters_and_requested_inverter_groups(
+    async def test_reads_low_word_first_parameters_and_requested_inverter_groups(
         self,
     ):
         self.transport.values.update(
@@ -433,6 +433,8 @@ class SolarSettingsTests(SettingsTestCase):
     async def test_capacity_and_coefficient_extremes_are_exact(self):
         for capacity, coefficient, words, raw in [
             (2147483647, 32.767, [0xFFFF, 0x7FFF], 0x7FFF),
+            (2147483648, -0.4, [0, 0x8000], 0xFE70),
+            (4294967295, 0, [0xFFFF, 0xFFFF], 0),
             (0, -32.768, [0, 0], 0x8000),
         ]:
             with self.subTest(capacity=capacity, coefficient=coefficient):
@@ -449,9 +451,23 @@ class SolarSettingsTests(SettingsTestCase):
                     [self.transport.values[5000], self.transport.values[5001]], words
                 )
                 self.assertEqual(self.transport.values[5002], raw)
+                actual = await self.settings.async_read_solar_settings(self.client, [])
+                self.assertEqual(actual.capacity, capacity)
+                self.assertEqual(actual.temperature_coefficient, coefficient)
+
+    async def test_reads_unsigned_capacity_across_signed_boundary(self):
+        for words, expected in [
+            ([0, 0], 0),
+            ([0, 0x8000], 2147483648),
+            ([0xFFFF, 0xFFFF], 4294967295),
+        ]:
+            with self.subTest(words=words):
+                self.transport.values.update({5000: words[0], 5001: words[1]})
+                actual = await self.settings.async_read_solar_settings(self.client, [])
+                self.assertEqual(actual.capacity, expected)
 
     async def test_invalid_numeric_representations_are_rejected_before_io(self):
-        for capacity in [-1, 2147483648, True, 1.5, float("nan"), float("inf"), "1"]:
+        for capacity in [-1, 4294967296, True, 1.5, float("nan"), float("inf"), "1"]:
             with self.subTest(capacity=capacity):
                 with self.assertRaises(ValueError):
                     await self.settings.async_write_solar_settings(

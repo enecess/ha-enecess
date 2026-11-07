@@ -32,7 +32,11 @@ class DisplayPrecisionTests(runtime_fixture.RealHARuntimeFixture):
             "main_l2_power_rt": (2, -12.345678, 0),
             "main_l1_energy_fwd_total": (3, 1234.567891, None),
             "solar_irradiance": (1, 567.891234, None),
-            "solar_performance_ratio": (2, 98.765432, None),
+            "solar_performance_ratio": (1, 98.765432, None),
+            "solar_actual_power": (2, -12.345678, None),
+            "solar_estimated_power": (2, 456.789123, None),
+            "solar_actual_energy": (3, 1234.567891, None),
+            "solar_estimated_energy": (3, 2345.678912, None),
         }
         coordinator.async_set_updated_data(
             {key: value for key, (_, value, _) in cases.items()}
@@ -41,7 +45,14 @@ class DisplayPrecisionTests(runtime_fixture.RealHARuntimeFixture):
             build_specs_local(
                 [4],
                 ["power", "energy_forward"],
-                ["solar_irradiance", "solar_performance_ratio"],
+                [
+                    "solar_irradiance",
+                    "solar_performance_ratio",
+                    "solar_actual_power",
+                    "solar_estimated_power",
+                    "solar_actual_energy",
+                    "solar_estimated_energy",
+                ],
             )
         )
         devices = device_registry.async_get(self.hass)

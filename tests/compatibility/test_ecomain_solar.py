@@ -36,11 +36,12 @@ class SolarClient:
             4000: 1000,
             4002: 0xFF9C,
             4004: 200,
+            4005: 987,
             4006: 1000,
-            4010: 0xFC18,
-            4011: 0xFFFF,
-            4012: 0xFFFF,
-            4013: 0xFFFF,
+            4008: 0xFF9C,
+            4009: 0xFFFF,
+            4013: 0x8000,
+            4014: 1001,
         }
         return SimpleNamespace(
             registers=[values.get(i, 0) for i in range(address, address + count)]
@@ -237,6 +238,18 @@ class SolarRuntimeTests(runtime_fixture.RealHARuntimeFixture):
             f"ecomain:{runtime_fixture.SERIAL}:sub_4:key_solar_actual_power:mode_local",
         )
         await coordinator.async_refresh()
+        for key, expected in {
+            "solar_irradiance": 100,
+            "solar_tilt_angle": 20,
+            "solar_module_temperature": -10,
+            "solar_actual_power": -1,
+            "solar_estimated_power": 10,
+            "solar_performance_ratio": 98.7,
+            "solar_actual_energy": 1.001,
+            "solar_estimated_energy": 9223372036854776.0,
+        }.items():
+            with self.subTest(key=key):
+                self.assertAlmostEqual(coordinator.data[key], expected)
         self.assertTrue(sensor.available)
         self.assertEqual(sensor.native_value, -1)
         self.assertTrue(derived.available)

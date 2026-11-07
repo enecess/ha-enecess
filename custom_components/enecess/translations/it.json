@@ -503,7 +503,7 @@
           "flow_action": "Azione"
         },
         "data_description": {
-          "capacity": "Inserisci un intero finito da 0 a 2147483647 W.",
+          "capacity": "Inserisci un intero finito da 0 a 4294967295 W.",
           "temperature_coefficient": "Inserisci un valore finito da -32,768 a 32,767 %/°C, con al massimo tre decimali."
         }
       }

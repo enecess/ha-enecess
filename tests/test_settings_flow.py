@@ -199,7 +199,7 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
             fields["capacity"].config,
             {
                 "min": 0,
-                "max": 2147483647,
+                "max": 4294967295,
                 "step": 1,
                 "mode": "box",
                 "unit_of_measurement": "W",

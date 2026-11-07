@@ -503,7 +503,7 @@
           "flow_action": "操作"
         },
         "data_description": {
-          "capacity": "输入 0 至 2147483647 W 范围内的有限整数。",
+          "capacity": "输入 0 至 4294967295 W 范围内的有限整数。",
           "temperature_coefficient": "输入 -32.768 至 32.767 %/°C 范围内的有限数值，最多三位小数。"
         }
       }

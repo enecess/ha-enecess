@@ -9,6 +9,7 @@ import voluptuous as vol
 
 from .const import (
     CONF_ECOMAIN_FIRMWARE_VERSION_REGISTER,
+    CONF_ECOMAIN_SOLAR_CAPACITY_MAX,
     CONF_ECOMAIN_SOLAR_FIRMWARE_VERSION,
     CONST_ADD_MODE,
     CONST_ADD_MODE_LOCAL,
@@ -201,7 +202,7 @@ class SettingsFlowMixin:
         errors = {}
         if user_input is not None and self._solar_values:
             for field, minimum, maximum, scale in [
-                ("capacity", 0, 2147483647, 1),
+                ("capacity", 0, CONF_ECOMAIN_SOLAR_CAPACITY_MAX, 1),
                 ("temperature_coefficient", -32.768, 32.767, 1000),
             ]:
                 value = Decimal(str(user_input[field]))
@@ -269,7 +270,7 @@ class SettingsFlowMixin:
         fields = {}
         if self._solar_values:
             for key, minimum, maximum, step, unit in [
-                ("capacity", 0, 2147483647, 1, "W"),
+                ("capacity", 0, CONF_ECOMAIN_SOLAR_CAPACITY_MAX, 1, "W"),
                 ("temperature_coefficient", -32.768, 32.767, 0.001, "%/°C"),
             ]:
                 fields[vol.Required(key, default=self._solar_values[key])] = (

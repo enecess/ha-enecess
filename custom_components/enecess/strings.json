@@ -503,7 +503,7 @@
           "flow_action": "Action"
         },
         "data_description": {
-          "capacity": "Enter a finite integer from 0 to 2147483647 W.",
+          "capacity": "Enter a finite integer from 0 to 4294967295 W.",
           "temperature_coefficient": "Enter a finite value from -32.768 to 32.767 %/°C, with at most three decimal places."
         }
       }
