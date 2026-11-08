@@ -382,8 +382,8 @@ Ouvrez **Configurer → Ajuster ecoMain**, puis **Configuration des canaux** ou 
 
 Ouvrez cette page après avoir ajouté **ecoSolarMonitor** :
 
-1. Renseignez **Puissance PV installée** en **W**, avec un entier.
-2. Renseignez le **Coefficient de température de puissance** du module en **%/°C**, avec trois décimales au maximum.
+1. Renseignez **Puissance maximale totale aux STC** en **W**, avec un entier.
+2. Renseignez le **Coefficient de température de Pmax** du module en **%/°C**, avec trois décimales au maximum.
 3. Choisissez les canaux de l’onduleur, de **Canal 1** à **Canal 10**, dans les listes **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3**.
 4. Une liste vide efface les canaux d’onduleur de ce groupe.
 5. Choisissez **Enregistrer**, puis **Terminer** au retour au menu.

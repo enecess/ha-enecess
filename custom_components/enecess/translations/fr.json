@@ -492,10 +492,10 @@
       },
       "solar_configuration": {
         "title": "Configuration ecoSolarMonitor",
-        "description": "Configurez l’ecoMain actuel : puissance PV installée en W (entier) et coefficient de température en %/°C (pas de 0,001). Les canaux d’onduleur sont affichés pour ecoMain et les ecoSub détectés en ligne, même sans mesures HA. Les appareils masqués restent inchangés. L’enregistrement met immédiatement à jour et vérifie le matériel.",
+        "description": "Configurez l’ecoMain actuel : Puissance maximale totale aux STC en W (entier) et Coefficient de température de Pmax en %/°C (pas de 0,001). Les canaux d’onduleur sont affichés pour ecoMain et les ecoSub détectés en ligne, même sans mesures HA. Les appareils masqués restent inchangés. L’enregistrement met immédiatement à jour et vérifie le matériel.",
         "data": {
-          "capacity": "Puissance PV installée",
-          "temperature_coefficient": "Coefficient de température de puissance",
+          "capacity": "Puissance maximale totale aux STC",
+          "temperature_coefficient": "Coefficient de température de Pmax",
           "inverter_channels_0": "ecoMain",
           "inverter_channels_1": "ecoSub 1",
           "inverter_channels_2": "ecoSub 2",

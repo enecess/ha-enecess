@@ -492,10 +492,10 @@
       },
       "solar_configuration": {
         "title": "Konfiguracja ecoSolarMonitor",
-        "description": "Skonfiguruj bieżący ecoMain: zainstalowaną moc PV w W (liczba całkowita) i współczynnik temperaturowy w %/°C (krok 0,001). Kanały falownika obejmują ecoMain i wykryte ecoSub dostępne online, również bez pomiarów HA. Ukryte urządzenia pozostają bez zmian. Zapis natychmiast aktualizuje i weryfikuje sprzęt.",
+        "description": "Skonfiguruj bieżący ecoMain: Łączna moc maksymalna w STC w W (liczba całkowita) i Współczynnik temperaturowy Pmax w %/°C (krok 0,001). Kanały falownika obejmują ecoMain i wykryte ecoSub dostępne online, również bez pomiarów HA. Ukryte urządzenia pozostają bez zmian. Zapis natychmiast aktualizuje i weryfikuje sprzęt.",
         "data": {
-          "capacity": "Zainstalowana moc PV",
-          "temperature_coefficient": "Współczynnik temperaturowy mocy",
+          "capacity": "Łączna moc maksymalna w STC",
+          "temperature_coefficient": "Współczynnik temperaturowy Pmax",
           "inverter_channels_0": "ecoMain",
           "inverter_channels_1": "ecoSub 1",
           "inverter_channels_2": "ecoSub 2",

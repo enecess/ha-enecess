@@ -375,8 +375,8 @@ Apri **Configura → Modifica ecoMain**, poi scegli **Configurazione canali** o 
 
 Apri questa pagina dopo aver aggiunto **ecoSolarMonitor**:
 
-1. Inserisci **Potenza FV installata** in **W**, come numero intero.
-2. Inserisci il **Coefficiente di temperatura della potenza** del modulo in **%/°C**, con al massimo tre decimali.
+1. Inserisci **Potenza massima totale in STC** in **W**, come numero intero.
+2. Inserisci il **Coefficiente di temperatura di Pmax** del modulo in **%/°C**, con al massimo tre decimali.
 3. Seleziona i canali dell’inverter, da **Canale 1** a **Canale 10**, nelle liste **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3**.
 4. Una lista vuota cancella i canali inverter del gruppo.
 5. Scegli **Salva**, poi **Fine** al ritorno nel menu.

@@ -386,8 +386,8 @@ Open **Configure → Adjust ecoMain** and choose **Channel Configuration** or **
 
 Open this page after adding **ecoSolarMonitor**:
 
-1. Enter **Installed PV Capacity** in **W**, as a whole number.
-2. Enter the module's **Power Temperature Coefficient** in **%/°C**, with up to three decimal places.
+1. Enter **Total Max Power at STC** in **W**, as a whole number.
+2. Enter the module's **Temperature Coefficient of Pmax** in **%/°C**, with up to three decimal places.
 3. Select the inverter's **Channel 1** through **Channel 10** in the **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3** lists.
 4. Leaving a list empty clears that group's inverter channels.
 5. Select **Save**, then **Finish** when back in the menu.

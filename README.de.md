@@ -386,8 +386,8 @@ Beim Fortfahren von der Quellenseite wird der bisherige Ausdruck gelöscht, auch
 
 Öffne diese Seite, nachdem **ecoSolarMonitor** hinzugefügt wurde:
 
-1. Gib **Installierte PV-Leistung** als ganze Zahl in **W** ein.
-2. Gib **Temperaturkoeffizient der Leistung** des Moduls in **%/°C** mit höchstens drei Nachkommastellen ein.
+1. Gib **Gesamtmaximalleistung bei STC** als ganze Zahl in **W** ein.
+2. Gib **Temperaturkoeffizient von Pmax** des Moduls in **%/°C** mit höchstens drei Nachkommastellen ein.
 3. Wähle die Wechselrichterkanäle **Kanal 1** bis **Kanal 10** in den Listen **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3**.
 4. Eine leere Liste löscht die Wechselrichterkanäle dieser Gruppe.
 5. Wähle **Speichern** und anschließend im Menü **Fertigstellen**.

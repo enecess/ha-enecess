@@ -492,10 +492,10 @@
       },
       "solar_configuration": {
         "title": "ecoSolarMonitor-Konfiguration",
-        "description": "Konfigurieren Sie den aktuellen ecoMain: installierte PV-Leistung in W (Ganzzahl) und Temperaturkoeffizient in %/°C (Schritt 0,001). Wechselrichterkanäle werden für ecoMain und erkannte, online verfügbare ecoSub angezeigt, auch ohne HA-Messwerte. Ausgeblendete Geräte bleiben unverändert. Speichern aktualisiert und prüft die Hardware sofort.",
+        "description": "Konfigurieren Sie den aktuellen ecoMain: Gesamtmaximalleistung bei STC in W (Ganzzahl) und Temperaturkoeffizient von Pmax in %/°C (Schritt 0,001). Wechselrichterkanäle werden für ecoMain und erkannte, online verfügbare ecoSub angezeigt, auch ohne HA-Messwerte. Ausgeblendete Geräte bleiben unverändert. Speichern aktualisiert und prüft die Hardware sofort.",
         "data": {
-          "capacity": "Installierte PV-Leistung",
-          "temperature_coefficient": "Temperaturkoeffizient der Leistung",
+          "capacity": "Gesamtmaximalleistung bei STC",
+          "temperature_coefficient": "Temperaturkoeffizient von Pmax",
           "inverter_channels_0": "ecoMain",
           "inverter_channels_1": "ecoSub 1",
           "inverter_channels_2": "ecoSub 2",

@@ -386,8 +386,8 @@ Otwórz **Konfiguruj → Dostosuj ecoMain** i wybierz **Konfiguracja kanałów**
 
 Otwórz tę stronę po dodaniu **ecoSolarMonitor**:
 
-1. Wpisz **Zainstalowana moc PV** w **W**, jako liczbę całkowitą.
-2. Wpisz **Współczynnik temperaturowy mocy** modułu w **%/°C**, z maksymalnie trzema miejscami po przecinku.
+1. Wpisz **Łączna moc maksymalna w STC** w **W**, jako liczbę całkowitą.
+2. Wpisz **Współczynnik temperaturowy Pmax** modułu w **%/°C**, z maksymalnie trzema miejscami po przecinku.
 3. Wybierz kanały falownika od **Kanał 1** do **Kanał 10** z list **ecoMain, ecoSub 1, ecoSub 2, ecoSub 3**.
 4. Pusta lista usuwa kanały falownika danej grupy.
 5. Wybierz **Zapisz**, a po powrocie do menu **Zakończ**.

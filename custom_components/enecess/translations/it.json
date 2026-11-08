@@ -492,10 +492,10 @@
       },
       "solar_configuration": {
         "title": "Configurazione ecoSolarMonitor",
-        "description": "Configura l’ecoMain corrente: potenza FV installata in W (intero) e coefficiente di temperatura in %/°C (passo 0,001). I canali inverter comprendono ecoMain e gli ecoSub rilevati online, anche senza misure HA. I dispositivi nascosti restano invariati. Il salvataggio aggiorna e verifica subito l’hardware.",
+        "description": "Configura l’ecoMain corrente: Potenza massima totale in STC in W (intero) e Coefficiente di temperatura di Pmax in %/°C (passo 0,001). I canali inverter comprendono ecoMain e gli ecoSub rilevati online, anche senza misure HA. I dispositivi nascosti restano invariati. Il salvataggio aggiorna e verifica subito l’hardware.",
         "data": {
-          "capacity": "Potenza FV installata",
-          "temperature_coefficient": "Coefficiente di temperatura della potenza",
+          "capacity": "Potenza massima totale in STC",
+          "temperature_coefficient": "Coefficiente di temperatura di Pmax",
           "inverter_channels_0": "ecoMain",
           "inverter_channels_1": "ecoSub 1",
           "inverter_channels_2": "ecoSub 2",
