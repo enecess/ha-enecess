@@ -43,16 +43,15 @@ Follow the official HACS usage guide:
 4. When finished, **restart Home Assistant**:
     - Settings → System → Restart
 
-> **Process Screenshot:**
-> ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+> ![HACS: Search for the enecess integration](docs/images/hacs-integration-download-1.png)
 
 ---
 
-> ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+> ![HACS: Download the enecess integration](docs/images/hacs-integration-download-2.png)
 
 ---
 
-> ![HA restart](docs/images/ha-restart.png)
+> ![Home Assistant: Restart from System settings](docs/images/ha-restart.png)
 
 ---
 
@@ -72,15 +71,15 @@ The integration supports **zeroconf (mDNS)** discovery. With ecoMain powered on 
 4. Setup starts in **Automatic Discovery (Local)** with the detected serial number and IP address filled in.
 5. Continue below to select devices and measurements.
 
-> ![Discovered integration card](docs/images/ha-add-integration-1.png)
+> ![Home Assistant: Open Devices & services](docs/images/ha-add-integration-1.png)
 
 ---
 
-> ![Discovered ecoMain card with Add](docs/images/ecomain-solar-discovered.jpg)
+> ![Home Assistant: Discovered ecoMain card with Add](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### Way 2: From “Add Integration” (manual start)
 
@@ -90,23 +89,23 @@ The integration supports **zeroconf (mDNS)** discovery. With ecoMain powered on 
    - **ecoMain**: choose **Automatic Discovery (Local)**, **Manual Setup (Local)** or **Account Login (Cloud)**.
    - **ecoPlug**: go directly to cloud account login.
 
-> ![Discovered integration card](docs/images/ha-add-integration-1.png)
+> ![Home Assistant: Open Devices & services](docs/images/ha-add-integration-1.png)
 
 ---
 
-> ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+> ![Home Assistant: Search for enecess in Add Integration](docs/images/ha-add-integration-2.png)
 
 ---
 
-> ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+> ![Home Assistant: Set up another instance of enecess](docs/images/ha-add-integration-3.png)
 
 ---
 
-> ![Select device type](docs/images/select-device-type.png)
+> ![enecess: Add Device with ecoMain selected](docs/images/select-device-type.png)
 
 ---
 
-> ![Select add method](docs/images/select-add-method.png)
+> ![ecoMain: Choose the local or cloud Add Method](docs/images/select-add-method.png)
 
 ---
 
@@ -126,35 +125,35 @@ Use this when ecoMain and Home Assistant share a LAN that allows mDNS discovery.
 
 If discovery finds nothing, try **Manual Setup (Local)**. Check that Home Assistant and ecoMain share a subnet / VLAN and that your router allows multicast / mDNS.
 
-> ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+> ![ecoMain: Select Automatic Discovery (Local)](docs/images/ecomain-auto-scan.png)
 
 ---
 
-> ![Select discovered device](docs/images/ecomain-select-discovered.png)
+> ![ecoMain: Automatic Discovery with a discovered device selected](docs/images/ecomain-select-discovered.png)
 
 ---
 
-> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
+> ![ecoMain: Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-> ![Measurement Types showing the five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![Nine optional solar readings and the separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
+> ![ecoMain: Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
 
 ---
 
-> ![Name and assign ecoMain and ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
+> ![Home Assistant: Name and assign ecoMain and ecoSolarMonitor to areas](docs/images/ecomain-solar-assign.jpg)
 
 ### B) Manual Setup (Local)
 
@@ -168,35 +167,35 @@ Use this if automatic discovery fails. Find ecoMain's **IP / hostname** in your 
 
 Home Assistant must be able to reach the address through your network and firewall. Modbus TCP uses port **502**; you do not need to enter it in the UI. If connection fails, check the address, network cable and network access.
 
-> ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+> ![ecoMain: Select Manual Setup (Local)](docs/images/ecomain-manual-input-1.png)
 
 ---
 
-> ![Manual setup input 1](docs/images/ecomain-manual-input-2.png)
+> ![ecoMain: Manual Setup with serial number and address fields](docs/images/ecomain-manual-input-2.png)
 
 ---
 
-> ![Confirm the local ecoMain details](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
+> ![ecoMain: Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-> ![Measurement Types showing the five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![Nine optional solar readings and the separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
+> ![ecoMain: Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
 
 ---
 
-> ![Name and assign ecoMain and ecoSolarMonitor](docs/images/ecomain-solar-assign.jpg)
+> ![Home Assistant: Name and assign ecoMain and ecoSolarMonitor to areas](docs/images/ecomain-solar-assign.jpg)
 
 ### C) Account Login (Cloud)
 
@@ -208,31 +207,31 @@ Use this to read ecoMain through **enecess cloud**. ecoMain must already be link
 
 Cloud data updates about every **60 seconds**, compared with **5 seconds** locally.
 
-> ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+> ![ecoMain: Select Account Login (Cloud)](docs/images/ecomain-cloud-login-1.png)
 
 ---
 
-> ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+> ![ecoMain: Account Login with username and password fields](docs/images/ecomain-cloud-login-2.png)
 
 ---
 
-> ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+> ![ecoMain: Select the cloud master device](docs/images/ecomain-cloud-master-select.png)
 
 ---
 
-> ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+> ![ecoMain: Confirm Device with cloud ecoSub selection](docs/images/ecomain-cloud-slaves-select.png)
 
 ---
 
-> ![Select cloud measurement types](docs/images/ecomain-measurement-types-cloud.png)
+> ![ecoMain: Measurement Types with cloud active energy and power selected](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
 
-> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+> ![ecoMain: Extra Entities with cloud power and formula actions](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 
 ---
 
-> ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
+> ![Home Assistant: Name and assign cloud ecoMain and ecoSub to areas](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
@@ -247,23 +246,23 @@ ecoPlug supports **enecess cloud only**, without local setup or extra entity con
 5. Finish to create one ecoPlug integration entry for the account and all selected plugs.
 6. To change the selection later, open **Settings → Devices & services → enecess → Configure**, add or remove plugs and save the options.
 
-> ![Select ecoPlug device type](docs/images/ecoplug-select-device-type.png)
+> ![enecess: Add Device with ecoPlug selected](docs/images/ecoplug-select-device-type.png)
 
 ---
 
-> ![ecoPlug cloud login](docs/images/ecoplug-cloud-login.png)
+> ![ecoPlug: Account Login with username and password fields](docs/images/ecoplug-cloud-login.png)
 
 ---
 
-> ![Select ecoPlug plugs](docs/images/ecoplug-select.png)
+> ![ecoPlug: Select the cloud plugs to add](docs/images/ecoplug-select.png)
 
 ---
 
-> ![ecoPlug setup complete](docs/images/ecoplug-complete.png)
+> ![Home Assistant: Name and assign ecoPlug to an area](docs/images/ecoplug-complete.png)
 
 ---
 
-> ![Open ecoPlug options](docs/images/ecoplug-options.png)
+> ![ecoPlug: Open configuration from the integration entry](docs/images/ecoplug-options.png)
 
 Each selected plug provides:
 
@@ -291,11 +290,11 @@ To add or adjust solar measurements on an existing local entry:
 2. Choose readings in **ecoSolarMonitor** and **ecoMain / ecoSub**, then select **Save**.
 3. Open **Channel Configuration** or **ecoSolarMonitor Configuration** if needed. Return to the menu and select **Finish**.
 
-> ![Adjust ecoMain with solar selected and upper actions](docs/images/ecomain-solar-options.jpg)
+> ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
 
 ---
 
-> ![Next Action list with channel and solar configuration](docs/images/ecomain-solar-options-actions.jpg)
+> ![ecoMain: Next Action with Channel Configuration and ecoSolarMonitor Configuration](docs/images/ecomain-solar-options-actions.jpg)
 
 ### Measurement Types
 
@@ -337,19 +336,19 @@ Solar power is under **Active power (W)**; cumulative and yesterday/today energy
 
 Continuing from the source page clears the previous expression, including when editing. Enter it again. For a result without a unit, choose **Number (no unit)**.
 
-> ![Add formula entity](docs/images/ecomain-formula-add.png)
+> ![ecoMain: Extra Entities with Add Formula Entity selected](docs/images/ecomain-formula-add.png)
 
 ---
 
-> ![Set formula name and result type](docs/images/ecomain-formula-setup.png)
+> ![ecoMain: Add Formula Entity with name and result type/unit](docs/images/ecomain-formula-setup.png)
 
 ---
 
-> ![Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
-> ![Enter formula expression](docs/images/ecomain-formula-expression.png)
+> ![ecoMain: Expression with source variables and a formula](docs/images/ecomain-formula-expression.png)
 
 | Formula | Result for two power readings |
 | --- | --- |
@@ -372,15 +371,15 @@ Open **Configure → Adjust ecoMain** and choose **Channel Configuration** or **
 3. ecoMain's **Main Circuit Current Transformers** section contains **L1, L2, L3**, each supporting **100 A** only.
 4. Select **Save**, then **Finish** when back in the menu.
 
-> ![Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
+> ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
-> ![Unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformer choices](docs/images/ecomain-solar-channel-settings.jpg)
+> ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
 
 ---
 
-> ![Main Circuit Current Transformers with the 100 A choice](docs/images/ecomain-solar-main-transformers.jpg)
+> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor Configuration
 
@@ -392,7 +391,7 @@ Open this page after adding **ecoSolarMonitor**:
 4. Leaving a list empty clears that group's inverter channels.
 5. Select **Save**, then **Finish** when back in the menu.
 
-> ![Example PV capacity, temperature coefficient and inverter channels](docs/images/ecomain-solar-configuration.jpg)
+> ![ecoSolarMonitor: Configuration example with PV capacity (W), Pmax temperature coefficient (%/°C) and inverter channels](docs/images/ecomain-solar-configuration.jpg)
 
 > **Device settings take effect immediately when saved. Cancelling configuration afterwards does not undo them.**
 
@@ -400,15 +399,15 @@ Open this page after adding **ecoSolarMonitor**:
 
 Open **Configure → Next Action → Channel Phases** and choose ecoMain or a selected, online ecoSub. Assign **L1, L2 or L3** to each of its ten channels, then select **Save**. Firmware 140 or later uses **Channel Configuration** above.
 
-> ![Open channel phase settings](docs/images/ecomain-phase-options.png)
+> ![ecoMain: Adjust ecoMain with Channel Phases selected](docs/images/ecomain-phase-options.png)
 
 ---
 
-> ![Select device for phase settings](docs/images/ecomain-phase-device.png)
+> ![ecoMain: Channel Phases with device selection](docs/images/ecomain-phase-device.png)
 
 ---
 
-> ![Set channel phases](docs/images/ecomain-channel-phases.png)
+> ![ecoMain: Channel Phases with L1, L2 and L3 assignments](docs/images/ecomain-channel-phases.png)
 
 ## Device Naming
 
@@ -490,7 +489,7 @@ ecoSolarMonitor belongs to the current ecoMain and provides fourteen readings. T
 
 Today's energy starts accumulating again each day. Yesterday's energy and performance ratio show the previous day's data.
 
-> ![All fourteen enabled ecoSolarMonitor readings with names and units](docs/images/ecomain-solar-entities-all.jpg)
+> ![ecoSolarMonitor: All fourteen enabled readings with names and units](docs/images/ecomain-solar-entities-all.jpg)
 
 ### Complete Cloud Measurement Catalog
 

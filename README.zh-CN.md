@@ -43,16 +43,15 @@ ecoMain 本地功能与固件版本：
 4. 下载完成后，**重启 Home Assistant**：
    - 设置 → 系统 → 重启
 
-> **流程截图：**
-> ![HACS integration download 1](docs/images/hacs-integration-download-1.png)
+> ![HACS: Search for the enecess integration](docs/images/hacs-integration-download-1.png)
 
 ---
 
-> ![HACS integration download 2](docs/images/hacs-integration-download-2.png)
+> ![HACS: Download the enecess integration](docs/images/hacs-integration-download-2.png)
 
 ---
 
-> ![HA restart](docs/images/ha-restart.png)
+> ![Home Assistant: Restart from System settings](docs/images/ha-restart.png)
 
 ---
 
@@ -73,16 +72,15 @@ ecoMain 的配置流程有 **两种入口**：
 4. 集成会自动启动配置流程，使用 **自动发现（本地）** 模式，并自动填好发现到的序列号和 IP 地址。
 5. 按照下文“自动发现（本地）”继续选择设备和测量。
 
-> **流程截图：**
-> ![Discovered integration card](docs/images/ha-add-integration-1.png)
+> ![Home Assistant: Open Devices & services](docs/images/ha-add-integration-1.png)
 
 ---
 
-> ![发现的 ecoMain 卡片及 Add 按钮](docs/images/ecomain-solar-discovered.jpg)
+> ![Home Assistant: Discovered ecoMain card with Add](docs/images/ecomain-solar-discovered.jpg)
 
 ---
 
-> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ### 方式二：从“添加集成”入口（手动启动）
 
@@ -93,24 +91,23 @@ ecoMain 的配置流程有 **两种入口**：
    - **ecoMain**：继续选择**自动发现（本地）**、**手动设置（本地）**或**账号登录（云端）**。
    - **ecoPlug**：直接进入云端账号登录。
 
-> **流程截图：**
-> ![Add integration entry 1](docs/images/ha-add-integration-1.png)
+> ![Home Assistant: Open Devices & services](docs/images/ha-add-integration-1.png)
 
 ---
 
-> ![Add integration entry 2](docs/images/ha-add-integration-2.png)
+> ![Home Assistant: Search for enecess in Add Integration](docs/images/ha-add-integration-2.png)
 
 ---
 
-> ![Add integration entry 3](docs/images/ha-add-integration-3.png)
+> ![Home Assistant: Set up another instance of enecess](docs/images/ha-add-integration-3.png)
 
 ---
 
-> ![Select device type](docs/images/select-device-type.png)
+> ![enecess: Add Device with ecoMain selected](docs/images/select-device-type.png)
 
 ---
 
-> ![Select add method](docs/images/select-add-method.png)
+> ![ecoMain: Choose the local or cloud Add Method](docs/images/select-add-method.png)
 
 ---
 
@@ -143,36 +140,35 @@ ecoMain 目前支持三种添加方式：
 - 请确保 Home Assistant 与 ecoMain 处于同一网段 / VLAN。
 - 部分路由器会隔离多播 / mDNS，需要在路由器中开启相关功能。
 
-> **流程截图：**
-> ![Auto discovery scan](docs/images/ecomain-auto-scan.png)
+> ![ecoMain: Select Automatic Discovery (Local)](docs/images/ecomain-auto-scan.png)
 
 ---
 
-> ![Select discovered device](docs/images/ecomain-select-discovered.png)
+> ![ecoMain: Automatic Discovery with a discovered device selected](docs/images/ecomain-select-discovered.png)
 
 ---
 
-> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Setup Device 中已选择 ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
+> ![ecoMain: Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-> ![Measurement Types 中的五项默认太阳能读数](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![九项可选太阳能读数及独立的电表分组](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Extra Entities 中已选择 Finish](docs/images/ecomain-solar-finish.jpg)
+> ![ecoMain: Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
 
 ---
 
-> ![为 ecoMain 与 ecoSolarMonitor 命名并分配区域](docs/images/ecomain-solar-assign.jpg)
+> ![Home Assistant: Name and assign ecoMain and ecoSolarMonitor to areas](docs/images/ecomain-solar-assign.jpg)
 
 ---
 
@@ -194,36 +190,35 @@ ecoMain 目前支持三种添加方式：
 - Modbus TCP 使用端口 **502**，无需在界面中填写。
 - 如果无法连接，请重新确认 IP / 主机名、网线连接及网络权限。
 
-> **流程截图：**
-> ![Manual setup input 1](docs/images/ecomain-manual-input-1.png)
+> ![ecoMain: Select Manual Setup (Local)](docs/images/ecomain-manual-input-1.png)
 
 ---
 
-> ![Manual setup input 2](docs/images/ecomain-manual-input-2.png)
+> ![ecoMain: Manual Setup with serial number and address fields](docs/images/ecomain-manual-input-2.png)
 
 ---
 
-> ![确认本地 ecoMain 信息](docs/images/ecomain-solar-local-confirm.jpg)
+> ![ecoMain: Confirm Device with local serial number and address](docs/images/ecomain-solar-local-confirm.jpg)
 
 ---
 
-> ![Setup Device 中已选择 ecoSolarMonitor](docs/images/ecomain-solar-subdevices.jpg)
+> ![ecoMain: Setup Device with ecoSolarMonitor selected](docs/images/ecomain-solar-subdevices.jpg)
 
 ---
 
-> ![Measurement Types 中的五项默认太阳能读数](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![九项可选太阳能读数及独立的电表分组](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
-> ![Extra Entities 中已选择 Finish](docs/images/ecomain-solar-finish.jpg)
+> ![ecoMain: Extra Entities with Finish selected](docs/images/ecomain-solar-finish.jpg)
 
 ---
 
-> ![为 ecoMain 与 ecoSolarMonitor 命名并分配区域](docs/images/ecomain-solar-assign.jpg)
+> ![Home Assistant: Name and assign ecoMain and ecoSolarMonitor to areas](docs/images/ecomain-solar-assign.jpg)
 
 ---
 
@@ -246,32 +241,31 @@ ecoMain 目前支持三种添加方式：
 
 云端数据约每 **60 秒**更新，本地约每 **5 秒**更新。
 
-> **流程截图：**
-> ![Cloud login 1](docs/images/ecomain-cloud-login-1.png)
+> ![ecoMain: Select Account Login (Cloud)](docs/images/ecomain-cloud-login-1.png)
 
 ---
 
-> ![Cloud login 2](docs/images/ecomain-cloud-login-2.png)
+> ![ecoMain: Account Login with username and password fields](docs/images/ecomain-cloud-login-2.png)
 
 ---
 
-> ![Select cloud master](docs/images/ecomain-cloud-master-select.png)
+> ![ecoMain: Select the cloud master device](docs/images/ecomain-cloud-master-select.png)
 
 ---
 
-> ![Select cloud slaves](docs/images/ecomain-cloud-slaves-select.png)
+> ![ecoMain: Confirm Device with cloud ecoSub selection](docs/images/ecomain-cloud-slaves-select.png)
 
 ---
 
-> ![Select cloud measurement types](docs/images/ecomain-measurement-types-cloud.png)
+> ![ecoMain: Measurement Types with cloud active energy and power selected](docs/images/ecomain-measurement-types-cloud.png)
 
 ---
 
-> ![Extra entities placeholder](docs/images/ecomain-cloud-extra-entities-placeholder.png)
+> ![ecoMain: Extra Entities with cloud power and formula actions](docs/images/ecomain-cloud-extra-entities-placeholder.png)
 
 ---
 
-> ![Cloud accomplish](docs/images/ecomain-cloud-accomplish.png)
+> ![Home Assistant: Name and assign cloud ecoMain and ecoSub to areas](docs/images/ecomain-cloud-accomplish.png)
 
 ---
 
@@ -288,23 +282,23 @@ ecoPlug **仅支持通过 enecess Cloud 添加**。本集成不提供 ecoPlug �
 5. 完成后，同一云端账号会创建一个 ecoPlug 集成条目，其中包含本次选择的全部插座。
 6. 后续如需更改选择，进入 **设置 → 设备与服务 → enecess → 配置**，增加或移除插座并保存选项。
 
-> ![Select ecoPlug device type](docs/images/ecoplug-select-device-type.png)
+> ![enecess: Add Device with ecoPlug selected](docs/images/ecoplug-select-device-type.png)
 
 ---
 
-> ![ecoPlug cloud login](docs/images/ecoplug-cloud-login.png)
+> ![ecoPlug: Account Login with username and password fields](docs/images/ecoplug-cloud-login.png)
 
 ---
 
-> ![Select ecoPlug plugs](docs/images/ecoplug-select.png)
+> ![ecoPlug: Select the cloud plugs to add](docs/images/ecoplug-select.png)
 
 ---
 
-> ![ecoPlug setup complete](docs/images/ecoplug-complete.png)
+> ![Home Assistant: Name and assign ecoPlug to an area](docs/images/ecoplug-complete.png)
 
 ---
 
-> ![Open ecoPlug options](docs/images/ecoplug-options.png)
+> ![ecoPlug: Open configuration from the integration entry](docs/images/ecoplug-options.png)
 
 每个已选择的 ecoPlug 只创建以下实体：
 
@@ -332,11 +326,11 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 2. 分别选择 **ecoSolarMonitor** 和 **ecoMain / ecoSub** 的读数，选择**保存**。
 3. 按需进入**通道配置**或 **ecoSolarMonitor 配置**；返回菜单后选择**完成**。
 
-> ![Adjust ecoMain 中的太阳能选择与上部操作](docs/images/ecomain-solar-options.jpg)
+> ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
 
 ---
 
-> ![Next Action 中的通道配置与太阳能配置入口](docs/images/ecomain-solar-options-actions.jpg)
+> ![ecoMain: Next Action with Channel Configuration and ecoSolarMonitor Configuration](docs/images/ecomain-solar-options-actions.jpg)
 
 ### 测量类型
 
@@ -378,19 +372,19 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 从来源页继续会清空原表达式，编辑时也需重新填写。没有单位的结果可选择**数值（无单位）**。
 
-> ![Add formula entity](docs/images/ecomain-formula-add.png)
+> ![ecoMain: Extra Entities with Add Formula Entity selected](docs/images/ecomain-formula-add.png)
 
 ---
 
-> ![Set formula name and result type](docs/images/ecomain-formula-setup.png)
+> ![ecoMain: Add Formula Entity with name and result type/unit](docs/images/ecomain-formula-setup.png)
 
 ---
 
-> ![Select Source Entities 中以 W 为单位的预估与实际太阳能功率](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
-> ![Enter formula expression](docs/images/ecomain-formula-expression.png)
+> ![ecoMain: Expression with source variables and a formula](docs/images/ecomain-formula-expression.png)
 
 | 公式           | 两路功率的计算结果       |
 | ------------ | --------------- |
@@ -413,15 +407,15 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 3. ecoMain 的**主回路电流互感器**分区包含 **L1、L2、L3**，均只支持 **100 A**。
 4. 选择**保存**，返回菜单后选择**完成**。
 
-> ![Channel Configuration 中已选择 ecoMain](docs/images/ecomain-solar-channel-device.jpg)
+> ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
-> ![未保存的 Channel 4 示例：Phase L2 与 30 A、100 A 互感器选项](docs/images/ecomain-solar-channel-settings.jpg)
+> ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
 
 ---
 
-> ![Main Circuit Current Transformers 中的 100 A 选项](docs/images/ecomain-solar-main-transformers.jpg)
+> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor 配置
 
@@ -433,7 +427,7 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 4. 列表留空会清除该组逆变器通道。
 5. 选择**保存**，返回菜单后选择**完成**。
 
-> ![装机容量、温度系数与逆变器通道示例](docs/images/ecomain-solar-configuration.jpg)
+> ![ecoSolarMonitor: Configuration example with PV capacity (W), Pmax temperature coefficient (%/°C) and inverter channels](docs/images/ecomain-solar-configuration.jpg)
 
 > **注意：设备设置保存后立即生效，之后取消配置也不会撤销。**
 
@@ -441,15 +435,15 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 在**配置 → 下一步操作 → 通道相位**中选择 ecoMain 或已选择且在线的 ecoSub，为十个通道分别选择 **L1、L2、L3**，然后选择**保存**。固件 140 及以上使用上面的**通道配置**。
 
-> ![Open channel phase settings](docs/images/ecomain-phase-options.png)
+> ![ecoMain: Adjust ecoMain with Channel Phases selected](docs/images/ecomain-phase-options.png)
 
 ---
 
-> ![Select device for phase settings](docs/images/ecomain-phase-device.png)
+> ![ecoMain: Channel Phases with device selection](docs/images/ecomain-phase-device.png)
 
 ---
 
-> ![Set channel phases](docs/images/ecomain-channel-phases.png)
+> ![ecoMain: Channel Phases with L1, L2 and L3 assignments](docs/images/ecomain-channel-phases.png)
 
 ## 设备命名规则
 
@@ -534,7 +528,7 @@ ecoSolarMonitor 属于当前 ecoMain，提供以下十四项读数。前五项�
 
 今日电量每天重新累计；昨日电量和昨日性能比显示前一天的数据。
 
-> ![已启用的全部十四项 ecoSolarMonitor 读数、名称与单位](docs/images/ecomain-solar-entities-all.jpg)
+> ![ecoSolarMonitor: All fourteen enabled readings with names and units](docs/images/ecomain-solar-entities-all.jpg)
 
 ### 云端模式完整测量清单
 
