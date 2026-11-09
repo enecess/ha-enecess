@@ -32,7 +32,6 @@ class Transport:
     def __init__(self):
         self.values = dict.fromkeys(range(2000, 2140), 0)
         self.values.update(dict.fromkeys(range(2200, 2240), 0))
-        self.values.update(dict.fromkeys(range(2040, 2043), 100))
         self.values.update(dict.fromkeys(range(2043, 2083), 30))
         self.values.update({5000: 0, 5001: 0, 5002: 0})
         self.commands = []
@@ -135,11 +134,10 @@ class SettingsTestCase(unittest.IsolatedAsyncioTestCase):
 
 
 class ChannelSettingsTests(SettingsTestCase):
-    def channel_patch(self, *, phases=None, transformers=None, main_transformers=None):
+    def channel_patch(self, *, phases=None, transformers=None):
         return self.settings.ChannelSettings(
             phases=phases or {},
             transformers=transformers or {},
-            main_transformers=main_transformers or {},
         )
 
     async def test_reads_first_and_last_phase_and_transformer_for_each_meter(self):
@@ -150,6 +148,7 @@ class ChannelSettingsTests(SettingsTestCase):
             (3, 2030, 2073),
         ]:
             with self.subTest(device=device):
+                self.transport.commands.clear()
                 self.transport.values[phase_start] = 0x8001
                 self.transport.values[phase_start + 9] = 2
                 self.transport.values[ct_start] = 100
@@ -163,17 +162,19 @@ class ChannelSettingsTests(SettingsTestCase):
                 self.assertEqual(len(actual.phases), 10)
                 self.assertEqual(len(actual.transformers), 10)
                 self.assertEqual(
-                    actual.main_transformers,
-                    {"l1": "100", "l2": "100", "l3": "100"} if device == 0 else {},
+                    self.transport.commands,
+                    [
+                        ("read", phase_start, 10, 255),
+                        ("read", ct_start, 10, 255),
+                    ],
                 )
 
     async def test_undefined_phase_and_transformer_remain_unselected(self):
-        self.transport.values.update({2000: 3, 2040: 30, 2043: 0, 2052: 31})
+        self.transport.values.update({2000: 3, 2043: 0, 2052: 31})
         actual = await self.settings.async_read_channel_settings(self.client, 0)
         self.assertIsNone(actual.phases["channel_1"])
         self.assertIsNone(actual.transformers["channel_1"])
         self.assertIsNone(actual.transformers["channel_10"])
-        self.assertIsNone(actual.main_transformers["l1"])
 
     async def test_writes_first_and_last_channels_for_each_meter(self):
         for device, phase_start, ct_start in [
@@ -197,27 +198,17 @@ class ChannelSettingsTests(SettingsTestCase):
                 self.assertEqual(self.transport.values[ct_start], 100)
                 self.assertEqual(self.transport.values[ct_start + 9], 100)
 
-    async def test_branch_transformer_accepts_30_and_main_transformer_only_100(self):
-        self.transport.values.update({2040: 0, 2041: 0, 2042: 0, 2043: 100})
+    async def test_branch_transformer_accepts_30(self):
+        self.transport.values[2043] = 100
         errors = await self.settings.async_write_channel_settings(
             self.client,
             0,
             self.channel_patch(
                 transformers={"channel_1": "30"},
-                main_transformers={"l1": "100", "l2": "100", "l3": "100"},
             ),
         )
         self.assertEqual(errors, {})
-        self.assertEqual(
-            [self.transport.values[a] for a in [2040, 2041, 2042, 2043]],
-            [100, 100, 100, 30],
-        )
-        self.transport.commands.clear()
-        with self.assertRaises(ValueError):
-            await self.settings.async_write_channel_settings(
-                self.client, 0, self.channel_patch(main_transformers={"l1": "30"})
-            )
-        self.assertEqual(self.transport.commands, [])
+        self.assertEqual(self.transport.values[2043], 30)
 
     async def test_empty_and_none_patches_do_no_io(self):
         for desired in [
@@ -225,7 +216,6 @@ class ChannelSettingsTests(SettingsTestCase):
             self.channel_patch(
                 phases={"channel_1": None},
                 transformers={"channel_10": None},
-                main_transformers={"l1": None},
             ),
         ]:
             self.assertEqual(
@@ -237,7 +227,7 @@ class ChannelSettingsTests(SettingsTestCase):
         self.assertEqual(self.transport.commands, [])
 
     async def test_partial_patch_preserves_omitted_and_unselected_values(self):
-        self.transport.values.update({2000: 3, 2043: 0, 2040: 0})
+        self.transport.values.update({2000: 3, 2043: 0})
         errors = await self.settings.async_write_channel_settings(
             self.client,
             0,
@@ -248,7 +238,7 @@ class ChannelSettingsTests(SettingsTestCase):
         )
         self.assertEqual(errors, {})
         self.assertEqual(
-            [self.transport.values[a] for a in [2000, 2043, 2040, 2052]], [3, 0, 0, 100]
+            [self.transport.values[a] for a in [2000, 2043, 2052]], [3, 0, 100]
         )
         self.assertEqual(
             [command for command in self.transport.commands if command[0] == "write"],
@@ -265,7 +255,6 @@ class ChannelSettingsTests(SettingsTestCase):
             self.channel_patch(
                 phases={"channel_1": "L1"},
                 transformers={"channel_1": "30"},
-                main_transformers={"l1": "100"},
             ),
         )
         self.assertEqual(errors, {})
@@ -275,7 +264,7 @@ class ChannelSettingsTests(SettingsTestCase):
         self.assertEqual(self.transport.values[2000], 0x8000)
 
     async def test_initial_read_failure_prevents_every_write(self):
-        for address in [2000, 2043, 2040]:
+        for address in [2000, 2043]:
             with self.subTest(address=address):
                 self.transport.commands.clear()
                 self.transport.fail_reads = {address}
@@ -285,7 +274,6 @@ class ChannelSettingsTests(SettingsTestCase):
                     self.channel_patch(
                         phases={"channel_1": "L2"},
                         transformers={"channel_10": "100"},
-                        main_transformers={"l1": "100"},
                     ),
                 )
                 self.assertEqual(
@@ -293,7 +281,6 @@ class ChannelSettingsTests(SettingsTestCase):
                     {
                         "channel_1_phase": "write_failed",
                         "channel_10_transformer": "write_failed",
-                        "main_transformer_l1": "write_failed",
                     },
                 )
                 self.assertTrue(
@@ -302,19 +289,16 @@ class ChannelSettingsTests(SettingsTestCase):
 
     async def test_partial_failures_report_fields_and_retry_skips_successes(self):
         self.transport.fail_writes.add(2000)
-        self.transport.ignore_writes.update({2043, 2040})
-        self.transport.values[2040] = 0
+        self.transport.ignore_writes.add(2043)
         desired = self.channel_patch(
             phases={"channel_1": "L2", "channel_10": "L3"},
             transformers={"channel_1": "100", "channel_10": "100"},
-            main_transformers={"l1": "100"},
         )
         self.assertEqual(
             await self.settings.async_write_channel_settings(self.client, 0, desired),
             {
                 "channel_1_phase": "write_failed",
                 "channel_1_transformer": "verify_failed",
-                "main_transformer_l1": "verify_failed",
             },
         )
         self.assertEqual(self.transport.values[2009], 2)
@@ -332,7 +316,7 @@ class ChannelSettingsTests(SettingsTestCase):
                 for command in self.transport.commands
                 if command[0] == "write"
             ],
-            [2000, 2043, 2040],
+            [2000, 2043],
         )
 
     async def test_invalid_meter_and_choices_are_rejected_before_io(self):
@@ -350,18 +334,12 @@ class ChannelSettingsTests(SettingsTestCase):
             self.channel_patch(transformers={"channel_0": "30"}),
             self.channel_patch(transformers={"channel_1": 30}),
             self.channel_patch(transformers={"channel_1": "31"}),
-            self.channel_patch(main_transformers={"l4": None}),
-            self.channel_patch(main_transformers={"l1": "30"}),
         ]:
             with self.subTest(desired=desired):
                 with self.assertRaises(ValueError):
                     await self.settings.async_write_channel_settings(
                         self.client, 0, desired
                     )
-        with self.assertRaises(ValueError):
-            await self.settings.async_write_channel_settings(
-                self.client, 1, self.channel_patch(main_transformers={"l1": "100"})
-            )
         self.assertEqual(self.transport.commands, [])
 
 

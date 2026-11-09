@@ -479,14 +479,6 @@
               "phase": "Phase",
               "transformer": "Current Transformer"
             }
-          },
-          "main_transformers": {
-            "name": "Main Circuit Current Transformers",
-            "data": {
-              "l1": "L1",
-              "l2": "L2",
-              "l3": "L3"
-            }
           }
         }
       },
@@ -540,13 +532,7 @@
       "settings_phase_write_failed": "Unable to save the phase in this group. Check the connection and retry; successful changes are retained.",
       "settings_phase_verify_failed": "The device readback for the phase in this group does not match your selection. Retry.",
       "settings_transformer_write_failed": "Unable to save the current transformer in this group. Check the connection and retry; successful changes are retained.",
-      "settings_transformer_verify_failed": "The device readback for the current transformer in this group does not match your selection. Retry.",
-      "settings_main_l1_write_failed": "Unable to save the L1 main circuit current transformer in this group. Check the connection and retry; successful changes are retained.",
-      "settings_main_l1_verify_failed": "The device readback for the L1 main circuit current transformer in this group does not match your selection. Retry.",
-      "settings_main_l2_write_failed": "Unable to save the L2 main circuit current transformer in this group. Check the connection and retry; successful changes are retained.",
-      "settings_main_l2_verify_failed": "The device readback for the L2 main circuit current transformer in this group does not match your selection. Retry.",
-      "settings_main_l3_write_failed": "Unable to save the L3 main circuit current transformer in this group. Check the connection and retry; successful changes are retained.",
-      "settings_main_l3_verify_failed": "The device readback for the L3 main circuit current transformer in this group does not match your selection. Retry."
+      "settings_transformer_verify_failed": "The device readback for the current transformer in this group does not match your selection. Retry."
     },
     "abort": {
       "phase_unavailable": "Channel phase settings are only available for online devices in local mode.",

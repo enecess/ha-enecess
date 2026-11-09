@@ -318,7 +318,7 @@ class LifecycleTests(RealHARuntimeFixture):
             await enecess.async_setup_entry(self.hass, entry)
             client = entry.runtime_data.modbus_client
             settings = asyncio.create_task(async_write_channel_settings(
-                client, 0, ChannelSettings(phases={}, transformers={"channel_1": "30", "channel_2": "30"}, main_transformers={})
+                client, 0, ChannelSettings(phases={}, transformers={"channel_1": "30", "channel_2": "30"})
             ))
             await asyncio.wait_for(started.wait(), 1)
             queued = asyncio.create_task(client.read_holding_registers(3009, 1))

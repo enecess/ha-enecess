@@ -479,14 +479,6 @@
               "phase": "Faza",
               "transformer": "Przekładnik prądowy"
             }
-          },
-          "main_transformers": {
-            "name": "Przekładniki prądowe obwodu głównego",
-            "data": {
-              "l1": "L1",
-              "l2": "L2",
-              "l3": "L3"
-            }
           }
         }
       },
@@ -540,13 +532,7 @@
       "settings_phase_write_failed": "Nie można zapisać ustawienia „Faza” w tej grupie. Sprawdź połączenie i ponów próbę; udane zmiany zostaną zachowane.",
       "settings_phase_verify_failed": "Odczytana wartość ustawienia „Faza” w tej grupie nie odpowiada wyborowi. Ponów próbę.",
       "settings_transformer_write_failed": "Nie można zapisać ustawienia „Przekładnik prądowy” w tej grupie. Sprawdź połączenie i ponów próbę; udane zmiany zostaną zachowane.",
-      "settings_transformer_verify_failed": "Odczytana wartość ustawienia „Przekładnik prądowy” w tej grupie nie odpowiada wyborowi. Ponów próbę.",
-      "settings_main_l1_write_failed": "Nie można zapisać ustawienia „Przekładnik główny L1” w tej grupie. Sprawdź połączenie i ponów próbę; udane zmiany zostaną zachowane.",
-      "settings_main_l1_verify_failed": "Odczytana wartość ustawienia „Przekładnik główny L1” w tej grupie nie odpowiada wyborowi. Ponów próbę.",
-      "settings_main_l2_write_failed": "Nie można zapisać ustawienia „Przekładnik główny L2” w tej grupie. Sprawdź połączenie i ponów próbę; udane zmiany zostaną zachowane.",
-      "settings_main_l2_verify_failed": "Odczytana wartość ustawienia „Przekładnik główny L2” w tej grupie nie odpowiada wyborowi. Ponów próbę.",
-      "settings_main_l3_write_failed": "Nie można zapisać ustawienia „Przekładnik główny L3” w tej grupie. Sprawdź połączenie i ponów próbę; udane zmiany zostaną zachowane.",
-      "settings_main_l3_verify_failed": "Odczytana wartość ustawienia „Przekładnik główny L3” w tej grupie nie odpowiada wyborowi. Ponów próbę."
+      "settings_transformer_verify_failed": "Odczytana wartość ustawienia „Przekładnik prądowy” w tej grupie nie odpowiada wyborowi. Ponów próbę."
     },
     "abort": {
       "phase_unavailable": "Ustawienia faz kanałów są dostępne tylko dla urządzeń online w trybie lokalnym.",

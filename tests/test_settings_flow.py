@@ -65,7 +65,6 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
             list(fields),
             [
                 *[f"channel_{n}" for n in range(1, 11)],
-                "main_transformers",
                 "flow_action",
             ],
         )
@@ -76,40 +75,31 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(controls["phase"].config["options"], ["L1", "L2", "L3"])
             self.assertEqual(controls["transformer"].config["options"], ["30", "100"])
             self.assertEqual(controls["phase"].config["mode"], "dropdown")
-        self.assertEqual(
-            [
-                value.config["options"]
-                for value in fields["main_transformers"].schema.schema.values()
-            ],
-            [["100"], ["100"], ["100"]],
-        )
         result = await self.submit(result, flow_action="back")
         result = await self.submit(result, channel_device="1")
-        self.assertNotIn(
-            "main_transformers", list(map(str, result["data_schema"].schema))
+        self.assertEqual(
+            list(map(str, result["data_schema"].schema)),
+            [*[f"channel_{n}" for n in range(1, 11)], "flow_action"],
         )
 
     async def test_channel_unknown_choices_require_explicit_valid_selection(self):
-        self.transport.values.update({2000: 3, 2043: 0, 2040: 0})
+        self.transport.values.update({2000: 3, 2043: 0})
         result = await self.open("channel_configuration")
         result = await self.submit(result, channel_device="0")
         values = submit_values(result, {})
         self.assertNotIn("phase", values["channel_1"])
         self.assertNotIn("transformer", values["channel_1"])
         self.transport.commands.clear()
-        result = await self.submit(
-            result, main_transformers={"l1": "100", "l2": "100", "l3": "100"}
-        )
+        result = await self.submit(result)
         self.assertEqual(result["errors"], {"channel_1": "invalid_input"})
         self.assertEqual(self.transport.commands, [])
         values.update(
             channel_1={"phase": "L3", "transformer": "100"},
-            main_transformers={"l1": "100", "l2": "100", "l3": "100"},
         )
         result = await self.submit(result, **values)
         self.assertEqual(result["step_id"], "init")
         self.assertEqual(
-            [self.transport.values[a] for a in (2000, 2043, 2040)], [2, 100, 100]
+            [self.transport.values[a] for a in (2000, 2043)], [2, 100]
         )
 
     async def test_channel_partial_retry_retains_targets_and_reports_visible_groups(

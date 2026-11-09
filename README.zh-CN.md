@@ -404,18 +404,13 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 1. 在**设备**中选择 ecoMain 或已选择且在线的 ecoSub。
 2. 展开**通道 1**至**通道 10**，设置**相位**（**L1、L2、L3**）和**电流互感器**（**30 A** 或 **100 A**）。
-3. ecoMain 的**主回路电流互感器**分区包含 **L1、L2、L3**，均只支持 **100 A**。
-4. 选择**保存**，返回菜单后选择**完成**。
+3. 选择**保存**，返回菜单后选择**完成**。
 
 > ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
 > ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
-
----
-
-> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor 配置
 

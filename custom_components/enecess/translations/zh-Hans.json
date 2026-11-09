@@ -479,14 +479,6 @@
               "phase": "相位",
               "transformer": "电流互感器"
             }
-          },
-          "main_transformers": {
-            "name": "主回路电流互感器",
-            "data": {
-              "l1": "L1",
-              "l2": "L2",
-              "l3": "L3"
-            }
           }
         }
       },
@@ -540,13 +532,7 @@
       "settings_phase_write_failed": "无法保存此分组的相位。请检查连接后重试；已成功的更改会保留。",
       "settings_phase_verify_failed": "此分组的相位回读值与选择不一致，请重试。",
       "settings_transformer_write_failed": "无法保存此分组的电流互感器。请检查连接后重试；已成功的更改会保留。",
-      "settings_transformer_verify_failed": "此分组的电流互感器回读值与选择不一致，请重试。",
-      "settings_main_l1_write_failed": "无法保存此分组的主回路 L1 电流互感器。请检查连接后重试；已成功的更改会保留。",
-      "settings_main_l1_verify_failed": "此分组的主回路 L1 电流互感器回读值与选择不一致，请重试。",
-      "settings_main_l2_write_failed": "无法保存此分组的主回路 L2 电流互感器。请检查连接后重试；已成功的更改会保留。",
-      "settings_main_l2_verify_failed": "此分组的主回路 L2 电流互感器回读值与选择不一致，请重试。",
-      "settings_main_l3_write_failed": "无法保存此分组的主回路 L3 电流互感器。请检查连接后重试；已成功的更改会保留。",
-      "settings_main_l3_verify_failed": "此分组的主回路 L3 电流互感器回读值与选择不一致，请重试。"
+      "settings_transformer_verify_failed": "此分组的电流互感器回读值与选择不一致，请重试。"
     },
     "abort": {
       "phase_unavailable": "通道相位设置仅适用于本地模式下在线的设备。",

@@ -479,14 +479,6 @@
               "phase": "Fase",
               "transformer": "Trasformatore di corrente"
             }
-          },
-          "main_transformers": {
-            "name": "Trasformatori di corrente del circuito principale",
-            "data": {
-              "l1": "L1",
-              "l2": "L2",
-              "l3": "L3"
-            }
           }
         }
       },
@@ -540,13 +532,7 @@
       "settings_phase_write_failed": "Impossibile salvare la fase in questo gruppo. Controlla la connessione e riprova; le modifiche riuscite vengono mantenute.",
       "settings_phase_verify_failed": "Il valore riletto per la fase in questo gruppo non corrisponde alla selezione. Riprova.",
       "settings_transformer_write_failed": "Impossibile salvare il trasformatore di corrente in questo gruppo. Controlla la connessione e riprova; le modifiche riuscite vengono mantenute.",
-      "settings_transformer_verify_failed": "Il valore riletto per il trasformatore di corrente in questo gruppo non corrisponde alla selezione. Riprova.",
-      "settings_main_l1_write_failed": "Impossibile salvare il trasformatore principale L1 in questo gruppo. Controlla la connessione e riprova; le modifiche riuscite vengono mantenute.",
-      "settings_main_l1_verify_failed": "Il valore riletto per il trasformatore principale L1 in questo gruppo non corrisponde alla selezione. Riprova.",
-      "settings_main_l2_write_failed": "Impossibile salvare il trasformatore principale L2 in questo gruppo. Controlla la connessione e riprova; le modifiche riuscite vengono mantenute.",
-      "settings_main_l2_verify_failed": "Il valore riletto per il trasformatore principale L2 in questo gruppo non corrisponde alla selezione. Riprova.",
-      "settings_main_l3_write_failed": "Impossibile salvare il trasformatore principale L3 in questo gruppo. Controlla la connessione e riprova; le modifiche riuscite vengono mantenute.",
-      "settings_main_l3_verify_failed": "Il valore riletto per il trasformatore principale L3 in questo gruppo non corrisponde alla selezione. Riprova."
+      "settings_transformer_verify_failed": "Il valore riletto per il trasformatore di corrente in questo gruppo non corrisponde alla selezione. Riprova."
     },
     "abort": {
       "phase_unavailable": "Le impostazioni delle fasi sono disponibili solo per dispositivi online in modalità locale.",

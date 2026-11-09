@@ -118,15 +118,10 @@ class SettingsFlowMixin:
                         f"channel_{n}": user_input[f"channel_{n}"]["transformer"]
                         for n in range(1, 11)
                     },
-                    main_transformers=user_input.get("main_transformers", {}),
                 ),
             )
             for key, category in write_errors.items():
-                if key.startswith("main_transformer_"):
-                    group = "main_transformers"
-                    detail = f"main_{key.rsplit('_', 1)[1]}"
-                else:
-                    group, detail = key.rsplit("_", 1)
+                group, detail = key.rsplit("_", 1)
                 # A native section can display one parent error; prefer a write failure.
                 if group not in errors or category == "write_failed":
                     errors[group] = f"settings_{detail}_{category}"
@@ -147,19 +142,11 @@ class SettingsFlowMixin:
                     }
                     for n in range(1, 11)
                 }
-                if self._channel_device == 0:
-                    self._channel_values["main_transformers"] = (
-                        current.main_transformers
-                    )
         fields = {}
         for group, values in self._channel_values.items():
             controls = {}
             for key, value in values.items():
-                choices = (
-                    ["L1", "L2", "L3"]
-                    if key == "phase"
-                    else (["100"] if group == "main_transformers" else ["30", "100"])
-                )
+                choices = ["L1", "L2", "L3"] if key == "phase" else ["30", "100"]
                 marker = (
                     vol.Required(key, default=value)
                     if value in choices

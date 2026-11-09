@@ -368,18 +368,13 @@ Beim Fortfahren von der Quellenseite wird der bisherige Ausdruck gelöscht, auch
 
 1. Wähle unter **Gerät** ecoMain oder einen ausgewählten, online verfügbaren ecoSub.
 2. Öffne **Kanal 1** bis **Kanal 10**. Wähle **Phase** (**L1, L2, L3**) und **Stromwandler** (**30 A** oder **100 A**).
-3. ecoMain bietet unter **Stromwandler des Hauptstromkreises** **L1, L2, L3**, jeweils nur **100 A**.
-4. Wähle **Speichern** und anschließend im Menü **Fertigstellen**.
+3. Wähle **Speichern** und anschließend im Menü **Fertigstellen**.
 
 > ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
 > ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
-
----
-
-> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor-Konfiguration
 

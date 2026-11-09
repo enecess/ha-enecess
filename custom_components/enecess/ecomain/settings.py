@@ -10,7 +10,6 @@ from ..const import CONF_ECOMAIN_SOLAR_CAPACITY_MAX
 from .phase import async_read_phases, async_write_phases
 
 _CHANNELS = tuple(f"channel_{channel}" for channel in range(1, 11))
-_MAIN_PHASES = ("l1", "l2", "l3")
 _INVERTER_CHANNELS = tuple(str(channel) for channel in range(1, 11))
 _IO_ERRORS = (ModbusException, OSError, TimeoutError)
 
@@ -21,7 +20,6 @@ class ChannelSettings:
 
     phases: dict[str, str | None]
     transformers: dict[str, str | None]
-    main_transformers: dict[str, str | None]
 
 
 @dataclass(frozen=True)
@@ -65,20 +63,12 @@ async def async_read_channel_settings(
     _validate_device_index(device_index)
     phases = await async_read_phases(client, device_index)
     transformers = await client.read_holding_registers(2043 + 10 * device_index, 10)
-    main_transformers = {}
-    if device_index == 0:
-        main = await client.read_holding_registers(2040, 3)
-        main_transformers = {
-            phase: "100" if value == 100 else None
-            for phase, value in zip(_MAIN_PHASES, main.registers, strict=True)
-        }
     return ChannelSettings(
         phases=phases,
         transformers={
             channel: str(value) if value in (30, 100) else None
             for channel, value in zip(_CHANNELS, transformers.registers, strict=True)
         },
-        main_transformers=main_transformers,
     )
 
 
@@ -92,31 +82,19 @@ async def async_write_channel_settings(
     for selections, keys, choices in (
         (desired.phases, _CHANNELS, ("L1", "L2", "L3")),
         (desired.transformers, _CHANNELS, ("30", "100")),
-        (desired.main_transformers, _MAIN_PHASES, ("100",)),
     ):
         if not isinstance(selections, dict) or any(
             key not in keys or (value is not None and value not in choices)
             for key, value in selections.items()
         ):
             raise ValueError("Invalid channel settings choices")
-    if device_index != 0 and any(
-        value is not None for value in desired.main_transformers.values()
-    ):
-        raise ValueError("Main transformers belong to ecoMain only")
-
     phases = {key: value for key, value in desired.phases.items() if value is not None}
     transformers = {
         key: value for key, value in desired.transformers.items() if value is not None
     }
-    main_transformers = {
-        key: value
-        for key, value in desired.main_transformers.items()
-        if value is not None
-    }
     fields = [
         *(f"{key}_phase" for key in phases),
         *(f"{key}_transformer" for key in transformers),
-        *(f"main_transformer_{key}" for key in main_transformers),
     ]
     if not fields:
         return {}
@@ -135,20 +113,13 @@ async def async_write_channel_settings(
         for key, error in phase_errors.items()
     }
     writes = [
-        *(
-            (
-                f"{key}_transformer",
-                2043 + 10 * device_index + _CHANNELS.index(key),
-                int(value),
-            )
-            for key, value in transformers.items()
-            if value != current.transformers[key]
-        ),
-        *(
-            (f"main_transformer_{key}", 2040 + _MAIN_PHASES.index(key), int(value))
-            for key, value in main_transformers.items()
-            if value != current.main_transformers[key]
-        ),
+        (
+            f"{key}_transformer",
+            2043 + 10 * device_index + _CHANNELS.index(key),
+            int(value),
+        )
+        for key, value in transformers.items()
+        if value != current.transformers[key]
     ]
     for field, address, value in writes:
         error = await _async_write_verified(client, address, [value])

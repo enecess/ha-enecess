@@ -479,14 +479,6 @@
               "phase": "Phase",
               "transformer": "Transformateur de courant"
             }
-          },
-          "main_transformers": {
-            "name": "Transformateurs de courant du circuit principal",
-            "data": {
-              "l1": "L1",
-              "l2": "L2",
-              "l3": "L3"
-            }
           }
         }
       },
@@ -540,13 +532,7 @@
       "settings_phase_write_failed": "Impossible d’enregistrer la phase dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
       "settings_phase_verify_failed": "La valeur relue pour la phase dans ce groupe ne correspond pas à votre sélection. Réessayez.",
       "settings_transformer_write_failed": "Impossible d’enregistrer le transformateur de courant dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
-      "settings_transformer_verify_failed": "La valeur relue pour le transformateur de courant dans ce groupe ne correspond pas à votre sélection. Réessayez.",
-      "settings_main_l1_write_failed": "Impossible d’enregistrer le transformateur principal L1 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
-      "settings_main_l1_verify_failed": "La valeur relue pour le transformateur principal L1 dans ce groupe ne correspond pas à votre sélection. Réessayez.",
-      "settings_main_l2_write_failed": "Impossible d’enregistrer le transformateur principal L2 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
-      "settings_main_l2_verify_failed": "La valeur relue pour le transformateur principal L2 dans ce groupe ne correspond pas à votre sélection. Réessayez.",
-      "settings_main_l3_write_failed": "Impossible d’enregistrer le transformateur principal L3 dans ce groupe. Vérifiez la connexion et réessayez ; les modifications réussies sont conservées.",
-      "settings_main_l3_verify_failed": "La valeur relue pour le transformateur principal L3 dans ce groupe ne correspond pas à votre sélection. Réessayez."
+      "settings_transformer_verify_failed": "La valeur relue pour le transformateur de courant dans ce groupe ne correspond pas à votre sélection. Réessayez."
     },
     "abort": {
       "phase_unavailable": "Les phases des canaux ne sont disponibles que pour les appareils en ligne en mode local.",

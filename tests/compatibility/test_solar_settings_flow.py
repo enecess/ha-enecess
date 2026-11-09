@@ -62,7 +62,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
             str(key): value for key, value in result["data_schema"].schema.items()
         }
         self.assertEqual(
-            sum(isinstance(value, section) for value in fields.values()), 11
+            sum(isinstance(value, section) for value in fields.values()), 10
         )
         serialized = self.serialize(result)
         channels = [item for item in serialized if item["name"].startswith("channel_")]

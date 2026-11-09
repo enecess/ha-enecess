@@ -368,18 +368,13 @@ Otwórz **Konfiguruj → Dostosuj ecoMain** i wybierz **Konfiguracja kanałów**
 
 1. W **Urządzenie** wybierz ecoMain lub wybrany ecoSub dostępny online.
 2. Rozwiń sekcje od **Kanał 1** do **Kanał 10**. Ustaw **Faza** (**L1, L2, L3**) i **Przekładnik prądowy** (**30 A** lub **100 A**).
-3. Sekcja ecoMain **Przekładniki prądowe obwodu głównego** zawiera **L1, L2, L3**, każda obsługuje tylko **100 A**.
-4. Wybierz **Zapisz**, a po powrocie do menu **Zakończ**.
+3. Wybierz **Zapisz**, a po powrocie do menu **Zakończ**.
 
 > ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
 > ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
-
----
-
-> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### Konfiguracja ecoSolarMonitor
 

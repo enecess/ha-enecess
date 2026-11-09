@@ -368,18 +368,13 @@ Open **Configure → Adjust ecoMain** and choose **Channel Configuration** or **
 
 1. Under **Device**, select ecoMain or a selected, online ecoSub.
 2. Expand **Channel 1** through **Channel 10** and set **Phase** (**L1, L2, L3**) and **Current Transformer** (**30 A** or **100 A**).
-3. ecoMain's **Main Circuit Current Transformers** section contains **L1, L2, L3**, each supporting **100 A** only.
-4. Select **Save**, then **Finish** when back in the menu.
+3. Select **Save**, then **Finish** when back in the menu.
 
 > ![ecoMain: Channel Configuration with ecoMain selected](docs/images/ecomain-solar-channel-device.jpg)
 
 ---
 
 > ![ecoMain: Channel Configuration, unsaved Channel 4 example with Phase L2 and 30 A or 100 A transformers](docs/images/ecomain-solar-channel-settings.jpg)
-
----
-
-> ![ecoMain: Main Circuit Current Transformers with the 100 A option](docs/images/ecomain-solar-main-transformers.jpg)
 
 #### ecoSolarMonitor Configuration
 
