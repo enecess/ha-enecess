@@ -1,5 +1,29 @@
 # enecess Home Assistant Integration Release Notes
 
+## v1.2.0
+
+Release date: 2026-11-12
+
+v1.2.0 adds ecoSolarMonitor monitoring and expands local ecoMain channel and solar installation settings.
+
+### Highlights
+
+- Added ecoSolarMonitor readings for irradiance, tilt, module temperature, actual/estimated power and cumulative energy, plus today/yesterday energy and performance ratios.
+- Expanded local channel phase and CT settings, including 30 A / 100 A branch CT selection, and added PV capacity, module temperature coefficient and inverter channel settings.
+- Expanded custom formula inputs to include solar power, energy, irradiance, module temperature, tilt and performance ratio.
+
+### Changes
+
+- Improved sensor display precision, cloud sign-in, integration reload/stop handling and Home Assistant compatibility.
+- Refreshed setup guides, screenshots and translations across all six supported languages.
+
+### Upgrade Notes
+
+- Upgrade through HACS, or Marketplace on Home Assistant 2026.11 or later, then restart Home Assistant.
+- The new solar monitoring and installation features require local ecoMain firmware **140 or later**. After updating firmware, reload the integration to refresh available measurements and settings.
+
+---
+
 ## v1.1.1
 
 Release date: 2026-10-18
