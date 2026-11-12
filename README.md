@@ -120,7 +120,7 @@ Use this when ecoMain and Home Assistant share a LAN that allows mDNS discovery.
 1. Start from **Add Integration → enecess → ecoMain → Automatic Discovery (Local)**, or select **Add** on a discovered ecoMain card.
 2. Select ecoMain by serial number and IP / hostname, then confirm the device details.
 3. In **Setup Device → Select Slaves to Add**, select the ecoSub devices or **ecoSolarMonitor** you want; you can also continue without sub-devices.
-4. In **Measurement Types**, choose readings separately for **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**, then select **Save**.
+4. In **Measurement Types**, choose measurement types separately for **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**, then select **Save**.
 5. Configure **Extra Entities** if needed, such as inverted or absolute power, sums or averages. Select **Finish** when done.
 
 If discovery finds nothing, try **Manual Setup (Local)**. Check that Home Assistant and ecoMain share a subnet / VLAN and that your router allows multicast / mDNS.
@@ -141,11 +141,11 @@ If discovery finds nothing, try **Manual Setup (Local)**. Check that Home Assist
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -162,7 +162,7 @@ Use this if automatic discovery fails. Find ecoMain's **IP / hostname** in your 
 1. Select **ecoMain → Manual Setup (Local)**.
 2. Enter **Master Serial Number** and **Address (IP or Hostname)**, then confirm the device details.
 3. In **Setup Device → Select Slaves to Add**, select the ecoSub devices or **ecoSolarMonitor** you want; you can also continue without sub-devices.
-4. In **Measurement Types**, choose readings for **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**, then select **Save**.
+4. In **Measurement Types**, choose measurement types for **ecoSolarMonitor** (when selected) and **ecoMain / ecoSub**, then select **Save**.
 5. Configure **Extra Entities** if needed, then select **Finish**.
 
 Home Assistant must be able to reach the address through your network and firewall. Modbus TCP uses port **502**; you do not need to enter it in the UI. If connection fails, check the address, network cable and network access.
@@ -183,11 +183,11 @@ Home Assistant must be able to reach the address through your network and firewa
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -284,10 +284,10 @@ Open **Settings → Devices & services → enecess → Configure**.
 - For ecoPlug, change the selected plugs.
 - To change device type, connection method or the main ecoMain device, remove the entry and add it again.
 
-To add or adjust solar measurements on an existing local entry:
+To add or adjust ecoSolarMonitor measurement types on an existing local entry:
 
 1. In **Adjust ecoMain → Select Slaves to Add**, select **ecoSolarMonitor** and the ecoSub devices you want, then open **Measurement Types**.
-2. Choose readings in **ecoSolarMonitor** and **ecoMain / ecoSub**, then select **Save**.
+2. Choose measurement types for **ecoSolarMonitor** and **ecoMain / ecoSub**, then select **Save**.
 3. Open **Channel Configuration** or **ecoSolarMonitor Configuration** if needed. Return to the menu and select **Finish**.
 
 > ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
@@ -298,15 +298,15 @@ To add or adjust solar measurements on an existing local entry:
 
 ### Measurement Types
 
-Choose readings after adding devices. To change them later, open **Configure → Adjust ecoMain → Next Action → Measurement Types**.
+Choose measurement types after adding devices. To change them later, open **Configure → Adjust ecoMain → Next Action → Measurement Types**.
 
-- Select **ecoSolarMonitor** and **ecoMain / ecoSub** readings separately. Keep at least one reading across the two groups; a solar-only selection is supported.
+- Select measurement types for **ecoSolarMonitor** and **ecoMain / ecoSub** separately. Keep at least one measurement type across the two groups; you can select only ecoSolarMonitor measurement types.
 - Select **Save**, then **Finish** in the menu when done.
 - Before deselecting devices or measurements, remove extra entities that depend on them.
 
-Local ecoMain / ecoSub options are listed below. See the separate [solar entity catalog](#solar-entities) for solar readings.
+Local measurement types for ecoMain / ecoSub are listed below. For ecoSolarMonitor measurement types, see [ecoSolarMonitor](#solar-entities).
 
-| Category | Meaning | Selected by default |
+| Measurement type | Meaning | Selected by default |
 | --- | --- | --- |
 | Forward Active Energy | Cumulative active energy in the CT arrow direction (Wh) | Yes |
 | Reverse Active Energy | Cumulative active energy against the CT arrow direction (Wh) | Yes |
@@ -327,12 +327,12 @@ See the entity tables below for supported phases, totals and channels. Cloud mod
 
 Create sensors from your measurements, such as the difference or average of two power readings.
 
-1. Enable the required readings in **Measurement Types**, then choose **Add Formula Entity**.
+1. Enable the required measurement types in **Measurement Types**, then choose **Add Formula Entity**.
 2. Enter a name and select **Result Type / Unit**.
 3. In **Select Source Entities**, choose at least one source. Sources are grouped by measurement type, and you can select across groups.
 4. Enter the **Expression** using the displayed `a`, `b`, etc. variables, and check the result's unit.
 
-Solar power is under **Active power (W)**; cumulative and yesterday/today energy are under **Active energy (cumulative, Wh)**. Irradiance, module temperature, tilt angle and performance ratio have their own groups. Options show actual names and units, such as `solar_today_actual_energy (Wh)`.
+ecoSolarMonitor power readings are under **Active power (W)**; cumulative and yesterday/today energy are under **Active energy (cumulative, Wh)**. Irradiance, module temperature, tilt angle and performance ratio have their own groups. Options show actual names and units, such as `solar_today_actual_energy (Wh)`.
 
 Continuing from the source page clears the previous expression, including when editing. Enter it again. For a result without a unit, choose **Number (no unit)**.
 
@@ -344,7 +344,7 @@ Continuing from the source page clears the previous expression, including when e
 
 ---
 
-> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual ecoSolarMonitor power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -434,9 +434,9 @@ ecoSub has no separate L1/L2/L3, three-phase total or frequency entities. “Cha
 
 ### Complete Local Measurement Catalog (Modbus)
 
-Firmware **136–138** supports the first three types; **139 or later** supports all twelve. Only the first three are selected by default; enable the others in **Measurement Types**. Unselected measurements do not create sensors.
+Firmware **136–138** supports the first three types; **139 or later** supports all twelve. Only the first three are selected by default; enable the others in **Measurement Types**. Unselected measurement types do not create sensors.
 
-| Measurement | HA name suffix / full name | Unit | ecoMain phases | ecoMain total | Channels | Selected by default |
+| Measurement type | HA name suffix / full name | Unit | ecoMain phases | ecoMain total | Channels | Selected by default |
 | --- | --- | --- | --- | --- | --- | --- |
 | Active Power | `power_rt` | W | ✓ | ✓ | ✓ | Yes |
 | Forward Active Energy | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Yes |
@@ -463,9 +463,9 @@ The CT arrow marks the forward direction. `energy_fwd_total` records forward act
 
 ### ecoSolarMonitor
 
-ecoSolarMonitor belongs to the current ecoMain and provides fourteen readings. The first five are selected by default; enable yesterday/today and other readings as needed.
+ecoSolarMonitor belongs to the current ecoMain and provides fourteen measurement types. The first five are selected by default; enable yesterday/today and other measurement types as needed.
 
-| Measurement | HA entity name | Unit | Selected by default |
+| Measurement type | HA entity name | Unit | Selected by default |
 | --- | --- | --- | --- |
 | Irradiance | `solar_irradiance` | W/m² | Yes |
 | Tilt Angle | `solar_tilt_angle` | ° | Yes |
@@ -490,7 +490,7 @@ Today's energy starts accumulating again each day. Yesterday's energy and perfor
 
 **Active Power** and **Active Energy (Accumulated And 1-Minute Increment)** are both selected by default. They apply to the ecoMain total and selected devices' channels, without per-phase readings.
 
-| Measurement option | Meaning | HA name suffix | Unit |
+| Measurement type | Meaning | HA name suffix | Unit |
 | --- | --- | --- | --- |
 | Active Power | 1-minute average active power | `power_avg_1m` | W |
 | Active Energy (Accumulated And 1-Minute Increment) | 1-minute active energy increment | `energy_total_1m` | Wh |

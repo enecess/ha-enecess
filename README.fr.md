@@ -116,7 +116,7 @@ Pour ecoMain et Home Assistant sur le même réseau local autorisant mDNS :
 1. Démarrez depuis **Ajouter une intégration → enecess → ecoMain → Découverte automatique (local)**, ou sélectionnez **Ajouter** sur la carte ecoMain découverte.
 2. Choisissez ecoMain selon son numéro de série et son IP / nom d’hôte, puis confirmez les informations.
 3. Dans **Configurer l'appareil → Sélectionner les modules esclaves à ajouter**, choisissez les ecoSub ou **ecoSolarMonitor** souhaités. Vous pouvez continuer sans sous-appareil.
-4. Dans **Types de mesures**, choisissez séparément les valeurs **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**, puis **Enregistrer**.
+4. Dans **Types de mesures**, choisissez séparément les types de mesures pour **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**, puis **Enregistrer**.
 5. Configurez au besoin des **Entités supplémentaires**, par exemple puissance inversée, valeur absolue, somme ou moyenne. Choisissez ensuite **Terminer**.
 
 Si rien n’est détecté, essayez **Configuration manuelle (local)**. Vérifiez le sous-réseau / VLAN commun et l’autorisation multicast / mDNS du routeur.
@@ -137,11 +137,11 @@ Si rien n’est détecté, essayez **Configuration manuelle (local)**. Vérifiez
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -158,7 +158,7 @@ Si la découverte automatique échoue, relevez l’**IP / le nom d’hôte** d�
 1. Choisissez **ecoMain → Configuration manuelle (local)**.
 2. Renseignez **Numéro de série du maître** et **Adresse (IP ou nom d'hôte)**, puis confirmez les informations.
 3. Dans **Configurer l'appareil → Sélectionner les modules esclaves à ajouter**, choisissez les ecoSub ou **ecoSolarMonitor** souhaités, ou continuez sans sous-appareil.
-4. Dans **Types de mesures**, choisissez les valeurs **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**, puis **Enregistrer**.
+4. Dans **Types de mesures**, choisissez les types de mesures pour **ecoSolarMonitor** (si sélectionné) et **ecoMain / ecoSub**, puis **Enregistrer**.
 5. Configurez au besoin des **Entités supplémentaires**, puis choisissez **Terminer**.
 
 Home Assistant doit pouvoir atteindre l’adresse à travers le réseau et le pare-feu. Modbus TCP utilise le port **502**, sans saisie dans l’interface. En cas d’échec, vérifiez l’adresse, le câble réseau et les autorisations réseau.
@@ -179,11 +179,11 @@ Home Assistant doit pouvoir atteindre l’adresse à travers le réseau et le pa
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -280,10 +280,10 @@ Ouvrez **Paramètres → Appareils et services → enecess → Configurer**.
 - ecoPlug : prises sélectionnées.
 - Pour changer le type d’appareil, la méthode de connexion ou l’ecoMain principal, supprimez l’entrée et ajoutez-la à nouveau.
 
-Pour ajouter ou modifier les mesures solaires d’une entrée locale existante :
+Pour ajouter ou modifier les types de mesures ecoSolarMonitor d’une entrée locale existante :
 
 1. Dans **Ajuster ecoMain → Sélectionner les modules esclaves à ajouter**, choisissez **ecoSolarMonitor** et les ecoSub souhaités, puis **Types de mesures**.
-2. Choisissez les valeurs **ecoSolarMonitor** et **ecoMain / ecoSub**, puis **Enregistrer**.
+2. Choisissez les types de mesures pour **ecoSolarMonitor** et **ecoMain / ecoSub**, puis **Enregistrer**.
 3. Ouvrez au besoin **Configuration des canaux** ou **Configuration ecoSolarMonitor**. Revenez au menu et choisissez **Terminer**.
 
 > ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
@@ -294,15 +294,15 @@ Pour ajouter ou modifier les mesures solaires d’une entrée locale existante :
 
 ### Types de mesures
 
-Choisissez les valeurs après les appareils. Pour les modifier ensuite : **Configurer → Ajuster ecoMain → Action suivante → Types de mesures**.
+Choisissez les types de mesures après avoir ajouté les appareils. Pour les modifier ensuite : **Configurer → Ajuster ecoMain → Action suivante → Types de mesures**.
 
-- **ecoSolarMonitor** et **ecoMain / ecoSub** se sélectionnent séparément. Gardez au moins une valeur au total ; une sélection uniquement solaire est possible.
+- Les types de mesures pour **ecoSolarMonitor** et **ecoMain / ecoSub** se sélectionnent séparément. Gardez au moins un type de mesure au total ; vous pouvez sélectionner uniquement les types de mesures ecoSolarMonitor.
 - Choisissez **Enregistrer**, puis **Terminer** dans le menu.
 - Supprimez les entités supplémentaires dépendantes avant de désélectionner appareils ou mesures.
 
-Options locales ecoMain / ecoSub ci-dessous ; mesures solaires dans le [catalogue solaire](#solar-entities).
+Les types de mesures locales pour ecoMain / ecoSub sont présentés ci-dessous. Pour les types de mesures ecoSolarMonitor, voir [ecoSolarMonitor](#solar-entities).
 
-| Catégorie | Signification | Sélection par défaut |
+| Type de mesure | Signification | Sélection par défaut |
 | --- | --- | --- |
 | Énergie Active Directe | Énergie active cumulée dans le sens de la flèche du CT (Wh) | Oui |
 | Énergie Active Inverse | Énergie active cumulée dans le sens opposé à la flèche du CT (Wh) | Oui |
@@ -323,12 +323,12 @@ Les tableaux d’entités précisent les phases, totaux et canaux disponibles. L
 
 Créez des capteurs à partir de vos mesures, par exemple la différence ou la moyenne de deux puissances.
 
-1. Activez les valeurs nécessaires dans **Types de mesures**, puis choisissez **Ajouter une entité de formule**.
+1. Activez les types de mesures nécessaires dans **Types de mesures**, puis choisissez **Ajouter une entité de formule**.
 2. Indiquez un nom et choisissez **Type de résultat / unité**.
 3. Dans **Sélectionner les entités sources**, choisissez au moins une source. Les sources sont groupées par mesure et peuvent être combinées entre groupes.
 4. Saisissez l’**Expression** avec les variables affichées `a`, `b`, etc., puis vérifiez l’unité du résultat.
 
-La puissance solaire figure dans **Puissance active (W)**, les énergies cumulées et d’hier/aujourd’hui dans **Énergie active (cumulée, Wh)**. Irradiance, température du module, inclinaison et ratio de performance ont leurs propres groupes. Les options indiquent noms réels et unités, par exemple `solar_today_actual_energy (Wh)`.
+Les mesures de puissance ecoSolarMonitor figurent dans **Puissance active (W)**, les énergies cumulées et d’hier/aujourd’hui dans **Énergie active (cumulée, Wh)**. Irradiance, température du module, inclinaison et ratio de performance ont leurs propres groupes. Les options indiquent noms réels et unités, par exemple `solar_today_actual_energy (Wh)`.
 
 Continuer depuis la page des sources efface l’expression précédente, même lors d’une modification : saisissez-la à nouveau. Pour un résultat sans unité, choisissez **Nombre (sans unité)**.
 
@@ -340,7 +340,7 @@ Continuer depuis la page des sources efface l’expression précédente, même l
 
 ---
 
-> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual ecoSolarMonitor power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -432,7 +432,7 @@ ecoSub n’a pas d’entités L1/L2/L3, total triphasé ou fréquence distinctes
 
 Le firmware **136–138** prend en charge les trois premières mesures ; **139 ou ultérieur**, les douze. Seules les trois premières sont sélectionnées par défaut ; activez les autres dans **Types de mesures**. Les mesures non sélectionnées ne créent pas de capteurs.
 
-| Mesure | Suffixe / nom complet HA | Unité | Phases ecoMain | Total ecoMain | Canaux | Sélection par défaut |
+| Type de mesure | Suffixe / nom complet HA | Unité | Phases ecoMain | Total ecoMain | Canaux | Sélection par défaut |
 | --- | --- | --- | --- | --- | --- | --- |
 | Puissance Active | `power_rt` | W | ✓ | ✓ | ✓ | Oui |
 | Énergie Active Directe | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Oui |
@@ -459,9 +459,9 @@ La flèche du CT indique le sens direct. `energy_fwd_total` compte l’énergie 
 
 ### ecoSolarMonitor
 
-ecoSolarMonitor appartient à l’ecoMain courant et fournit quatorze valeurs. Les cinq premières sont sélectionnées par défaut ; activez celles d’hier/aujourd’hui et les autres selon vos besoins.
+ecoSolarMonitor appartient à l’ecoMain courant et fournit quatorze types de mesures. Les cinq premiers sont sélectionnés par défaut ; activez ceux d’hier/aujourd’hui et les autres selon vos besoins.
 
-| Mesure | Nom de l’entité HA | Unité | Sélection par défaut |
+| Type de mesure | Nom de l’entité HA | Unité | Sélection par défaut |
 | --- | --- | --- | --- |
 | Irradiance | `solar_irradiance` | W/m² | Oui |
 | Angle D’Inclinaison | `solar_tilt_angle` | ° | Oui |
@@ -486,7 +486,7 @@ L’énergie du jour recommence à s’accumuler chaque jour. L’énergie et le
 
 **Puissance Active** et **Énergie Active (Cumul Et Incrément Par Minute)** sont sélectionnés par défaut. Ils concernent le total ecoMain et les canaux des appareils sélectionnés, sans mesures par phase.
 
-| Option de mesure | Signification | Suffixe du nom HA | Unité |
+| Type de mesure | Signification | Suffixe du nom HA | Unité |
 | --- | --- | --- | --- |
 | Puissance Active | Puissance active moyenne sur une minute | `power_avg_1m` | W |
 | Énergie Active (Cumul Et Incrément Par Minute) | Incrément d’énergie active d’une minute | `energy_total_1m` | Wh |

@@ -120,7 +120,7 @@ Für ecoMain und Home Assistant im selben LAN mit erlaubter mDNS-Erkennung:
 1. Starte über **Integration hinzufügen → enecess → ecoMain → Automatische Erkennung (Lokal)** oder **Hinzufügen** auf der gefundenen ecoMain-Karte.
 2. Wähle ecoMain anhand von Seriennummer und IP / Hostname und bestätige die Gerätedaten.
 3. Wähle unter **Gerät konfigurieren → Hinzuzufügende Slaves auswählen** die gewünschten ecoSub oder **ecoSolarMonitor**. Du kannst auch ohne Untergeräte fortfahren.
-4. Wähle unter **Messgrößen** getrennt die Werte für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
+4. Wähle unter **Messgrößen** getrennt die Messgrößen für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
 5. Konfiguriere bei Bedarf **Zusätzliche Entitäten**, etwa invertierte oder absolute Leistung, Summen oder Mittelwerte. Wähle abschließend **Fertigstellen**.
 
 Wird nichts gefunden, verwende **Manuelle Einrichtung (Lokal)**. Prüfe das gemeinsame Subnetz / VLAN und ob dein Router Multicast / mDNS zulässt.
@@ -141,11 +141,11 @@ Wird nichts gefunden, verwende **Manuelle Einrichtung (Lokal)**. Prüfe das geme
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -162,7 +162,7 @@ Wenn die automatische Erkennung fehlschlägt: Ermittle die **IP / den Hostnamen*
 1. Wähle **ecoMain → Manuelle Einrichtung (Lokal)**.
 2. Gib **Master-Seriennummer** und **Adresse (IP oder Hostname)** ein und bestätige die Gerätedaten.
 3. Wähle unter **Gerät konfigurieren → Hinzuzufügende Slaves auswählen** die gewünschten ecoSub oder **ecoSolarMonitor**, oder fahre ohne Untergeräte fort.
-4. Wähle unter **Messgrößen** Werte für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
+4. Wähle unter **Messgrößen** die Messgrößen für **ecoSolarMonitor** (falls ausgewählt) und **ecoMain / ecoSub**, dann **Speichern**.
 5. Konfiguriere bei Bedarf **Zusätzliche Entitäten** und wähle **Fertigstellen**.
 
 Home Assistant muss die Adresse über Netzwerk und Firewall erreichen können. Modbus TCP verwendet Port **502**; eine Eingabe im Formular ist nicht nötig. Prüfe bei Verbindungsproblemen Adresse, Netzwerkkabel und Netzwerkzugriff.
@@ -183,11 +183,11 @@ Home Assistant muss die Adresse über Netzwerk und Firewall erreichen können. M
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -284,10 +284,10 @@ Die Daten aktualisieren sich etwa alle **60 Sekunden**. Nach erfolgreichem Schal
 - ecoPlug: ausgewählte Steckdosen ändern.
 - Für einen anderen Gerätetyp, Verbindungsweg oder ecoMain entferne den Eintrag und füge ihn neu hinzu.
 
-Solarmessungen zu einem bestehenden lokalen Eintrag hinzufügen oder ändern:
+Messgrößen von ecoSolarMonitor zu einem bestehenden lokalen Eintrag hinzufügen oder ändern:
 
 1. Wähle unter **ecoMain anpassen → Hinzuzufügende Slaves auswählen** **ecoSolarMonitor** und die gewünschten ecoSub, dann **Messgrößen**.
-2. Wähle Werte für **ecoSolarMonitor** und **ecoMain / ecoSub**, dann **Speichern**.
+2. Wähle Messgrößen für **ecoSolarMonitor** und **ecoMain / ecoSub**, dann **Speichern**.
 3. Öffne bei Bedarf **Kanalkonfiguration** oder **ecoSolarMonitor-Konfiguration**. Wähle anschließend im Menü **Fertigstellen**.
 
 > ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
@@ -298,15 +298,15 @@ Solarmessungen zu einem bestehenden lokalen Eintrag hinzufügen oder ändern:
 
 ### Messgrößen
 
-Wähle die Werte nach dem Hinzufügen der Geräte. Später änderst du sie unter **Konfigurieren → ecoMain anpassen → Nächste Aktion → Messgrößen**.
+Wähle die Messgrößen nach dem Hinzufügen der Geräte. Später änderst du sie unter **Konfigurieren → ecoMain anpassen → Nächste Aktion → Messgrößen**.
 
-- **ecoSolarMonitor** und **ecoMain / ecoSub** werden getrennt ausgewählt. Insgesamt muss mindestens ein Wert bleiben; eine reine Solarauswahl ist möglich.
+- Die Messgrößen für **ecoSolarMonitor** und **ecoMain / ecoSub** werden getrennt ausgewählt. Insgesamt muss mindestens eine Messgröße bleiben; es können ausschließlich ecoSolarMonitor-Messgrößen ausgewählt werden.
 - Wähle **Speichern** und abschließend im Menü **Fertigstellen**.
 - Entferne abhängige zusätzliche Entitäten, bevor du Geräte oder Messgrößen abwählst.
 
-Lokale ecoMain-/ecoSub-Optionen stehen hier, Solarwerte im [Solarkatalog](#solar-entities).
+Die lokalen Messgrößen für ecoMain / ecoSub sind unten aufgeführt. Die Messgrößen für ecoSolarMonitor stehen unter [ecoSolarMonitor](#solar-entities).
 
-| Kategorie | Bedeutung | Standardauswahl |
+| Messgröße | Bedeutung | Standardauswahl |
 | --- | --- | --- |
 | Wirkenergie Vorwärts | Kumulierte Wirkenergie in CT-Pfeilrichtung (Wh) | Ja |
 | Wirkenergie Rückwärts | Kumulierte Wirkenergie entgegen der CT-Pfeilrichtung (Wh) | Ja |
@@ -327,12 +327,12 @@ Die Entitätstabellen unten zeigen die verfügbaren Phasen, Gesamtwerte und Kan�
 
 Erstelle Sensoren aus Messwerten, etwa die Differenz oder den Mittelwert zweier Leistungen.
 
-1. Aktiviere die benötigten Werte unter **Messgrößen**, dann wähle **Formelentität hinzufügen**.
+1. Aktiviere die benötigten Messgrößen unter **Messgrößen**, dann wähle **Formelentität hinzufügen**.
 2. Gib einen Namen ein und wähle **Ergebnistyp / Einheit**.
 3. Wähle unter **Quellentitäten auswählen** mindestens eine Quelle. Die Quellen sind nach Messgröße gruppiert; du kannst Gruppen kombinieren.
 4. Gib unter **Formelausdruck** die Formel mit den angezeigten Variablen `a`, `b` usw. ein und prüfe die Ergebniseinheit.
 
-Solarleistung steht unter **Wirkleistung (W)**, kumulierte und gestrige/heutige Energie unter **Wirkenergie (kumuliert, Wh)**. Bestrahlungsstärke, Modultemperatur, Neigungswinkel und Performance Ratio haben eigene Gruppen. Die Optionen zeigen tatsächliche Namen und Einheiten, etwa `solar_today_actual_energy (Wh)`.
+ecoSolarMonitor-Leistungswerte stehen unter **Wirkleistung (W)**, kumulierte und gestrige/heutige Energie unter **Wirkenergie (kumuliert, Wh)**. Bestrahlungsstärke, Modultemperatur, Neigungswinkel und Performance Ratio haben eigene Gruppen. Die Optionen zeigen tatsächliche Namen und Einheiten, etwa `solar_today_actual_energy (Wh)`.
 
 Beim Fortfahren von der Quellenseite wird der bisherige Ausdruck gelöscht, auch beim Bearbeiten. Gib ihn erneut ein. Für Ergebnisse ohne Einheit wähle **Zahl (ohne Einheit)**.
 
@@ -344,7 +344,7 @@ Beim Fortfahren von der Quellenseite wird der bisherige Ausdruck gelöscht, auch
 
 ---
 
-> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual ecoSolarMonitor power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -463,7 +463,7 @@ Der CT-Pfeil zeigt vorwärts. `energy_fwd_total` zählt Wirkenergie vorwärts, `
 
 ### ecoSolarMonitor
 
-ecoSolarMonitor gehört zum aktuellen ecoMain und bietet vierzehn Werte. Die ersten fünf sind standardmäßig ausgewählt; gestrige/heutige und weitere Werte kannst du bei Bedarf aktivieren.
+ecoSolarMonitor gehört zum aktuellen ecoMain und bietet vierzehn Messgrößen. Die ersten fünf sind standardmäßig ausgewählt; gestrige/heutige und weitere Messgrößen kannst du bei Bedarf aktivieren.
 
 | Messgröße | HA-Entitätsname | Einheit | Standardauswahl |
 | --- | --- | --- | --- |
@@ -490,7 +490,7 @@ Die heutige Energie beginnt jeden Tag neu zu zählen. Gestrige Energie und gestr
 
 **Wirkleistung** und **Wirkenergie (Kumuliert Und Minuteninkrement)** sind standardmäßig ausgewählt. Sie gelten für die ecoMain-Summe und die Kanäle ausgewählter Geräte, ohne Phasenwerte.
 
-| Messoption | Bedeutung | HA-Namenssuffix | Einheit |
+| Messgröße | Bedeutung | HA-Namenssuffix | Einheit |
 | --- | --- | --- | --- |
 | Wirkleistung | Mittlere Wirkleistung einer Minute | `power_avg_1m` | W |
 | Wirkenergie (Kumuliert Und Minuteninkrement) | Wirkenergiezuwachs einer Minute | `energy_total_1m` | Wh |

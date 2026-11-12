@@ -120,7 +120,7 @@ Dla ecoMain i Home Assistant w tej samej sieci LAN, która zezwala na mDNS:
 1. Rozpocznij przez **Dodaj integrację → enecess → ecoMain → Automatyczne wykrywanie (lokalnie)** albo **Dodaj** na karcie wykrytego ecoMain.
 2. Wybierz ecoMain według numeru seryjnego i IP / nazwy hosta, a potem potwierdź dane.
 3. W **Konfiguracja urządzenia → Wybierz urządzenia podrzędne do dodania** wybierz potrzebne ecoSub lub **ecoSolarMonitor**. Możesz kontynuować bez urządzeń podrzędnych.
-4. W **Rodzaje pomiarów** wybierz osobno odczyty **ecoSolarMonitor** (jeśli wybrany) i **ecoMain / ecoSub**, a następnie **Zapisz**.
+4. W **Rodzaje pomiarów** wybierz osobno rodzaje pomiarów dla **ecoSolarMonitor** (jeśli wybrany) i **ecoMain / ecoSub**, a następnie **Zapisz**.
 5. W razie potrzeby skonfiguruj **Dodatkowe encje**, np. odwrócenie znaku mocy, wartość bezwzględną, sumę lub średnią. Na końcu wybierz **Zakończ**.
 
 Jeśli nic nie znaleziono, spróbuj **Konfiguracja ręczna (lokalnie)**. Sprawdź wspólną podsieć / VLAN oraz obsługę multicast / mDNS w routerze.
@@ -141,11 +141,11 @@ Jeśli nic nie znaleziono, spróbuj **Konfiguracja ręczna (lokalnie)**. Sprawd�
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -162,7 +162,7 @@ Jeśli wykrywanie automatyczne zawiedzie, odczytaj **IP / nazwę hosta** ecoMain
 1. Wybierz **ecoMain → Konfiguracja ręczna (lokalnie)**.
 2. Wpisz **Numer seryjny urządzenia głównego** i **Adres (IP lub nazwa hosta)**, a potem potwierdź dane.
 3. W **Konfiguracja urządzenia → Wybierz urządzenia podrzędne do dodania** wybierz potrzebne ecoSub lub **ecoSolarMonitor**, albo kontynuuj bez urządzeń podrzędnych.
-4. W **Rodzaje pomiarów** wybierz odczyty **ecoSolarMonitor** (jeśli wybrany) i **ecoMain / ecoSub**, potem **Zapisz**.
+4. W **Rodzaje pomiarów** wybierz rodzaje pomiarów dla **ecoSolarMonitor** (jeśli wybrany) i **ecoMain / ecoSub**, potem **Zapisz**.
 5. Skonfiguruj potrzebne **Dodatkowe encje** i wybierz **Zakończ**.
 
 Home Assistant musi mieć dostęp do adresu przez sieć i zaporę. Modbus TCP używa portu **502**, którego nie trzeba wpisywać w interfejsie. Przy problemach sprawdź adres, kabel i uprawnienia sieciowe.
@@ -183,11 +183,11 @@ Home Assistant musi mieć dostęp do adresu przez sieć i zaporę. Modbus TCP u�
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -284,10 +284,10 @@ Otwórz **Ustawienia → Urządzenia i usługi → enecess → Konfiguruj**.
 - ecoPlug: zmień wybrane gniazdka.
 - Zmiana typu urządzenia, metody połączenia lub głównego ecoMain wymaga usunięcia wpisu i ponownego dodania.
 
-Aby dodać lub zmienić pomiary solarne w istniejącym wpisie lokalnym:
+Aby dodać lub zmienić rodzaje pomiarów ecoSolarMonitor w istniejącym wpisie lokalnym:
 
 1. W **Dostosuj ecoMain → Wybierz urządzenia podrzędne do dodania** wybierz **ecoSolarMonitor** i potrzebne ecoSub, potem **Rodzaje pomiarów**.
-2. Wybierz odczyty **ecoSolarMonitor** i **ecoMain / ecoSub**, a potem **Zapisz**.
+2. Wybierz rodzaje pomiarów dla **ecoSolarMonitor** i **ecoMain / ecoSub**, a potem **Zapisz**.
 3. W razie potrzeby otwórz **Konfiguracja kanałów** lub **Konfiguracja ecoSolarMonitor**. Po powrocie do menu wybierz **Zakończ**.
 
 > ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
@@ -298,15 +298,15 @@ Aby dodać lub zmienić pomiary solarne w istniejącym wpisie lokalnym:
 
 ### Rodzaje pomiarów
 
-Wybierz odczyty po dodaniu urządzeń. Późniejsza zmiana: **Konfiguruj → Dostosuj ecoMain → Następna akcja → Rodzaje pomiarów**.
+Wybierz rodzaje pomiarów po dodaniu urządzeń. Późniejsza zmiana: **Konfiguruj → Dostosuj ecoMain → Następna akcja → Rodzaje pomiarów**.
 
-- **ecoSolarMonitor** i **ecoMain / ecoSub** wybiera się osobno. Łącznie musi pozostać co najmniej jeden odczyt; można wybrać tylko pomiary solarne.
+- Rodzaje pomiarów dla **ecoSolarMonitor** i **ecoMain / ecoSub** wybiera się osobno. Łącznie musi pozostać co najmniej jeden rodzaj pomiaru; można wybrać tylko rodzaje pomiarów ecoSolarMonitor.
 - Wybierz **Zapisz**, a na końcu **Zakończ** w menu.
 - Przed odznaczeniem urządzeń lub pomiarów usuń zależne dodatkowe encje.
 
-Lokalne opcje ecoMain / ecoSub są poniżej, a odczyty solarne w [katalogu solarnym](#solar-entities).
+Lokalne rodzaje pomiarów ecoMain / ecoSub są wymienione poniżej. Rodzaje pomiarów ecoSolarMonitor znajdują się w sekcji [ecoSolarMonitor](#solar-entities).
 
-| Kategoria | Znaczenie | Wybór domyślny |
+| Rodzaj pomiaru | Znaczenie | Wybór domyślny |
 | --- | --- | --- |
 | Energia Czynna W Kierunku Zgodnym | Skumulowana energia czynna zgodnie ze strzałką CT (Wh) | Tak |
 | Energia Czynna W Kierunku Przeciwnym | Skumulowana energia czynna przeciwnie do strzałki CT (Wh) | Tak |
@@ -327,12 +327,12 @@ Tabele encji wskazują dostępne fazy, sumy i kanały. Chmura oferuje tylko **Mo
 
 Twórz czujniki z pomiarów, np. różnicę lub średnią dwóch wartości mocy.
 
-1. Włącz potrzebne odczyty w **Rodzaje pomiarów**, potem wybierz **Dodaj encję formuły**.
+1. Włącz potrzebne rodzaje pomiarów w **Rodzaje pomiarów**, potem wybierz **Dodaj encję formuły**.
 2. Podaj nazwę i wybierz **Typ wyniku / jednostka**.
 3. W **Wybierz encje źródłowe** wybierz co najmniej jedno źródło. Źródła są grupowane według pomiaru i można łączyć różne grupy.
 4. Wypełnij **Wyrażenie** zmiennymi `a`, `b` itd. pokazanymi na stronie i sprawdź jednostkę wyniku.
 
-Moc solarna jest w **Moc czynna (W)**, energia skumulowana i z wczoraj/dzisiaj w **Energia czynna (skumulowana, Wh)**. Promieniowanie, temperatura modułu, nachylenie i współczynnik wydajności mają osobne grupy. Opcje pokazują rzeczywiste nazwy i jednostki, np. `solar_today_actual_energy (Wh)`.
+Odczyty mocy ecoSolarMonitor znajdują się w **Moc czynna (W)**, energia skumulowana i z wczoraj/dzisiaj w **Energia czynna (skumulowana, Wh)**. Promieniowanie, temperatura modułu, nachylenie i współczynnik wydajności mają osobne grupy. Opcje pokazują rzeczywiste nazwy i jednostki, np. `solar_today_actual_energy (Wh)`.
 
 Przejście dalej ze strony źródeł usuwa poprzednie wyrażenie, także przy edycji: wpisz je ponownie. Dla wyniku bez jednostki wybierz **Liczba (bez jednostki)**.
 
@@ -344,7 +344,7 @@ Przejście dalej ze strony źródeł usuwa poprzednie wyrażenie, także przy ed
 
 ---
 
-> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual ecoSolarMonitor power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -436,7 +436,7 @@ ecoSub nie ma osobnych encji L1/L2/L3, sumy trzech faz ani częstotliwości. „
 
 Oprogramowanie **136–138** obsługuje pierwsze trzy pomiary; **od 139** wszystkie dwanaście. Domyślnie wybrane są tylko pierwsze trzy; pozostałe włącz w **Rodzaje pomiarów**. Niewybrane pomiary nie tworzą czujników.
 
-| Pomiar | Przyrostek / pełna nazwa HA | Jednostka | Fazy ecoMain | Suma ecoMain | Kanały | Wybór domyślny |
+| Rodzaj pomiaru | Przyrostek / pełna nazwa HA | Jednostka | Fazy ecoMain | Suma ecoMain | Kanały | Wybór domyślny |
 | --- | --- | --- | --- | --- | --- | --- |
 | Moc Czynna | `power_rt` | W | ✓ | ✓ | ✓ | Tak |
 | Energia Czynna W Kierunku Zgodnym | `energy_fwd_total` | Wh | ✓ | ✓ | ✓ | Tak |
@@ -463,9 +463,9 @@ Strzałka CT wyznacza kierunek zgodny. `energy_fwd_total` zlicza energię czynn�
 
 ### ecoSolarMonitor
 
-ecoSolarMonitor należy do bieżącego ecoMain i oferuje czternaście odczytów. Pierwsze pięć jest wybranych domyślnie; odczyty z wczoraj/dzisiaj i pozostałe włącz według potrzeb.
+ecoSolarMonitor należy do bieżącego ecoMain i oferuje czternaście rodzajów pomiarów. Pierwsze pięć jest wybranych domyślnie; rodzaje pomiarów z wczoraj/dzisiaj i pozostałe włącz według potrzeb.
 
-| Pomiar | Nazwa encji HA | Jednostka | Wybór domyślny |
+| Rodzaj pomiaru | Nazwa encji HA | Jednostka | Wybór domyślny |
 | --- | --- | --- | --- |
 | Natężenie Promieniowania | `solar_irradiance` | W/m² | Tak |
 | Kąt Nachylenia | `solar_tilt_angle` | ° | Tak |
@@ -490,7 +490,7 @@ Dzisiejsza energia zaczyna gromadzić się od nowa każdego dnia. Wczorajsza ene
 
 **Moc Czynna** i **Energia Czynna (Skumulowana I Przyrost Minutowy)** są wybrane domyślnie. Dotyczą sumy ecoMain i kanałów wybranych urządzeń, bez odczytów fazowych.
 
-| Opcja pomiaru | Znaczenie | Przyrostek nazwy HA | Jednostka |
+| Rodzaj pomiaru | Znaczenie | Przyrostek nazwy HA | Jednostka |
 | --- | --- | --- | --- |
 | Moc Czynna | Średnia moc czynna z jednej minuty | `power_avg_1m` | W |
 | Energia Czynna (Skumulowana I Przyrost Minutowy) | Minutowy przyrost energii czynnej | `energy_total_1m` | Wh |

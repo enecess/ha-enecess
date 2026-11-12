@@ -131,7 +131,7 @@ ecoMain 目前支持三种添加方式：
 1. 从 **添加集成 → enecess → ecoMain → 自动发现（本地）** 开始，或点击已发现 ecoMain 卡片上的**添加**。
 2. 按序列号和 IP / 主机名选择 ecoMain，并确认设备信息。
 3. 在**设备设置 → 选择要添加的从机**中选择需要的 ecoSub 或 **ecoSolarMonitor**；也可不选子设备。
-4. 在**测量类型**中，分别从 **ecoSolarMonitor**（已选择时显示）和 **ecoMain / ecoSub** 选择读数，再选择**保存**。
+4. 在**测量类型**中，分别从 **ecoSolarMonitor**（已选择时显示）和 **ecoMain / ecoSub** 选择测量类型，再选择**保存**。
 5. 按需配置**额外实体**，例如功率取反、绝对值、总和或平均值；最后选择**完成**。
 
 排错提示：
@@ -156,11 +156,11 @@ ecoMain 目前支持三种添加方式：
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -181,7 +181,7 @@ ecoMain 目前支持三种添加方式：
 1. 选择 **ecoMain → 手动设置（本地）**。
 2. 输入**主机序列号**和**地址（IP 或主机名）**，确认设备信息。
 3. 在**设备设置 → 选择要添加的从机**中选择需要的 ecoSub 或 **ecoSolarMonitor**；也可不选子设备。
-4. 在**测量类型**中选择 **ecoSolarMonitor**（已选择时显示）和 **ecoMain / ecoSub** 的读数，再选择**保存**。
+4. 在**测量类型**中选择 **ecoSolarMonitor**（已选择时显示）和 **ecoMain / ecoSub** 的测量类型，再选择**保存**。
 5. 按需配置**额外实体**，最后选择**完成**。
 
 排错提示：
@@ -206,11 +206,11 @@ ecoMain 目前支持三种添加方式：
 
 ---
 
-> ![ecoMain: Measurement Types with five default solar readings](docs/images/ecomain-solar-measurements.jpg)
+> ![ecoMain: Measurement Types with five ecoSolarMonitor measurement types selected by default](docs/images/ecomain-solar-measurements.jpg)
 
 ---
 
-> ![ecoMain: Measurement Types with nine optional solar readings and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
+> ![ecoMain: Measurement Types with nine optional ecoSolarMonitor measurement types and a separate meter group](docs/images/ecomain-solar-measurements-daily.jpg)
 
 ---
 
@@ -320,10 +320,10 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 - ecoPlug 可调整已选择的插座。
 - 设备类型、添加方式和 ecoMain 主设备不能直接更改；如需更换，请移除条目后重新添加。
 
-为已有本地条目添加或调整太阳能测量：
+为已有本地条目添加或调整 ecoSolarMonitor 测量类型：
 
 1. 在**调整 ecoMain → 选择要添加的从机**中选择 **ecoSolarMonitor** 及需要的 ecoSub，进入**测量类型**。
-2. 分别选择 **ecoSolarMonitor** 和 **ecoMain / ecoSub** 的读数，选择**保存**。
+2. 分别选择 **ecoSolarMonitor** 和 **ecoMain / ecoSub** 的测量类型，选择**保存**。
 3. 按需进入**通道配置**或 **ecoSolarMonitor 配置**；返回菜单后选择**完成**。
 
 > ![ecoMain: Adjust ecoMain with ecoSolarMonitor and Finish selected](docs/images/ecomain-solar-options.jpg)
@@ -334,15 +334,15 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 ### 测量类型
 
-添加设备后选择读数；后续可在**配置 → 调整 ecoMain → 下一步操作 → 测量类型**中修改。
+添加设备后选择测量类型；后续可在**配置 → 调整 ecoMain → 下一步操作 → 测量类型**中修改。
 
-- **ecoSolarMonitor** 和 **ecoMain / ecoSub** 分别选择，两组合计至少保留一项；支持只选择太阳能读数。
+- **ecoSolarMonitor** 和 **ecoMain / ecoSub** 的测量类型分别选择，两组合计至少保留一项；支持只选择 ecoSolarMonitor 的测量类型。
 - 选择**保存**后，最后在菜单选择**完成**。
 - 取消设备或测量前，请先移除依赖它们的额外实体。
 
-以下是 ecoMain / ecoSub 的本地测量选项；太阳能读数另见[太阳能实体清单](#solar-entities)。
+以下列出 ecoMain / ecoSub 的本地测量类型；ecoSolarMonitor 的测量类型见 [ecoSolarMonitor](#solar-entities)。
 
-| 类别     | 含义                    | 默认启用 |
+| 测量类型   | 含义                    | 默认选择 |
 | ------ | --------------------- | ---- |
 | 正向有功电能 | 沿 CT 箭头方向累计的有功电能（Wh）  | 是    |
 | 反向有功电能 | 逆 CT 箭头方向累计的有功电能（Wh）  | 是    |
@@ -357,18 +357,18 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 | 功率因数   | 有功功率与视在功率之比，无单位       | 否    |
 | 频率     | 电网频率（Hz），仅 ecoMain 提供 | 否    |
 
-各测量适用的相位、合计和通道见下文实体表。云端仅提供**有功功率**和**电能**，默认均选择；ecoPlug 使用固定的开关、功率和电能实体。
+各测量类型适用的相位、合计和通道见下文实体表。云端仅提供**有功功率**和**电能**，默认均选择；ecoPlug 使用固定的开关、功率和电能实体。
 
 ### 自定义公式实体
 
 用测量数据创建新传感器，例如两路功率的差值或平均值。
 
-1. 先在**测量类型**中启用需要的读数，再选择**添加公式实体**。
+1. 先在**测量类型**中启用需要的测量类型，再选择**添加公式实体**。
 2. 填写名称，选择**结果类型 / 单位**。
 3. 在**选择源实体**中选择至少一个来源。来源按测量类型分组，可跨组选择。
 4. 按页面显示的 `a`、`b` 等变量填写**表达式**，并检查计算结果的单位。
 
-太阳能功率位于**有功功率 (W)**，累计和昨日/今日电量位于**有功电能（累计量，Wh）**；辐照度、组件温度、倾角和性能比各有分组。选项会显示实际名称和单位，例如 `solar_today_actual_energy (Wh)`。
+ecoSolarMonitor 的功率读数位于**有功功率 (W)**，累计和昨日/今日电量位于**有功电能（累计量，Wh）**；辐照度、组件温度、倾角和性能比各有分组。选项会显示实际名称和单位，例如 `solar_today_actual_energy (Wh)`。
 
 从来源页继续会清空原表达式，编辑时也需重新填写。没有单位的结果可选择**数值（无单位）**。
 
@@ -380,7 +380,7 @@ ecoPlug 数据约每 **60 秒**更新。开关操作成功后会立即显示目�
 
 ---
 
-> ![ecoMain: Select Source Entities with estimated and actual solar power in W](docs/images/ecomain-solar-formula-sources.jpg)
+> ![ecoMain: Select Source Entities with estimated and actual ecoSolarMonitor power in W](docs/images/ecomain-solar-formula-sources.jpg)
 
 ---
 
@@ -473,9 +473,9 @@ ecoMain / ecoSub 的实体名称由下表的测点前缀和测量后缀组成：
 
 ### 本地模式（Modbus）完整测量清单
 
-固件 **136–138** 仅支持前三类；固件 **139 及以上**支持全部十二类。默认只选择前三类，其余需在**测量类型**中启用。这里的默认值指测量选项；未选择的测量不会创建传感器。
+固件 **136–138** 仅支持前三类；固件 **139 及以上**支持全部十二类。默认只选择前三类，其余需在**测量类型**中启用。这里的默认值指测量类型的选择状态；未选择的测量类型不会创建传感器。
 
-| 测量名称   | HA 名称后缀 / 完整名称                   | 单位 | 主机分相 | 主机合计 | 支路  | 默认选择    |
+| 测量类型   | HA 名称后缀 / 完整名称                   | 单位 | 主机分相 | 主机合计 | 支路  | 默认选择    |
 | ------ | --------------------------- | ---- | ---- | ---- | --- | ------- |
 | 有功功率   | `power_rt`                  | W    | ✓    | ✓    | ✓   | 是       |
 | 正向有功电能 | `energy_fwd_total`          | Wh   | ✓    | ✓    | ✓   | 是       |
@@ -502,9 +502,9 @@ CT 箭头标识正方向。`energy_fwd_total` 记录正向有功电能，`energy
 
 ### ecoSolarMonitor
 
-ecoSolarMonitor 属于当前 ecoMain，提供以下十四项读数。前五项默认选择，昨日/今日等其他读数可按需启用。
+ecoSolarMonitor 属于当前 ecoMain，提供以下十四种测量类型。前五种默认选择，昨日/今日等其他测量类型可按需启用。
 
-| 测量含义 | HA 实体名称 | 单位 | 默认选择 |
+| 测量类型 | HA 实体名称 | 单位 | 默认选择 |
 | --- | --- | --- | --- |
 | 辐照度 | `solar_irradiance` | W/m² | 是 |
 | 倾角 | `solar_tilt_angle` | ° | 是 |
@@ -529,7 +529,7 @@ ecoSolarMonitor 属于当前 ecoMain，提供以下十四项读数。前五项�
 
 云端的**有功功率**和**电能**默认均选择，适用于主机合计及所选设备的通道；不提供分相测量。
 
-| 测量选项 | 测量含义 | HA 名称后缀 | 单位 |
+| 测量类型 | 含义 | HA 名称后缀 | 单位 |
 | --- | --- | --- | --- |
 | 有功功率 | 1 分钟平均有功功率 | `power_avg_1m` | W |
 | 电能 | 1 分钟有功电能增量 | `energy_total_1m` | Wh |
