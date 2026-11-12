@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "通道配置",
-        "description": "配置 {device}。保存后立即写入设备并回读校验。返回或取消不会撤销已经保存到设备的更改。",
+        "description": "配置 {device}。保存立即生效；返回或取消不会撤销已保存的更改。",
         "data": {
           "flow_action": "操作"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "ecoSolarMonitor 配置",
-        "description": "配置当前 ecoMain：STC 下总最大功率以 W 为单位，须为整数；Pmax 温度系数单位为 %/°C，精度为 0.001。逆变器通道包括 ecoMain 和当前检测在线的 ecoSub，即使未选择在 HA 中创建其测量。未显示的设备保持原值。保存后立即写入并回读校验。",
+        "description": "- 选择连接逆变器的通道。\n- 未列出的设备保持原有设置。\n- 保存立即生效；返回或取消不会撤销已保存的更改。",
         "data": {
           "capacity": "STC 下总最大功率",
           "temperature_coefficient": "Pmax 温度系数",
@@ -495,8 +495,8 @@
           "flow_action": "操作"
         },
         "data_description": {
-          "capacity": "输入 0 至 4294967295 W 范围内的有限整数。",
-          "temperature_coefficient": "输入 -32.768 至 32.767 %/°C 范围内的有限数值，最多三位小数。"
+          "capacity": "输入光伏阵列在 STC 下的额定功率，须为整数。",
+          "temperature_coefficient": "使用组件数据表中的数值，最多三位小数。"
         }
       }
     },

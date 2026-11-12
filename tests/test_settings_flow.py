@@ -4,6 +4,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock
 
+import voluptuous as vol
+
 from flow_test_support import load_flow, submit_values
 from test_ecomain_settings import Transport
 
@@ -52,6 +54,7 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_channel_device_choices_and_ten_native_sections(self):
+        self.transport.values.update({2000: 2, 2043: 100})
         result = await self.open("channel_configuration")
         fields = {
             str(key): value for key, value in result["data_schema"].schema.items()
@@ -69,8 +72,21 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
             ],
         )
         for n in range(1, 11):
+            marker = next(
+                key for key in result["data_schema"].schema if str(key) == f"channel_{n}"
+            )
+            self.assertIsInstance(marker, vol.Required)
+            self.assertEqual(
+                marker.default(),
+                {"phase": "L3", "transformer": "100"}
+                if n == 1
+                else {"phase": "L1", "transformer": "30"},
+            )
             section = fields[f"channel_{n}"]
             self.assertTrue(section.options["collapsed"])
+            self.assertTrue(
+                all(isinstance(key, vol.Required) for key in section.schema.schema)
+            )
             controls = {str(key): value for key, value in section.schema.schema.items()}
             self.assertEqual(controls["phase"].config["options"], ["L1", "L2", "L3"])
             self.assertEqual(controls["transformer"].config["options"], ["30", "100"])
@@ -86,21 +102,80 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         self.transport.values.update({2000: 3, 2043: 0})
         result = await self.open("channel_configuration")
         result = await self.submit(result, channel_device="0")
-        values = submit_values(result, {})
-        self.assertNotIn("phase", values["channel_1"])
-        self.assertNotIn("transformer", values["channel_1"])
+        marker, section = next(
+            (key, value)
+            for key, value in result["data_schema"].schema.items()
+            if str(key) == "channel_1"
+        )
+        self.assertEqual(marker.default(), {})
+        self.assertTrue(
+            all(key.default is vol.UNDEFINED for key in section.schema.schema)
+        )
+        with self.assertRaises(vol.Invalid):
+            result["data_schema"]({})
         self.transport.commands.clear()
-        result = await self.submit(result)
+        result = await self.flow.async_step_channel_configuration(
+            {"flow_action": "save"}
+        )
         self.assertEqual(result["errors"], {"channel_1": "invalid_input"})
         self.assertEqual(self.transport.commands, [])
-        values.update(
-            channel_1={"phase": "L3", "transformer": "100"},
+        result = await self.submit(
+            result, channel_1={"phase": "L3", "transformer": "100"}
         )
-        result = await self.submit(result, **values)
         self.assertEqual(result["step_id"], "init")
         self.assertEqual(
             [self.transport.values[a] for a in (2000, 2043)], [2, 100]
         )
+
+    async def test_channel_blank_and_null_choices_are_rejected_before_io(self):
+        result = await self.open("channel_configuration")
+        result = await self.submit(result, channel_device="0")
+        for field in ("phase", "transformer"):
+            for value in ("", None):
+                with self.subTest(field=field, value=value):
+                    self.transport.commands.clear()
+                    result = await self.flow.async_step_channel_configuration(
+                        {
+                            "channel_1": {
+                                "phase": "L3", "transformer": "100", field: value
+                            },
+                            "flow_action": "save",
+                        }
+                    )
+                    self.assertEqual(result["errors"], {"channel_1": "invalid_input"})
+                    self.assertEqual(self.transport.commands, [])
+                    marker = next(
+                        key
+                        for key in result["data_schema"].schema
+                        if str(key) == "channel_1"
+                    )
+                    self.assertEqual(
+                        marker.default(),
+                        {"transformer": "100"}
+                        if field == "phase"
+                        else {"phase": "L3"},
+                    )
+                    with self.assertRaises(vol.Invalid):
+                        result["data_schema"]({})
+
+    async def test_raw_channel_navigation_bypasses_incomplete_draft_validation(self):
+        self.transport.values.update({2000: 3, 2043: 0})
+        result = await self.open("channel_configuration")
+        result = await self.submit(result, channel_device="0")
+        for action in ("back", "cancel"):
+            self.transport.commands.clear()
+            result = await self.flow.async_step_channel_configuration(
+                {
+                    "channel_1": {"phase": None, "transformer": ""},
+                    "flow_action": action,
+                }
+            )
+            self.assertEqual(self.transport.commands, [])
+            self.assertEqual(
+                result["step_id"], "channel_device" if action == "back" else "init"
+            )
+            if action == "back":
+                result = await self.submit(result, channel_device="0")
 
     async def test_channel_partial_retry_retains_targets_and_reports_visible_groups(
         self,
@@ -126,6 +201,12 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
             submit_values(result, {})["channel_1"],
             {"phase": "L2", "transformer": "100"},
         )
+        self.assertEqual(
+            next(
+                key for key in result["data_schema"].schema if str(key) == "channel_1"
+            ).default(),
+            {"phase": "L2", "transformer": "100"},
+        )
         self.transport.fail_writes.clear()
         self.transport.ignore_writes.clear()
         self.transport.commands.clear()
@@ -148,6 +229,12 @@ class SettingsFlowTests(unittest.IsolatedAsyncioTestCase):
         result = await self.submit(result, channel_device="0")
         self.assertEqual(
             submit_values(result, {})["channel_1"],
+            {"phase": "L3", "transformer": "100"},
+        )
+        self.assertEqual(
+            next(
+                key for key in result["data_schema"].schema if str(key) == "channel_1"
+            ).default(),
             {"phase": "L3", "transformer": "100"},
         )
         result = await self.submit(result, flow_action="back")

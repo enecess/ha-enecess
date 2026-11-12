@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "Configuration des canaux",
-        "description": "Configurez {device}. L’enregistrement met immédiatement à jour et vérifie les réglages de l’appareil. Retour et Annuler conservent les modifications déjà enregistrées sur le matériel.",
+        "description": "Configurez {device}. L’enregistrement prend effet immédiatement ; Retour ou Annuler n’annule pas les modifications enregistrées.",
         "data": {
           "flow_action": "Action"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "Configuration ecoSolarMonitor",
-        "description": "Configurez l’ecoMain actuel : Puissance maximale totale aux STC en W (entier) et Coefficient de température de Pmax en %/°C (pas de 0,001). Les canaux d’onduleur sont affichés pour ecoMain et les ecoSub détectés en ligne, même sans mesures HA. Les appareils masqués restent inchangés. L’enregistrement met immédiatement à jour et vérifie le matériel.",
+        "description": "- Sélectionnez les canaux raccordés aux onduleurs.\n- Les appareils non répertoriés conservent leurs réglages.\n- L’enregistrement prend effet immédiatement ; Retour ou Annuler n’annule pas les modifications enregistrées.",
         "data": {
           "capacity": "Puissance maximale totale aux STC",
           "temperature_coefficient": "Coefficient de température de Pmax",
@@ -495,8 +495,8 @@
           "flow_action": "Action"
         },
         "data_description": {
-          "capacity": "Saisissez un entier fini de 0 à 4294967295 W.",
-          "temperature_coefficient": "Saisissez une valeur finie de -32,768 à 32,767 %/°C avec trois décimales au maximum."
+          "capacity": "Saisissez la puissance nominale du champ photovoltaïque aux STC sous forme de nombre entier.",
+          "temperature_coefficient": "Utilisez la valeur de la fiche technique du module, avec trois décimales au maximum."
         }
       }
     },

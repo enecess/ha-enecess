@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "Kanalkonfiguration",
-        "description": "Konfigurieren Sie {device}. Beim Speichern werden die Geräteeinstellungen sofort aktualisiert und geprüft. Zurück oder Abbrechen macht bereits gespeicherte Hardwareänderungen nicht rückgängig.",
+        "description": "Konfigurieren Sie {device}. Speichern wirkt sofort; Zurück oder Abbrechen macht gespeicherte Änderungen nicht rückgängig.",
         "data": {
           "flow_action": "Aktion"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "ecoSolarMonitor-Konfiguration",
-        "description": "Konfigurieren Sie den aktuellen ecoMain: Gesamtmaximalleistung bei STC in W (Ganzzahl) und Temperaturkoeffizient von Pmax in %/°C (Schritt 0,001). Wechselrichterkanäle werden für ecoMain und erkannte, online verfügbare ecoSub angezeigt, auch ohne HA-Messwerte. Ausgeblendete Geräte bleiben unverändert. Speichern aktualisiert und prüft die Hardware sofort.",
+        "description": "- Wählen Sie die mit Wechselrichtern verbundenen Kanäle.\n- Nicht aufgeführte Geräte behalten ihre Einstellungen.\n- Speichern wirkt sofort; Zurück oder Abbrechen macht gespeicherte Änderungen nicht rückgängig.",
         "data": {
           "capacity": "Gesamtmaximalleistung bei STC",
           "temperature_coefficient": "Temperaturkoeffizient von Pmax",
@@ -495,8 +495,8 @@
           "flow_action": "Aktion"
         },
         "data_description": {
-          "capacity": "Geben Sie eine endliche Ganzzahl von 0 bis 4294967295 W ein.",
-          "temperature_coefficient": "Geben Sie einen endlichen Wert von -32,768 bis 32,767 %/°C mit höchstens drei Nachkommastellen ein."
+          "capacity": "Geben Sie die Nennleistung der PV-Anlage bei STC als ganze Zahl ein.",
+          "temperature_coefficient": "Verwenden Sie den Wert aus dem Moduldatenblatt mit bis zu drei Nachkommastellen."
         }
       }
     },

@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "Configurazione canali",
-        "description": "Configura {device}. Il salvataggio aggiorna e verifica subito le impostazioni del dispositivo. Indietro e Annulla mantengono le modifiche già salvate nell’hardware.",
+        "description": "Configura {device}. Il salvataggio ha effetto immediato; Indietro e Annulla non annullano le modifiche salvate.",
         "data": {
           "flow_action": "Azione"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "Configurazione ecoSolarMonitor",
-        "description": "Configura l’ecoMain corrente: Potenza massima totale in STC in W (intero) e Coefficiente di temperatura di Pmax in %/°C (passo 0,001). I canali inverter comprendono ecoMain e gli ecoSub rilevati online, anche senza misure HA. I dispositivi nascosti restano invariati. Il salvataggio aggiorna e verifica subito l’hardware.",
+        "description": "- Seleziona i canali collegati agli inverter.\n- I dispositivi non elencati mantengono le proprie impostazioni.\n- Il salvataggio ha effetto immediato; Indietro e Annulla non annullano le modifiche salvate.",
         "data": {
           "capacity": "Potenza massima totale in STC",
           "temperature_coefficient": "Coefficiente di temperatura di Pmax",
@@ -495,8 +495,8 @@
           "flow_action": "Azione"
         },
         "data_description": {
-          "capacity": "Inserisci un intero finito da 0 a 4294967295 W.",
-          "temperature_coefficient": "Inserisci un valore finito da -32,768 a 32,767 %/°C, con al massimo tre decimali."
+          "capacity": "Inserisci la potenza nominale del campo fotovoltaico in STC come numero intero.",
+          "temperature_coefficient": "Usa il valore della scheda tecnica del modulo, con un massimo di tre decimali."
         }
       }
     },

@@ -242,7 +242,9 @@ class FlowNavigationMixin:
             return super().async_show_form(**form)
         values = self._navigation_inputs.get(step, {})
         fields = self._navigation_fields(
-            form["data_schema"], values, root_required=step == "user"
+            form["data_schema"],
+            values,
+            preserve_required=step in {"user", "channel_configuration"},
         )
         if step == "user":
             return super().async_show_form(
@@ -280,8 +282,8 @@ class FlowNavigationMixin:
         )
         return super().async_show_form(**{**form, "data_schema": vol.Schema(fields)})
 
-    def _navigation_fields(self, schema, values, *, root_required=False):
-        """Make nested inputs optional for navigation while preserving draft values."""
+    def _navigation_fields(self, schema, values, *, preserve_required=False):
+        """Preserve valid defaults and each step's native required-field policy."""
         fields = {}
         for key, validator in schema.schema.items():
             name = str(key)
@@ -295,20 +297,24 @@ class FlowNavigationMixin:
                         self._navigation_fields(
                             validator.schema,
                             candidate if isinstance(candidate, dict) else {},
+                            preserve_required=preserve_required,
                         )
                     ),
                     validator.options,
                 )
-                default = {}
+                default = {
+                    str(key): key.default()
+                    for key in validator.schema.schema
+                    if key.default is not vol.UNDEFINED
+                }
             elif candidate is not vol.UNDEFINED:
                 try:
                     default = vol.Schema(validator)(candidate)
                 except vol.Invalid:
                     default = vol.UNDEFINED
-            # Required fields are checked on Continue, so empty forms can go Back.
             marker = (
                 vol.Required
-                if root_required and isinstance(key, vol.Required)
+                if preserve_required and isinstance(key, vol.Required)
                 else vol.Optional
             )
             fields[

@@ -6,6 +6,7 @@ import json
 from homeassistant.data_entry_flow import FlowResultType, section
 from homeassistant.helpers.data_entry_flow import FlowManagerResourceView
 from homeassistant.helpers.selector import NumberSelector, SelectSelectorMode
+import voluptuous as vol
 
 from custom_components.enecess.client_modbus import EnecessModbusClient
 from custom_components.enecess.config_flow import ConfigFlow
@@ -55,6 +56,7 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
     async def test_native_channel_sections_serialize_validate_and_keep_back_drafts(
         self,
     ):
+        self.transport.values.update({2000: 2, 2043: 100})
         result = await self.flow._show_options_menu()
         result = await self.submit(result, extra_action="channel_configuration")
         result = await self.submit(result, channel_device="0")
@@ -68,9 +70,16 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         channels = [item for item in serialized if item["name"].startswith("channel_")]
         self.assertEqual(len(channels), 10)
         for item in channels:
+            self.assertEqual(
+                item["default"],
+                {"phase": "L3", "transformer": "100"}
+                if item["name"] == "channel_1"
+                else {"phase": "L1", "transformer": "30"},
+            )
             self.assertEqual(item["type"], "expandable")
             self.assertFalse(item["expanded"])
-            self.assertTrue(all(not control["required"] for control in item["schema"]))
+            self.assertTrue(item["required"])
+            self.assertTrue(all(control["required"] for control in item["schema"]))
             self.assertEqual(
                 [control["name"] for control in item["schema"]],
                 ["phase", "transformer"],
@@ -81,13 +90,16 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
             )
         self.transport.commands.clear()
         result = await self.submit(
-            result, channel_1={"phase": "L3", "transformer": "100"}, flow_action="back"
+            result, channel_1={"phase": "L2", "transformer": "30"}, flow_action="back"
         )
         self.assertEqual(self.transport.commands, [])
         result = await self.submit(result, channel_device="0")
         self.assertEqual(
             result["data_schema"]({})["channel_1"],
-            {"phase": "L3", "transformer": "100"},
+            {"phase": "L2", "transformer": "30"},
+        )
+        self.assertEqual(
+            self.serialize(result)[0]["default"], {"phase": "L2", "transformer": "30"}
         )
         result = await self.submit(result, flow_action="back")
         result = await self.submit(result, channel_device="1")
@@ -98,6 +110,38 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         self.assertEqual(
             result["data_schema"]({})["channel_1"], {"phase": "L1", "transformer": "30"}
         )
+        self.assertEqual(
+            serialized[0]["default"], {"phase": "L1", "transformer": "30"}
+        )
+        self.transport.commands.clear()
+        result = await self.submit(result, flow_action="cancel")
+        self.assertEqual(result["step_id"], "init")
+        self.assertEqual(self.transport.commands, [])
+
+    async def test_blank_and_null_native_channel_choices_fail_without_io(self):
+        result = await self.flow._show_options_menu()
+        result = await self.submit(result, extra_action="channel_configuration")
+        result = await self.submit(result, channel_device="0")
+        for field in ("phase", "transformer"):
+            for value in ("", None):
+                with self.subTest(field=field, value=value):
+                    self.transport.commands.clear()
+                    values = {
+                        "channel_1": {
+                            "phase": "L3", "transformer": "100", field: value
+                        }
+                    }
+                    with self.assertRaises(vol.Invalid):
+                        result["data_schema"](values)
+                    result = await self.flow.async_step_channel_configuration(values)
+                    self.assertEqual(result["errors"], {"channel_1": "invalid_input"})
+                    self.assertEqual(self.transport.commands, [])
+                    self.assertEqual(
+                        self.serialize(result)[0]["default"],
+                        {"transformer": "100"}
+                        if field == "phase"
+                        else {"phase": "L3"},
+                    )
 
     async def test_real_numeric_selectors_convert_integral_capacity_and_validate_precision_before_io(
         self,
@@ -205,8 +249,11 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         result = await self.flow._show_options_menu()
         result = await self.submit(result, extra_action="channel_configuration")
         result = await self.submit(result, channel_device="0")
+        self.assertEqual(self.serialize(result)[0]["default"], {"phase": "L1"})
+        with self.assertRaises(vol.Invalid):
+            result["data_schema"]({})
         self.transport.commands.clear()
-        result = await self.submit(result)
+        result = await self.flow.async_step_channel_configuration({})
         self.assertEqual(result["errors"], {"channel_1": "invalid_input"})
         self.assertEqual(self.transport.commands, [])
         self.transport.ignore_writes.add(2043)
@@ -229,9 +276,16 @@ class SolarSettingsFlowTests(runtime_fixture.RealHARuntimeFixture):
         result = await self.submit(result, extra_action="channel_configuration")
         result = await self.submit(result, channel_device="0")
         for action in ("back", "cancel"):
-            self.assertEqual(result["data_schema"]({})["channel_1"], {})
+            channel = self.serialize(result)[0]
+            self.assertEqual(channel["default"], {})
+            self.assertTrue(all(control["required"] for control in channel["schema"]))
+            self.assertTrue(all("default" not in control for control in channel["schema"]))
+            with self.assertRaises(vol.Invalid):
+                result["data_schema"]({"channel_1": {}, "flow_action": action})
             self.transport.commands.clear()
-            result = await self.submit(result, channel_1={}, flow_action=action)
+            result = await self.flow.async_step_channel_configuration(
+                {"channel_1": {}, "flow_action": action}
+            )
             self.assertEqual(self.transport.commands, [])
             if action == "cancel":
                 self.assertEqual(result["step_id"], "init")

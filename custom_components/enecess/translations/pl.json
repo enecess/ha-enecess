@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "Konfiguracja kanałów",
-        "description": "Skonfiguruj {device}. Zapis natychmiast aktualizuje i weryfikuje ustawienia urządzenia. Wstecz i Anuluj zachowują zmiany już zapisane w sprzęcie.",
+        "description": "Skonfiguruj {device}. Zapis działa od razu; wybranie Wstecz lub Anuluj nie cofa zapisanych zmian.",
         "data": {
           "flow_action": "Działanie"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "Konfiguracja ecoSolarMonitor",
-        "description": "Skonfiguruj bieżący ecoMain: Łączna moc maksymalna w STC w W (liczba całkowita) i Współczynnik temperaturowy Pmax w %/°C (krok 0,001). Kanały falownika obejmują ecoMain i wykryte ecoSub dostępne online, również bez pomiarów HA. Ukryte urządzenia pozostają bez zmian. Zapis natychmiast aktualizuje i weryfikuje sprzęt.",
+        "description": "- Wybierz kanały podłączone do falowników.\n- Urządzenia spoza listy zachowują swoje ustawienia.\n- Zapis działa od razu; wybranie Wstecz lub Anuluj nie cofa zapisanych zmian.",
         "data": {
           "capacity": "Łączna moc maksymalna w STC",
           "temperature_coefficient": "Współczynnik temperaturowy Pmax",
@@ -495,8 +495,8 @@
           "flow_action": "Działanie"
         },
         "data_description": {
-          "capacity": "Wprowadź skończoną liczbę całkowitą od 0 do 4294967295 W.",
-          "temperature_coefficient": "Wprowadź skończoną wartość od -32,768 do 32,767 %/°C, z maksymalnie trzema miejscami po przecinku."
+          "capacity": "Wprowadź moc znamionową instalacji PV w warunkach STC jako liczbę całkowitą.",
+          "temperature_coefficient": "Użyj wartości z karty katalogowej modułu, z maksymalnie trzema miejscami po przecinku."
         }
       }
     },

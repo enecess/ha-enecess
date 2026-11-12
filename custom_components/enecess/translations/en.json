@@ -405,7 +405,7 @@
       },
       "channel_configuration": {
         "title": "Channel Configuration",
-        "description": "Configure {device}. Saving immediately updates and verifies the device settings. Changes already saved to hardware are retained when you go Back or Cancel.",
+        "description": "Configure {device}. Saving takes effect immediately; Back or Cancel does not undo saved changes.",
         "data": {
           "flow_action": "Action"
         },
@@ -484,7 +484,7 @@
       },
       "solar_configuration": {
         "title": "ecoSolarMonitor Configuration",
-        "description": "Configure the current ecoMain: Total Max Power at STC in W (integer) and Temperature Coefficient of Pmax in %/°C (step 0.001). Inverter channels are shown for ecoMain and currently detected online ecoSub devices, including devices without HA measurements. Hidden devices are unchanged. Saving immediately updates and verifies the hardware.",
+        "description": "- Select the channels connected to inverters.\n- Devices not listed keep their settings.\n- Saving takes effect immediately; Back or Cancel does not undo saved changes.",
         "data": {
           "capacity": "Total Max Power at STC",
           "temperature_coefficient": "Temperature Coefficient of Pmax",
@@ -495,8 +495,8 @@
           "flow_action": "Action"
         },
         "data_description": {
-          "capacity": "Enter a finite integer from 0 to 4294967295 W.",
-          "temperature_coefficient": "Enter a finite value from -32.768 to 32.767 %/°C, with at most three decimal places."
+          "capacity": "Enter the PV array's rated power at STC as a whole number.",
+          "temperature_coefficient": "Use the module datasheet value; up to three decimal places."
         }
       }
     },
