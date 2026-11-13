@@ -17,6 +17,7 @@ python3 -m venv /dev-tmp/ha-enecess-tests-venv
 The suite exercises production register decoding and configuration flows with in-memory Modbus responses and isolated Home Assistant framework doubles. All device identifiers in test fixtures are synthetic. Tests do not connect to devices, cloud accounts, or deployment servers.
 
 Coverage includes the firmware 136 baseline, firmware 139 channel-phase configuration and extended measurements, measurement selection and defaults, register addresses and signed values, read-block boundaries, phase writes and readback verification, partial failures and retries, default product-name migration, formula validation and evaluation, formula flow and sensor behavior, and translation consistency.
+Energy reads preserve complete values and force device-region boundaries at registers 352 and 704.
 
 Protocol 1.0.5 coverage includes the corrected reactive-energy addresses and
 optional apparent-energy selection and formulas. Options regressions preserve

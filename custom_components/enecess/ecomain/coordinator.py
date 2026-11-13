@@ -60,7 +60,12 @@ def build_read_blocks(specs: list[RegisterSpec]) -> list[tuple[int, int]]:
             raise ValueError(f"Unsupported register count: {width}")
         if blocks:
             start, count = blocks[-1]
-            if address == start + count and count + width <= 125:
+            # ecoMain rejects reads spanning energy-region boundaries at 352 and 704.
+            if (
+                address == start + count
+                and count + width <= 125
+                and address not in (352, 704)
+            ):
                 blocks[-1] = (start, count + width)
                 continue
         blocks.append((address, width))

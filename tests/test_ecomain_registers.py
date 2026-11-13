@@ -136,6 +136,24 @@ class RegisterTests(unittest.TestCase):
         self.assertEqual(descriptions["main_l1_power_factor_rt"].native_unit_of_measurement, None)
         self.assertEqual(descriptions["main_l1_apparent_power_rt"].device_class, "apparent_power")
 
+    def test_read_blocks_respect_energy_regions_and_merge_selected_neighbors(self):
+        for addresses, expected in (
+            ((348, 352), [(348, 4), (352, 4)]),
+            ((700, 704), [(700, 4), (704, 4)]),
+            ((344, 348), [(344, 8)]),
+            ((352, 356, 380, 384, 540, 544), [(352, 8), (380, 8), (540, 8)]),
+            ((696, 700), [(696, 8)]),
+            ((704, 708, 716, 720), [(704, 8), (716, 8)]),
+            ((348, 356), [(348, 4), (356, 4)]),
+        ):
+            with self.subTest(addresses=addresses):
+                specs = [
+                    self.model.RegisterSpec(key=f"fictional_{address}", kind="energy",
+                                            device_index=0, address=address, regs=4)
+                    for address in (*reversed(addresses), addresses[-1])
+                ]
+                self.assertEqual(self.coordinator.build_read_blocks(specs), expected)
+
 
 class PollingTests(unittest.IsolatedAsyncioTestCase):
     async def test_polling_only_selected_registers_decodes_unsigned_and_signed(self):
@@ -164,12 +182,52 @@ class PollingTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_read_blocks_do_not_split_uint64_or_cross_gaps(self):
         model, coordinator = load_runtime()
-        specs = model.build_specs_local([1, 2, 3], ["energy_forward", "energy_reverse", "reactive_energy_forward", "reactive_energy_reverse"])
+        specs = model.build_specs_local([1, 2, 3], ["energy_forward", "energy_reverse", "reactive_energy_forward", "reactive_energy_reverse", "apparent_energy"])
         blocks = coordinator.build_read_blocks(specs)
-        self.assertTrue(all(count <= 125 for _, count in blocks))
+        self.assertTrue(all(1 <= count <= 125 for _, count in blocks))
         self.assertTrue(all(any(start <= s.address and s.address + s.regs <= start + count for start, count in blocks) for s in specs))
         covered = {i for start, count in blocks for i in range(start, start + count)}
-        self.assertEqual(covered, set(range(704)))
+        self.assertEqual(covered, set(range(880)))
+        for boundary in (352, 704):
+            with self.subTest(boundary=boundary):
+                self.assertFalse(any(start < boundary < start + count for start, count in blocks))
+
+    async def test_all_energy_polling_stays_within_device_regions(self):
+        model, coordinator = load_runtime()
+        specs = model.build_specs_local([1, 2, 3], ["energy_forward", "energy_reverse", "reactive_energy_forward", "reactive_energy_reverse", "apparent_energy"])
+        wire_values = {
+            348: [0xE240, 0x0001, 0, 0],
+            352: [0xFBF1, 0x0009, 0, 0],
+            700: [0xD687, 0x0012, 0, 0],
+            704: [0xCBB1, 0x0074, 0, 0],
+        }
+        registers = {address + offset: value for address, words in wire_values.items()
+                     for offset, value in enumerate(words)}
+
+        class Client:
+            async def async_set_target(self, host, port):
+                pass
+
+            async def read_holding_registers(self, start, count):
+                if start == 3009:
+                    return SimpleNamespace(registers=[139])
+                if start == 3101:
+                    return SimpleNamespace(registers=[1, 1, 1])
+                if any(start < boundary < start + count for boundary in (352, 704)):
+                    raise OSError(f"Read crosses energy region: ({start}, {count})")
+                return SimpleNamespace(registers=[registers.get(i, 0) for i in range(start, start + count)])
+
+        poller = coordinator.EcoMainModbusCoordinator(None, SimpleNamespace(data={"ecomain_host": "offline"}), Client(), specs)
+        values = await poller._async_update_data()
+        self.assertEqual(set(values), {spec.key for spec in specs})
+        for key, expected in (
+            ("sub3_ch10_energy_rev_total", 123.456),
+            ("main_l1_reactive_energy_fwd_total", 654.321),
+            ("sub3_ch10_reactive_energy_rev_total", 1234.567),
+            ("main_l1_apparent_energy_total", 7654.321),
+        ):
+            with self.subTest(key=key):
+                self.assertAlmostEqual(values[key], expected)
 
     async def test_firmware_capabilities_filter_reads_and_restore_after_target_change(self):
         model, coordinator = load_runtime()
