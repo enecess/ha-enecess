@@ -82,7 +82,11 @@ class EcoSubOnlineTests(runtime_fixture.RealHARuntimeFixture):
         await coordinator.async_refresh()
         self.assertTrue(coordinator.last_update_success)
         self.assertEqual(client.calls, [(3101, 3), (1000, 28)])
-        self.assertTrue(all(key.startswith("main_") for key in coordinator.data))
+        self.assertEqual(
+            set(coordinator.data), {spec.key for spec in specs if spec.device_index == 0}
+        )
+        self.assertTrue(sensors["main_l1_power_rt"].available)
+        self.assertEqual(sensors["main_l1_power_rt"].native_value, 1000.0)
         self.assertFalse(sensors["sub3_ch1_power_rt"].available)
 
         client.online = [1, 1, 1]
