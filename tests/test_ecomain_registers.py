@@ -141,10 +141,11 @@ class RegisterTests(unittest.TestCase):
             ((348, 352), [(348, 4), (352, 4)]),
             ((700, 704), [(700, 4), (704, 4)]),
             ((344, 348), [(344, 8)]),
-            ((352, 356, 380, 384, 540, 544), [(352, 8), (380, 8), (540, 8)]),
+            ((352, 356, 380, 384, 540, 544), [(352, 36), (540, 8)]),
             ((696, 700), [(696, 8)]),
-            ((704, 708, 716, 720), [(704, 8), (716, 8)]),
+            ((704, 708, 716, 720), [(704, 20)]),
             ((348, 356), [(348, 4), (356, 4)]),
+            ((700, 708), [(700, 4), (708, 4)]),
         ):
             with self.subTest(addresses=addresses):
                 specs = [
@@ -154,31 +155,134 @@ class RegisterTests(unittest.TestCase):
                 ]
                 self.assertEqual(self.coordinator.build_read_blocks(specs), expected)
 
+    def test_read_blocks_keep_meter_regions_separate(self):
+        for pair in (
+            ((876, 4), (900, 2)),
+            ((986, 2), (1000, 2)),
+            ((1086, 2), (1100, 2)),
+            ((1186, 2), (1200, 1)),
+            ((1328, 1), (1400, 1)),
+        ):
+            with self.subTest(pair=pair):
+                specs = [
+                    self.model.RegisterSpec(
+                        key=f"fictional_{address}", kind="power", device_index=0,
+                        address=address, regs=width,
+                    )
+                    for address, width in pair
+                ]
+                self.assertEqual(self.coordinator.build_read_blocks(specs), list(pair))
+
+    def test_default_solar_read_blocks_keep_unselected_gaps(self):
+        self.assertEqual(
+            self.coordinator.build_read_blocks(self.model.build_specs_local([4], [])),
+            [(4000, 1), (4002, 1), (4004, 1), (4006, 4)],
+        )
+
+
+class MeterPollClient:
+    """Serve synthetic firmware, online status, and meter data while recording reads."""
+
+    def __init__(self, firmware=140, *, online=(0, 0, 0, 0), registers=None):
+        self.firmware = firmware
+        self.online = online
+        self.registers = registers or {}
+        self.calls = []
+
+    async def async_set_target(self, host, port):
+        pass
+
+    async def read_holding_registers(self, start, count):
+        self.calls.append((start, count))
+        if start == 3009:
+            return SimpleNamespace(registers=[self.firmware])
+        if start == 3101:
+            return SimpleNamespace(registers=list(self.online[:count]))
+        return SimpleNamespace(
+            registers=[self.registers.get(i, 0) for i in range(start, start + count)],
+        )
+
 
 class PollingTests(unittest.IsolatedAsyncioTestCase):
-    async def test_polling_only_selected_registers_decodes_unsigned_and_signed(self):
+    async def test_steady_meter_poll_request_counts(self):
+        model, coordinator = load_runtime()
+        slave_combinations = ((), (1,), (2,), (3,), (1, 2), (1, 3), (2, 3), (1, 2, 3))
+        entry = SimpleNamespace(data={"ecomain_host": "offline"})
+        for measurements, expected_counts in (
+            (None, [3, 4, 5, 5, 5, 5, 5, 5]),
+            (model.LOCAL_MEASUREMENTS, [10, 11, 14, 15, 14, 15, 15, 15]),
+        ):
+            plans = {}
+            for slaves in slave_combinations:
+                specs = model.build_specs_local(list(slaves), measurements)
+                client = MeterPollClient(online=tuple(int(i in slaves) for i in range(1, 5)))
+                poller = coordinator.EcoMainModbusCoordinator(None, entry, client, specs)
+                await poller._async_update_data()
+                client.calls.clear()
+                await poller._async_update_data()
+                plans[slaves] = client.calls
+            with self.subTest(measurements=measurements):
+                self.assertEqual([len(plans[slaves]) for slaves in slave_combinations], expected_counts)
+            if measurements is None:
+                with self.subTest(default_slaves=(2,)):
+                    self.assertEqual(
+                        plans[(2,)],
+                        [(3101, 4), (0, 72), (112, 120), (272, 40), (1000, 68)],
+                    )
+                with self.subTest(default_slaves=(1, 2, 3)):
+                    self.assertEqual(
+                        plans[(1, 2, 3)],
+                        [(3101, 4), (0, 124), (124, 124), (248, 104), (1000, 88)],
+                    )
+
+    async def test_polling_selected_measurements_decodes_unsigned_and_signed(self):
         model, coordinator = load_runtime()
         specs = model.build_specs_local([], ["voltage", "power_factor", "frequency"])
-        calls = []
-
-        class Client:
-            async def async_set_target(self, host, port):
-                pass
-
-            async def read_holding_registers(self, start, count):
-                if start == 3009:
-                    return SimpleNamespace(registers=[139])
-                calls.append((start, count))
-                values = {1200: 50000, 1202: 0xFFA6, 1400: 5000}
-                return SimpleNamespace(registers=[values.get(i, 0) for i in range(start, start + count)])
-
-        poller = coordinator.EcoMainModbusCoordinator(None, SimpleNamespace(data={"ecomain_host": "offline"}), Client(), specs)
+        client = MeterPollClient(139, registers={1200: 50000, 1202: 0xFFA6, 1400: 5000})
+        entry = SimpleNamespace(data={"ecomain_host": "offline"})
+        poller = coordinator.EcoMainModbusCoordinator(None, entry, client, specs)
         values = await poller._async_update_data()
         self.assertEqual(values["main_l1_voltage_rt"], 500)
         self.assertEqual(values["main_l1_power_factor_rt"], -.9)
         self.assertEqual(values["main_frequency_rt"], 50)
-        covered = {i for start, count in calls for i in range(start, start + count)}
-        self.assertEqual(covered, {s.address for s in specs})
+        self.assertEqual(set(values), {spec.key for spec in specs})
+        self.assertEqual(client.calls, [(3009, 1), (1200, 39), (1400, 1)])
+
+    async def test_partial_meter_selections_plan_only_needed_reads(self):
+        model, coordinator = load_runtime()
+        entry = SimpleNamespace(data={"ecomain_host": "offline"})
+        for slaves, measurements, online, expected in (
+            ([3], ["voltage"], (0, 0, 1, 0), [(3101, 4), (1200, 37), (1299, 28)]),
+            ([1, 2, 3], ["frequency"], (1, 1, 1, 0), [(1400, 1)]),
+            ([1, 2, 3], [], (1, 1, 1, 0), []),
+        ):
+            with self.subTest(slaves=slaves, measurements=measurements):
+                specs = model.build_specs_local(slaves, measurements)
+                client = MeterPollClient(online=online)
+                poller = coordinator.EcoMainModbusCoordinator(None, entry, client, specs)
+                await poller._async_update_data()
+                client.calls.clear()
+                values = await poller._async_update_data()
+                self.assertEqual(set(values), {spec.key for spec in specs})
+                self.assertEqual(client.calls, expected)
+
+    async def test_older_firmware_reads_default_meter_registers_for_selected_sub(self):
+        model, coordinator = load_runtime()
+        entry = SimpleNamespace(data={"ecomain_host": "offline"})
+        specs = model.build_specs_local([2], model.LOCAL_MEASUREMENTS)
+        default_keys = {spec.key for spec in model.build_specs_local([2])}
+        for firmware in (136, 138):
+            with self.subTest(firmware=firmware):
+                client = MeterPollClient(firmware, online=(0, 1, 0))
+                poller = coordinator.EcoMainModbusCoordinator(None, entry, client, specs)
+                await poller._async_update_data()
+                client.calls.clear()
+                values = await poller._async_update_data()
+                self.assertEqual(set(values), default_keys)
+                self.assertEqual(
+                    client.calls,
+                    [(3101, 3), (0, 72), (112, 120), (272, 40), (1000, 68)],
+                )
 
     async def test_read_blocks_do_not_split_uint64_or_cross_gaps(self):
         model, coordinator = load_runtime()

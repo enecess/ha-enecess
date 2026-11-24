@@ -45,9 +45,22 @@ from .model import RegisterSpec, available_local_measurements
 _LOGGER = logging.getLogger(__name__)
 
 
+_MAX_READ_REGISTERS = 125
+# Half-open windows where a read can include unselected meter registers.
+_METER_READ_WINDOWS = (
+    (0, 352),
+    (352, 704),
+    (704, 880),
+    (900, 988),
+    (1000, 1088),
+    (1100, 1188),
+    (1200, 1329),
+    (1400, 1401),
+)
+
+
 def build_read_blocks(specs: list[RegisterSpec]) -> list[tuple[int, int]]:
-    """Coalesce adjacent complete values without reading unselected registers."""
-    blocks: list[tuple[int, int]] = []
+    """Minimize requests, then registers, while reading each complete value."""
     intervals = sorted(
         {
             (spec.address, spec.regs)
@@ -55,20 +68,46 @@ def build_read_blocks(specs: list[RegisterSpec]) -> list[tuple[int, int]]:
             if spec.address is not None and spec.regs is not None
         }
     )
-    for address, width in intervals:
-        if width < 1 or width > 125:
+    costs = [(0, 0)] * (len(intervals) + 1)
+    next_indices = [0] * len(intervals)
+    for index in range(len(intervals) - 1, -1, -1):
+        start, width = intervals[index]
+        if not 1 <= width <= _MAX_READ_REGISTERS:
             raise ValueError(f"Unsupported register count: {width}")
-        if blocks:
-            start, count = blocks[-1]
-            # ecoMain rejects reads spanning energy-region boundaries at 352 and 704.
-            if (
-                address == start + count
-                and count + width <= 125
-                and address not in (352, 704)
-            ):
-                blocks[-1] = (start, count + width)
-                continue
-        blocks.append((address, width))
+        window_end = next(
+            (end for lower, end in _METER_READ_WINDOWS if lower <= start < end),
+            None,
+        )
+        limit = start + _MAX_READ_REGISTERS
+        if window_end is not None:
+            limit = min(limit, window_end)
+
+        end = start + width
+        next_index = index + 1
+        requests, registers = costs[next_index]
+        best_cost = (requests + 1, registers + width)
+        for last in range(index + 1, len(intervals)):
+            address, width = intervals[last]
+            # Outside the meter windows, including solar, values must be adjacent.
+            if address + width > limit or (window_end is None and address != end):
+                break
+            end = address + width
+            requests, registers = costs[last + 1]
+            cost = (requests + 1, registers + end - start)
+            # Candidates grow in order, so ties favor the longest first block.
+            if cost <= best_cost:
+                best_cost = cost
+                next_index = last + 1
+        costs[index] = best_cost
+        next_indices[index] = next_index
+
+    blocks = []
+    index = 0
+    while index < len(intervals):
+        start, _ = intervals[index]
+        index = next_indices[index]
+        address, width = intervals[index - 1]
+        blocks.append((start, address + width - start))
     return blocks
 
 

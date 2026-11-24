@@ -37,7 +37,7 @@ class RegisterClient:
             return SimpleNamespace(registers=self.online, isError=lambda: False)
         values = {}
         for start in range(1000, 1088, 2):
-            raw = start * 100
+            raw = 0 if start == 1068 else start * 100
             values[start] = raw & 0xFFFF
             values[start + 1] = raw >> 16
         return SimpleNamespace(
@@ -58,8 +58,9 @@ class EcoSubOnlineTests(runtime_fixture.RealHARuntimeFixture):
         self.addAsyncCleanup(coordinator.async_shutdown)
         return coordinator, client, specs
 
-    async def test_offline_sub_is_not_read_or_published_and_other_devices_continue(self):
-        coordinator, client, specs = self.make_coordinator()
+    async def test_sub_availability_and_recovery_across_combined_meter_read(self):
+        coordinator, client, specs = self.make_coordinator(slaves=(1, 3))
+        client.online = [0, 1, 1]
         descriptions = build_sensor_descriptions(specs)
         sensors = {
             desc.key: EcoMainSensor(coordinator, "local", runtime_fixture.SERIAL, desc)
@@ -67,22 +68,29 @@ class EcoSubOnlineTests(runtime_fixture.RealHARuntimeFixture):
         }
         await coordinator.async_refresh()
         self.assertTrue(coordinator.last_update_success)
-        self.assertNotIn("sub1_ch1_power_rt", coordinator.data)
+        self.assertFalse(any(key.startswith(("sub1_", "sub2_")) for key in coordinator.data))
         self.assertFalse(sensors["sub1_ch1_power_rt"].available)
         self.assertTrue(sensors["main_l1_power_rt"].available)
         self.assertTrue(sensors["sub3_ch1_power_rt"].available)
         self.assertEqual(coordinator.data["main_l1_power_rt"], 1000.0)
-        self.assertEqual(coordinator.data["sub3_ch1_power_rt"], 1068.0)
-        covered = {index for start, count in client.calls for index in range(start, start + count)}
-        self.assertTrue({3101, 3102, 3103}.issubset(covered))
-        self.assertTrue(set(range(1028, 1048)).isdisjoint(covered))
-        self.assertTrue(set(range(1048, 1068)).isdisjoint(covered))
+        self.assertEqual(sensors["sub3_ch1_power_rt"].native_value, 0)
+        self.assertEqual(client.calls, [(3009, 1), (3101, 3), (1000, 88)])
+
         identity = sensors["sub1_ch1_power_rt"].unique_id
-        client.online = [1, 0, 1]
+        client.online = [0, 1, 0]
+        client.calls.clear()
         await coordinator.async_refresh()
-        self.assertEqual(coordinator.data["sub1_ch1_power_rt"], 1028.0)
+        self.assertTrue(coordinator.last_update_success)
+        self.assertEqual(client.calls, [(3101, 3), (1000, 28)])
+        self.assertTrue(all(key.startswith("main_") for key in coordinator.data))
+        self.assertFalse(sensors["sub3_ch1_power_rt"].available)
+
+        client.online = [1, 1, 1]
+        await coordinator.async_refresh()
         self.assertTrue(sensors["sub1_ch1_power_rt"].available)
+        self.assertEqual(sensors["sub1_ch1_power_rt"].native_value, 1028.0)
         self.assertEqual(sensors["sub1_ch1_power_rt"].unique_id, identity)
+        self.assertFalse(any(key.startswith("sub2_") for key in coordinator.data))
         self.assertEqual(len(coordinator.specs), len(specs))
 
     async def test_cross_device_formula_unavailable_until_all_sources_online(self):
